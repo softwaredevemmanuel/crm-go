@@ -3,6 +3,7 @@ package main
 import (
 	"crm-go/controllers"
 	"crm-go/database"
+	"crm-go/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -30,6 +31,35 @@ func main() {
 
 	// Login route
 	r.POST("/login", controllers.Login)
+
+	// Protected routes
+	protected := r.Group("/api")
+	protected.Use(middleware.AuthMiddleware())
+
+	// Only logged-in users
+	protected.GET("/profile", func(c *gin.Context) {
+		userID, _ := c.Get("user_id")
+		role, _ := c.Get("role")
+
+		c.JSON(200, gin.H{
+			"message": "This is your profile",
+			"user_id": userID,
+			"role":    role,
+		})
+	})
+
+	// Role-based access
+	protected.GET("/admin", middleware.RoleMiddleware("admin"), func(c *gin.Context) {
+		c.JSON(200, gin.H{"message": "Welcome Admin!"})
+	})
+
+	protected.GET("/tutor", middleware.RoleMiddleware("tutor"), func(c *gin.Context) {
+		c.JSON(200, gin.H{"message": "Welcome Tutor!"})
+	})
+
+	protected.GET("/student", middleware.RoleMiddleware("student"), func(c *gin.Context) {
+		c.JSON(200, gin.H{"message": "Welcome Student!"})
+	})
 
 	r.Run(":8080")
 }
