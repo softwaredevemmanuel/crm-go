@@ -10,7 +10,8 @@ import (
 )
 
 type SignUpInput struct {
-	Name     string       `json:"name" binding:"required"`
+	FirstName     string       `json:"first_name" binding:"required"`
+	LastName     string       `json:"last_name" binding:"required"`
 	Email    string       `json:"email" binding:"required,email"`
 	Password string       `json:"password" binding:"required,min=6"`
 	Role     models.Role  `json:"role" binding:"required"`
@@ -27,7 +28,8 @@ func SignUp(c *gin.Context) {
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(input.Password), 14)
 
 	user := models.User{
-		Name:     input.Name,
+		FirstName:     input.FirstName,
+		LastName:     input.LastName,
 		Email:    input.Email,
 		Password: string(hashedPassword),
 		Role:     input.Role,

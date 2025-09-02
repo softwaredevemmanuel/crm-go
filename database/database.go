@@ -1,32 +1,41 @@
 package database
 
-
 import (
 	"fmt"
 	"log"
-	// "os"
 
+	"crm-go/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-
 	"crm-go/models"
 )
 
 var DB *gorm.DB
+var cfg = config.LoadConfig()
 
 
-func Connect() {
-	dsn := "host=localhost user=postgres password=root dbname=go_crm port=5432 sslmode=disable"
-	
+func ConnectDatabase() {
+	dsn := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%d sslmode=%s",
+		cfg.DBHost,
+		cfg.DBUser,
+		cfg.DBPassword,
+		cfg.DBName,
+		cfg.DBPort,
+		cfg.DBSSLMode,
+	)
+
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	
 	if err != nil {
-		log.Fatal("Failed to connect to database: ", err)
+		log.Fatalf("❌ Failed to connect to database: %v", err)
 	}
 
-	// Run migrations
-	db.AutoMigrate(&models.User{})
-
 	DB = db
-	fmt.Println("Database connected!")
+	log.Println("✅ Database connected successfully")
+	   
+	// Run migrations
+    db.AutoMigrate(&models.User{})
+    db.AutoMigrate(&models.PasswordReset{})
+	log.Println("✅ Database migrated successfully")
+
 }

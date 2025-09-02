@@ -6,14 +6,15 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtSecret = []byte("supersecretkey") // 🔥 change this to env variable in prod
+var jwtSecret = []byte(cfg.JWTSecret) // 🔥 change this to env variable in prod
 
 // Generate JWT token
-func GenerateJWT(userID string, role string) (string, error) {
+func GenerateJWT(userID string, email string, role string) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID,
+		"email": email,
 		"role":    role,
-		"exp":     time.Now().Add(time.Hour * 24).Unix(), // token expires in 24h
+		"exp":     time.Now().Add(time.Hour * time.Duration(cfg.JWTExpire)).Unix(), // token expires in 24h
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
