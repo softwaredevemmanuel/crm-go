@@ -7,6 +7,8 @@ import (
 	"crm-go/routes"
 
 	"github.com/gin-gonic/gin"
+	"flag"
+	"crm-go/database/seeds"
 )
 
 func main() {
@@ -59,8 +61,6 @@ func main() {
 	})
 
 	// Role-based access
-	
-
 
 	protected.GET("/tutor", middleware.RoleMiddleware("tutor"), func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "Welcome Tutor!"})
@@ -69,6 +69,16 @@ func main() {
 	protected.GET("/student", middleware.RoleMiddleware("student"), func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "Welcome Student!"})
 	})
+
+		// Add a flag to run seeder
+	seed := flag.Bool("seed", false, "Run database seeder")
+	flag.Parse()
+
+	if *seed {
+		seeds.SeedCourses()
+		seeds.SeedUsers()
+		return
+	}
 
 
 	r.Run(":8080")

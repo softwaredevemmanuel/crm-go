@@ -33,7 +33,7 @@ func ForgotPassword(c *gin.Context) {
 	// Create reset token
 	token := uuid.New().String()
 	reset := models.PasswordReset{
-		UserID:    user.ID,
+		UserID:    user.ID.String(),
 		Token:     token,
 		ExpiresAt: time.Now().Add(15 * time.Minute),
 	}

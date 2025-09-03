@@ -10,7 +10,6 @@ import (
 	"crm-go/models"
 )
 
-var DB *gorm.DB
 var cfg = config.LoadEnv()
 
 
