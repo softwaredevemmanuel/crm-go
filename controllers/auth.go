@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"crm-go/database"
+	"crm-go/config"
 	"crm-go/models"
 	"net/http"
 
@@ -35,7 +35,7 @@ func SignUp(c *gin.Context) {
 		Role:     input.Role,
 	}
 
-	result := database.DB.Create(&user)
+	result := config.DB.Create(&user)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": result.Error.Error()})
 		return

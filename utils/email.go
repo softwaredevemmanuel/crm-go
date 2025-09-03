@@ -6,7 +6,7 @@ import (
 	"crm-go/config"
 )
 
-var cfg = config.LoadConfig()
+var cfg = config.LoadEnv()
 
 func SendEmail(to string, subject string, body string) error {
 	m := gomail.NewMessage()

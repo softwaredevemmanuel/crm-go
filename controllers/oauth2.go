@@ -16,6 +16,18 @@ import (
 	"gorm.io/gorm"
 )
 
+func GoogleLoginHandler (c *gin.Context) {
+		role := c.Query("role")
+
+		if role == "" {
+			role = "student" // default if not provided
+		}
+
+		// Use the role as the state parameter
+		url := config.GoogleOauthConfig.AuthCodeURL(role)
+		c.Redirect(http.StatusFound, url) // 302
+	}
+
 func GoogleCallbackHandler(c *gin.Context) {
 	
 	// Get code from query

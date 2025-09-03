@@ -1,14 +1,15 @@
 package controllers
 
 import (
-	"crm-go/database"
+	"crm-go/config"
 	"crm-go/models"
 	"net/http"
 	"time"
 
+	"crm-go/utils"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"crm-go/utils"
 )
 
 type ForgotPasswordInput struct {
@@ -24,7 +25,7 @@ func ForgotPassword(c *gin.Context) {
 
 	// Check if user exists
 	var user models.User
-	if err := database.DB.Where("email = ?", input.Email).First(&user).Error; err != nil {
+	if err := config.DB.Where("email = ?", input.Email).First(&user).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"message": "If that email exists, a reset link has been sent"}) 
 		return // security: don't reveal whether email exists
 	}
@@ -36,7 +37,7 @@ func ForgotPassword(c *gin.Context) {
 		Token:     token,
 		ExpiresAt: time.Now().Add(15 * time.Minute),
 	}
-	database.DB.Create(&reset)
+	config.DB.Create(&reset)
 
 	// TODO: send email with link
 	resetLink := "http://localhost:8080/reset-password?token=" + token

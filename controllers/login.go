@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"crm-go/database"
+	"crm-go/config"
 	"crm-go/models"
 	"crm-go/utils"
 	"net/http"
@@ -24,7 +24,7 @@ func Login(c *gin.Context) {
 
 	// Find user by email
 	var user models.User
-	if err := database.DB.Where("email = ?", input.Email).First(&user).Error; err != nil {
+	if err := config.DB.Where("email = ?", input.Email).First(&user).Error; err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
 		return
 	}

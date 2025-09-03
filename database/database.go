@@ -11,10 +11,11 @@ import (
 )
 
 var DB *gorm.DB
-var cfg = config.LoadConfig()
+var cfg = config.LoadEnv()
 
 
-func ConnectDatabase() {
+func MigrateDatabase() {
+	// Connect to database
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%d sslmode=%s",
 		cfg.DBHost,
@@ -29,13 +30,12 @@ func ConnectDatabase() {
 	if err != nil {
 		log.Fatalf("❌ Failed to connect to database: %v", err)
 	}
-
-	DB = db
-	log.Println("✅ Database connected successfully")
 	   
-	// Run migrations
+	// Run migrations to database
     db.AutoMigrate(&models.User{})
     db.AutoMigrate(&models.PasswordReset{})
+	db.AutoMigrate(&models.Course{})
+
 	log.Println("✅ Database migrated successfully")
 
 }

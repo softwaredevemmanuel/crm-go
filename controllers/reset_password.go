@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"crm-go/database"
+	"crm-go/config"
 	"crm-go/models"
 	"net/http"
 	"time"
@@ -24,7 +24,7 @@ func ResetPassword(c *gin.Context) {
 	}
 
 	var reset models.PasswordReset
-	if err := database.DB.Where("token = ?", input.Token).First(&reset).Error; err != nil {
+	if err := config.DB.Where("token = ?", input.Token).First(&reset).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid token"})
 		return
 	}
@@ -37,15 +37,15 @@ func ResetPassword(c *gin.Context) {
 
 	// Get user
 	var user models.User
-	database.DB.First(&user, "id = ?", reset.UserID)
+	config.DB.First(&user, "id = ?", reset.UserID)
 
 	// Update password
 	hashed, _ := bcrypt.GenerateFromPassword([]byte(input.NewPassword), 14)
 	user.Password = string(hashed)
-	database.DB.Save(&user)
+	config.DB.Save(&user)
 
 	// Delete used token
-	database.DB.Delete(&reset)
+	config.DB.Delete(&reset)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Password has been reset successfully"})
 }
