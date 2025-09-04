@@ -11,7 +11,9 @@ type Course struct {
 	Description string    `gorm:"type:text" json:"description"`
 	Image       string    `gorm:"size:255" json:"image"`
 	VideoURL    string    `gorm:"size:255" json:"video_url"`
-	TutorID     uuid.UUID `gorm:"type:varchar(255)" json:"tutor_id"`
+	TutorID     uuid.UUID `gorm:"type:uuid;not null" json:"tutor_id"`
+	 // Relationships
+    Categories []CourseCategory `gorm:"constraint:OnDelete:CASCADE;" json:"-"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }

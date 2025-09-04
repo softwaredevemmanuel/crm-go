@@ -17,8 +17,8 @@ type Category struct {
 
 type CourseCategory struct {
     ID         uuid.UUID `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
-    CourseID   uuid.UUID `gorm:"type:uuid;not null"`
-    CategoryID uuid.UUID `gorm:"type:uuid;not null"`
+   	CourseID   uuid.UUID `gorm:"type:uuid;not null;constraint:OnDelete:CASCADE;" `
+	CategoryID uuid.UUID `gorm:"type:uuid;not null;constraint:OnDelete:CASCADE;" `
     CreatedAt  time.Time
     UpdatedAt  time.Time
 }
