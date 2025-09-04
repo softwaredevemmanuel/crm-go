@@ -53,6 +53,40 @@ func GetCourseByID(c *gin.Context) {
 	c.JSON(http.StatusOK, course)
 }
 
+func GetCourseWithCategoryMates(c *gin.Context) {
+	courseID := c.Param("id")
+	db := config.DB
+
+	// Get the course itself
+	var course models.Course
+	if err := db.First(&course, "id = ?", courseID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Course not found"})
+		return
+	}
+
+	// Find categories this course belongs to
+	var courseCategories []models.CourseCategory
+	db.Where("course_id = ?", courseID).Find(&courseCategories)
+
+	if len(courseCategories) == 0 {
+		c.JSON(http.StatusOK, gin.H{"course": course, "related_courses": []models.Course{}})
+		return
+	}
+
+	// Get related courses in the same categories
+	var relatedCourses []models.Course
+	db.Joins("JOIN course_categories ON courses.id = course_categories.course_id").
+		Where("course_categories.category_id IN (?) AND courses.id != ?", 
+			db.Select("category_id").Where("course_id = ?", courseID).Table("course_categories"), 
+			courseID).
+		Find(&relatedCourses)
+
+	c.JSON(http.StatusOK, gin.H{
+		"course":          course,
+		"related_courses": relatedCourses,
+	})
+}
+
 // UpdateCourse - Update a course
 func UpdateCourse(c *gin.Context) {
 	id := c.Param("id")

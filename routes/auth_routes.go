@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"crm-go/controllers"
+	"crm-go/controllers/authentication"
 	"github.com/gin-gonic/gin"
 )
 

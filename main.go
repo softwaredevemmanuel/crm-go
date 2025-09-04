@@ -42,6 +42,8 @@ func main() {
 	routes.RegisterAuthRoutes(r)
 	routes.RegisterCourseRoutes(r)
 	routes.AdminRoutes(r)
+	routes.CategoryRoutes(r)
+	routes.CourseCategoryRoutes(r)
 
 
 	// Protected routes
