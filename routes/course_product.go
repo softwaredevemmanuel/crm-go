@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"crm-go/controllers/category"
+	"crm-go/controllers/courses"
 	"crm-go/middleware"
 	"github.com/gin-gonic/gin"
 )

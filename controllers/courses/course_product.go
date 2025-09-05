@@ -99,7 +99,6 @@ func CreateCourseProduct(c *gin.Context) {
 }
 
 
-
 func GetCoursesByProduct(c *gin.Context) {
 	productID := c.Param("id")
 
