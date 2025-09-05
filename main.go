@@ -44,7 +44,9 @@ func main() {
 	routes.AdminRoutes(r)
 	routes.CategoryRoutes(r)
 	routes.CourseProductRoutes(r)
+	routes.CourseCategoryRoutes(r)
 	routes.ProductRoutes(r)
+
 
 
 	// Protected routes
