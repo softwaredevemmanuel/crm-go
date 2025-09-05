@@ -13,7 +13,7 @@ type Course struct {
 	VideoURL    string    `gorm:"size:255" json:"video_url"`
 	TutorID     uuid.UUID `gorm:"type:uuid;not null" json:"tutor_id"`
 	 // Relationships
-    Categories []CourseCategory `gorm:"constraint:OnDelete:CASCADE;" json:"-"`
+    Products []CourseProduct `gorm:"constraint:OnDelete:CASCADE;" json:"-"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }

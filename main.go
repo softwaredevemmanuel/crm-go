@@ -43,7 +43,8 @@ func main() {
 	routes.RegisterCourseRoutes(r)
 	routes.AdminRoutes(r)
 	routes.CategoryRoutes(r)
-	routes.CourseCategoryRoutes(r)
+	routes.CourseProductRoutes(r)
+	routes.ProductRoutes(r)
 
 
 	// Protected routes

@@ -3,7 +3,6 @@ package models
 import (
 	"time"
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 
 )
 
@@ -15,18 +14,4 @@ type Category struct {
 }
 
 
-type CourseCategory struct {
-    ID         uuid.UUID `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
-   	CourseID   uuid.UUID `gorm:"type:uuid;not null;constraint:OnDelete:CASCADE;" `
-	CategoryID uuid.UUID `gorm:"type:uuid;not null;constraint:OnDelete:CASCADE;" `
-    CreatedAt  time.Time
-    UpdatedAt  time.Time
-}
 
-// Add these methods to your CourseCategory model for proper JSON marshaling/unmarshaling
-func (c *CourseCategory) BeforeCreate(tx *gorm.DB) (err error) {
-    if c.ID == uuid.Nil {
-        c.ID = uuid.New()
-    }
-    return
-}

@@ -11,7 +11,7 @@ func RegisterCourseRoutes(r *gin.Engine) {
 	{
 		courses.GET("/", courseController.GetCourses)
 		courses.GET("/:id", courseController.GetCourseByID)
-		courses.GET("/:id/categories", courseController.GetCourseWithCategoryMates)
+		courses.GET("/:id/products", courseController.GetCourseWithProducts)
 
 		// Protected routes
 		protected := r.Group("/api")
