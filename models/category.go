@@ -15,7 +15,7 @@ type Category struct {
 }
 
 
-type CourseCategory struct {
+type CourseCategoryTable struct {
     ID         uuid.UUID `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
     CourseID   uuid.UUID `gorm:"type:uuid;not null;constraint:OnDelete:CASCADE;" `
     CategoryID uuid.UUID `gorm:"type:uuid;not null;constraint:OnDelete:CASCADE;" `
@@ -24,7 +24,7 @@ type CourseCategory struct {
 }
 
 // Add these methods to your CourseCategory model for proper JSON marshaling/unmarshaling
-func (c *CourseCategory) BeforeCreate(tx *gorm.DB) (err error) {
+func (c *CourseCategoryTable) BeforeCreate(tx *gorm.DB) (err error) {
     if c.ID == uuid.Nil {
         c.ID = uuid.New()
     }

@@ -67,7 +67,7 @@ func GetCourseWithCategoryMates(c *gin.Context) {
     }
 
     // Find categories this course belongs to
-    var courseCategories []models.CourseCategory
+    var courseCategories []models.CourseCategoryTable
     db.Where("course_id = ?", courseID).Find(&courseCategories)
 
     if len(courseCategories) == 0 {

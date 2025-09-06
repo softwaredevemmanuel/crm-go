@@ -70,7 +70,7 @@ func CreateCourseProduct(c *gin.Context) {
     }
 
     // ✅ Check if course-product relationship already exists
-    var existing models.CourseProduct
+    var existing models.CourseProductTable
     if err := db.Where("course_id = ? AND product_id = ?", courseUUID, productUUID).First(&existing).Error; err == nil {
         c.JSON(http.StatusConflict, gin.H{"error": "Course already exists in this product"})
         return
@@ -80,7 +80,7 @@ func CreateCourseProduct(c *gin.Context) {
     }
 
     // ✅ Create new course product relationship
-    courseProduct := models.CourseProduct{
+    courseProduct := models.CourseProductTable{
         CourseID:   courseUUID,
         ProductID: productUUID,
     }
@@ -130,7 +130,7 @@ func DeleteCourseProduct(c *gin.Context) {
 	}
 
 	db := config.GetDB()
-	var course_product models.CourseProduct
+	var course_product models.CourseProductTable
 
 	// Check if course product exists before deleting
 	if err := db.First(&course_product, "id = ?", uid).Error; err != nil {

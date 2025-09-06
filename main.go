@@ -82,6 +82,11 @@ func main() {
 	if *seed {
 		seeds.SeedCourses()
 		seeds.SeedUsers()
+		seeds.SeedCategories()
+		seeds.SeedCourseCategories()
+		seeds.SeedCourseProductsTable()
+		seeds.SeedProducts()
+		
 		return
 	}
 

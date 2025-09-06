@@ -138,7 +138,7 @@ func GetProductWithCourseMates(c *gin.Context) {
 	}
 
 	// Find course this product belongs to
-	var courseProducts []models.CourseProduct
+	var courseProducts []models.CourseProductTable
 	db.Where("product_id = ?", productID).Find(&courseProducts)
 
 	if len(courseProducts) == 0 {

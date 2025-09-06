@@ -14,8 +14,8 @@ type Course struct {
 	TutorID     uuid.UUID `gorm:"type:uuid;not null" json:"tutor_id"`
 
 	// Relationships
-    Products []CourseProduct `gorm:"constraint:OnDelete:CASCADE;" json:"-"`
-    Categories []CourseCategory `gorm:"constraint:OnDelete:CASCADE;" json:"-"`
+    Products []CourseProductTable `gorm:"constraint:OnDelete:CASCADE;" json:"-"`
+    Categories []CourseCategoryTable `gorm:"constraint:OnDelete:CASCADE;" json:"-"`
 
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`

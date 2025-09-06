@@ -70,7 +70,7 @@ func CreateCourseCategory(c *gin.Context) {
     }
 
     // ✅ Check if course-category relationship already exists
-    var existing models.CourseCategory
+    var existing models.CourseCategoryTable
     if err := db.Where("course_id = ? AND category_id = ?", courseUUID, categoryUUID).First(&existing).Error; err == nil {
         c.JSON(http.StatusConflict, gin.H{"error": "Course already exists in this category"})
         return
@@ -80,7 +80,7 @@ func CreateCourseCategory(c *gin.Context) {
     }
 
     // ✅ Create new course category relationship
-    courseCategory := models.CourseCategory{
+    courseCategory := models.CourseCategoryTable{
         CourseID:   courseUUID,
         CategoryID: categoryUUID,
     }
@@ -131,7 +131,7 @@ func DeleteCourseCategory(c *gin.Context) {
     }
 
     db := config.GetDB()
-    var course_category models.CourseCategory
+    var course_category models.CourseCategoryTable
 
     // Check if course category exists before deleting
     if err := db.First(&course_category, "id = ?", uid).Error; err != nil {
