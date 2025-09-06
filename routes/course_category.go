@@ -7,9 +7,9 @@ import (
 )
 
 func CourseCategoryRoutes(r *gin.Engine) {
-    course_categories := r.Group("/category-courses")
+    course_category_tables := r.Group("/category-courses")
     {
-        course_categories.GET("/:id/courses", controllers.GetCoursesByCategory)
+        course_category_tables.GET("/:id/courses", controllers.GetCoursesByCategory)
 
         // Protected routes
         protected := r.Group("/api")

@@ -97,7 +97,7 @@ if err11 != nil {
 
 
 
-	course_products := []models.CourseProductTable{
+	course_product_tables := []models.CourseProductTable{
 		{
 		ID: 	  courseProductID1,
 		CourseID: courseID1,
@@ -157,7 +157,7 @@ if err11 != nil {
 
 	
 
-	for _, course_product := range course_products {
+	for _, course_product := range course_product_tables {
 		if err := db.Create(&course_product).Error; err != nil {
 			log.Printf("❌ Failed to seed Course Product Table: %v", err)
 		} else {

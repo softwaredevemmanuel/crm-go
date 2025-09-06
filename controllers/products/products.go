@@ -148,9 +148,9 @@ func GetProductWithCourseMates(c *gin.Context) {
 
 	// Get related products in the same course
 	var relatedProducts []models.Product
-	db.Joins("JOIN course_products ON products.id = course_products.product_id").
-		Where("course_products.course_id IN (?) AND products.id != ?", 
-			db.Select("course_id").Where("product_id = ?", productID).Table("course_products"), 
+	db.Joins("JOIN course_product_tables ON products.id = course_product_tables.product_id").
+		Where("course_product_tables.course_id IN (?) AND products.id != ?", 
+			db.Select("course_id").Where("product_id = ?", productID).Table("course_product_tables"), 
 			productID).
 		Find(&relatedProducts)
 

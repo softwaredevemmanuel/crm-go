@@ -105,8 +105,8 @@ func GetCoursesByProduct(c *gin.Context) {
 	var courses []models.Course
 	db := config.DB
 
-	err := db.Joins("JOIN course_products ON courses.id = course_products.course_id").
-		Where("course_products.product_id = ?", productID).
+	err := db.Joins("JOIN course_product_tables ON courses.id = course_product_tables.course_id").
+		Where("course_product_tables.product_id = ?", productID).
 		Find(&courses).Error
 
 	if err != nil {

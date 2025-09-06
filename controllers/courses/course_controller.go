@@ -77,9 +77,9 @@ func GetCourseWithCategoryMates(c *gin.Context) {
 
     // Get related courses in the same categories
     var relatedCourses []models.Course
-    db.Joins("JOIN course_categories ON courses.id = course_categories.course_id").
-        Where("course_categories.category_id IN (?) AND courses.id != ?", 
-            db.Select("category_id").Where("course_id = ?", courseID).Table("course_categories"), 
+    db.Joins("JOIN course_category_tables ON courses.id = course_category_tables.course_id").
+        Where("course_category_tables.category_id IN (?) AND courses.id != ?", 
+            db.Select("category_id").Where("course_id = ?", courseID).Table("course_category_tables"), 
             courseID).
         Find(&relatedCourses)
 
@@ -110,9 +110,9 @@ func GetCourseWithProducts(c *gin.Context) {
 		return
 	}
 
-	// Get all products linked to this course (from the pivot table course_products)
+	// Get all products linked to this course (from the pivot table course_product_tables)
 	var relatedProducts []models.Product
-	err = db.Joins("JOIN course_products cp ON cp.product_id = products.id").
+	err = db.Joins("JOIN course_product_tables cp ON cp.product_id = products.id").
 		Where("cp.course_id = ?", uid).
 		Find(&relatedProducts).Error
 

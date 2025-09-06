@@ -106,8 +106,8 @@ func GetCoursesByCategory(c *gin.Context) {
     var courses []models.Course
     db := config.DB
 
-    err := db.Joins("JOIN course_categories ON courses.id = course_categories.course_id").
-        Where("course_categories.category_id = ?", categoryID).
+    err := db.Joins("JOIN course_category_tables ON courses.id = course_category_tables.course_id").
+        Where("course_category_tables.category_id = ?", categoryID).
         Find(&courses).Error
 
     if err != nil {

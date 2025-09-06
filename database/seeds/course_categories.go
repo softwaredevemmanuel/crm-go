@@ -97,7 +97,7 @@ if err11 != nil {
 
 
 
-	course_categories := []models.CourseCategoryTable{
+	course_category_tables := []models.CourseCategoryTable{
 			{
 		ID: 	  courseCategoryID1,
 		CourseID: courseID1,
@@ -155,7 +155,7 @@ if err11 != nil {
 
 	
 
-	for _, course_category := range course_categories {
+	for _, course_category := range course_category_tables {
 		if err := db.Create(&course_category).Error; err != nil {
 			log.Printf("❌ Failed to seed Course Category: %v", err)
 		} else {
