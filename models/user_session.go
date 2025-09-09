@@ -22,7 +22,7 @@ type UserSession struct {
 	ExpiresAt    time.Time      `gorm:"not null;index"`
 	LastUsedAt   time.Time      `gorm:"default:CURRENT_TIMESTAMP;index"`
 	CreatedAt    time.Time
-	UpdatedAt    time.Time
+    LoggedOutAt  *time.Time     `gorm:"index"`  // ✅ Changed to pointer
 
 	User         User           `gorm:"foreignKey:UserID"`
 }

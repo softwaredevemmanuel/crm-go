@@ -63,7 +63,6 @@ func Logout(c *gin.Context) {
 		Updates(map[string]interface{}{
 			"is_active":    false,
 			"logged_out_at": time.Now(),
-			"logout_reason": "user",
 		})
 
 	if result.Error != nil {
@@ -71,8 +70,17 @@ func Logout(c *gin.Context) {
 		return
 	}
 
-	// Clear cookie
-	c.SetCookie("session_token", "", -1, "/", "", false, true)
+	 if result.RowsAffected == 0 {
+        // Token was already invalid or doesn't exist
+        c.JSON(http.StatusOK, gin.H{
+            "message": "Session already invalidated",
+            "warning": "No active session found for this token",
+        })
+        return
+    }
+	   // Clear all auth cookies
+    c.SetCookie("session_token", "", -1, "/", "", false, true)
+    c.SetCookie("refresh_token", "", -1, "/", "", false, true)
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Logout successful",
