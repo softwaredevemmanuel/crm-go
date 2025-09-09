@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"time"
 )
 
 type SignUpInput struct {
@@ -42,4 +43,38 @@ func SignUp(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "User created successfully", "user": user})
+}
+
+// controllers/auth.go
+func Logout(c *gin.Context) {
+	token := c.GetHeader("Authorization")
+	if len(token) > 7 && token[:7] == "Bearer " {
+		token = token[7:]
+	}
+
+	if token == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No token provided"})
+		return
+	}
+
+	// Invalidate session
+	result := config.DB.Model(&models.UserSession{}).
+		Where("session_token = ? AND is_active = true", token).
+		Updates(map[string]interface{}{
+			"is_active":    false,
+			"logged_out_at": time.Now(),
+			"logout_reason": "user",
+		})
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to logout"})
+		return
+	}
+
+	// Clear cookie
+	c.SetCookie("session_token", "", -1, "/", "", false, true)
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Logout successful",
+	})
 }

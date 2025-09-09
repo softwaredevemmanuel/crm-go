@@ -29,6 +29,8 @@ func main() {
 	r.Use(gin.Recovery())
 
 	r.SetTrustedProxies(nil) // trust no proxies in dev
+	r.Use(middleware.SessionMiddleware()) // Add this line
+
 
 	
 	// Home route

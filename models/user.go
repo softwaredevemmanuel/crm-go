@@ -25,6 +25,7 @@ type User struct {
 	Role      Role      `gorm:"type:varchar(10);not null"`
 	CreatedAt time.Time `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updated_at"`
+	
 }
 
 type PasswordReset struct {
@@ -34,4 +35,8 @@ type PasswordReset struct {
 	ExpiresAt time.Time `gorm:"not null"`
 }
 
+
+func (User) TableName() string {
+	return "users"
+}
 
