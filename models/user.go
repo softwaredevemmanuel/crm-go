@@ -36,6 +36,8 @@ type PasswordReset struct {
 }
 
 
+
+
 func (User) TableName() string {
 	return "users"
 }

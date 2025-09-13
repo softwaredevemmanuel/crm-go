@@ -12,6 +12,8 @@ type Course struct {
 	Image       string    `gorm:"size:255" json:"image"`
 	VideoURL    string    `gorm:"size:255" json:"video_url"`
 	TutorID     uuid.UUID `gorm:"type:uuid;not null" json:"tutor_id"`
+	LearningOutcomes []string `gorm:"type:jsonb;default:'[]'" json:"learning_outcomes"`
+
 
 	// Relationships
     Products []CourseProductTable `gorm:"constraint:OnDelete:CASCADE;" json:"-"`

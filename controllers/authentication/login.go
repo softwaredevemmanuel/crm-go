@@ -13,43 +13,63 @@ import (
 
 var cfg = config.LoadEnv()
 
-type LoginInput struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required"`
-}
 
+
+// Login handles user login
+// @Summary User login
+// @Description Authenticate user and return JWT token with session information
+// @Tags Authentication
+// @Accept json
+// @Produce json
+// @Param login body models.LoginInput true "Login credentials"
+// @Success 200 {object} models.LoginResponse "Login successful"
+// @Failure 400 {object} models.ErrorResponse "Invalid input"
+// @Failure 401 {object} models.ErrorResponse "Invalid credentials"
+// @Failure 500 {object} models.ErrorResponse "Internal server error"
+// @Router /auth/login [post]
 func Login(c *gin.Context) {
-	var input LoginInput
+	var input models.LoginInput
 	
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Error:   "Invalid input",
+			Message: err.Error(),
+		})
 		return
 	}
 
 	// Find user by email
 	var user models.User
 	if err := config.DB.Where("email = ?", input.Email).First(&user).Error; err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
+		c.JSON(http.StatusUnauthorized, models.ErrorResponse{
+			Error:   "Invalid credentials",
+			Message: "Invalid email or password",
+		})
 		return
 	}
 
 	// Compare passwords
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password)); err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
+		c.JSON(http.StatusUnauthorized, models.ErrorResponse{
+			Error:   "Invalid credentials",
+			Message: "Invalid email or password",
+		})
 		return
 	}
 
 	// Generate JWT token
-	token, err := utils.GenerateJWT(user.ID.String(), string(user.Email), string(user.Role))
+	token, err := utils.GenerateJWT(user.ID.String(), user.Email, string(user.Role))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Error:   "Internal server error",
+			Message: "Failed to generate token",
+		})
 		return
 	}
 
-	
 	// Create user session
 	session := models.UserSession{
-		SessionToken: token, // Or generate a separate session token if preferred
+		SessionToken: token,
 		UserID:       user.ID,
 		UserAgent:    c.Request.UserAgent(),
 		UserIP:       c.ClientIP(),
@@ -59,36 +79,49 @@ func Login(c *gin.Context) {
 		IsActive:     true,
 		LoginType:    "password",
 		IssuedAt:     time.Now(),
-		ExpiresAt:    time.Now().Add(time.Duration(cfg.JWTExpire) * time.Hour), // Match your JWT expiration
+		ExpiresAt:    time.Now().Add(time.Duration(cfg.JWTExpire) * time.Hour),
 		LastUsedAt:   time.Now(),
 	}
 
 	// Save session to database
 	if err := config.DB.Create(&session).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create session"})
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Error:   "Internal server error",
+			Message: "Failed to create session",
+		})
 		return
 	}
 
-	// Set session cookie (optional)
+	// Set session cookie
 	c.SetCookie("session_token", token, 3600, "/", "", false, true)
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Login successful",
-		"token":   token,
-		"session_id": session.ID,
-		"user": gin.H{
-			"id":    user.ID,
-			"name":  user.FirstName + " " + user.LastName,
-			"email": user.Email,
-			"role":  user.Role,
+	// Return structured response
+	response := models.LoginResponse{
+		Message:    "Login successful",
+		Token:      token,
+		SessionID:  session.ID,
+		User: models.UserInfo{
+			ID:    user.ID,
+			Name:  user.FirstName + " " + user.LastName,
+			Email: user.Email,
+			Role:  string(user.Role),
 		},
-		"session": gin.H{
-			"expires_at": session.ExpiresAt,
-			"device":     session.DeviceType,
-			"browser":    session.Browser,
+		Session: models.SessionInfo{
+			ExpiresAt: session.ExpiresAt,
+			Device:    session.DeviceType,
+			Browser:   session.Browser,
+			IPAddress: session.UserIP,
 		},
-	})
+	}
+
+	c.JSON(http.StatusOK, response)
 }
+
+
+
+
+
+
 
 // Helper functions to parse user agent
 func getDeviceType(userAgent string) string {

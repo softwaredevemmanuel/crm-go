@@ -1,0 +1,179 @@
+basePath: /
+definitions:
+  controllers.SignUpInput:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      role:
+        $ref: '#/definitions/models.Role'
+    required:
+    - email
+    - first_name
+    - last_name
+    - password
+    - role
+    type: object
+  models.ErrorResponse:
+    description: Error response structure
+    properties:
+      error:
+        example: Invalid request
+        type: string
+      message:
+        example: Please check your input
+        type: string
+    type: object
+  models.LoginInput:
+    description: Login request payload
+    properties:
+      email:
+        example: user@example.com
+        type: string
+      password:
+        example: password123
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  models.LoginResponse:
+    description: Login response with token and session information
+    properties:
+      message:
+        example: Login successful
+        type: string
+      session:
+        $ref: '#/definitions/models.SessionInfo'
+      session_id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+      user:
+        $ref: '#/definitions/models.UserInfo'
+    type: object
+  models.Role:
+    enum:
+    - student
+    - tutor
+    - admin
+    type: string
+    x-enum-varnames:
+    - Student
+    - Tutor
+    - Admin
+  models.SessionInfo:
+    description: Session information
+    properties:
+      browser:
+        example: Chrome
+        type: string
+      device:
+        example: desktop
+        type: string
+      expires_at:
+        example: "2024-01-20T15:04:05Z"
+        type: string
+      ip_address:
+        example: 192.168.1.1
+        type: string
+    type: object
+  models.UserInfo:
+    description: User information
+    properties:
+      email:
+        example: user@example.com
+        type: string
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      name:
+        example: John Doe
+        type: string
+      role:
+        example: student
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@gocrm.com
+    name: API Support
+  description: This is a comprehensive CRM system for course management with authentication
+    and role-based access control.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  title: GO CRM API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and return JWT token with session information
+      parameters:
+      - description: Login credentials
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successful
+          schema:
+            $ref: '#/definitions/models.LoginResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: User login
+      tags:
+      - Authentication
+  /auth/signup:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account with first name, last name, email, password,
+        and role
+      parameters:
+      - description: User signup credentials
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.SignUpInput'
+      produces:
+      - application/json
+      responses: {}
+      summary: Register a new user
+      tags:
+      - Authentication
+schemes:
+- http
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

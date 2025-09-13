@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 	"time"
+	
 )
 
 type SignUpInput struct {
@@ -18,6 +19,14 @@ type SignUpInput struct {
 	Role     models.Role  `json:"role" binding:"required"`
 }
 
+// SignUp godoc
+// @Summary Register a new user
+// @Description Create a new user account with first name, last name, email, password, and role
+// @Tags Authentication
+// @Accept  json
+// @Produce  json
+// @Param   input body SignUpInput true "User signup credentials"
+// @Router /auth/signup [post]
 func SignUp(c *gin.Context) {
 	var input SignUpInput
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -44,6 +53,9 @@ func SignUp(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "User created successfully", "user": user})
 }
+
+
+
 
 // controllers/auth.go
 func Logout(c *gin.Context) {
