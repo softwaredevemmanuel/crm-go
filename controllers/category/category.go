@@ -9,7 +9,22 @@ import (
 	"github.com/google/uuid"
 )
 
-// CreateCategory - Admin creates a category
+
+
+// CreateCategory godoc
+// @Summary Create a new category
+// @Description Admin can create a new course category
+// @Tags Categories
+// @Accept  json
+// @Produce  json
+// @Security BearerAuth
+// @Success 201 {object} CategoryResponse
+// @Failure 400 {object} models.ErrorResponse "Invalid request payload"
+// @Failure 409 {object} models.ErrorResponse "Category with this name already exists"
+// @Failure 500 {object} models.ErrorResponse "Failed to create category"
+// @Failure 401 {object} models.ErrorResponse "Unauthorized"
+// @Param   category body models.CategoryInput true "Category data"
+// @Router /api/categories [post]
 func CreateCategory(c *gin.Context) {
 	var category models.Category
 
@@ -25,13 +40,21 @@ func CreateCategory(c *gin.Context) {
 	var existing models.Category
 	if err := db.Where("name = ?", category.Name).First(&existing).Error; err == nil {
 		// Found a duplicate
-		c.JSON(http.StatusConflict, gin.H{"error": "Category with this name already exists"})
+		c.JSON(http.StatusConflict, models.ErrorResponse{
+			Error:   "Duplicate Error",
+			Message: "Category with this name already exists",
+		})
 		return
 	}
 
 	// ✅ Create new category
 	if err := db.Create(&category).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create category"})
+		c.JSON(http.StatusInternalServerError, models.Category{
+			ID:   category.ID,
+			Name: category.Name,
+			CreatedAt: category.CreatedAt,
+			UpdatedAt: category.UpdatedAt,
+		})
 		return
 	}
 

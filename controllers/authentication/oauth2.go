@@ -16,18 +16,34 @@ import (
 	"gorm.io/gorm"
 )
 
-func GoogleLoginHandler (c *gin.Context) {
-		role := c.Query("role")
+// GoogleLoginHandler initiates Google OAuth2 login
+// @Summary Initiate Google OAuth2 login
+// @Description Redirects to Google OAuth2 consent screen with optional role parameter
+// @Tags Authentication
+// @Produce json
+// @Param role query string false "User role (student/tutor)" Enums(student, tutor) default(student)
+// @Success 302 {string} string "Redirect to Google OAuth2"
+// @Router /auth/google/login [get]
+func GoogleLoginHandler(c *gin.Context) {
+    role := c.Query("role")
+    if role == "" {
+        role = "student"
+    }
+    url := config.GoogleOauthConfig.AuthCodeURL(role)
+    c.Redirect(http.StatusFound, url)
+}
 
-		if role == "" {
-			role = "student" // default if not provided
-		}
-
-		// Use the role as the state parameter
-		url := config.GoogleOauthConfig.AuthCodeURL(role)
-		c.Redirect(http.StatusFound, url) // 302
-	}
-
+// GoogleCallbackHandler handles Google OAuth2 callback
+// @Summary Handle Google OAuth2 callback
+// @Description Processes Google OAuth2 callback, creates/updates user, and returns JWT token
+// @Tags Authentication
+// @Produce json
+// @Param code query string true "OAuth2 authorization code from Google"
+// @Param state query string true "State parameter containing user role"
+// @Success 200 {object} models.LoginResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /auth/google/callback [get]
 func GoogleCallbackHandler(c *gin.Context) {
 	
 	// Get code from query

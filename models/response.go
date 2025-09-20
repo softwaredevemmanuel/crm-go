@@ -47,3 +47,28 @@ type ErrorResponse struct {
 	Error   string `json:"error" example:"Invalid request"`
 	Message string `json:"message,omitempty" example:"Please check your input"`
 }
+
+// LogoutResponse represents successful logout response
+// @Description Logout successful response
+type LogoutResponse struct {
+	Message string `json:"message" example:"Logout successful"`
+	Status  string `json:"status" example:"logged_out"`
+	Details string `json:"details" example:"Session terminated and cookies cleared"`
+}
+
+// AlreadyLoggedOutResponse represents response when session was already invalidated
+// @Description Already logged out response
+type AlreadyLoggedOutResponse struct {
+	Message string `json:"message" example:"Session already invalidated"`
+	Warning string `json:"warning" example:"No active session found for this token"`
+	Status  string `json:"status" example:"already_logged_out"`
+}
+
+
+// CategoryResponse represents the JSON returned after creating a category
+type CategoryResponse struct {
+	ID        uuid.UUID `json:"id"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}

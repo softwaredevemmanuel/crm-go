@@ -14,6 +14,9 @@ type Category struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
+type CategoryInput struct {
+	Name    string `json:"name" binding:"required"`
+}
 
 type CourseCategoryTable struct {
     ID         uuid.UUID `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`

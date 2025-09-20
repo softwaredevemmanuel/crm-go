@@ -16,6 +16,16 @@ type ResetPasswordInput struct {
 	NewPassword string `json:"new_password" binding:"required,min=6"`
 }
 
+// ResetPassword handles password reset confirmation
+// @Summary Reset user password
+// @Description Confirms password reset using a valid token and sets new password
+// @Tags Authentication
+// @Accept json
+// @Produce json
+// @Param input body ResetPasswordInput true "Password reset data"
+// @Success 200 {object} object{message=string} "Password reset successful"
+// @Failure 400 {object} object{error=string} "Invalid token, token expired, or invalid input"
+// @Router /auth/reset-password [post]
 func ResetPassword(c *gin.Context) {
 	var input ResetPasswordInput
 	if err := c.ShouldBindJSON(&input); err != nil {

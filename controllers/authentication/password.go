@@ -12,10 +12,20 @@ import (
 	"github.com/google/uuid"
 )
 
-type ForgotPasswordInput struct {
-	Email string `json:"email" binding:"required,email"`
-}
 
+
+// ForgotPassword handles password reset requests
+// @Summary Request password reset
+// @Description Initiates a password reset process by sending a reset link to the provided email (if exists)
+// @Tags Authentication
+// @Accept json
+// @Produce json
+// @Param input body ForgotPasswordInput true "Email address for password reset"
+// @Success 200 {object} map[string]interface{} "Reset email sent (always returns success for security)"
+// @Success 200 {object} object{message=string,link=string} "Success response with reset link (for testing)"
+// @Failure 400 {object} map[string]string "Invalid input data"
+// @Failure 500 {object} map[string]string "Failed to send email"
+// @Router /auth/forgot-password [post]
 func ForgotPassword(c *gin.Context) {
 	var input ForgotPasswordInput
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -55,4 +65,8 @@ func ForgotPassword(c *gin.Context) {
 		"message": "If that email exists, a reset link has been sent",
 		"link":    resetLink, // just for testing; in prod, send via email
 	})
+}
+
+type ForgotPasswordInput struct {
+	Email string `json:"email" binding:"required,email"`
 }

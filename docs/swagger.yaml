@@ -1,5 +1,34 @@
 basePath: /
 definitions:
+  controllers.CategoryResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  controllers.ForgotPasswordInput:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  controllers.ResetPasswordInput:
+    properties:
+      new_password:
+        minLength: 6
+        type: string
+      token:
+        type: string
+    required:
+    - new_password
+    - token
+    type: object
   controllers.SignUpInput:
     properties:
       email:
@@ -19,6 +48,26 @@ definitions:
     - last_name
     - password
     - role
+    type: object
+  models.AlreadyLoggedOutResponse:
+    description: Already logged out response
+    properties:
+      message:
+        example: Session already invalidated
+        type: string
+      status:
+        example: already_logged_out
+        type: string
+      warning:
+        example: No active session found for this token
+        type: string
+    type: object
+  models.CategoryInput:
+    properties:
+      name:
+        type: string
+    required:
+    - name
     type: object
   models.ErrorResponse:
     description: Error response structure
@@ -59,6 +108,19 @@ definitions:
         type: string
       user:
         $ref: '#/definitions/models.UserInfo'
+    type: object
+  models.LogoutResponse:
+    description: Logout successful response
+    properties:
+      details:
+        example: Session terminated and cookies cleared
+        type: string
+      message:
+        example: Logout successful
+        type: string
+      status:
+        example: logged_out
+        type: string
     type: object
   models.Role:
     enum:
@@ -115,6 +177,137 @@ info:
   title: GO CRM API
   version: "1.0"
 paths:
+  /api/categories:
+    post:
+      consumes:
+      - application/json
+      description: Admin can create a new course category
+      parameters:
+      - description: Category data
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/models.CategoryInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/controllers.CategoryResponse'
+        "400":
+          description: Invalid request payload
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: Category with this name already exists
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Failed to create category
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new category
+      tags:
+      - Categories
+  /auth/forgot-password:
+    post:
+      consumes:
+      - application/json
+      description: Initiates a password reset process by sending a reset link to the
+        provided email (if exists)
+      parameters:
+      - description: Email address for password reset
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.ForgotPasswordInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success response with reset link (for testing)
+          schema:
+            properties:
+              link:
+                type: string
+              message:
+                type: string
+            type: object
+        "400":
+          description: Invalid input data
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to send email
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Request password reset
+      tags:
+      - Authentication
+  /auth/google/callback:
+    get:
+      description: Processes Google OAuth2 callback, creates/updates user, and returns
+        JWT token
+      parameters:
+      - description: OAuth2 authorization code from Google
+        in: query
+        name: code
+        required: true
+        type: string
+      - description: State parameter containing user role
+        in: query
+        name: state
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Handle Google OAuth2 callback
+      tags:
+      - Authentication
+  /auth/google/login:
+    get:
+      description: Redirects to Google OAuth2 consent screen with optional role parameter
+      parameters:
+      - default: student
+        description: User role (student/tutor)
+        enum:
+        - student
+        - tutor
+        in: query
+        name: role
+        type: string
+      produces:
+      - application/json
+      responses:
+        "302":
+          description: Redirect to Google OAuth2
+          schema:
+            type: string
+      summary: Initiate Google OAuth2 login
+      tags:
+      - Authentication
   /auth/login:
     post:
       consumes:
@@ -147,6 +340,61 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       summary: User login
+      tags:
+      - Authentication
+  /auth/logout:
+    post:
+      description: Invalidates the user's session and clears authentication cookies
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Session already invalidated
+          schema:
+            $ref: '#/definitions/models.AlreadyLoggedOutResponse'
+        "400":
+          description: No token provided
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Failed to logout
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: User logout
+      tags:
+      - Authentication
+  /auth/reset-password:
+    post:
+      consumes:
+      - application/json
+      description: Confirms password reset using a valid token and sets new password
+      parameters:
+      - description: Password reset data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.ResetPasswordInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Password reset successful
+          schema:
+            properties:
+              message:
+                type: string
+            type: object
+        "400":
+          description: Invalid token, token expired, or invalid input
+          schema:
+            properties:
+              error:
+                type: string
+            type: object
+      summary: Reset user password
       tags:
       - Authentication
   /auth/signup:
