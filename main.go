@@ -34,6 +34,7 @@ import (
 // @name Authorization
 // @description Type "Bearer" followed by a space and JWT token.
 
+
 func main() {
 	// Migrate to database	
 	database.MigrateDatabase()
@@ -52,7 +53,7 @@ func main() {
 	r.Use(middleware.SessionMiddleware())
 
 	// ✅ Swagger documentation route
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	//r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	
 	// Home route
 	// @Summary Welcome endpoint
@@ -140,6 +141,19 @@ func main() {
 		seeds.SeedProducts()
 		return
 	}
+	
+	SetupSwagger(r)
+
 
 	r.Run(":8080")
+}
+
+
+func SetupSwagger(r *gin.Engine) {
+	url := "http://localhost:8080/swagger/doc.json" // your swagger.json
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler,
+		ginSwagger.URL(url),
+		ginSwagger.DefaultModelsExpandDepth(-1),
+		ginSwagger.PersistAuthorization(true), // 👈 keeps token after refresh
+	))
 }
