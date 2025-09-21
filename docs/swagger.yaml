@@ -1,16 +1,5 @@
 basePath: /
 definitions:
-  controllers.CategoryResponse:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      updated_at:
-        type: string
-    type: object
   controllers.ForgotPasswordInput:
     properties:
       email:
@@ -62,8 +51,23 @@ definitions:
         example: No active session found for this token
         type: string
     type: object
+  models.Category:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
   models.CategoryInput:
     properties:
+      description:
+        type: string
       name:
         type: string
     required:
@@ -195,9 +199,13 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/controllers.CategoryResponse'
+            $ref: '#/definitions/models.Category'
         "400":
           description: Invalid request payload
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/models.ErrorResponse'
         "409":
@@ -211,6 +219,93 @@ paths:
       security:
       - BearerAuth: []
       summary: Create a new category
+      tags:
+      - Categories
+  /api/categories/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an existing category by ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Category deleted successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid category ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Category not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to delete category
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a category
+      tags:
+      - Categories
+    put:
+      consumes:
+      - application/json
+      description: Update an existing category by ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated Category Data
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/models.CategoryInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Category'
+        "400":
+          description: Invalid category ID or bad request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Category not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Category with this name already exists
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a category
       tags:
       - Categories
   /auth/forgot-password:
@@ -416,6 +511,27 @@ paths:
       summary: Register a new user
       tags:
       - Authentication
+  /categories:
+    get:
+      description: Retrieve a list of all available categories
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Category'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all categories
+      tags:
+      - Categories
 schemes:
 - http
 securityDefinitions:

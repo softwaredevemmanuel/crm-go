@@ -37,22 +37,29 @@ func SeedCategories() {
 		{
 		ID: 	  categoryID1,
 		Name:     "Coding",
+		Description:"Master the art of writing clean, efficient code to build powerful software applications and solve complex problems.",
 		},
 		{
 		ID: 	  categoryID2,
 		Name:     "Design",
+		Description:"Learn the principles of visual communication to create compelling and effective user experiences across digital and physical products",
 		},
 		{
 		ID: 	  categoryID3,
 		Name:     "Backend Development",
+		Description:"Master server-side programming, APIs, and databases to build the powerful, unseen logic that drives modern web applications and services.",
+
 		},
 		{
 		ID: 	  categoryID4,
 		Name:     "Frontend Development",
+		Description:"Craft engaging user interfaces with HTML, CSS, and JavaScript to create fast, accessible, and visually stunning websites and applications.",
 		},
 		{
 		ID: 	  categoryID5,
 		Name:     "Programming",
+		Description:"Learn the fundamentals of writing code to create software, solve complex problems, and automate tasks across various technologies.",
+
 		},	
 		
 	}

@@ -10,12 +10,15 @@ import (
 type Category struct {
 	ID          uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
 	Name       string    `gorm:"size:255;not null" json:"name"`
+	Description       string    `gorm:"size:255; default:No Description" json:"description"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 type CategoryInput struct {
 	Name    string `json:"name" binding:"required"`
+    Description       string    `gorm:"size:255;not null" json:"description"`
+
 }
 
 type CourseCategoryTable struct {

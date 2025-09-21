@@ -11,14 +11,14 @@ import (
 
 
 
-// CreateCategory godoc
+// Create A Category
 // @Summary Create a new category
 // @Description Admin can create a new course category
 // @Tags Categories
 // @Accept  json
 // @Produce  json
 // @Security BearerAuth
-// @Success 201 {object} CategoryResponse
+// @Success 201 {object} models.Category
 // @Failure 400 {object} models.ErrorResponse "Invalid request payload"
 // @Failure 409 {object} models.ErrorResponse "Category with this name already exists"
 // @Failure 500 {object} models.ErrorResponse "Failed to create category"
@@ -52,6 +52,7 @@ func CreateCategory(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, models.Category{
 			ID:   category.ID,
 			Name: category.Name,
+			Description: category.Description,
 			CreatedAt: category.CreatedAt,
 			UpdatedAt: category.UpdatedAt,
 		})
@@ -62,7 +63,14 @@ func CreateCategory(c *gin.Context) {
 }
 
 
-// GetCategories - List all categories
+// Get All Categories 
+// @Summary Get all categories
+// @Description Retrieve a list of all available categories
+// @Tags Categories
+// @Produce  json
+// @Success 200 {array} models.Category
+// @Failure 500 {object} map[string]string "Internal Server Error"
+// @Router /categories [get]
 func GetCategories(c *gin.Context) {
 	var categories []models.Category
 	db := config.DB
@@ -70,26 +78,20 @@ func GetCategories(c *gin.Context) {
 	c.JSON(http.StatusOK, categories)
 }
 
-// GetCourse - Get one course by ID
-func GetCourseByID(c *gin.Context) {
-	id := c.Param("id")
-
-	uid, err := uuid.Parse(id)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid course ID"})
-		return
-	}
-
-	db := config.GetDB()
-	var course models.Course
-	if err := db.First(&course, "id = ?", uid).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Course not found"})
-		return
-	}
-
-	c.JSON(http.StatusOK, course)
-}
-
+// UpdateCategory godoc
+// @Summary Update a category
+// @Description Update an existing category by ID
+// @Tags Categories
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Category ID"
+// @Param category body models.CategoryInput true "Updated Category Data"
+// @Success 200 {object} models.Category
+// @Failure 400 {object} map[string]string "Invalid category ID or bad request body"
+// @Failure 404 {object} map[string]string "Category not found"
+// @Failure 409 {object} models.ErrorResponse "Category with this name already exists"
+// @Router /api/categories/{id} [put]
 // UpdateCategory - Update a category
 func UpdateCategory(c *gin.Context) {
 	id := c.Param("id")
@@ -102,21 +104,58 @@ func UpdateCategory(c *gin.Context) {
 
 	db := config.GetDB()
 	var category models.Category
+
+	// Check if category exists
 	if err := db.First(&category, "id = ?", uid).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Category not found"})
 		return
 	}
 
-	if err := c.ShouldBindJSON(&category); err != nil {
+	// Bind new data
+	var input models.Category
+	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	db.Save(&category)
+	// ✅ Check for duplicate name (excluding current category)
+	var existing models.Category
+	if err := db.Where("name = ? AND id <> ?", input.Name, uid).First(&existing).Error; err == nil {
+		c.JSON(http.StatusConflict, models.ErrorResponse{
+			Error:   "Duplicate Error",
+			Message: "Category with this name already exists",
+		})
+		return
+	}
+
+	// Update fields
+	category.Name = input.Name
+	category.Description = input.Description
+
+	// Save
+	if err := db.Save(&category).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update category"})
+		return
+	}
+
 	c.JSON(http.StatusOK, category)
 }
 
-// DeleteCategory - Delete a category
+
+
+// DeleteCategory godoc
+// @Summary Delete a category
+// @Description Delete an existing category by ID
+// @Tags Categories
+// @Accept json
+// @Produce json
+// @Param id path string true "Category ID"
+// @Security BearerAuth
+// @Success 200 {object} map[string]string "Category deleted successfully"
+// @Failure 400 {object} map[string]string "Invalid category ID"
+// @Failure 404 {object} map[string]string "Category not found"
+// @Failure 500 {object} map[string]string "Failed to delete category"
+// @Router /api/categories/{id} [delete]
 func DeleteCategory(c *gin.Context) {
 	id := c.Param("id")
 
@@ -144,4 +183,5 @@ func DeleteCategory(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Category deleted successfully"})
 }
+
 
