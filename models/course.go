@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 	"github.com/google/uuid"
+	"gorm.io/datatypes"
 )
 
 type Course struct {
@@ -12,8 +13,8 @@ type Course struct {
 	Image       string    `gorm:"size:255" json:"image"`
 	VideoURL    string    `gorm:"size:255" json:"video_url"`
 	TutorID     uuid.UUID `gorm:"type:uuid;not null" json:"tutor_id"`
-	LearningOutcomes []string `gorm:"type:jsonb;default:'[]'" json:"learning_outcomes"`
-
+	LearningOutcomes datatypes.JSON `gorm:"type:jsonb;default:'[]'" json:"learning_outcomes"`
+	Requirements datatypes.JSON `gorm:"type:jsonb;default:'[]'" json:"requirements"`
 
 	// Relationships
     Products []CourseProductTable `gorm:"constraint:OnDelete:CASCADE;" json:"-"`
@@ -22,3 +23,4 @@ type Course struct {
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
+

@@ -15,7 +15,20 @@ import (
 
 
 
-// CreateCourseCategory - Admin creates a course category relationship
+// CreateCourseCategory godoc
+// @Summary Create a Course-Category relationship
+// @Description Admin creates a relationship between a course and a category
+// @Tags CourseCategories
+// @Accept json
+// @Produce json
+// @Param request body models.CreateCourseCategoryRequest true "Course-Category Payload"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 409 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /api/category-courses [post]
+// @Security BearerAuth
 func CreateCourseCategory(c *gin.Context) {
     var request struct {
         CourseID   string `json:"course_id" binding:"required,uuid4"`
@@ -50,6 +63,8 @@ func CreateCourseCategory(c *gin.Context) {
     // ✅ Check if course exists
     var course models.Course
     if err := db.Where("id = ?", courseUUID).First(&course).Error; err != nil {
+        log.Printf("✅ value of error: %v", err)
+
         if errors.Is(err, gorm.ErrRecordNotFound) {
             c.JSON(http.StatusBadRequest, gin.H{"error": "Course ID does not exist"})
         } else {

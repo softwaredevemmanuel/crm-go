@@ -73,6 +73,16 @@ definitions:
     required:
     - name
     type: object
+  models.CreateCourseCategoryRequest:
+    properties:
+      category_id:
+        type: string
+      course_id:
+        type: string
+    required:
+    - category_id
+    - course_id
+    type: object
   models.ErrorResponse:
     description: Error response structure
     properties:
@@ -308,6 +318,55 @@ paths:
       summary: Update a category
       tags:
       - Categories
+  /api/category-courses:
+    post:
+      consumes:
+      - application/json
+      description: Admin creates a relationship between a course and a category
+      parameters:
+      - description: Course-Category Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateCourseCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a Course-Category relationship
+      tags:
+      - CourseCategories
   /auth/forgot-password:
     post:
       consumes:

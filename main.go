@@ -3,13 +3,13 @@ package main
 import (
 	"crm-go/config"
 	"crm-go/database"
+	"crm-go/database/seeds"
 	"crm-go/middleware"
 	"crm-go/routes"
 	"flag"
-	"crm-go/database/seeds"
 
-	"github.com/gin-gonic/gin"
 	_ "crm-go/docs" // ✅ Import generated docs package
+	"github.com/gin-gonic/gin"
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -34,9 +34,8 @@ import (
 // @name Authorization
 // @description Type "Bearer" followed by a space and JWT token.
 
-
 func main() {
-	// Migrate to database	
+	// Migrate to database
 	database.MigrateDatabase()
 
 	// Initialize DB connection
@@ -44,7 +43,7 @@ func main() {
 
 	// Init Google OAuth
 	config.InitGoogleOauthConfig()
-	
+
 	// Initialize Gin router
 	r := gin.New()
 	r.Use(gin.Logger())
@@ -54,7 +53,7 @@ func main() {
 
 	// ✅ Swagger documentation route
 	//r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	
+
 	// Home route
 	// @Summary Welcome endpoint
 	// @Description Returns a welcome message
@@ -67,7 +66,7 @@ func main() {
 			"message": "Welcome to GO CRM 🚀",
 		})
 	})
-	
+
 	// Register all routes
 	routes.RegisterAuthRoutes(r)
 	routes.RegisterCourseRoutes(r)
@@ -76,6 +75,12 @@ func main() {
 	routes.CourseProductRoutes(r)
 	routes.CourseCategoryRoutes(r)
 	routes.ProductRoutes(r)
+
+	// Example curl command to clear DB (replace with your server address):
+	// curl -X DELETE "http://localhost:8080/admin/clear-db" \
+	//      -H "Content-Type: application/json" \
+	//      -d '{"password":"mypassword"}'
+	routes.AdminDangerRoutes(r)
 
 	// Protected routes
 	protected := r.Group("/api")
@@ -141,13 +146,11 @@ func main() {
 		seeds.SeedProducts()
 		return
 	}
-	
-	SetupSwagger(r)
 
+	SetupSwagger(r)
 
 	r.Run(":8080")
 }
-
 
 func SetupSwagger(r *gin.Engine) {
 	url := "http://localhost:8080/swagger/doc.json" // your swagger.json

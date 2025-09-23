@@ -7,6 +7,7 @@ import (
 	"crm-go/models"
 
 	"github.com/google/uuid"
+	"gorm.io/datatypes"
 )
 
 func SeedCourses() {
@@ -46,6 +47,8 @@ func SeedCourses() {
 			Image:       "https://example.com/images/golang.png",
 			VideoURL:    "https://example.com/videos/golang-intro.mp4",
 			TutorID:     tutorID, 
+			LearningOutcomes: datatypes.JSON([]byte(`["Understand Go syntax", "Work with Go routines", "Build a simple web server"]`)),
+			Requirements: datatypes.JSON([]byte(`["Basic programming knowledge", "Familiarity with command line", "Willingness to learn", "No prior Go experience required"]`)),
 		},
 		{
 			ID:          courseID2,
@@ -54,6 +57,8 @@ func SeedCourses() {
 			Image:       "https://example.com/images/react.png",
 			VideoURL:    "https://example.com/videos/react-advanced.mp4",
 			TutorID:     tutorID,
+			LearningOutcomes: datatypes.JSON([]byte(`["Understand advanced React patterns", "State management with Redux", "Performance optimization"]`)),
+			Requirements: datatypes.JSON([]byte(`["Basic React knowledge", "Familiarity with JavaScript ES6+", "Understanding of web development concepts", "Experience with building React applications"]`)),
 		},
 		{
 			ID:          courseID3,
@@ -62,6 +67,8 @@ func SeedCourses() {
 			Image:       "https://example.com/images/python.png",
 			VideoURL:    "https://example.com/videos/python-data-science.mp4",
 			TutorID:     tutorID,
+			LearningOutcomes: datatypes.JSON([]byte(`["Understand Python basics", "Data manipulation with Pandas", "Data visualization with Matplotlib"]`)),
+			Requirements: datatypes.JSON([]byte(`["Basic programming knowledge", "Familiarity with command line", "Willingness to learn", "No prior Python experience required"]`)),
 		},
 		{
 			ID:          courseID4,
@@ -70,6 +77,8 @@ func SeedCourses() {
 			Image:       "https://example.com/images/django.png",
 			VideoURL:    "https://example.com/videos/django-web-dev.mp4",
 			TutorID:     tutorID,
+			LearningOutcomes: datatypes.JSON([]byte(`["Set up Django project", "Create models and views", "Deploy Django applications"]`)),
+			Requirements: datatypes.JSON([]byte(`["Basic Python knowledge", "Familiarity with web development concepts", "Understanding of MVC architecture", "No prior Django experience required"]`)),
 		},
 		{
 			ID:          courseID5,
@@ -78,6 +87,8 @@ func SeedCourses() {
 			Image:       "https://example.com/images/machine-learning.png",
 			VideoURL:    "https://example.com/videos/machine-learning-basics.mp4",
 			TutorID:     tutorID,
+			LearningOutcomes: datatypes.JSON([]byte(`["Understand ML concepts", "Implement algorithms", "Evaluate model performance"]`)),
+			Requirements: datatypes.JSON([]byte(`["Basic programming knowledge", "Familiarity with statistics", "Willingness to learn", "No prior ML experience required"]`)),
 		},
 		
 	}

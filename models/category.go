@@ -29,6 +29,10 @@ type CourseCategoryTable struct {
     UpdatedAt  time.Time
 }
 
+type CreateCourseCategoryRequest struct {
+    CourseID   string `json:"course_id" binding:"required,uuid4"`
+    CategoryID string `json:"category_id" binding:"required,uuid4"`
+}
 // Add these methods to your CourseCategory model for proper JSON marshaling/unmarshaling
 func (c *CourseCategoryTable) BeforeCreate(tx *gorm.DB) (err error) {
     if c.ID == uuid.Nil {
