@@ -10,6 +10,8 @@ func CategoryRoutes(r *gin.Engine) {
 	categories := r.Group("/categories")
 	{
 		categories.GET("/", controllers.GetCategories)
+		categories.GET("/:id/with-course-mate", controllers.CategoryDetailsWithRelatedCourses)
+
 
 		// Protected routes
 		protected := r.Group("/api")

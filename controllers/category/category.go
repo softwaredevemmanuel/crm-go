@@ -9,6 +9,12 @@ import (
 	"github.com/google/uuid"
 )
 
+type ListCategoryCourses struct {
+	ID          string `json:"course_id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Image       string `json:"image"`
+}
 
 
 // Create A Category
@@ -77,6 +83,61 @@ func GetCategories(c *gin.Context) {
 	db.Find(&categories)
 	c.JSON(http.StatusOK, categories)
 }
+
+
+// GetCoursesByCategory godoc
+// @Summary      Category Details with Related Courses
+// @Description  Retrieve all courses that belong to a specific category
+// @Tags         Categories
+// @Param        id   path      string  true  "Category ID (UUID)"
+// @Produce      json
+// @Success      200  {array}   ListCategoryCourses
+// @Failure      400  {object}  map[string]string
+// @Failure      500  {object}  map[string]string
+// @Router       /categories/{id}/with-course-mate [get]
+// CategoryDetailsWithRelatedCourses - Get category details along with its courses
+func CategoryDetailsWithRelatedCourses(c *gin.Context) {
+	categoryID := c.Param("id")
+	db := config.DB
+
+	// Fetch category details
+	var category models.Category
+	if err := db.First(&category, "id = ?", categoryID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Category not found"})
+		return
+	}
+
+	// Fetch courses under this category
+	var courses []models.Course
+	if err := db.Joins("JOIN course_category_tables ON courses.id = course_category_tables.course_id").
+		Where("course_category_tables.category_id = ?", categoryID).
+		Find(&courses).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch courses"})
+		return
+	}
+
+	// Map courses to DTO
+	var relatedCourses []ListCategoryCourses
+	for _, course := range courses {
+		relatedCourses = append(relatedCourses, ListCategoryCourses{
+			ID:          course.ID.String(),
+			Title:       course.Title,
+			Description: course.Description,
+			Image:       course.Image,
+		})
+	}
+
+	// Final response
+	response := gin.H{
+		"id":          category.ID.String(),
+		"name":        category.Name,
+		"description": category.Description,
+		"courses":     relatedCourses,
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
 
 // UpdateCategory godoc
 // @Summary Update a category

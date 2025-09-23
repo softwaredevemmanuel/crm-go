@@ -10,7 +10,15 @@ import (
 	"github.com/gin-gonic/gin"
 	
 )
-// ExportExcelHandler - download all data as Excel
+// ExportAllData godoc
+// @Summary      Export all data to Excel
+// @Description  Fetches all data from the database and exports it as an Excel (.xlsx) file.
+// @Tags         Export
+// @Produce      application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+// @Success      200 {file} file "Excel file containing all exported data"
+// @Failure      500 {object} map[string]string "Internal server error"
+// @Router       /api/export/excel [get]
+// @Security BearerAuth
 func ExportExcelHandler(c *gin.Context) {
     filePath := "exported_data.xlsx"
     
@@ -20,6 +28,7 @@ func ExportExcelHandler(c *gin.Context) {
     // Serve file as download
     c.FileAttachment(filePath, "all-data.xlsx")
 }
+
 
 func ExportDataToExcel() {
 	db := config.GetDB()

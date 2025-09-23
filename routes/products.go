@@ -12,7 +12,7 @@ func ProductRoutes(r *gin.Engine) {
 	{
 		products.GET("/", controllers.GetProducts)
 		products.GET("/:id", controllers.GetProductByID)
-		products.GET("/:id/products", controllers.GetProductWithCourseMates)
+		products.GET("/:id/products", controllers.GetProductDetailsWithCourses)
 
 		// Protected routes
 		protected := r.Group("/api")

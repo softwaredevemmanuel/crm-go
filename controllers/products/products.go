@@ -1,4 +1,4 @@
-package products
+package controllers
 
 import (
 	"crm-go/config"
@@ -10,6 +10,18 @@ import (
 )
 
 // CreateProduct - Admin creates a product
+// @Summary      Create a new product
+// @Description  Admin creates a new product. Prevents duplicates by name.
+// @Tags         Products
+// @Accept       json
+// @Produce      json
+// @Param request body models.ProductInput true "Product Payload"
+// @Success      201     {object}  models.Product
+// @Failure      400     {object}  map[string]string "Invalid request body"
+// @Failure      409     {object}  map[string]string "Product with this name already exists"
+// @Failure      500     {object}  map[string]string "Failed to create product"
+// @Router       /api/products [post]
+// @Security BearerAuth
 func CreateProduct(c *gin.Context) {
 	var product models.Product
 
@@ -40,6 +52,13 @@ func CreateProduct(c *gin.Context) {
 
 
 // GetProducts - List all products
+// @Summary      List all products
+// @Description  Retrieve a list of all products
+// @Tags         Products
+// @Produce      json
+// @Success      200  {array}   models.Product
+// @Failure      500  {object}  map[string]string "Failed to fetch products"
+// @Router       /products [get]	
 func GetProducts(c *gin.Context) {
 	var products []models.Product
 	db := config.DB
@@ -48,6 +67,15 @@ func GetProducts(c *gin.Context) {
 }
 
 // GetProductByID - Get one product by ID
+// @Summary      Get product by ID
+// @Description  Retrieve a single product by its ID
+// @Tags         Products
+// @Produce      json
+// @Param        id   path      string  true  "Product ID"
+// @Success      200  {object}  models.Product
+// @Failure      400  {object}  map[string]string "Invalid product ID"
+// @Failure      404  {object}  map[string]string "Product not found"
+// @Router       /products/{id} [get]	
 func GetProductByID(c *gin.Context) {
 	id := c.Param("id")
 
@@ -67,7 +95,89 @@ func GetProductByID(c *gin.Context) {
 	c.JSON(http.StatusOK, product)
 }
 
+type ListCoursesByProduct struct {
+	ID          string `json:"course_id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Image       string `json:"image"`
+}
+
+type ListCategoryCourses struct {
+	ID          string `json:"course_id" binding:"required,uuid4"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Image       string `json:"image"`
+}
+
+// GetCoursesByProduct - fetch all courses linked to a specific product
+// @Summary      Get related courses with product ID
+// @Description  Retrieve all courses associated with a specific product via the pivot table
+// @Tags         Products
+// @Produce      json
+// @Param        id   path      string  true  "Product ID"
+// @Success      200  {array}   ListCoursesByProduct
+// @Failure      400  {object}  map[string]string "Invalid product ID"
+// @Failure      500  {object}  map[string]string "Failed to fetch courses"
+// @Router       /products/{id}/products [get]
+// GetProductDetailsWithCourses - Get product details with its related courses
+func GetProductDetailsWithCourses(c *gin.Context) {
+	productID := c.Param("id")
+	db := config.DB
+
+	// Fetch product details
+	var product models.Product
+	if err := db.First(&product, "id = ?", productID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
+		return
+	}
+
+	// Fetch courses related to this product
+	var courses []models.Course
+	if err := db.Joins("JOIN course_product_tables ON courses.id = course_product_tables.course_id").
+		Where("course_product_tables.product_id = ?", productID).
+		Find(&courses).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch courses"})
+		return
+	}
+
+	// Map courses to DTO
+	var relatedCourses []ListCategoryCourses
+	for _, course := range courses {
+		relatedCourses = append(relatedCourses, ListCategoryCourses{
+			ID:          course.ID.String(),
+			Title:       course.Title,
+			Description: course.Description,
+			Image:       course.Image,
+		})
+	}
+
+	// Final response
+	response := gin.H{
+		"id":          product.ID.String(),
+		"name":        product.Name,
+		"description": product.Description,
+		"price":       product.Price,
+		"courses":     relatedCourses,
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+
 // UpdateProduct - Update a product
+// @Summary      Update a product
+// @Description  Update product details by its ID
+// @Tags         Products	
+// @Accept       json
+// @Produce      json
+// @Param        id      path      string         true  "Product ID"
+// @Param        request body      models.ProductInput true  "Product Payload"
+// @Success      200     {object}  models.Product
+// @Failure      400     {object}  map[string]string "Invalid product ID or request body"
+// @Failure      404     {object}  map[string]string "Product not found"
+// @Failure      500     {object}  map[string]string "Failed to update product"
+// @Router       /api/products/{id} [put]
+// @Security BearerAuth		
 func UpdateProduct(c *gin.Context) {
 	id := c.Param("id")
 
@@ -96,6 +206,16 @@ func UpdateProduct(c *gin.Context) {
 	
 
 // DeleteProduct - Delete a product
+// @Summary      Delete a product
+// @Description  Delete a product by its ID
+// @Tags         Products	
+// @Param        id   path      string  true  "Product ID"	
+// @Success      200  {object}  map[string]string "Product deleted successfully"
+// @Failure      400  {object}  map[string]string "Invalid product ID"
+// @Failure      404  {object}  map[string]string "Product not found"
+// @Failure      500  {object}  map[string]string "Failed to delete product"
+// @Router       /api/products/{id} [delete]
+// @Security BearerAuth	
 func DeleteProduct(c *gin.Context) {
 	id := c.Param("id")
 
@@ -122,40 +242,4 @@ func DeleteProduct(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Product deleted successfully"})
-}
-
-
-
-func GetProductWithCourseMates(c *gin.Context) {
-	productID := c.Param("id")
-	db := config.DB
-
-	// Get the product itself
-	var product models.Product
-	if err := db.First(&product, "id = ?", productID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
-		return
-	}
-
-	// Find course this product belongs to
-	var courseProducts []models.CourseProductTable
-	db.Where("product_id = ?", productID).Find(&courseProducts)
-
-	if len(courseProducts) == 0 {
-		c.JSON(http.StatusOK, gin.H{"product": product, "related_products": []models.Product{}})
-		return
-	}
-
-	// Get related products in the same course
-	var relatedProducts []models.Product
-	db.Joins("JOIN course_product_tables ON products.id = course_product_tables.product_id").
-		Where("course_product_tables.course_id IN (?) AND products.id != ?", 
-			db.Select("course_id").Where("product_id = ?", productID).Table("course_product_tables"), 
-			productID).
-		Find(&relatedProducts)
-
-	c.JSON(http.StatusOK, gin.H{
-		"product":          product,
-		"related_products": relatedProducts,
-	})
 }

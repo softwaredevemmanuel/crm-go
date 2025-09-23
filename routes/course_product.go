@@ -7,10 +7,8 @@ import (
 )
 
 func CourseProductRoutes(r *gin.Engine) {
-	course_product_tables := r.Group("/course-products")
 	{
-		course_product_tables.GET("/:id/courses", controllers.GetCoursesByProduct)
-
+		
 		// Protected routes
 		protected := r.Group("/api")
 		protected.Use(middleware.AuthMiddleware())

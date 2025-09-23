@@ -1,5 +1,53 @@
 basePath: /
 definitions:
+  controllers.CourseResponse:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      image:
+        type: string
+      learning_outcomes:
+        items:
+          type: string
+        type: array
+      requirements:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+      tutor_id:
+        type: string
+      video_url:
+        type: string
+    type: object
+  controllers.CreateCourseInput:
+    properties:
+      description:
+        type: string
+      image:
+        type: string
+      learning_outcomes:
+        items:
+          type: string
+        type: array
+      requirements:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+      tutor_id:
+        type: string
+      video_url:
+        type: string
+    required:
+    - description
+    - title
+    - tutor_id
+    type: object
   controllers.ForgotPasswordInput:
     properties:
       email:
@@ -7,7 +55,7 @@ definitions:
     required:
     - email
     type: object
-  controllers.ListCategoryCourses:
+  controllers.ListCoursesByProduct:
     properties:
       course_id:
         type: string
@@ -48,6 +96,17 @@ definitions:
     - last_name
     - password
     - role
+    type: object
+  crm-go_controllers_category.ListCategoryCourses:
+    properties:
+      course_id:
+        type: string
+      description:
+        type: string
+      image:
+        type: string
+      title:
+        type: string
     type: object
   models.AlreadyLoggedOutResponse:
     description: Already logged out response
@@ -93,6 +152,16 @@ definitions:
     required:
     - category_id
     - course_id
+    type: object
+  models.CreateCourseProductRequest:
+    properties:
+      course_id:
+        type: string
+      product_id:
+        type: string
+    required:
+    - course_id
+    - product_id
     type: object
   models.ErrorResponse:
     description: Error response structure
@@ -146,6 +215,57 @@ definitions:
       status:
         example: logged_out
         type: string
+    type: object
+  models.Product:
+    properties:
+      compare_at_price:
+        type: number
+      created_at:
+        type: string
+      description:
+        description: Use text for longer descriptions
+        type: string
+      id:
+        type: string
+      image:
+        description: URLs can be long
+        type: string
+      name:
+        type: string
+      price:
+        description: 'Use float64 or better: create a Price type'
+        type: number
+      requires_shipping:
+        type: boolean
+      status:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.ProductInput:
+    properties:
+      compare_at_price:
+        type: number
+      description:
+        type: string
+      image:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      requires_shipping:
+        type: boolean
+      status:
+        enum:
+        - draft
+        - active
+        - inactive
+        - discontinued
+        type: string
+    required:
+    - name
+    - price
     type: object
   models.Role:
     enum:
@@ -377,7 +497,7 @@ paths:
       - BearerAuth: []
       summary: Create a Course-Category relationship
       tags:
-      - CourseCategories
+      - Course Categories
   /api/category-courses/{id}:
     delete:
       description: Remove a course-category relationship by its ID
@@ -418,7 +538,374 @@ paths:
       - BearerAuth: []
       summary: Delete a course category relationship
       tags:
-      - CourseCategories
+      - Course Categories
+  /api/course-products:
+    post:
+      consumes:
+      - application/json
+      description: Admin creates a relationship between a course and a product. Prevents
+        duplicates.
+      parameters:
+      - description: Course-Category Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateCourseProductRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request body or IDs
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Course ID does not exist" or "Product ID does not exist
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Product already exists for this course
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to create course product relationship
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a course-product relationship
+      tags:
+      - Course Products
+  /api/course-products/{id}:
+    delete:
+      description: Remove a relationship between a course and a product by its ID
+      parameters:
+      - description: Course Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Course Product deleted successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid product ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Course Product not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to delete course product
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a course-product relationship
+      tags:
+      - Course Products
+  /api/courses:
+    post:
+      consumes:
+      - application/json
+      description: Admin creates a new course. Prevents duplicate titles.
+      parameters:
+      - description: Course details
+        in: body
+        name: course
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.CreateCourseInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/controllers.CourseResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Course with the same title already exists
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to create course
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new course
+      tags:
+      - Courses
+  /api/courses/{id}:
+    delete:
+      description: Admin deletes a course by ID
+      parameters:
+      - description: Course ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Course deleted successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid course ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Course not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to delete course
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a course
+      tags:
+      - Courses
+    put:
+      consumes:
+      - application/json
+      description: Admin updates course details by ID
+      parameters:
+      - description: Course ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated course details
+        in: body
+        name: course
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.CreateCourseInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.CourseResponse'
+        "400":
+          description: Invalid course ID or request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Course not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to update course
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update an existing course
+      tags:
+      - Courses
+  /api/export/excel:
+    get:
+      description: Fetches all data from the database and exports it as an Excel (.xlsx)
+        file.
+      produces:
+      - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+      responses:
+        "200":
+          description: Excel file containing all exported data
+          schema:
+            type: file
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Export all data to Excel
+      tags:
+      - Export
+  /api/products:
+    post:
+      consumes:
+      - application/json
+      description: Admin creates a new product. Prevents duplicates by name.
+      parameters:
+      - description: Product Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProductInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Product'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Product with this name already exists
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to create product
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new product
+      tags:
+      - Products
+  /api/products/{id}:
+    delete:
+      description: Delete a product by its ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Product deleted successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid product ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Product not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to delete product
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a product
+      tags:
+      - Products
+    put:
+      consumes:
+      - application/json
+      description: Update product details by its ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Product Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProductInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Product'
+        "400":
+          description: Invalid product ID or request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Product not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to update product
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update a product
+      tags:
+      - Products
   /auth/forgot-password:
     post:
       consumes:
@@ -643,7 +1130,7 @@ paths:
       summary: Get all categories
       tags:
       - Categories
-  /category-courses/{id}/courses:
+  /categories/{id}/with-course-mate:
     get:
       description: Retrieve all courses that belong to a specific category
       parameters:
@@ -659,7 +1146,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/controllers.ListCategoryCourses'
+              $ref: '#/definitions/crm-go_controllers_category.ListCategoryCourses'
             type: array
         "400":
           description: Bad Request
@@ -673,9 +1160,186 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: Get courses by category
+      summary: Category Details with Related Courses
       tags:
-      - CourseCategories
+      - Categories
+  /courses:
+    get:
+      description: Retrieve all courses available in the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/controllers.CourseResponse'
+            type: array
+        "500":
+          description: Failed to fetch courses
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List all courses
+      tags:
+      - Courses
+  /courses/{id}:
+    get:
+      description: Retrieve details of a specific course using its ID
+      parameters:
+      - description: Course ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.CourseResponse'
+        "400":
+          description: Invalid course ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Course not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a course by ID
+      tags:
+      - Courses
+  /courses/{id}/products:
+    get:
+      description: Retrieve a course along with products linked to it via the pivot
+        table
+      parameters:
+      - description: Course ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid course ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Course not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to fetch related products
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get Products related to a course ID
+      tags:
+      - Courses
+  /products:
+    get:
+      description: Retrieve a list of all products
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Product'
+            type: array
+        "500":
+          description: Failed to fetch products
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List all products
+      tags:
+      - Products
+  /products/{id}:
+    get:
+      description: Retrieve a single product by its ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Product'
+        "400":
+          description: Invalid product ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Product not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get product by ID
+      tags:
+      - Products
+  /products/{id}/products:
+    get:
+      description: Retrieve all courses associated with a specific product via the
+        pivot table
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/controllers.ListCoursesByProduct'
+            type: array
+        "400":
+          description: Invalid product ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to fetch courses
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get related courses with product ID
+      tags:
+      - Products
 schemes:
 - http
 securityDefinitions:

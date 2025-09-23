@@ -18,7 +18,7 @@ import (
 // CreateCourseCategory godoc
 // @Summary Create a Course-Category relationship
 // @Description Admin creates a relationship between a course and a category
-// @Tags CourseCategories
+// @Tags Course Categories
 // @Accept json
 // @Produce json
 // @Param request body models.CreateCourseCategoryRequest true "Course-Category Payload"
@@ -114,57 +114,12 @@ func CreateCourseCategory(c *gin.Context) {
 }
 
 
-type ListCategoryCourses struct {
-	ID          string `json:"course_id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Image       string `json:"image"`
-}
-
-// GetCoursesByCategory godoc
-// @Summary      Get courses by category
-// @Description  Retrieve all courses that belong to a specific category
-// @Tags         CourseCategories
-// @Param        id   path      string  true  "Category ID (UUID)"
-// @Produce      json
-// @Success      200  {array}   ListCategoryCourses
-// @Failure      400  {object}  map[string]string
-// @Failure      500  {object}  map[string]string
-// @Router       /category-courses/{id}/courses [get]
-func GetCoursesByCategory(c *gin.Context) {
-	categoryID := c.Param("id")
-
-	var courses []models.Course
-	db := config.DB
-
-	err := db.Joins("JOIN course_category_tables ON courses.id = course_category_tables.course_id").
-		Where("course_category_tables.category_id = ?", categoryID).
-		Find(&courses).Error
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch courses"})
-		return
-	}
-
-	// Map courses to response DTO
-	var response []ListCategoryCourses
-	for _, course := range courses {
-		response = append(response, ListCategoryCourses{
-			ID:          course.ID.String(),
-			Title:       course.Title,
-			Description: course.Description,
-			Image:       course.Image,
-		})
-	}
-
-	c.JSON(http.StatusOK, response)
-}
 
 
 // DeleteCourseCategory godoc
 // @Summary      Delete a course category relationship
 // @Description  Remove a course-category relationship by its ID
-// @Tags         CourseCategories
+// @Tags         Course Categories
 // @Param        id   path      string  true  "Course Category ID (UUID)"
 // @Produce      json
 // @Success      200  {object}  map[string]string

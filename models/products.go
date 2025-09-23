@@ -28,6 +28,16 @@ type CourseProductTable struct {
     CreatedAt  time.Time
 }
 
+type ProductInput struct {
+    Name            string   `json:"name" binding:"required"`
+    Description     string   `json:"description"`
+	Price           float64  `json:"price" binding:"required,gt=0"`
+	CompareAtPrice  float64  `json:"compare_at_price"`
+	Image           string   `json:"image"`
+	RequiresShipping bool    `json:"requires_shipping"`
+	Status          string   `json:"status" binding:"omitempty,oneof=draft active inactive discontinued"`
+}
+
 // Add these methods to your CourseCategory model for proper JSON marshaling/unmarshaling
 func (c *CourseProductTable) BeforeCreate(tx *gorm.DB) (err error) {
     if c.ID == uuid.Nil {

@@ -6,12 +6,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterCourseRoutes(r *gin.Engine) {
+func CourseRoutes(r *gin.Engine) {
 	courses := r.Group("/courses")
 	{
 		courses.GET("/", courseController.GetCourses)
 		courses.GET("/:id", courseController.GetCourseByID)
-		courses.GET("/:id/products", courseController.GetCourseWithProducts)
+		courses.GET("/:id/products", courseController.GetProductsWithRalatedCourseID)
 
 		// Protected routes
 		protected := r.Group("/api")

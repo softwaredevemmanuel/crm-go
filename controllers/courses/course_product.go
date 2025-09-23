@@ -16,6 +16,19 @@ import (
 
 
 // CreateCourseProduct - Admin creates a course product relationship
+// @Summary      Create a course-product relationship
+// @Description  Admin creates a relationship between a course and a product. Prevents duplicates.
+// @Tags         Course Products
+// @Accept       json
+// @Produce      json
+// @Param request body models.CreateCourseProductRequest true "Course-Category Payload"
+// @Success      201     {object}  map[string]interface{}
+// @Failure      400     {object}  map[string]string "Invalid request body or IDs"
+// @Failure      404     {object}  map[string]string "Course ID does not exist" or "Product ID does not exist"
+// @Failure      409     {object}  map[string]string "Product already exists for this course"
+// @Failure      500     {object}  map[string]string "Failed to create course product relationship"
+// @Router       /api/course-products [post]
+// @Security BearerAuth
 func CreateCourseProduct(c *gin.Context) {
     var request struct {
         CourseID   string `json:"course_id" binding:"required,uuid4"`
@@ -72,7 +85,7 @@ func CreateCourseProduct(c *gin.Context) {
     // ✅ Check if course-product relationship already exists
     var existing models.CourseProductTable
     if err := db.Where("course_id = ? AND product_id = ?", courseUUID, productUUID).First(&existing).Error; err == nil {
-        c.JSON(http.StatusConflict, gin.H{"error": "Course already exists in this product"})
+        c.JSON(http.StatusConflict, gin.H{"error": "Product already exists for this course"})
         return
     } else if !errors.Is(err, gorm.ErrRecordNotFound) {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check existing relationship"})
@@ -99,26 +112,19 @@ func CreateCourseProduct(c *gin.Context) {
 }
 
 
-func GetCoursesByProduct(c *gin.Context) {
-	productID := c.Param("id")
-
-	var courses []models.Course
-	db := config.DB
-
-	err := db.Joins("JOIN course_product_tables ON courses.id = course_product_tables.course_id").
-		Where("course_product_tables.product_id = ?", productID).
-		Find(&courses).Error
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch courses"})
-		return
-	}
-
-	c.JSON(http.StatusOK, courses)
-}
 
 
 // DeleteCategory - Delete a course category
+// @Summary      Delete a course-product relationship
+// @Description  Remove a relationship between a course and a product by its ID
+// @Tags         Course Products
+// @Param        id   path      string  true  "Course Product ID"
+// @Success      200  {object}  map[string]string "Course Product deleted successfully"
+// @Failure      400  {object}  map[string]string "Invalid product ID"
+// @Failure      404  {object}  map[string]string "Course Product not found"
+// @Failure      500  {object}  map[string]string "Failed to delete course product"
+// @Router       /api/course-products/{id} [delete]
+// @Security BearerAuth
 func DeleteCourseProduct(c *gin.Context) {
 	id := c.Param("id")
 
