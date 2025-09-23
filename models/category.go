@@ -13,6 +13,9 @@ type Category struct {
 	Description       string    `gorm:"size:255; default:No Description" json:"description"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+
+    // Relationships
+    Courses []CourseCategoryTable `gorm:"constraint:OnDelete:CASCADE;" json:"-"`
 }
 
 type CategoryInput struct {

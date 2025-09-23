@@ -7,6 +7,17 @@ definitions:
     required:
     - email
     type: object
+  controllers.ListCategoryCourses:
+    properties:
+      course_id:
+        type: string
+      description:
+        type: string
+      image:
+        type: string
+      title:
+        type: string
+    type: object
   controllers.ResetPasswordInput:
     properties:
       new_password:
@@ -367,6 +378,47 @@ paths:
       summary: Create a Course-Category relationship
       tags:
       - CourseCategories
+  /api/category-courses/{id}:
+    delete:
+      description: Remove a course-category relationship by its ID
+      parameters:
+      - description: Course Category ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a course category relationship
+      tags:
+      - CourseCategories
   /auth/forgot-password:
     post:
       consumes:
@@ -591,6 +643,39 @@ paths:
       summary: Get all categories
       tags:
       - Categories
+  /category-courses/{id}/courses:
+    get:
+      description: Retrieve all courses that belong to a specific category
+      parameters:
+      - description: Category ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/controllers.ListCategoryCourses'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get courses by category
+      tags:
+      - CourseCategories
 schemes:
 - http
 securityDefinitions:
