@@ -26,12 +26,21 @@ type EnrollmentResponse struct {
 // @Router       /enrollments [get]
 func GetEnrollments(c *gin.Context) {
 	var enrollments []models.Enrollment
-	if err := config.DB.Find(&enrollments).Error; err != nil {
+
+	err := config.DB.
+		Preload("Student").
+		Preload("Course").
+		Preload("Certificate").
+		Find(&enrollments).Error
+
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
 	c.JSON(http.StatusOK, enrollments)
 }
+
 
 
 // GetEnrollmentByID retrieves an enrollment by its ID
@@ -47,13 +56,34 @@ func GetEnrollments(c *gin.Context) {
 // @Router       /enrollments/{id} [get]
 func GetEnrollmentByID(c *gin.Context) {
 	id := c.Param("id")
-	var enrollment models.Enrollment
-	if err := config.DB.First(&enrollment, "id = ?", id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Enrollment not found"})
+
+	// Parse UUID safely
+	enrollmentID, err := uuid.Parse(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid enrollment ID"})
 		return
 	}
+
+	var enrollment models.Enrollment
+
+	err = config.DB.
+		Preload("Student").
+		Preload("Course").
+		Preload("Certificate").
+		First(&enrollment, "id = ?", enrollmentID).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Enrollment not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		return
+	}
+
 	c.JSON(http.StatusOK, enrollment)
 }
+
 
 type CreateEnrollmentInput struct {
 	StudentID string `json:"student_id" binding:"required,uuid4"`
@@ -110,23 +140,4 @@ func CreateEnrollment(c *gin.Context) {
 	c.JSON(http.StatusCreated, enrollment)
 }
 
-
-// UpdateEnrollment updates an existing enrollment
-func UpdateEnrollment(c *gin.Context) {
-	id := c.Param("id")
-	var enrollment models.Enrollment
-	if err := config.DB.First(&enrollment, "id = ?", id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Enrollment not found"})
-		return
-	}
-	if err := c.ShouldBindJSON(&enrollment); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	if err := config.DB.Save(&enrollment).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, enrollment)
-}
 

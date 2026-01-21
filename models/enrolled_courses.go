@@ -35,9 +35,9 @@ type Enrollment struct {
  
 
     // Relationships
-    Student    User   `gorm:"foreignKey:StudentID" json:"student,omitempty"`
-    Course     Course `gorm:"foreignKey:CourseID" json:"course,omitempty"`
-    Certificate Certificate `gorm:"foreignKey:CertificateID" json:"certificate,omitempty"`
+    Student    *User   `gorm:"foreignKey:StudentID" json:"student,omitempty"`
+    Course     *Course `gorm:"foreignKey:CourseID" json:"course,omitempty"`
+    Certificate *Certificate `gorm:"foreignKey:CertificateID" json:"certificate,omitempty"`
 }
 
 // Add this index in your migration
