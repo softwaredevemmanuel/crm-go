@@ -108,6 +108,25 @@ definitions:
       title:
         type: string
     type: object
+  enrollments.CreateEnrollmentInput:
+    properties:
+      course_id:
+        type: string
+      student_id:
+        type: string
+    required:
+    - course_id
+    - student_id
+    type: object
+  enrollments.EnrollmentResponse:
+    properties:
+      course_id:
+        type: string
+      id:
+        type: string
+      student_id:
+        type: string
+    type: object
   models.AlreadyLoggedOutResponse:
     description: Already logged out response
     properties:
@@ -1254,6 +1273,93 @@ paths:
       summary: Get Products related to a course ID
       tags:
       - Courses
+  /enrollments:
+    get:
+      consumes:
+      - application/json
+      description: Get all enrollments
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/enrollments.EnrollmentResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List enrollments
+      tags:
+      - Enrollments
+    post:
+      consumes:
+      - application/json
+      description: Create a new enrollment with the provided details
+      parameters:
+      - description: Course details
+        in: body
+        name: enrollment
+        required: true
+        schema:
+          $ref: '#/definitions/enrollments.CreateEnrollmentInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/enrollments.EnrollmentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new enrollment
+      tags:
+      - Enrollments
+  /enrollments/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get an enrollment by its ID
+      parameters:
+      - description: Enrollment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/enrollments.EnrollmentResponse'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get enrollment by ID
+      tags:
+      - Enrollments
   /products:
     get:
       description: Retrieve a list of all products

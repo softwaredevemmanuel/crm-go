@@ -9,8 +9,8 @@ import (
 
 type Enrollment struct {
     ID                 uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
-    StudentID          uuid.UUID  `gorm:"type:uuid;not null" json:"student_id"`
-    CourseID           uuid.UUID  `gorm:"type:uuid;not null" json:"course_id"`
+   	StudentID uuid.UUID `gorm:"type:uuid;not null;index:idx_student_course,unique" json:"student_id"`
+	CourseID  uuid.UUID `gorm:"type:uuid;not null;index:idx_student_course,unique" json:"course_id"`
     Status             string     `gorm:"type:varchar(20);default:'pending';check:status IN ('pending', 'active', 'completed', 'cancelled', 'expired', 'suspended')" json:"status"`
     EnrollmentDate     time.Time  `gorm:"default:CURRENT_TIMESTAMP" json:"enrollment_date"`
     StartDate          *time.Time `json:"start_date,omitempty"`

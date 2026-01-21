@@ -8,7 +8,7 @@ import (
 	"crm-go/routes"
 	"flag"
 
-	_ "crm-go/docs" // ✅ Import generated docs package
+	_ "crm-go/docs" 
 	"github.com/gin-gonic/gin"
 
 	swaggerFiles "github.com/swaggo/files"
@@ -75,6 +75,7 @@ func main() {
 	routes.CourseProductRoutes(r)
 	routes.CourseCategoryRoutes(r)
 	routes.ProductRoutes(r)
+	routes.EnrollmentRoutes(r)
 
 	// Example curl command to clear DB (replace with your server address):
 	// curl -X DELETE "http://localhost:8080/admin/clear-db" \
