@@ -53,6 +53,80 @@ definitions:
         example: Announcement not found
         type: string
     type: object
+  assignments.AssignmentInput:
+    properties:
+      chapter_id:
+        type: string
+      course_id:
+        type: string
+      description:
+        type: string
+      due_date:
+        type: string
+      learning_objectives:
+        items:
+          type: string
+        type: array
+      lesson_id:
+        type: string
+      published_by:
+        type: string
+      slug:
+        description: optional, can be auto-generated
+        type: string
+      title:
+        type: string
+      type:
+        enum:
+        - homework
+        - project
+        - essay
+        - quiz
+        - exam
+        - lab
+        - presentation
+        - discussion
+        - peer_review
+        - group
+        - research
+        - creative
+        type: string
+    required:
+    - course_id
+    - due_date
+    - published_by
+    - title
+    type: object
+  assignments.DeleteSuccessResponse:
+    properties:
+      message:
+        example: Assignment deleted successfully
+        type: string
+    type: object
+  assignments.ErrorResponse:
+    properties:
+      error:
+        example: Invalid assignment ID
+        type: string
+    type: object
+  assignments.FailureResponse:
+    properties:
+      error:
+        example: Failed to create assignment
+        type: string
+    type: object
+  assignments.NotFoundResponse:
+    properties:
+      error:
+        example: Assignment not found
+        type: string
+    type: object
+  assignments.SuccessResponse:
+    properties:
+      message:
+        example: Assignment created successfully
+        type: string
+    type: object
   controllers.CourseResponse:
     properties:
       description:
@@ -223,6 +297,8 @@ definitions:
         allOf:
         - $ref: '#/definitions/models.User'
         description: Relationships
+    type: object
+  models.Assignment:
     type: object
   models.Category:
     properties:
@@ -1191,6 +1267,149 @@ paths:
       summary: Update a product
       tags:
       - Products
+  /assignments:
+    get:
+      consumes:
+      - application/json
+      description: Get all assignments
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/assignments.SuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/assignments.FailureResponse'
+      summary: Get all assignments
+      tags:
+      - Assignments
+    post:
+      consumes:
+      - application/json
+      description: Create a new assignment
+      parameters:
+      - description: Assignment
+        in: body
+        name: assignment
+        required: true
+        schema:
+          $ref: '#/definitions/assignments.AssignmentInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/assignments.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/assignments.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/assignments.FailureResponse'
+      summary: Create a new assignment
+      tags:
+      - Assignments
+  /assignments/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an existing assignment
+      parameters:
+      - description: Assignment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/assignments.DeleteSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/assignments.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/assignments.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/assignments.FailureResponse'
+      summary: Delete an existing assignment
+      tags:
+      - Assignments
+    get:
+      consumes:
+      - application/json
+      description: Get a single assignment by ID
+      parameters:
+      - description: Assignment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/assignments.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/assignments.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/assignments.FailureResponse'
+      summary: Get a single assignment by ID
+      tags:
+      - Assignments
+    put:
+      consumes:
+      - application/json
+      description: Update an existing assignment
+      parameters:
+      - description: Assignment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Assignment
+        in: body
+        name: assignment
+        required: true
+        schema:
+          $ref: '#/definitions/models.Assignment'
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/assignments.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/assignments.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/assignments.FailureResponse'
+      summary: Update an existing assignment
+      tags:
+      - Assignments
   /auth/forgot-password:
     post:
       consumes:

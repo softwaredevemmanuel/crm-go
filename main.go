@@ -77,6 +77,7 @@ func main() {
 	routes.ProductRoutes(r)
 	routes.EnrollmentRoutes(r)
 	routes.AnnouncementRoutes(r)
+	routes.AssignmentRoutes(r)
 
 	// Example curl command to clear DB (replace with your server address):
 	// curl -X DELETE "http://localhost:8080/admin/clear-db" \

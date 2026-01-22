@@ -1177,6 +1177,222 @@
                 }
             }
         },
+        "/assignments": {
+            "get": {
+                "description": "Get all assignments",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assignments"
+                ],
+                "summary": "Get all assignments",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/assignments.SuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/assignments.FailureResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new assignment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assignments"
+                ],
+                "summary": "Create a new assignment",
+                "parameters": [
+                    {
+                        "description": "Assignment",
+                        "name": "assignment",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/assignments.AssignmentInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/assignments.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/assignments.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/assignments.FailureResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/assignments/{id}": {
+            "get": {
+                "description": "Get a single assignment by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assignments"
+                ],
+                "summary": "Get a single assignment by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Assignment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/assignments.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/assignments.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/assignments.FailureResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update an existing assignment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assignments"
+                ],
+                "summary": "Update an existing assignment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Assignment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Assignment",
+                        "name": "assignment",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Assignment"
+                        }
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/assignments.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/assignments.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/assignments.FailureResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete an existing assignment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assignments"
+                ],
+                "summary": "Delete an existing assignment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Assignment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/assignments.DeleteSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/assignments.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/assignments.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/assignments.FailureResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/forgot-password": {
             "post": {
                 "description": "Initiates a password reset process by sending a reset link to the provided email (if exists)",
@@ -2040,6 +2256,110 @@
                 }
             }
         },
+        "assignments.AssignmentInput": {
+            "type": "object",
+            "required": [
+                "course_id",
+                "due_date",
+                "published_by",
+                "title"
+            ],
+            "properties": {
+                "chapter_id": {
+                    "type": "string"
+                },
+                "course_id": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "due_date": {
+                    "type": "string"
+                },
+                "learning_objectives": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "lesson_id": {
+                    "type": "string"
+                },
+                "published_by": {
+                    "type": "string"
+                },
+                "slug": {
+                    "description": "optional, can be auto-generated",
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "homework",
+                        "project",
+                        "essay",
+                        "quiz",
+                        "exam",
+                        "lab",
+                        "presentation",
+                        "discussion",
+                        "peer_review",
+                        "group",
+                        "research",
+                        "creative"
+                    ]
+                }
+            }
+        },
+        "assignments.DeleteSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Assignment deleted successfully"
+                }
+            }
+        },
+        "assignments.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid assignment ID"
+                }
+            }
+        },
+        "assignments.FailureResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Failed to create assignment"
+                }
+            }
+        },
+        "assignments.NotFoundResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Assignment not found"
+                }
+            }
+        },
+        "assignments.SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Assignment created successfully"
+                }
+            }
+        },
         "controllers.CourseResponse": {
             "type": "object",
             "properties": {
@@ -2295,6 +2615,9 @@
                     ]
                 }
             }
+        },
+        "models.Assignment": {
+            "type": "object"
         },
         "models.Category": {
             "type": "object",
