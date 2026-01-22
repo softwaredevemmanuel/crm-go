@@ -610,6 +610,165 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/chapters": {
+            "post": {
+                "description": "Create a new chapter",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chapters"
+                ],
+                "summary": "Create a new chapters",
+                "parameters": [
+                    {
+                        "description": "Chapter",
+                        "name": "chapter",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ChapterInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponses"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/models.DuplicateChapterError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.FailureResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/chapters/{id}": {
+            "put": {
+                "description": "Update an existing chapter",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chapters"
+                ],
+                "summary": "Update an existing chapter",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Chapter ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Chapter",
+                        "name": "chapter",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ChapterInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponses"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.FailureResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete an existing chapter",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chapters"
+                ],
+                "summary": "Delete an existing chapter",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Chapter ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.DeleteSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponses"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.FailureResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/course-products": {
             "post": {
                 "security": [
@@ -1785,6 +1944,85 @@ const docTemplate = `{
                 }
             }
         },
+        "/chapters": {
+            "get": {
+                "description": "Get all chapters",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chapters"
+                ],
+                "summary": "Get all chapters",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.FailureResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/chapters/{id}": {
+            "get": {
+                "description": "Get a single chapter by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chapters"
+                ],
+                "summary": "Get a single chapter by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Chapter ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponses"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.FailureResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/courses": {
             "get": {
                 "description": "Retrieve all courses available in the system",
@@ -2656,6 +2894,41 @@ const docTemplate = `{
                 }
             }
         },
+        "models.ChapterInput": {
+            "type": "object",
+            "required": [
+                "course_id",
+                "slug",
+                "title"
+            ],
+            "properties": {
+                "chapter_number": {
+                    "type": "integer"
+                },
+                "course_id": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "estimated_time": {
+                    "type": "integer"
+                },
+                "is_free": {
+                    "type": "boolean"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string",
+                    "default": "draft"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "models.CreateCourseCategoryRequest": {
             "type": "object",
             "required": [
@@ -2686,6 +2959,24 @@ const docTemplate = `{
                 }
             }
         },
+        "models.DeleteSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Chapter deleted successfully"
+                }
+            }
+        },
+        "models.DuplicateChapterError": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Chapter number already exists for this course"
+                }
+            }
+        },
         "models.ErrorResponse": {
             "description": "Error response structure",
             "type": "object",
@@ -2697,6 +2988,24 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "Please check your input"
+                }
+            }
+        },
+        "models.ErrorResponses": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid chapter ID"
+                }
+            }
+        },
+        "models.FailureResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Failed to create chapter"
                 }
             }
         },
@@ -2757,6 +3066,15 @@ const docTemplate = `{
                 "status": {
                     "type": "string",
                     "example": "logged_out"
+                }
+            }
+        },
+        "models.NotFoundResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Chapter not found"
                 }
             }
         },
@@ -2866,6 +3184,15 @@ const docTemplate = `{
                 "ip_address": {
                     "type": "string",
                     "example": "192.168.1.1"
+                }
+            }
+        },
+        "models.SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Chapter created successfully"
                 }
             }
         },

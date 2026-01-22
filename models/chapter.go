@@ -9,7 +9,7 @@ type Chapter struct {
     ID              uuid.UUID      `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
     
     // Course Relationship
-    CourseID        uuid.UUID      `gorm:"type:uuid;not null;index"`
+    CourseID     uuid.UUID `gorm:"type:uuid;not null;uniqueIndex:idx_course_chapter_number"`
     
     // Chapter Identification
     Title           string         `gorm:"type:varchar(255);not null"`
@@ -17,7 +17,7 @@ type Chapter struct {
     Description     string         `gorm:"type:text"`
     
     // Chapter Organization
-    ChapterNumber   int            `gorm:"default:0;index"` // Display number (Chapter 1, Chapter 2)
+    ChapterNumber int `gorm:"default:1;index;uniqueIndex:idx_course_chapter_number"`
     
     // Access Control
     IsFree          bool           `gorm:"default:false"` // Free preview chapter
@@ -37,6 +37,59 @@ type Chapter struct {
     // Timestamps
     CreatedAt       time.Time
     UpdatedAt       time.Time
+}
+
+type ChapterInput struct {
+	CourseID      uuid.UUID `json:"course_id" binding:"required"`
+	Title         string    `json:"title" binding:"required"`
+	Slug          string    `json:"slug" binding:"required"`
+	Description   string    `json:"description"`
+	ChapterNumber int       `json:"chapter_number"`
+	IsFree        bool      `json:"is_free"`
+	Status        string    `json:"status" default:"draft"`
+	EstimatedTime int       `json:"estimated_time"`
+}
+
+
+type FailureResponse struct {
+	Error string `json:"error" example:"Failed to create chapter"`
+}
+type NotFoundResponse struct {
+	Error string `json:"error" example:"Chapter not found"`
+}
+type SuccessResponse struct {
+	Message string `json:"message" example:"Chapter created successfully"`
+}
+type DeleteSuccessResponse struct {
+	Message string `json:"message" example:"Chapter deleted successfully"`
+}
+type ErrorResponses struct {
+	Error string `json:"error" example:"Invalid chapter ID"`
+}
+type DuplicateChapterError struct {
+	Error string `json:"error" example:"Chapter number already exists for this course"`
+}
+
+type ChapterResponse struct {
+	ID            uuid.UUID `json:"id"`
+	CourseID      uuid.UUID `json:"course_id"`
+	Title         string    `json:"title"`
+	Slug          string    `json:"slug"`
+	Description   string    `json:"description"`
+	ChapterNumber int       `json:"chapter_number"`
+	IsFree        bool      `json:"is_free"`
+	Status        string    `json:"status"`
+	EstimatedTime int       `json:"estimated_time"`
+	TotalLessons  int       `json:"total_lessons"`
+	TotalDuration int       `json:"total_duration"`
+
+	Course struct {
+		ID    uuid.UUID `json:"id"`
+		Title string    `json:"title"`
+	} `json:"course"`
+
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 // TableName specifies the table name

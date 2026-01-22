@@ -322,6 +322,30 @@ definitions:
     required:
     - name
     type: object
+  models.ChapterInput:
+    properties:
+      chapter_number:
+        type: integer
+      course_id:
+        type: string
+      description:
+        type: string
+      estimated_time:
+        type: integer
+      is_free:
+        type: boolean
+      slug:
+        type: string
+      status:
+        default: draft
+        type: string
+      title:
+        type: string
+    required:
+    - course_id
+    - slug
+    - title
+    type: object
   models.CreateCourseCategoryRequest:
     properties:
       category_id:
@@ -342,6 +366,18 @@ definitions:
     - course_id
     - product_id
     type: object
+  models.DeleteSuccessResponse:
+    properties:
+      message:
+        example: Chapter deleted successfully
+        type: string
+    type: object
+  models.DuplicateChapterError:
+    properties:
+      error:
+        example: Chapter number already exists for this course
+        type: string
+    type: object
   models.ErrorResponse:
     description: Error response structure
     properties:
@@ -350,6 +386,18 @@ definitions:
         type: string
       message:
         example: Please check your input
+        type: string
+    type: object
+  models.ErrorResponses:
+    properties:
+      error:
+        example: Invalid chapter ID
+        type: string
+    type: object
+  models.FailureResponse:
+    properties:
+      error:
+        example: Failed to create chapter
         type: string
     type: object
   models.LoginInput:
@@ -393,6 +441,12 @@ definitions:
         type: string
       status:
         example: logged_out
+        type: string
+    type: object
+  models.NotFoundResponse:
+    properties:
+      error:
+        example: Chapter not found
         type: string
     type: object
   models.Product:
@@ -470,6 +524,12 @@ definitions:
         type: string
       ip_address:
         example: 192.168.1.1
+        type: string
+    type: object
+  models.SuccessResponse:
+    properties:
+      message:
+        example: Chapter created successfully
         type: string
     type: object
   models.User:
@@ -900,6 +960,111 @@ paths:
       summary: Delete a course category relationship
       tags:
       - Course Categories
+  /api/chapters:
+    post:
+      consumes:
+      - application/json
+      description: Create a new chapter
+      parameters:
+      - description: Chapter
+        in: body
+        name: chapter
+        required: true
+        schema:
+          $ref: '#/definitions/models.ChapterInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponses'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/models.DuplicateChapterError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.FailureResponse'
+      summary: Create a new chapters
+      tags:
+      - Chapters
+  /api/chapters/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an existing chapter
+      parameters:
+      - description: Chapter ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.DeleteSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponses'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.FailureResponse'
+      summary: Delete an existing chapter
+      tags:
+      - Chapters
+    put:
+      consumes:
+      - application/json
+      description: Update an existing chapter
+      parameters:
+      - description: Chapter ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Chapter
+        in: body
+        name: chapter
+        required: true
+        schema:
+          $ref: '#/definitions/models.ChapterInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponses'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.FailureResponse'
+      summary: Update an existing chapter
+      tags:
+      - Chapters
   /api/course-products:
     post:
       consumes:
@@ -1667,6 +1832,58 @@ paths:
       summary: Category Details with Related Courses
       tags:
       - Categories
+  /chapters:
+    get:
+      consumes:
+      - application/json
+      description: Get all chapters
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.FailureResponse'
+      summary: Get all chapters
+      tags:
+      - Chapters
+  /chapters/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a single chapter by ID
+      parameters:
+      - description: Chapter ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponses'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.FailureResponse'
+      summary: Get a single chapter by ID
+      tags:
+      - Chapters
   /courses:
     get:
       description: Retrieve all courses available in the system
