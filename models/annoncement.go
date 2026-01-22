@@ -21,6 +21,9 @@ type Announcement struct {
 
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+
+	// Relationships
+    UserDetails    User   `gorm:"foreignKey:CreatedBy" json:"user_details,omitempty"`
 }
 
 func (Announcement) TableName() string {

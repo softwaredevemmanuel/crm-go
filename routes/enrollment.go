@@ -11,7 +11,6 @@ func EnrollmentRoutes(r *gin.Engine) {
 		enrollments.GET("/", enrollmentsController.GetEnrollments)
 		enrollments.GET("/:id", enrollmentsController.GetEnrollmentByID)
 		enrollments.POST("/", enrollmentsController.CreateEnrollment)
-		enrollments.PUT("/:id", enrollmentsController.UpdateEnrollment)
 
 	}
 }

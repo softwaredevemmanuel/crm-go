@@ -1,5 +1,58 @@
 basePath: /
 definitions:
+  annoncements.AnnouncementInput:
+    properties:
+      audience:
+        description: all, students, tutors, admins
+        example: all
+        type: string
+      created_by:
+        example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        type: string
+      end_date:
+        example: "2026-01-22T04:00:00Z"
+        type: string
+      is_pinned:
+        example: true
+        type: boolean
+      message:
+        example: The platform will be unavailable from 2AM to 4AM.
+        type: string
+      start_date:
+        example: "2026-01-22T02:00:00Z"
+        type: string
+      title:
+        example: System Maintenance
+        type: string
+      type:
+        description: general, update, maintenance, urgent
+        example: maintenance
+        type: string
+    type: object
+  annoncements.DeleteSuccessResponse:
+    properties:
+      message:
+        example: Announcement deleted successfully
+        type: string
+    type: object
+  annoncements.ErrorResponse:
+    properties:
+      error:
+        example: Invalid announcement ID
+        type: string
+    type: object
+  annoncements.FailureResponse:
+    properties:
+      error:
+        example: Failed to create announcement
+        type: string
+    type: object
+  annoncements.NotFoundResponse:
+    properties:
+      error:
+        example: Announcement not found
+        type: string
+    type: object
   controllers.CourseResponse:
     properties:
       description:
@@ -139,6 +192,37 @@ definitions:
       warning:
         example: No active session found for this token
         type: string
+    type: object
+  models.Announcement:
+    properties:
+      audience:
+        description: all, students, tutors, admins
+        type: string
+      created_at:
+        type: string
+      created_by:
+        type: string
+      end_date:
+        type: string
+      id:
+        type: string
+      is_pinned:
+        type: boolean
+      message:
+        type: string
+      start_date:
+        type: string
+      title:
+        type: string
+      type:
+        description: general, update, maintenance, urgent
+        type: string
+      updated_at:
+        type: string
+      user_details:
+        allOf:
+        - $ref: '#/definitions/models.User'
+        description: Relationships
     type: object
   models.Category:
     properties:
@@ -312,6 +396,27 @@ definitions:
         example: 192.168.1.1
         type: string
     type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      last_name:
+        type: string
+      picture:
+        type: string
+      provider:
+        type: string
+      role:
+        $ref: '#/definitions/models.Role'
+      updated_at:
+        type: string
+    type: object
   models.UserInfo:
     description: User information
     properties:
@@ -341,6 +446,167 @@ info:
   title: GO CRM API
   version: "1.0"
 paths:
+  /announcements:
+    get:
+      consumes:
+      - application/json
+      description: Get all announcements
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Announcement'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/annoncements.FailureResponse'
+      summary: Get all announcements
+      tags:
+      - Announcements
+  /announcements/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get an announcement by ID
+      parameters:
+      - description: Announcement ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Announcement'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/annoncements.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/annoncements.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/annoncements.FailureResponse'
+      summary: Get an announcement by ID
+      tags:
+      - Announcements
+  /api/announcements:
+    post:
+      consumes:
+      - application/json
+      description: Create a new announcement
+      parameters:
+      - description: Announcement
+        in: body
+        name: announcement
+        required: true
+        schema:
+          $ref: '#/definitions/annoncements.AnnouncementInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Announcement'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/annoncements.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/annoncements.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new announcement
+      tags:
+      - Announcements
+  /api/announcements/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an announcement by ID
+      parameters:
+      - description: Announcement ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/annoncements.DeleteSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/annoncements.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/annoncements.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/annoncements.FailureResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete an announcement by ID
+      tags:
+      - Announcements
+    put:
+      consumes:
+      - application/json
+      description: Update an announcement by ID
+      parameters:
+      - description: Announcement ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Announcement
+        in: body
+        name: announcement
+        required: true
+        schema:
+          $ref: '#/definitions/annoncements.AnnouncementInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Announcement'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/annoncements.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/annoncements.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/annoncements.FailureResponse'
+      security:
+      - BearerAuth: []
+      summary: Update an announcement by ID
+      tags:
+      - Announcements
   /api/categories:
     post:
       consumes:
