@@ -644,13 +644,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponses"
+                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/models.DuplicateChapterError"
+                            "$ref": "#/definitions/models.ConflictResponse"
                         }
                     },
                     "500": {
@@ -703,7 +703,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponses"
+                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     },
                     "404": {
@@ -751,7 +751,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponses"
+                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     },
                     "404": {
@@ -1141,6 +1141,177 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/lessons": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new lesson under a chapter",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Create a lesson",
+                "parameters": [
+                    {
+                        "description": "Lesson payload",
+                        "name": "lesson",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.LessonInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/models.ConflictResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.FailureResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/lessons/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update lesson details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Update lesson",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Lesson ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Lesson payload",
+                        "name": "lesson",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.LessonInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.LessonResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.FailureResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Delete lesson by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Delete lesson",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Lesson ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.FailureResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/products": {
             "post": {
                 "security": [
@@ -1356,13 +1527,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/assignments.SuccessResponse"
+                            "$ref": "#/definitions/models.SuccessResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/assignments.FailureResponse"
+                            "$ref": "#/definitions/models.FailureResponse"
                         }
                     }
                 }
@@ -1386,7 +1557,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/assignments.AssignmentInput"
+                            "$ref": "#/definitions/models.AssignmentInput"
                         }
                     }
                 ],
@@ -1394,19 +1565,19 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/assignments.SuccessResponse"
+                            "$ref": "#/definitions/models.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/assignments.ErrorResponse"
+                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/assignments.FailureResponse"
+                            "$ref": "#/definitions/models.FailureResponse"
                         }
                     }
                 }
@@ -1435,22 +1606,28 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessResponse"
+                        }
+                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/assignments.ErrorResponse"
+                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/assignments.NotFoundResponse"
+                            "$ref": "#/definitions/models.NotFoundResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/assignments.FailureResponse"
+                            "$ref": "#/definitions/models.FailureResponse"
                         }
                     }
                 }
@@ -1476,12 +1653,12 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Assignment",
+                        "description": "Assignment payload",
                         "name": "assignment",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Assignment"
+                            "$ref": "#/definitions/models.AssignmentUpdateInput"
                         }
                     }
                 ],
@@ -1489,19 +1666,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/assignments.ErrorResponse"
+                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/assignments.NotFoundResponse"
+                            "$ref": "#/definitions/models.NotFoundResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/assignments.FailureResponse"
+                            "$ref": "#/definitions/models.FailureResponse"
                         }
                     }
                 }
@@ -1531,25 +1708,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/assignments.DeleteSuccessResponse"
+                            "$ref": "#/definitions/models.DeleteSuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/assignments.ErrorResponse"
+                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/assignments.NotFoundResponse"
+                            "$ref": "#/definitions/models.NotFoundResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/assignments.FailureResponse"
+                            "$ref": "#/definitions/models.FailureResponse"
                         }
                     }
                 }
@@ -2005,7 +2182,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponses"
+                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     },
                     "404": {
@@ -2291,6 +2468,76 @@ const docTemplate = `{
                 }
             }
         },
+        "/lessons": {
+            "get": {
+                "description": "Get all lessons",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "List lessons",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.LessonResponse"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.FailureResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/lessons/{id}": {
+            "get": {
+                "description": "Get lesson with chapter and course details",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Get lesson details",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Lesson ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.LessonResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.NotFoundResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/products": {
             "get": {
                 "description": "Retrieve a list of all products",
@@ -2494,110 +2741,6 @@ const docTemplate = `{
                 "error": {
                     "type": "string",
                     "example": "Announcement not found"
-                }
-            }
-        },
-        "assignments.AssignmentInput": {
-            "type": "object",
-            "required": [
-                "course_id",
-                "due_date",
-                "published_by",
-                "title"
-            ],
-            "properties": {
-                "chapter_id": {
-                    "type": "string"
-                },
-                "course_id": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "due_date": {
-                    "type": "string"
-                },
-                "learning_objectives": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "lesson_id": {
-                    "type": "string"
-                },
-                "published_by": {
-                    "type": "string"
-                },
-                "slug": {
-                    "description": "optional, can be auto-generated",
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string",
-                    "enum": [
-                        "homework",
-                        "project",
-                        "essay",
-                        "quiz",
-                        "exam",
-                        "lab",
-                        "presentation",
-                        "discussion",
-                        "peer_review",
-                        "group",
-                        "research",
-                        "creative"
-                    ]
-                }
-            }
-        },
-        "assignments.DeleteSuccessResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string",
-                    "example": "Assignment deleted successfully"
-                }
-            }
-        },
-        "assignments.ErrorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Invalid assignment ID"
-                }
-            }
-        },
-        "assignments.FailureResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Failed to create assignment"
-                }
-            }
-        },
-        "assignments.NotFoundResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Assignment not found"
-                }
-            }
-        },
-        "assignments.SuccessResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string",
-                    "example": "Assignment created successfully"
                 }
             }
         },
@@ -2857,8 +3000,96 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Assignment": {
-            "type": "object"
+        "models.AssignmentInput": {
+            "type": "object",
+            "required": [
+                "course_id",
+                "due_date",
+                "slug",
+                "title"
+            ],
+            "properties": {
+                "chapter_id": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "course_id": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "due_date": {
+                    "type": "string"
+                },
+                "lesson_id": {
+                    "type": "string"
+                },
+                "publisher_id": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "submission_type": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.AssignmentUpdateInput": {
+            "type": "object",
+            "required": [
+                "course_id",
+                "due_date",
+                "slug",
+                "title"
+            ],
+            "properties": {
+                "chapter_id": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "course_id": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "due_date": {
+                    "type": "string"
+                },
+                "lesson_id": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "submission_type": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
         },
         "models.Category": {
             "type": "object",
@@ -2929,6 +3160,14 @@ const docTemplate = `{
                 }
             }
         },
+        "models.ConflictResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
         "models.CreateCourseCategoryRequest": {
             "type": "object",
             "required": [
@@ -2963,17 +3202,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "message": {
-                    "type": "string",
-                    "example": "Chapter deleted successfully"
-                }
-            }
-        },
-        "models.DuplicateChapterError": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Chapter number already exists for this course"
+                    "type": "string"
                 }
             }
         },
@@ -2991,21 +3220,68 @@ const docTemplate = `{
                 }
             }
         },
-        "models.ErrorResponses": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Invalid chapter ID"
-                }
-            }
-        },
         "models.FailureResponse": {
             "type": "object",
             "properties": {
                 "error": {
-                    "type": "string",
-                    "example": "Failed to create chapter"
+                    "type": "string"
+                }
+            }
+        },
+        "models.LessonInput": {
+            "type": "object",
+            "required": [
+                "chapter_id",
+                "content_type",
+                "content_url",
+                "course_id",
+                "title"
+            ],
+            "properties": {
+                "chapter_id": {
+                    "type": "string"
+                },
+                "content_type": {
+                    "description": "video, pdf, text, quiz",
+                    "type": "string"
+                },
+                "content_url": {
+                    "type": "string"
+                },
+                "course_id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.LessonResponse": {
+            "type": "object",
+            "properties": {
+                "chapter_id": {
+                    "type": "string"
+                },
+                "content_type": {
+                    "type": "string"
+                },
+                "content_url": {
+                    "type": "string"
+                },
+                "course_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
         },
@@ -3019,11 +3295,11 @@ const docTemplate = `{
             "properties": {
                 "email": {
                     "type": "string",
-                    "example": "user@example.com"
+                    "example": "eokereke47@gmail.com"
                 },
                 "password": {
                     "type": "string",
-                    "example": "password123"
+                    "example": "123456"
                 }
             }
         },
@@ -3073,8 +3349,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "error": {
-                    "type": "string",
-                    "example": "Chapter not found"
+                    "type": "string"
                 }
             }
         },
@@ -3191,8 +3466,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "message": {
-                    "type": "string",
-                    "example": "Chapter created successfully"
+                    "type": "string"
                 }
             }
         },

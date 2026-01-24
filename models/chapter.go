@@ -7,33 +7,21 @@ import (
 
 type Chapter struct {
     ID              uuid.UUID      `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-    
-    // Course Relationship
-    CourseID     uuid.UUID `gorm:"type:uuid;not null;uniqueIndex:idx_course_chapter_number"`
-    
-    // Chapter Identification
+    CourseID     uuid.UUID `gorm:"type:uuid;not null;uniqueIndex:idx_course_chapter_number"`    
     Title           string         `gorm:"type:varchar(255);not null"`
 	Slug            string         `gorm:"type:varchar(300);not null;index"` // introduction-to-python
     Description     string         `gorm:"type:text"`
-    
-    // Chapter Organization
-    ChapterNumber int `gorm:"default:1;index;uniqueIndex:idx_course_chapter_number"`
-    
-    // Access Control
+    ChapterNumber   int            `gorm:"default:1;index;uniqueIndex:idx_course_chapter_number"`
     IsFree          bool           `gorm:"default:false"` // Free preview chapter
-	 // Status & Workflow
-    Status          string         `gorm:"type:varchar(20);default:'draft';check:status IN ('draft', 'review', 'approved', 'published', 'archived')"`
-    
-    
-   // Content Details
+    Status          string         `gorm:"type:varchar(20);default:'draft';check:status IN ('draft', 'review', 'approved', 'published', 'archived')"`    
     EstimatedTime   int            `gorm:"default:0"` // Estimated minutes to complete
     TotalLessons    int            `gorm:"default:0"` // Auto-calculated lesson count
     TotalDuration   int            `gorm:"default:0"` // Auto-calculated total minutes
     
     // Relationships
     Course          Course         `gorm:"foreignKey:CourseID"`
-    Lessons         []Lesson       `gorm:"foreignKey:ChapterID"`
-    
+    Lessons         *[]Lesson      `gorm:"foreignKey:ChapterID"`
+
     // Timestamps
     CreatedAt       time.Time
     UpdatedAt       time.Time
@@ -51,25 +39,6 @@ type ChapterInput struct {
 }
 
 
-type FailureResponse struct {
-	Error string `json:"error" example:"Failed to create chapter"`
-}
-type NotFoundResponse struct {
-	Error string `json:"error" example:"Chapter not found"`
-}
-type SuccessResponse struct {
-	Message string `json:"message" example:"Chapter created successfully"`
-}
-type DeleteSuccessResponse struct {
-	Message string `json:"message" example:"Chapter deleted successfully"`
-}
-type ErrorResponses struct {
-	Error string `json:"error" example:"Invalid chapter ID"`
-}
-type DuplicateChapterError struct {
-	Error string `json:"error" example:"Chapter number already exists for this course"`
-}
-
 type ChapterResponse struct {
 	ID            uuid.UUID `json:"id"`
 	CourseID      uuid.UUID `json:"course_id"`
@@ -82,14 +51,8 @@ type ChapterResponse struct {
 	EstimatedTime int       `json:"estimated_time"`
 	TotalLessons  int       `json:"total_lessons"`
 	TotalDuration int       `json:"total_duration"`
-
-	Course struct {
-		ID    uuid.UUID `json:"id"`
-		Title string    `json:"title"`
-	} `json:"course"`
-
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 // TableName specifies the table name

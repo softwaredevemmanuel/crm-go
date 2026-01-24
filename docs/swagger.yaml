@@ -53,80 +53,6 @@ definitions:
         example: Announcement not found
         type: string
     type: object
-  assignments.AssignmentInput:
-    properties:
-      chapter_id:
-        type: string
-      course_id:
-        type: string
-      description:
-        type: string
-      due_date:
-        type: string
-      learning_objectives:
-        items:
-          type: string
-        type: array
-      lesson_id:
-        type: string
-      published_by:
-        type: string
-      slug:
-        description: optional, can be auto-generated
-        type: string
-      title:
-        type: string
-      type:
-        enum:
-        - homework
-        - project
-        - essay
-        - quiz
-        - exam
-        - lab
-        - presentation
-        - discussion
-        - peer_review
-        - group
-        - research
-        - creative
-        type: string
-    required:
-    - course_id
-    - due_date
-    - published_by
-    - title
-    type: object
-  assignments.DeleteSuccessResponse:
-    properties:
-      message:
-        example: Assignment deleted successfully
-        type: string
-    type: object
-  assignments.ErrorResponse:
-    properties:
-      error:
-        example: Invalid assignment ID
-        type: string
-    type: object
-  assignments.FailureResponse:
-    properties:
-      error:
-        example: Failed to create assignment
-        type: string
-    type: object
-  assignments.NotFoundResponse:
-    properties:
-      error:
-        example: Assignment not found
-        type: string
-    type: object
-  assignments.SuccessResponse:
-    properties:
-      message:
-        example: Assignment created successfully
-        type: string
-    type: object
   controllers.CourseResponse:
     properties:
       description:
@@ -298,7 +224,67 @@ definitions:
         - $ref: '#/definitions/models.User'
         description: Relationships
     type: object
-  models.Assignment:
+  models.AssignmentInput:
+    properties:
+      chapter_id:
+        type: string
+      content:
+        type: string
+      course_id:
+        type: string
+      description:
+        type: string
+      due_date:
+        type: string
+      lesson_id:
+        type: string
+      publisher_id:
+        type: string
+      slug:
+        type: string
+      status:
+        type: string
+      submission_type:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+    required:
+    - course_id
+    - due_date
+    - slug
+    - title
+    type: object
+  models.AssignmentUpdateInput:
+    properties:
+      chapter_id:
+        type: string
+      content:
+        type: string
+      course_id:
+        type: string
+      description:
+        type: string
+      due_date:
+        type: string
+      lesson_id:
+        type: string
+      slug:
+        type: string
+      status:
+        type: string
+      submission_type:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+    required:
+    - course_id
+    - due_date
+    - slug
+    - title
     type: object
   models.Category:
     properties:
@@ -346,6 +332,11 @@ definitions:
     - slug
     - title
     type: object
+  models.ConflictResponse:
+    properties:
+      error:
+        type: string
+    type: object
   models.CreateCourseCategoryRequest:
     properties:
       category_id:
@@ -369,13 +360,6 @@ definitions:
   models.DeleteSuccessResponse:
     properties:
       message:
-        example: Chapter deleted successfully
-        type: string
-    type: object
-  models.DuplicateChapterError:
-    properties:
-      error:
-        example: Chapter number already exists for this course
         type: string
     type: object
   models.ErrorResponse:
@@ -388,26 +372,58 @@ definitions:
         example: Please check your input
         type: string
     type: object
-  models.ErrorResponses:
-    properties:
-      error:
-        example: Invalid chapter ID
-        type: string
-    type: object
   models.FailureResponse:
     properties:
       error:
-        example: Failed to create chapter
+        type: string
+    type: object
+  models.LessonInput:
+    properties:
+      chapter_id:
+        type: string
+      content_type:
+        description: video, pdf, text, quiz
+        type: string
+      content_url:
+        type: string
+      course_id:
+        type: string
+      title:
+        type: string
+    required:
+    - chapter_id
+    - content_type
+    - content_url
+    - course_id
+    - title
+    type: object
+  models.LessonResponse:
+    properties:
+      chapter_id:
+        type: string
+      content_type:
+        type: string
+      content_url:
+        type: string
+      course_id:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+      updated_at:
         type: string
     type: object
   models.LoginInput:
     description: Login request payload
     properties:
       email:
-        example: user@example.com
+        example: eokereke47@gmail.com
         type: string
       password:
-        example: password123
+        example: "123456"
         type: string
     required:
     - email
@@ -446,7 +462,6 @@ definitions:
   models.NotFoundResponse:
     properties:
       error:
-        example: Chapter not found
         type: string
     type: object
   models.Product:
@@ -529,7 +544,6 @@ definitions:
   models.SuccessResponse:
     properties:
       message:
-        example: Chapter created successfully
         type: string
     type: object
   models.User:
@@ -982,11 +996,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponses'
+            $ref: '#/definitions/models.ErrorResponse'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/models.DuplicateChapterError'
+            $ref: '#/definitions/models.ConflictResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -1015,7 +1029,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponses'
+            $ref: '#/definitions/models.ErrorResponse'
         "404":
           description: Not Found
           schema:
@@ -1053,7 +1067,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponses'
+            $ref: '#/definitions/models.ErrorResponse'
         "404":
           description: Not Found
           schema:
@@ -1305,6 +1319,115 @@ paths:
       summary: Export all data to Excel
       tags:
       - Export
+  /api/lessons:
+    post:
+      consumes:
+      - application/json
+      description: Create a new lesson under a chapter
+      parameters:
+      - description: Lesson payload
+        in: body
+        name: lesson
+        required: true
+        schema:
+          $ref: '#/definitions/models.LessonInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/models.ConflictResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.FailureResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a lesson
+      tags:
+      - Lessons
+  /api/lessons/{id}:
+    delete:
+      description: Delete lesson by ID
+      parameters:
+      - description: Lesson ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.FailureResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete lesson
+      tags:
+      - Lessons
+    put:
+      consumes:
+      - application/json
+      description: Update lesson details
+      parameters:
+      - description: Lesson ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Lesson payload
+        in: body
+        name: lesson
+        required: true
+        schema:
+          $ref: '#/definitions/models.LessonInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.LessonResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.FailureResponse'
+      security:
+      - BearerAuth: []
+      summary: Update lesson
+      tags:
+      - Lessons
   /api/products:
     post:
       consumes:
@@ -1443,11 +1566,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/assignments.SuccessResponse'
+            $ref: '#/definitions/models.SuccessResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/assignments.FailureResponse'
+            $ref: '#/definitions/models.FailureResponse'
       summary: Get all assignments
       tags:
       - Assignments
@@ -1461,22 +1584,22 @@ paths:
         name: assignment
         required: true
         schema:
-          $ref: '#/definitions/assignments.AssignmentInput'
+          $ref: '#/definitions/models.AssignmentInput'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/assignments.SuccessResponse'
+            $ref: '#/definitions/models.SuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/assignments.ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/assignments.FailureResponse'
+            $ref: '#/definitions/models.FailureResponse'
       summary: Create a new assignment
       tags:
       - Assignments
@@ -1497,19 +1620,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/assignments.DeleteSuccessResponse'
+            $ref: '#/definitions/models.DeleteSuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/assignments.ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/assignments.NotFoundResponse'
+            $ref: '#/definitions/models.NotFoundResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/assignments.FailureResponse'
+            $ref: '#/definitions/models.FailureResponse'
       summary: Delete an existing assignment
       tags:
       - Assignments
@@ -1526,18 +1649,22 @@ paths:
       produces:
       - application/json
       responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/assignments.ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/assignments.NotFoundResponse'
+            $ref: '#/definitions/models.NotFoundResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/assignments.FailureResponse'
+            $ref: '#/definitions/models.FailureResponse'
       summary: Get a single assignment by ID
       tags:
       - Assignments
@@ -1551,27 +1678,27 @@ paths:
         name: id
         required: true
         type: string
-      - description: Assignment
+      - description: Assignment payload
         in: body
         name: assignment
         required: true
         schema:
-          $ref: '#/definitions/models.Assignment'
+          $ref: '#/definitions/models.AssignmentUpdateInput'
       produces:
       - application/json
       responses:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/assignments.ErrorResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/assignments.NotFoundResponse'
+            $ref: '#/definitions/models.NotFoundResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/assignments.FailureResponse'
+            $ref: '#/definitions/models.FailureResponse'
       summary: Update an existing assignment
       tags:
       - Assignments
@@ -1872,7 +1999,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponses'
+            $ref: '#/definitions/models.ErrorResponse'
         "404":
           description: Not Found
           schema:
@@ -2062,6 +2189,52 @@ paths:
       summary: Get enrollment by ID
       tags:
       - Enrollments
+  /lessons:
+    get:
+      description: Get all lessons
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.LessonResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.FailureResponse'
+      summary: List lessons
+      tags:
+      - Lessons
+  /lessons/{id}:
+    get:
+      description: Get lesson with chapter and course details
+      parameters:
+      - description: Lesson ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.LessonResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.NotFoundResponse'
+      summary: Get lesson details
+      tags:
+      - Lessons
   /products:
     get:
       description: Retrieve a list of all products

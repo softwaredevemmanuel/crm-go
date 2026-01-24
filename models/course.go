@@ -24,3 +24,16 @@ type Course struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
+type CourseResponse struct {
+	ID               uuid.UUID      `json:"id"`
+	Title            string         `json:"title"`
+	Description      string         `json:"description"`
+	Image            string         `json:"image"`
+	VideoURL         string         `json:"video_url"`
+	TutorID          uuid.UUID      `json:"tutor_id"`
+	LearningOutcomes datatypes.JSON `json:"learning_outcomes"`
+	Requirements     datatypes.JSON `json:"requirements"`
+}
+
+
+

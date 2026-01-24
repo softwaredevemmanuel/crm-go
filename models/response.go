@@ -9,8 +9,8 @@ import (
 // LoginInput represents login request
 // @Description Login request payload
 type LoginInput struct {
-	Email    string `json:"email" binding:"required,email" example:"user@example.com"`
-	Password string `json:"password" binding:"required" example:"password123"`
+	Email    string `json:"email" binding:"required,email" example:"eokereke47@gmail.com"`
+	Password string `json:"password" binding:"required" example:"123456"`
 }
 
 // LoginResponse represents login response
@@ -71,4 +71,20 @@ type CategoryResponse struct {
 	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+}
+
+type FailureResponse struct {
+	Error string `json:"error"`
+}
+type NotFoundResponse struct {
+	Error string `json:"error"`
+}
+type SuccessResponse struct {
+	Message string `json:"message"`
+}
+type DeleteSuccessResponse struct {
+	Message string `json:"message"`
+}
+type ConflictResponse struct {
+	Error string `json:"error"`
 }

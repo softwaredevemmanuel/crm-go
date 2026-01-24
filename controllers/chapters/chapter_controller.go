@@ -18,8 +18,8 @@ import (
 //@Produce json
 //@Param chapter body models.ChapterInput true "Chapter"
 //@Success 201 {object} models.SuccessResponse
-//@Failure 400 {object} models.ErrorResponses
-//@Failure 409 {object} models.DuplicateChapterError
+//@Failure 400 {object} models.ErrorResponse
+//@Failure 409 {object} models.ConflictResponse
 //@Failure 500 {object} models.FailureResponse
 //@Router /api/chapters [post]
 func CreateChapter(c *gin.Context) {
@@ -38,7 +38,7 @@ func CreateChapter(c *gin.Context) {
 
 	if err == nil {
 		// Record found → duplicate
-		c.JSON(http.StatusConflict, models.DuplicateChapterError{Error: "Chapter number already exists for this course"})
+		c.JSON(http.StatusConflict, models.ConflictResponse{Error: "Chapter number already exists for this course"})
 		return
 	}
 
@@ -114,9 +114,6 @@ func GetAllChapters(c *gin.Context) {
 		r.CreatedAt = ch.CreatedAt
 		r.UpdatedAt = ch.UpdatedAt
 
-		r.Course.ID = ch.Course.ID
-		r.Course.Title = ch.Course.Title
-
 		response = append(response, r)
 	}
 
@@ -132,7 +129,7 @@ func GetAllChapters(c *gin.Context) {
 //@Produce json
 //@Param id path string true "Chapter ID"
 //@Success 200 {object} models.SuccessResponse
-//@Failure 400 {object} models.ErrorResponses
+//@Failure 400 {object} models.ErrorResponse
 //@Failure 404 {object} models.NotFoundResponse
 //@Failure 500 {object} models.FailureResponse
 //@Router /chapters/{id} [get]
@@ -170,7 +167,7 @@ func GetChapterByID(c *gin.Context) {
 //@Param id path string true "Chapter ID"
 //@Param chapter body models.ChapterInput true "Chapter"
 //@Success 200 {object} models.SuccessResponse
-//@Failure 400 {object} models.ErrorResponses
+//@Failure 400 {object} models.ErrorResponse
 //@Failure 404 {object} models.NotFoundResponse
 //@Failure 500 {object} models.FailureResponse
 //@Router /api/chapters/{id} [put]
@@ -250,7 +247,7 @@ func UpdateChapter(c *gin.Context) {
 //@Produce json
 //@Param id path string true "Chapter ID"
 //@Success 200 {object} models.DeleteSuccessResponse
-//@Failure 400 {object} models.ErrorResponses
+//@Failure 400 {object} models.ErrorResponse
 //@Failure 404 {object} models.NotFoundResponse
 //@Failure 500 {object} models.FailureResponse
 //@Router /api/chapters/{id} [delete]
