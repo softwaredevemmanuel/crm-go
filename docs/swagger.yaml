@@ -332,9 +332,83 @@ definitions:
     - slug
     - title
     type: object
+  models.ChapterMiniResponse:
+    properties:
+      chapter_number:
+        type: integer
+      id:
+        type: string
+      title:
+        type: string
+    type: object
   models.ConflictResponse:
     properties:
       error:
+        type: string
+    type: object
+  models.CourseMaterialResponse:
+    properties:
+      chapter_id:
+        type: string
+      course_id:
+        type: string
+      createdAt:
+        type: string
+      description:
+        type: string
+      file_url:
+        type: string
+      id:
+        type: string
+      lesson_id:
+        type: string
+      slug:
+        type: string
+      status:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+    type: object
+  models.CourseMaterialViewResponse:
+    properties:
+      chapter:
+        $ref: '#/definitions/models.ChapterMiniResponse'
+      chapter_id:
+        type: string
+      course:
+        allOf:
+        - $ref: '#/definitions/models.CourseMiniResponse'
+        description: Relationships
+      course_id:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      file_url:
+        type: string
+      id:
+        type: string
+      lesson:
+        $ref: '#/definitions/models.LessonMiniResponse'
+      lesson_id:
+        type: string
+      slug:
+        type: string
+      status:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+    type: object
+  models.CourseMiniResponse:
+    properties:
+      id:
+        type: string
+      title:
         type: string
     type: object
   models.CreateCourseCategoryRequest:
@@ -346,6 +420,29 @@ definitions:
     required:
     - category_id
     - course_id
+    type: object
+  models.CreateCourseMaterialRequest:
+    properties:
+      chapter_id:
+        type: string
+      course_id:
+        type: string
+      description:
+        type: string
+      file_url:
+        type: string
+      lesson_id:
+        type: string
+      status:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+    required:
+    - course_id
+    - title
+    - type
     type: object
   models.CreateCourseProductRequest:
     properties:
@@ -396,6 +493,17 @@ definitions:
     - content_url
     - course_id
     - title
+    type: object
+  models.LessonMiniResponse:
+    properties:
+      content_type:
+        type: string
+      content_url:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
     type: object
   models.LessonResponse:
     properties:
@@ -545,6 +653,26 @@ definitions:
     properties:
       message:
         type: string
+    type: object
+  models.UpdateCourseMaterialRequest:
+    properties:
+      chapter_id:
+        type: string
+      description:
+        type: string
+      file_url:
+        type: string
+      lesson_id:
+        type: string
+      status:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+    required:
+    - title
+    - type
     type: object
   models.User:
     properties:
@@ -1079,6 +1207,115 @@ paths:
       summary: Update an existing chapter
       tags:
       - Chapters
+  /api/course-materials:
+    post:
+      consumes:
+      - application/json
+      description: Create a new course material
+      parameters:
+      - description: Course Material
+        in: body
+        name: chapter
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateCourseMaterialRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/models.ConflictResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.FailureResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new course material
+      tags:
+      - Course Materials
+  /api/course-materials/{id}:
+    delete:
+      description: Delete course material by ID
+      parameters:
+      - description: Course Material ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.FailureResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete course material
+      tags:
+      - Course Materials
+    put:
+      consumes:
+      - application/json
+      description: Update course material details
+      parameters:
+      - description: Course Material ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Course Material payload
+        in: body
+        name: material
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateCourseMaterialRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CourseMaterialResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.FailureResponse'
+      security:
+      - BearerAuth: []
+      summary: Update course material
+      tags:
+      - Course Materials
   /api/course-products:
     post:
       consumes:
@@ -2011,6 +2248,74 @@ paths:
       summary: Get a single chapter by ID
       tags:
       - Chapters
+  /course-materials:
+    get:
+      description: Get all course materials, optionally filtered by course, chapter,
+        or lesson
+      parameters:
+      - description: Course ID
+        in: query
+        name: course_id
+        type: string
+      - description: Chapter ID
+        in: query
+        name: chapter_id
+        type: string
+      - description: Lesson ID
+        in: query
+        name: lesson_id
+        type: string
+      - description: Status
+        in: query
+        name: status
+        type: string
+      - description: Material Type
+        in: query
+        name: type
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.SuccessResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get course materials
+      tags:
+      - Course Materials
+  /course-materials/{id}:
+    get:
+      description: Get course material with chapter and lesson details
+      parameters:
+      - description: Course Material ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CourseMaterialViewResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.NotFoundResponse'
+      summary: Get course material details
+      tags:
+      - Course Materials
   /courses:
     get:
       description: Retrieve all courses available in the system
