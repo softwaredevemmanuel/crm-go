@@ -34,6 +34,11 @@ type CourseResponse struct {
 	LearningOutcomes datatypes.JSON `json:"learning_outcomes"`
 	Requirements     datatypes.JSON `json:"requirements"`
 }
+type CourseMiniResponse struct {
+	ID               uuid.UUID      `json:"id"`
+	Title            string         `json:"title"`
+}
+
 
 
 

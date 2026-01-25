@@ -29,7 +29,7 @@ type Assignment struct {
     Publisher   User      `gorm:"foreignKey:PublisherID"`
     Course      Course     `gorm:"foreignKey:CourseID"`
     Chapter     Chapter    `gorm:"foreignKey:ChapterID"`
-    Lesson      Lesson     `gorm:"foreignKey:LessonID"`
+    Lesson      Lessons     `gorm:"foreignKey:LessonID"`
 
     CreatedAt   time.Time
     UpdatedAt   time.Time

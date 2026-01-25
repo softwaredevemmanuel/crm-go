@@ -20,7 +20,7 @@ type Chapter struct {
     
     // Relationships
     Course          Course         `gorm:"foreignKey:CourseID"`
-    Lessons         *[]Lesson      `gorm:"foreignKey:ChapterID"`
+    Lessons         *[]Lessons      `gorm:"foreignKey:ChapterID"`
 
     // Timestamps
     CreatedAt       time.Time
@@ -53,6 +53,31 @@ type ChapterResponse struct {
 	TotalDuration int       `json:"total_duration"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
+}
+
+type ChapterMiniResponse struct {
+	ID            uuid.UUID `json:"id"`
+	Title         string    `json:"title"`
+	ChapterNumber int       `json:"chapter_number"`
+
+}
+
+type ChapterViewResponse struct {
+	ID            uuid.UUID `json:"id"`
+	CourseID      uuid.UUID `json:"course_id"`
+	Title         string    `json:"title"`
+	Slug          string    `json:"slug"`
+	Description   string    `json:"description"`
+	ChapterNumber int       `json:"chapter_number"`
+	IsFree        bool      `json:"is_free"`
+	Status        string    `json:"status"`
+	EstimatedTime int       `json:"estimated_time"`
+	TotalDuration int       `json:"total_duration"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
+
+	Course      CourseMiniResponse                   `json:"course"`
+	Lessons     *LessonMiniResponse                 `json:"lessons,omitempty"`
 }
 
 // TableName specifies the table name

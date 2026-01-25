@@ -6,7 +6,8 @@ import (
 	"net/http"
 	"crm-go/config"
 	"github.com/google/uuid"
-	"gorm.io/gorm"
+	// "gorm.io/gorm"
+	
 )
 
 // CreateLesson godoc
@@ -31,7 +32,7 @@ func CreateLesson(c *gin.Context) {
 	}
 
 	// 🔒 Duplicate check
-	var existing models.Lesson
+	var existing models.Lessons
 	if err := config.DB.
 		Where("course_id = ? AND chapter_id = ? AND title = ?",
 			input.CourseID, input.ChapterID, input.Title).
@@ -43,7 +44,7 @@ func CreateLesson(c *gin.Context) {
 		return
 	}
 
-	lesson := models.Lesson{
+	lesson := models.Lessons{
 		ID:          uuid.New(),
 		CourseID:    input.CourseID,
 		ChapterID:   input.ChapterID,
@@ -63,48 +64,59 @@ func CreateLesson(c *gin.Context) {
 }
 
 // GetLessons godoc
-// @Summary      List lessons
-// @Description  Get all lessons
+// @Summary      Get lessons
+// @Description  Get all lessons, optionally filtered by course or chapter
 // @Tags         Lessons
 // @Produce      json
-// @Success      200 {array} models.LessonResponse
-// @Failure      500 {object} models.FailureResponse
+// @Param        course_id   query   string  false  "Course ID"
+// @Param        chapter_id  query   string  false  "Chapter ID"
+// @Success      200 {array}  models.LessonResponse
+// @Failure      400 {object} models.ErrorResponse
 // @Router       /lessons [get]
-func GetLessons(c *gin.Context) {
-	var lessons []models.Lesson
+func GetAllLessons(c *gin.Context) {
+	var lessons []models.Lessons
 
-	if err := config.DB.
-		Preload("Chapter", func(db *gorm.DB) *gorm.DB {
-			return db.
-				Select("id", "course_id", "title", "slug", "description",
-					"chapter_number", "is_free", "status",
-					"estimated_time", "total_lessons", "total_duration",
-					"created_at", "updated_at").
-				Preload("Course", func(db *gorm.DB) *gorm.DB {
-					return db.Select(
-						"id", "title", "description", "image",
-						"video_url", "tutor_id",
-						"learning_outcomes", "requirements",
-						"created_at", "updated_at",
-					)
-				})
-		}).
-		Select(
-			"id", "chapter_id", "course_id",
-			"title", "content_type", "content_url",
-			"created_at", "updated_at",
-		).
+	query := config.DB
+
+	if courseID := c.Query("course_id"); courseID != "" {
+		if uid, err := uuid.Parse(courseID); err == nil {
+			query = query.Where("course_id = ?", uid)
+		}
+	}
+
+	if chapterID := c.Query("chapter_id"); chapterID != "" {
+		if uid, err := uuid.Parse(chapterID); err == nil {
+			query = query.Where("chapter_id = ?", uid)
+		}
+	}
+
+	if err := query.
 		Order("created_at DESC").
 		Find(&lessons).Error; err != nil {
 
-		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
-			Error: "Failed to fetch lessons",
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to fetch lessons",
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, lessons)
+	responses := make([]models.LessonResponse, 0, len(lessons))
+	for _, lesson := range lessons {
+		responses = append(responses, models.LessonResponse{
+			ID:          lesson.ID,
+			ChapterID:   lesson.ChapterID,
+			CourseID:    lesson.CourseID,
+			Title:       lesson.Title,
+			ContentType: lesson.ContentType,
+			ContentURL:  lesson.ContentURL,
+			CreatedAt:   lesson.CreatedAt,
+			UpdatedAt:   lesson.UpdatedAt,
+		})
+	}
+
+	c.JSON(http.StatusOK, responses)
 }
+
 
 
 
@@ -129,12 +141,14 @@ func GetLessonByID(c *gin.Context) {
 		return
 	}
 
-	var lesson models.Lesson
+	var lesson models.Lessons
 
+	// Fetch lesson with relations
 	if err := config.DB.
 		Preload("Chapter").
-		Preload("Course").
-		First(&lesson, "id = ?", lessonID).Error; err != nil {
+		Preload("Chapter.Course").
+		First(&lesson, "id = ?", lessonID).
+		Error; err != nil {
 
 		c.JSON(http.StatusNotFound, models.ErrorResponse{
 			Error: "Lesson not found",
@@ -142,8 +156,30 @@ func GetLessonByID(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, lesson)
+	// Map to DTO
+	response := models.LessonViewResponse{
+		ID:          lesson.ID,
+		ChapterID:   lesson.ChapterID,
+		CourseID:    lesson.CourseID,
+		Title:       lesson.Title,
+		ContentType: lesson.ContentType,
+		ContentURL:  lesson.ContentURL,
+		CreatedAt:   lesson.CreatedAt,
+		UpdatedAt:   lesson.UpdatedAt,
+		Course:      models.CourseMiniResponse{
+			ID:    lesson.Chapter.Course.ID,
+			Title: lesson.Chapter.Course.Title,
+		},
+		Chapter: &models.ChapterMiniResponse{
+			ID:    lesson.Chapter.ID,
+			Title: lesson.Chapter.Title,
+			ChapterNumber: lesson.Chapter.ChapterNumber,
+		},
+	}
+
+	c.JSON(http.StatusOK, response)
 }
+
 
 
 // UpdateLesson godoc
@@ -171,7 +207,9 @@ func UpdateLesson(c *gin.Context) {
 		return
 	}
 
-	var lesson models.Lesson
+	var lesson models.Lessons
+
+	// 1️⃣ Check if lesson exists
 	if err := config.DB.First(&lesson, "id = ?", lessonID).Error; err != nil {
 		c.JSON(http.StatusNotFound, models.ErrorResponse{
 			Error: "Lesson not found",
@@ -179,7 +217,8 @@ func UpdateLesson(c *gin.Context) {
 		return
 	}
 
-	var input models.LessonInput
+	// 2️⃣ Bind update payload
+	var input models.LessonUpdateInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse{
 			Error: err.Error(),
@@ -187,28 +226,53 @@ func UpdateLesson(c *gin.Context) {
 		return
 	}
 
-	if err := config.DB.Model(&lesson).Updates(models.Lesson{
-		ChapterID:   input.ChapterID,
-		CourseID:    input.CourseID,
-		Title:       input.Title,
-		ContentType: input.ContentType,
-		ContentURL:  input.ContentURL,
-	}).Error; err != nil {
-
+	// 3️⃣ Apply updates safely
+	if err := config.DB.Model(&lesson).Updates(input).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
-			Error: err.Error(),
+			Error: "Failed to update lesson",
 		})
 		return
 	}
 
-	// reload relations
-	config.DB.
+	// 4️⃣ Reload lesson with relations
+	if err := config.DB.
 		Preload("Chapter").
-		Preload("Course").
-		First(&lesson, "id = ?", lessonID)
+		Preload("Chapter.Course").
+		First(&lesson, "id = ?", lessonID).Error; err != nil {
 
-	c.JSON(http.StatusOK, lesson)
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Error: "Failed to load updated lesson",
+		})
+		return
+	}
+
+	// 5️⃣ Map to LessonViewResponse DTO
+	response := models.LessonViewResponse{
+		ID:          lesson.ID,
+		ChapterID:   lesson.ChapterID,
+		CourseID:    lesson.CourseID,
+		Title:       lesson.Title,
+		ContentType: lesson.ContentType,
+		ContentURL:  lesson.ContentURL,
+		CreatedAt:   lesson.CreatedAt,
+		UpdatedAt:   lesson.UpdatedAt,
+
+		Course: models.CourseMiniResponse{
+			ID:    lesson.Chapter.Course.ID,
+			Title: lesson.Chapter.Course.Title,
+		},
+
+		Chapter: &models.ChapterMiniResponse{
+			ID:            lesson.Chapter.ID,
+			Title:         lesson.Chapter.Title,
+			ChapterNumber: lesson.Chapter.ChapterNumber,
+		},
+	}
+
+	// 6️⃣ Return clean DTO
+	c.JSON(http.StatusOK, response)
 }
+
 
 
 // DeleteLesson godoc
@@ -234,7 +298,7 @@ func DeleteLesson(c *gin.Context) {
 		return
 	}
 
-	result := config.DB.Delete(&models.Lesson{}, "id = ?", lessonID)
+	result := config.DB.Delete(&models.Lessons{}, "id = ?", lessonID)
 
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse{

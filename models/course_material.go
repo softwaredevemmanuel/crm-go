@@ -34,7 +34,7 @@ type CourseMaterial struct {
     // Relationships
     Course             Course         `gorm:"foreignKey:CourseID"`
     Chapter            Chapter        `gorm:"foreignKey:ChapterID"`
-    Lesson             Lesson         `gorm:"foreignKey:LessonID"`
+    Lesson             Lessons         `gorm:"foreignKey:LessonID"`
 
     
     // Timestamps

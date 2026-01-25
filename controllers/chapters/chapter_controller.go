@@ -153,8 +153,43 @@ func GetChapterByID(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, chapter)
+	// Map Course
+	course := models.CourseMiniResponse{
+		ID:    chapter.Course.ID,
+		Title: chapter.Course.Title,
+	}
+
+	// Optional: pick one lesson (or latest)
+	var lesson *models.LessonMiniResponse
+	if chapter.Lessons != nil && len(*chapter.Lessons) > 0 {
+		lesson = &models.LessonMiniResponse{
+			ID:    (*chapter.Lessons)[0].ID,
+			Title: (*chapter.Lessons)[0].Title,
+			ContentType: (*chapter.Lessons)[0].ContentType,
+			ContentURL:  (*chapter.Lessons)[0].ContentURL,
+		}
+	}
+
+	response := models.ChapterViewResponse{
+		ID:            chapter.ID,
+		CourseID:      chapter.CourseID,
+		Title:         chapter.Title,
+		Slug:          chapter.Slug,
+		Description:   chapter.Description,
+		ChapterNumber: chapter.ChapterNumber,
+		IsFree:        chapter.IsFree,
+		Status:        chapter.Status,
+		EstimatedTime: chapter.EstimatedTime,
+		TotalDuration: chapter.TotalDuration,
+		CreatedAt:     chapter.CreatedAt,
+		UpdatedAt:     chapter.UpdatedAt,
+		Course:        course,
+		Lessons:       lesson,
+	}
+
+	c.JSON(http.StatusOK, response)
 }
+
 
 
 

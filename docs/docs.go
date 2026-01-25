@@ -2470,14 +2470,28 @@ const docTemplate = `{
         },
         "/lessons": {
             "get": {
-                "description": "Get all lessons",
+                "description": "Get all lessons, optionally filtered by course or chapter",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Lessons"
                 ],
-                "summary": "List lessons",
+                "summary": "Get lessons",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Course ID",
+                        "name": "course_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Chapter ID",
+                        "name": "chapter_id",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -2488,10 +2502,10 @@ const docTemplate = `{
                             }
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.FailureResponse"
+                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     }
                 }

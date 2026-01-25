@@ -2191,7 +2191,16 @@ paths:
       - Enrollments
   /lessons:
     get:
-      description: Get all lessons
+      description: Get all lessons, optionally filtered by course or chapter
+      parameters:
+      - description: Course ID
+        in: query
+        name: course_id
+        type: string
+      - description: Chapter ID
+        in: query
+        name: chapter_id
+        type: string
       produces:
       - application/json
       responses:
@@ -2201,11 +2210,11 @@ paths:
             items:
               $ref: '#/definitions/models.LessonResponse'
             type: array
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
-            $ref: '#/definitions/models.FailureResponse'
-      summary: List lessons
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get lessons
       tags:
       - Lessons
   /lessons/{id}:

@@ -9,7 +9,7 @@ import (
 func LessonRoutes(r *gin.Engine) {
 	{
 		lessons := r.Group("/lessons")
-		lessons.GET("/", lessonController.GetLessons)
+		lessons.GET("/", lessonController.GetAllLessons)
 		lessons.GET("/:id", lessonController.GetLessonByID)
 
 		// Protected routes
