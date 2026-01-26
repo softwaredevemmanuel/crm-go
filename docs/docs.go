@@ -1278,6 +1278,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/deleted-records/{id}/restore": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Restores a deleted course material from archive",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "DeletedRecords"
+                ],
+                "summary": "Restore deleted course material",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Deleted Record ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.CourseMaterialResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/export/excel": {
             "get": {
                 "security": [

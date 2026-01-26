@@ -1534,6 +1534,35 @@ paths:
       summary: Update an existing course
       tags:
       - Courses
+  /api/deleted-records/{id}/restore:
+    post:
+      description: Restores a deleted course material from archive
+      parameters:
+      - description: Deleted Record ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CourseMaterialResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Restore deleted course material
+      tags:
+      - DeletedRecords
   /api/export/excel:
     get:
       description: Fetches all data from the database and exports it as an Excel (.xlsx)

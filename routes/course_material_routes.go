@@ -18,6 +18,7 @@ func CourseMaterialRoutes(r *gin.Engine) {
 		protected.POST("/course-materials", middleware.RoleMiddleware("admin"), courseMaterialController.CreateCourseMaterial)
 		protected.PUT("/course-materials/:id", middleware.RoleMiddleware("admin"), courseMaterialController.UpdateCourseMaterial)
 		protected.DELETE("/course-materials/:id", middleware.RoleMiddleware("admin"), courseMaterialController.DeleteCourseMaterial)
+		protected.POST("/deleted-records/:id/restore", middleware.RoleMiddleware("admin"), courseMaterialController.RestoreCourseMaterial)
 
 	}
 }

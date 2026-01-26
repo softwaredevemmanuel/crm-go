@@ -409,46 +409,7 @@ func UpdateCourseMaterial(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-// DeleteWithArchive moved to services/delete_service.go to avoid duplicate declarations
-// (implementation exists later in this file under the services/delete_service.go section)
 
-// services/delete_service.go
-func DeleteWithArchive(
-    tx *gorm.DB,
-    entityType string,
-    entityID uuid.UUID,
-    data any,        // This is for archiving only, NOT for deletion
-    deletedBy *uuid.UUID,
-    reason string,
-    model interface{}, // Add this parameter - the actual model to delete
-) error {
-    
-    // First, marshal the data for archiving
-    jsonData, err := json.Marshal(data)
-    if err != nil {
-        return err
-    }
-
-    // Create the archive record
-    archive := models.DeletedRecord{
-        EntityType: entityType,
-        EntityID:   entityID,
-        Data:       jsonData,
-        DeletedBy:  deletedBy,
-        Reason:     reason,
-    }
-
-    if err := tx.Create(&archive).Error; err != nil {
-        return err
-    }
-
-    // Delete the actual model, NOT the data parameter
-    if err := tx.Delete(model, "id = ?", entityID).Error; err != nil {
-        return err
-    }
-
-    return nil
-}
 
 func GetUserIDFromContext(c *gin.Context) *uuid.UUID {
 	v, exists := c.Get("user_id")
@@ -482,39 +443,39 @@ func GetUserIDFromContext(c *gin.Context) *uuid.UUID {
 // @Router       /api/course-materials/{id} [delete]
 // @Security BearerAuth
 func DeleteCourseMaterial(c *gin.Context) {
-    id := c.Param("id")
+	id := c.Param("id")
 
-    materialID, err := uuid.Parse(id)
-    if err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
-        return
-    }
+	materialID, err := uuid.Parse(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+	}
 
-    // Get the material to archive
-    var material models.CourseMaterial
-    if err := config.DB.
-        First(&material, "id = ?", materialID).
-        Error; err != nil {
-        c.JSON(http.StatusNotFound, gin.H{"error": "Material not found"})
-        return
-    }
+	// Get the material to archive
+	var material models.CourseMaterial
+	if err := config.DB.
+		First(&material, "id = ?", materialID).
+		Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Material not found"})
+		return
+	}
 
-    userID := GetUserIDFromContext(c)
+	userID := GetUserIDFromContext(c)
 
-    // Convert to response struct for archiving
-    materialResponse := models.CourseMaterialResponse{
-        ID:          material.ID,
-        CourseID:    material.CourseID,
-        ChapterID:   material.ChapterID,
-        LessonID:    material.LessonID,
-        Title:       material.Title,
-        Description: material.Description,
-        Slug:        material.Slug,
-        Type:        material.Type,
-        FileURL:     material.FileURL,
-        Status:      material.Status,
-        CreatedAt:   material.CreatedAt,
-    }
+	// Convert to response struct for archiving
+	materialResponse := models.CourseMaterialResponse{
+		ID:          material.ID,
+		CourseID:    material.CourseID,
+		ChapterID:   material.ChapterID,
+		LessonID:    material.LessonID,
+		Title:       material.Title,
+		Description: material.Description,
+		Slug:        material.Slug,
+		Type:        material.Type,
+		FileURL:     material.FileURL,
+		Status:      material.Status,
+		CreatedAt:   material.CreatedAt,
+	}
 
 	// ✅ TRANSACTION STARTS HERE
 	tx := config.DB.Begin()
@@ -537,7 +498,80 @@ func DeleteCourseMaterial(c *gin.Context) {
 
 	tx.Commit()
 
-    c.JSON(http.StatusOK, gin.H{
-        "message": "Material deleted successfully",
-    })
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Material deleted successfully",
+	})
+}
+
+// RestoreCourseMaterial godoc
+// @Summary      Restore deleted course material
+// @Description  Restores a deleted course material from archive
+// @Tags         DeletedRecords
+// @Produce      json
+// @Param        id path string true "Deleted Record ID"
+// @Success      200 {object} models.CourseMaterialResponse
+// @Failure      400 {object} models.ErrorResponse
+// @Failure      404 {object} models.ErrorResponse
+// @Router       /api/deleted-records/{id}/restore [post]
+// @Security BearerAuth
+func RestoreDeletedRecord(id uuid.UUID, target any) error {
+	var record models.DeletedRecord
+
+	if err := config.DB.First(&record, "id = ?", id).Error; err != nil {
+		return err
+	}
+
+	return json.Unmarshal(record.Data, target)
+}
+
+func RestoreCourseMaterial(c *gin.Context) {
+	idParam := c.Param("id")
+
+	deletedID, err := uuid.Parse(idParam)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "Invalid deleted record ID"})
+		return
+	}
+
+	// 1️⃣ Restore DTO
+	var archived models.CourseMaterialResponse
+	if err := RestoreDeletedRecord(deletedID, &archived); err != nil {
+		c.JSON(404, gin.H{"error": "Deleted record not found"})
+		return
+	}
+
+	// 2️⃣ Validate foreign keys BEFORE insert
+	if archived.CourseID == uuid.Nil {
+		c.JSON(400, gin.H{"error": "Archived record has no valid course_id"})
+		return
+	}
+
+	// 3️⃣ Convert DTO → model
+	material := models.CourseMaterial{
+		ID:          archived.ID,
+		CourseID:    archived.CourseID,
+		ChapterID:   archived.ChapterID,
+		LessonID:    archived.LessonID,
+		Title:       archived.Title,
+		Description: archived.Description,
+		Slug:        archived.Slug,
+		Type:        archived.Type,
+		FileURL:     archived.FileURL,
+		Status:      archived.Status,
+		CreatedAt:   archived.CreatedAt,
+	}
+
+	// 4️⃣ Restore
+	if err := config.DB.Create(&material).Error; err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	// 5️⃣ Cleanup archive
+	config.DB.Delete(&models.DeletedRecord{}, "id = ?", deletedID)
+
+	c.JSON(200, gin.H{
+		"message": "Course material restored successfully",
+		"data":    archived,
+	})
 }
