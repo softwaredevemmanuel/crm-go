@@ -53,6 +53,46 @@ definitions:
         example: Announcement not found
         type: string
     type: object
+  assignmentsubmission.CreateAssignmentSubmissionRequest:
+    properties:
+      assignment_id:
+        type: string
+      code_repo_url:
+        type: string
+      external_url:
+        type: string
+      file_url:
+        type: string
+      metadata:
+        description: Raw JSON
+        items:
+          type: string
+        type: array
+      status:
+        description: Defaults to "submitted"
+        type: string
+      student_id:
+        type: string
+      submission_type:
+        enum:
+        - text
+        - file
+        - url
+        - code
+        - video
+        - audio
+        - image
+        - document
+        - presentation
+        - multiple
+        type: string
+      text_content:
+        type: string
+    required:
+    - assignment_id
+    - student_id
+    - submission_type
+    type: object
   controllers.CourseResponse:
     properties:
       description:
@@ -885,6 +925,42 @@ paths:
       summary: Update an announcement by ID
       tags:
       - Announcements
+  /api/assignment_submissions:
+    post:
+      consumes:
+      - application/json
+      description: Create a new assignment submission
+      parameters:
+      - description: Create Assignment Submission Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/assignmentsubmission.CreateAssignmentSubmissionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new assignment submission
+      tags:
+      - Assignment Submissions
   /api/categories:
     post:
       consumes:

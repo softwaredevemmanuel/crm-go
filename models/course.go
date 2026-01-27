@@ -37,6 +37,7 @@ type CourseResponse struct {
 type CourseMiniResponse struct {
 	ID               uuid.UUID      `json:"id"`
 	Title            string         `json:"title"`
+
 }
 
 

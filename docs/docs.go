@@ -272,6 +272,63 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/assignment_submissions": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new assignment submission",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assignment Submissions"
+                ],
+                "summary": "Create a new assignment submission",
+                "parameters": [
+                    {
+                        "description": "Create Assignment Submission Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/assignmentsubmission.CreateAssignmentSubmissionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/categories": {
             "post": {
                 "security": [
@@ -3074,6 +3131,60 @@ const docTemplate = `{
                 "error": {
                     "type": "string",
                     "example": "Announcement not found"
+                }
+            }
+        },
+        "assignmentsubmission.CreateAssignmentSubmissionRequest": {
+            "type": "object",
+            "required": [
+                "assignment_id",
+                "student_id",
+                "submission_type"
+            ],
+            "properties": {
+                "assignment_id": {
+                    "type": "string"
+                },
+                "code_repo_url": {
+                    "type": "string"
+                },
+                "external_url": {
+                    "type": "string"
+                },
+                "file_url": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "description": "Raw JSON",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "status": {
+                    "description": "Defaults to \"submitted\"",
+                    "type": "string"
+                },
+                "student_id": {
+                    "type": "string"
+                },
+                "submission_type": {
+                    "type": "string",
+                    "enum": [
+                        "text",
+                        "file",
+                        "url",
+                        "code",
+                        "video",
+                        "audio",
+                        "image",
+                        "document",
+                        "presentation",
+                        "multiple"
+                    ]
+                },
+                "text_content": {
+                    "type": "string"
                 }
             }
         },
