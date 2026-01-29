@@ -78,7 +78,7 @@ func main() {
 	routes.EnrollmentRoutes(r)
 	routes.AnnouncementRoutes(r)
 	routes.AssignmentRoutes(r)
-	routes.AssignmentSubmissionRoutes(r)
+	routes.AssignmentSubmissionRoutes(r, config.DB)
 	routes.ChapterRoutes(r)
 	routes.LessonRoutes(r)
 	routes.CourseMaterialRoutes(r)
