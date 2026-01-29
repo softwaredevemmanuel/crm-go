@@ -1,20 +1,22 @@
 package assignmentsubmission
 
 import (
-    "time"
-	"net/http"
-	"github.com/gin-gonic/gin"
-	"gorm.io/datatypes"
-	"crm-go/models"
 	"crm-go/config"
-	"github.com/google/uuid"
+	controllers "crm-go/controllers/activitylogs"
+	"crm-go/models"
 	"encoding/json"
-	"strings"
 	"fmt"
-	"net/url"
 	"log"
+	"net/http"
+	"net/url"
+	"strings"
+	"time"
 
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"gorm.io/datatypes"
 )
+
 // Create DTO
 type CreateAssignmentSubmissionRequest struct {
     AssignmentID   uuid.UUID       `json:"assignment_id" binding:"required"`
@@ -44,6 +46,9 @@ type AssignmentSubmissionResponse struct {
     CreatedAt      time.Time       `json:"created_at"`
     UpdatedAt      time.Time       `json:"updated_at"`
 }
+
+var activityLogger = controllers.NewActivityLogger(config.DB)
+
 
 // CreateAssignmentSubmission creates a new assignment submission
 //@Summary Create a new assignment submission
@@ -196,19 +201,30 @@ func CreateAssignmentSubmission(c *gin.Context) {
     // }
 
     // Create activity log
-    activityLog := models.ActivityLog{
-        ID:        uuid.New(),
-        UserID:    req.StudentID,
-        Action:    "assignment_submitted",
-        EntityID:  submission.ID,
-        EntityType: "assignment_submission",
-        Details:   fmt.Sprintf("Submitted assignment: %s", assignment.Title),
-        CreatedAt: time.Now(),
+    // Create activity log with proper metadata
+    metadata := map[string]interface{}{
+        "assignment_id":   assignment.ID,
+        "assignment_title": assignment.Title,
+        "submission_type": req.SubmissionType,
+        "course_id":       assignment.CourseID,
+        "file_size":       len(req.FileURL) > 0, // Simplified, you might want actual file size
+        "has_metadata":    len(req.Metadata) > 0,
     }
     
-    if err := tx.Create(&activityLog).Error; err != nil {
+    // Log the activity
+    if err := activityLogger.LogAssignmentSubmission(
+        tx,
+        req.StudentID,
+        assignment.ID,
+        submission.ID,
+        assignment.Title,
+        metadata,
+    ); err != nil {
+        // Log the error but don't fail the submission
         log.Printf("Warning: Failed to create activity log: %v", err)
     }
+
+
 
     tx.Commit()
 

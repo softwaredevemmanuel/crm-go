@@ -1,14 +1,16 @@
+package middleware
 import (
-	controllers "crm-go/controllers"
 	"time"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"fmt"
 	"strings"
+	"crm-go/controllers/activitylogs"
+
 )
 
 // ActivityLogMiddleware creates middleware that automatically logs requests
-func ActivityLogMiddleware(activityLogger *services.ActivityLogger) gin.HandlerFunc {
+func ActivityLogMiddleware(activityLogger *controllers.ActivityLogger) gin.HandlerFunc {
     return func(c *gin.Context) {
         // Skip logging for certain paths
         if shouldSkipLogging(c.Request.URL.Path) {
@@ -43,7 +45,7 @@ func ActivityLogMiddleware(activityLogger *services.ActivityLogger) gin.HandlerF
             
             // Only log certain status codes
             if shouldLogStatus(status) {
-                _ = activityLogger.LogFromGinContext(c, services.ActivityLogData{
+                _ = activityLogger.LogFromGinContext(c, controllers.ActivityLogData{
                     UserID:     userID.(uuid.UUID),
                     Action:     "http_request",
                     EntityID:   uuid.New(), // Generate a unique ID for the request

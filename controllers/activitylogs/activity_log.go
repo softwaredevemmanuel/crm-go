@@ -1,4 +1,4 @@
-package activitylogs
+package controllers
 
 
 import (
