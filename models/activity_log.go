@@ -55,7 +55,11 @@ const (
     ActionMaterialCreate      = "material_create"
     ActionMaterialUpdate      = "material_update"
     ActionMaterialDelete      = "material_delete"
-    
+
+    ActionTopicCreate      = "topic_create"
+    ActionTopicUpdate      = "topic_update"
+    ActionTopicDelete      = "topic_delete"
+
     ActionPaymentSuccess      = "payment_success"
     ActionPaymentFailed       = "payment_failed"
     ActionSubscriptionStart   = "subscription_start"

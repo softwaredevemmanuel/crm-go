@@ -527,12 +527,15 @@ definitions:
         type: string
       title:
         type: string
+      topic_id:
+        type: string
     required:
     - chapter_id
     - content_type
     - content_url
     - course_id
     - title
+    - topic_id
     type: object
   models.LessonMiniResponse:
     properties:
@@ -560,6 +563,8 @@ definitions:
       id:
         type: string
       title:
+        type: string
+      topic_id:
         type: string
       updated_at:
         type: string
@@ -693,6 +698,28 @@ definitions:
     properties:
       message:
         type: string
+    type: object
+  models.TopicInput:
+    properties:
+      chapter_id:
+        type: string
+      course_id:
+        type: string
+      description:
+        type: string
+      order:
+        type: integer
+      title:
+        type: string
+      tutor_id:
+        type: string
+    required:
+    - chapter_id
+    - course_id
+    - description
+    - order
+    - title
+    - tutor_id
     type: object
   models.UpdateCourseMaterialRequest:
     properties:
@@ -1897,6 +1924,34 @@ paths:
       summary: Update a product
       tags:
       - Products
+  /api/topics:
+    post:
+      consumes:
+      - application/json
+      description: Create a new topic
+      parameters:
+      - description: Topic
+        in: body
+        name: topic
+        required: true
+        schema:
+          $ref: '#/definitions/models.TopicInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Topic created successfully
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new topic
+      tags:
+      - topics
   /assignments:
     get:
       consumes:

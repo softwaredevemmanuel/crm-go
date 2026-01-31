@@ -1784,6 +1784,51 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/topics": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new topic",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "topics"
+                ],
+                "summary": "Create a new topic",
+                "parameters": [
+                    {
+                        "description": "Topic",
+                        "name": "topic",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TopicInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Topic created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/assignments": {
             "get": {
                 "description": "Get all assignments",
@@ -3828,7 +3873,8 @@ const docTemplate = `{
                 "content_type",
                 "content_url",
                 "course_id",
-                "title"
+                "title",
+                "topic_id"
             ],
             "properties": {
                 "chapter_id": {
@@ -3845,6 +3891,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "title": {
+                    "type": "string"
+                },
+                "topic_id": {
                     "type": "string"
                 }
             }
@@ -3888,6 +3937,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "title": {
+                    "type": "string"
+                },
+                "topic_id": {
                     "type": "string"
                 },
                 "updated_at": {
@@ -4076,6 +4128,37 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.TopicInput": {
+            "type": "object",
+            "required": [
+                "chapter_id",
+                "course_id",
+                "description",
+                "order",
+                "title",
+                "tutor_id"
+            ],
+            "properties": {
+                "chapter_id": {
+                    "type": "string"
+                },
+                "course_id": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "tutor_id": {
                     "type": "string"
                 }
             }
