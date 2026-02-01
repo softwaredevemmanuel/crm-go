@@ -4,23 +4,27 @@ import (
     "net/http"
     
     "crm-go/models"
-    "crm-go/services"
+    "crm-go/services/topics"
     "crm-go/services/activity"
     "github.com/gin-gonic/gin"
     "gorm.io/gorm"
 )
 
 type TopicController struct {
-    db           *gorm.DB
-    topicService *services.TopicService
-    activity     *activity.Service
+    db                *gorm.DB
+    createTopicService *services.CreateTopicService
+    getTopicService    *services.GetTopicService
+    updateTopicService *services.UpdateTopicService
+    activity          *activity.Service
 }
 
-func NewTopicController(db *gorm.DB, topicService *services.TopicService, activitySvc *activity.Service) *TopicController {
+func NewCreateTopicController(db *gorm.DB, createTopicService *services.CreateTopicService, getTopicService *services.GetTopicService, updateTopicService *services.UpdateTopicService, activitySvc *activity.Service) *TopicController {
     return &TopicController{
-        db:           db,
-        topicService: topicService,
-        activity:     activitySvc,
+        db:                db,
+        createTopicService: createTopicService,
+        getTopicService:    getTopicService,
+        updateTopicService: updateTopicService,
+        activity:          activitySvc,
     }
 }
 // CreateTopic creates a new topic
@@ -53,7 +57,7 @@ func (ctl *TopicController) CreateTopic(c *gin.Context) {
     }()
     
     // Create topic - need to use transaction version
-    response, err := ctl.topicService.CreateTopicWithTx(tx, req)
+    response, err := ctl.createTopicService.CreateTopicWithTx(tx, req)
     if err != nil {
         tx.Rollback()
         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

@@ -1,9 +1,9 @@
 package routes
 
 import (
-	topicController "crm-go/controllers/topic"
+	topicController "crm-go/controllers/topics"
 	"crm-go/middleware"
-	"crm-go/services"
+	"crm-go/services/topics"
 	"crm-go/services/activity"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -15,10 +15,14 @@ func TopicRoutes(r *gin.Engine, db *gorm.DB) {
 	topics := r.Group("/topics")
 
 	{
-		topicSvc := services.NewTopicService(db)
-		topicCtrl := topicController.NewTopicController(
+		createTopicSvc := services.NewCreateTopicService(db)
+		getTopicSvc := services.NewGetTopicService(db)
+		updateTopicSvc := services.NewUpdateTopicService(db)
+		topicCtrl := topicController.NewCreateTopicController(
 			db,
-			topicSvc,
+			createTopicSvc,
+			getTopicSvc,
+			updateTopicSvc,
 			activitySvc,
 		)
 		

@@ -13,7 +13,7 @@ type GetTopicService struct {
     db *gorm.DB
 }
 
-func NewTopicService(db *gorm.DB) *GetTopicService {
+func NewGetTopicService(db *gorm.DB) *GetTopicService {
     return &GetTopicService{db: db}
 }
 

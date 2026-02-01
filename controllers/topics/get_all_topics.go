@@ -71,7 +71,7 @@ func (ctl *TopicController) GetAllTopics(c *gin.Context) {
     }
     
     // Get paginated results
-    result, err := ctl.topicService.GetAllTopicsWithPagination(filters)
+    result, err := ctl.getTopicService.GetAllTopicsWithPagination(filters)
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{
             "error": err.Error(),
@@ -111,7 +111,7 @@ func (ctl *TopicController) GetTopicsByChapter(c *gin.Context) {
         }
     }
     
-    topics, err := ctl.topicService.GetTopicsByChapterID(chapterID, tutorID)
+    topics, err := ctl.getTopicService.GetTopicsByChapterID(chapterID, tutorID)
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{
             "error": err.Error(),
@@ -153,7 +153,7 @@ func (ctl *TopicController) GetTopicsByCourse(c *gin.Context) {
         }
     }
     
-    topics, err := ctl.topicService.GetTopicsByCourseID(courseID, tutorID)
+    topics, err := ctl.getTopicService.GetTopicsByCourseID(courseID, tutorID)
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{
             "error": err.Error(),

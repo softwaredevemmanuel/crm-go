@@ -48,7 +48,7 @@ func (ctl *TopicController) UpdateTopic(ctx *gin.Context) {
     }()
     
     // Update topic - need to use transaction version
-    updatedTopic, err := ctl.topicService.UpdateTopicWithTx(tx, topicID, req)
+    updatedTopic, err := ctl.updateTopicService.UpdateTopicWithTx(tx, topicID, req)
     if err != nil {
         tx.Rollback()
         ctx.JSON(http.StatusBadRequest, gin.H{
