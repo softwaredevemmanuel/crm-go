@@ -617,6 +617,21 @@ definitions:
       error:
         type: string
     type: object
+  models.PaginatedTopicsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.TopicResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
   models.Product:
     properties:
       compare_at_price:
@@ -720,6 +735,27 @@ definitions:
     - order
     - title
     - tutor_id
+    type: object
+  models.TopicResponse:
+    properties:
+      chapter_id:
+        type: string
+      course_id:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      order:
+        type: integer
+      title:
+        type: string
+      tutor_id:
+        type: string
+      updated_at:
+        type: string
     type: object
   models.UpdateCourseMaterialRequest:
     properties:
@@ -1239,6 +1275,39 @@ paths:
       summary: Create a new chapters
       tags:
       - Chapters
+  /api/chapters/{chapter_id}/topics:
+    get:
+      consumes:
+      - application/json
+      description: Get all topics for a specific chapter
+      parameters:
+      - description: Chapter ID
+        in: path
+        name: chapter_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TopicResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get topics by chapter
+      tags:
+      - topics
   /api/chapters/{id}:
     delete:
       consumes:
@@ -1550,6 +1619,39 @@ paths:
       summary: Create a new course
       tags:
       - Courses
+  /api/courses/{course_id}/topics:
+    get:
+      consumes:
+      - application/json
+      description: Get all topics for a specific course
+      parameters:
+      - description: Course ID
+        in: path
+        name: course_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TopicResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get topics by course
+      tags:
+      - topics
   /api/courses/{id}:
     delete:
       description: Admin deletes a course by ID
@@ -1950,6 +2052,43 @@ paths:
       security:
       - BearerAuth: []
       summary: Create a new topic
+      tags:
+      - topics
+  /api/topics/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update a topic by ID
+      parameters:
+      - description: Topic ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Topic
+        in: body
+        name: topic
+        required: true
+        schema:
+          $ref: '#/definitions/models.TopicInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Topic updated successfully
+          schema:
+            $ref: '#/definitions/models.TopicResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a topic
       tags:
       - topics
   /assignments:
@@ -2795,6 +2934,58 @@ paths:
       summary: Get related courses with product ID
       tags:
       - Products
+  /topics:
+    get:
+      consumes:
+      - application/json
+      description: Get all topics with optional filtering
+      parameters:
+      - description: Course ID
+        in: query
+        name: course_id
+        type: string
+      - description: Chapter ID
+        in: query
+        name: chapter_id
+        type: string
+      - description: Search term
+        in: query
+        name: search
+        type: string
+      - description: Sort field (title, order, created_at, updated_at)
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort order (asc, desc)
+        in: query
+        name: sort_order
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.PaginatedTopicsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all topics
+      tags:
+      - topics
 schemes:
 - http
 securityDefinitions:

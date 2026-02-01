@@ -40,3 +40,27 @@ func (a *TopicActivity) Created(
 }
 
 
+func (a *TopicActivity) Updated(
+	tx *gorm.DB,
+	userID uuid.UUID,
+	topic models.Topic,
+) error {
+
+	metadata := map[string]interface{}{
+		"topic_id": topic.ID,
+		"course_id": topic.CourseID,
+	}
+
+	return a.logger.LogWithTx(
+		context.Background(),
+		tx,
+		Event{
+			UserID:   userID,
+			Action:   models.ActionTopicUpdate,
+			EntityID: topic.ID,
+			EntityType: "topic",
+			Details:  fmt.Sprintf("Updated topic: %s", topic.Title),
+			Metadata: metadata,
+		},
+	)
+}
