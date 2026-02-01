@@ -110,7 +110,7 @@ func (s *GetTopicService) topicsToResponse(topics []models.Topic, tutorID uuid.U
             ID:          topic.ID,
             CourseID:    topic.CourseID,
             ChapterID:   topic.ChapterID,
-            TutorID:     tutorID,
+            TutorID:     topic.TutorID,
             Title:       topic.Title,
             Description: topic.Description,
             Order:       topic.Order,
