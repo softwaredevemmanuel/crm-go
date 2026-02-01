@@ -4,29 +4,11 @@ import (
     "net/http"
     
     "crm-go/models"
-    "crm-go/services/topics"
-    "crm-go/services/activity"
+  
     "github.com/gin-gonic/gin"
-    "gorm.io/gorm"
 )
 
-type TopicController struct {
-    db                *gorm.DB
-    createTopicService *services.CreateTopicService
-    getTopicService    *services.GetTopicService
-    updateTopicService *services.UpdateTopicService
-    activity          *activity.Service
-}
 
-func NewCreateTopicController(db *gorm.DB, createTopicService *services.CreateTopicService, getTopicService *services.GetTopicService, updateTopicService *services.UpdateTopicService, activitySvc *activity.Service) *TopicController {
-    return &TopicController{
-        db:                db,
-        createTopicService: createTopicService,
-        getTopicService:    getTopicService,
-        updateTopicService: updateTopicService,
-        activity:          activitySvc,
-    }
-}
 // CreateTopic creates a new topic
 // @Summary Create a new topic
 // @Description Create a new topic
