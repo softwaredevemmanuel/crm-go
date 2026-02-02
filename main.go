@@ -80,6 +80,7 @@ func main() {
 	routes.AssignmentRoutes(r)
 	routes.AssignmentSubmissionRoutes(r, config.DB)
 	routes.TopicRoutes(r, config.DB)
+	routes.GradeRoutes(r, config.DB)
 	routes.ChapterRoutes(r)
 	routes.LessonRoutes(r)
 	routes.CourseMaterialRoutes(r)

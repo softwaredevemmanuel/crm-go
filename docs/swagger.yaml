@@ -514,6 +514,58 @@ definitions:
       error:
         type: string
     type: object
+  models.GradeInput:
+    properties:
+      assignment_id:
+        description: Optional
+        type: string
+      course_id:
+        type: string
+      remarks:
+        maxLength: 500
+        type: string
+      score:
+        maximum: 100
+        minimum: 0
+        type: number
+      student_id:
+        type: string
+    required:
+    - course_id
+    - score
+    - student_id
+    type: object
+  models.GradeResponse:
+    properties:
+      assignment_id:
+        type: string
+      course_id:
+        type: string
+      course_name:
+        description: Optional
+        type: string
+      created_at:
+        type: string
+      grade:
+        description: A, B, C, etc.
+        type: string
+      id:
+        type: string
+      percentage:
+        description: Score as percentage
+        type: number
+      remarks:
+        type: string
+      score:
+        type: number
+      student_id:
+        type: string
+      student_name:
+        description: Optional, can be populated
+        type: string
+      updated_at:
+        type: string
+    type: object
   models.LessonInput:
     properties:
       chapter_id:
@@ -1724,6 +1776,70 @@ paths:
       summary: Export all data to Excel
       tags:
       - Export
+  /api/grades:
+    post:
+      consumes:
+      - application/json
+      description: Create a grade for a student
+      parameters:
+      - description: Grade data
+        in: body
+        name: grade
+        required: true
+        schema:
+          $ref: '#/definitions/models.GradeInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.GradeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new grade
+      tags:
+      - grades
+  /api/grades/bulk:
+    post:
+      consumes:
+      - application/json
+      description: Create grades in bulk
+      parameters:
+      - description: Array of grade data
+        in: body
+        name: grades
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/models.GradeInput'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            items:
+              $ref: '#/definitions/models.GradeResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create multiple grades
+      tags:
+      - grades
   /api/lessons:
     post:
       consumes:

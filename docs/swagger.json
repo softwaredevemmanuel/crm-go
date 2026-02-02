@@ -1412,6 +1412,108 @@
                 }
             }
         },
+        "/api/grades": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a grade for a student",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "grades"
+                ],
+                "summary": "Create a new grade",
+                "parameters": [
+                    {
+                        "description": "Grade data",
+                        "name": "grade",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.GradeInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.GradeResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/grades/bulk": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create grades in bulk",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "grades"
+                ],
+                "summary": "Create multiple grades",
+                "parameters": [
+                    {
+                        "description": "Array of grade data",
+                        "name": "grades",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.GradeInput"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.GradeResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/lessons": {
             "post": {
                 "security": [
@@ -3997,6 +4099,80 @@
             "type": "object",
             "properties": {
                 "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.GradeInput": {
+            "type": "object",
+            "required": [
+                "course_id",
+                "score",
+                "student_id"
+            ],
+            "properties": {
+                "assignment_id": {
+                    "description": "Optional",
+                    "type": "string"
+                },
+                "course_id": {
+                    "type": "string"
+                },
+                "remarks": {
+                    "type": "string",
+                    "maxLength": 500
+                },
+                "score": {
+                    "type": "number",
+                    "maximum": 100,
+                    "minimum": 0
+                },
+                "student_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.GradeResponse": {
+            "type": "object",
+            "properties": {
+                "assignment_id": {
+                    "type": "string"
+                },
+                "course_id": {
+                    "type": "string"
+                },
+                "course_name": {
+                    "description": "Optional",
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "grade": {
+                    "description": "A, B, C, etc.",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "percentage": {
+                    "description": "Score as percentage",
+                    "type": "number"
+                },
+                "remarks": {
+                    "type": "string"
+                },
+                "score": {
+                    "type": "number"
+                },
+                "student_id": {
+                    "type": "string"
+                },
+                "student_name": {
+                    "description": "Optional, can be populated",
+                    "type": "string"
+                },
+                "updated_at": {
                     "type": "string"
                 }
             }

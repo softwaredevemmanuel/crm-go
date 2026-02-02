@@ -60,6 +60,10 @@ const (
     ActionTopicUpdate      = "topic_update"
     ActionTopicDelete      = "topic_delete"
 
+    ActionGradeCreate      = "grade_create"
+    ActionGradeUpdate      = "grade_update"
+    ActionGradeDelete      = "grade_delete"
+
     ActionPaymentSuccess      = "payment_success"
     ActionPaymentFailed       = "payment_failed"
     ActionSubscriptionStart   = "subscription_start"
