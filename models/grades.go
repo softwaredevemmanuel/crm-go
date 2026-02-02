@@ -78,3 +78,43 @@ type GradeHistory struct {
     ChangedBy uuid.UUID `gorm:"type:uuid;not null"` // User who made change
     CreatedAt time.Time
 }
+
+// GradeFilters for querying grades
+type GradeFilters struct {
+    StudentID    uuid.UUID `form:"student_id"`
+    CourseID     uuid.UUID `form:"course_id"`
+    AssignmentID uuid.UUID `form:"assignment_id"`
+    TutorID      uuid.UUID `form:"tutor_id"`   // Teacher/tutor who can view grades
+    MinScore     float64   `form:"min_score" binding:"omitempty,min=0,max=100"`
+    MaxScore     float64   `form:"max_score" binding:"omitempty,min=0,max=100"`
+    GradeLetter  string    `form:"grade" binding:"omitempty,oneof=A B C D F A+ A- B+ B- C+ C- D+ D-"`
+    StartDate    time.Time `form:"start_date" time_format:"2006-01-02"`
+    EndDate      time.Time `form:"end_date" time_format:"2006-01-02"`
+    Search       string    `form:"search"` // Search in remarks
+    WithDetails  bool      `form:"with_details"` // Include student/course details
+    
+    // Pagination
+    Page     int    `form:"page,default=1" binding:"min=1"`
+    Limit    int    `form:"limit,default=20" binding:"min=1,max=100"`
+    SortBy   string `form:"sort_by" binding:"omitempty,oneof=created_at updated_at score student course"`
+    SortOrder string `form:"sort_order" binding:"omitempty,oneof=asc desc ASC DESC"`
+}
+
+// PaginatedGradesResponse for paginated results
+type PaginatedGradesResponse struct {
+    Data       []GradeResponse `json:"data"`
+    Total      int64           `json:"total"`
+    Page       int             `json:"page"`
+    Limit      int             `json:"limit"`
+    TotalPages int             `json:"total_pages"`
+    Filters    GradeFilters    `json:"filters,omitempty"`
+}
+
+// GradeStats for statistics
+type GradeStats struct {
+    AverageScore float64 `json:"average_score"`
+    HighestScore float64 `json:"highest_score"`
+    LowestScore  float64 `json:"lowest_score"`
+    GradeDistribution map[string]int `json:"grade_distribution"`
+    TotalCount   int64   `json:"total_count"`
+}

@@ -18,13 +18,18 @@ func GradeRoutes(r *gin.Engine, db *gorm.DB) {
 	// Initialize controller
 	gradeController := controllers.NewGradeController(db, gradeService, activityService)
 
+	grades := r.Group("/grades")
+		grades.GET("/", gradeController.GetAllGrades)
+		grades.GET("/:id", gradeController.GetGradeStats)
+		grades.GET("/student/:student_id/grades", gradeController.GetStudentGrades)
+		grades.GET("/courses/:course_id/grades", gradeController.GetCourseGrades)
+
 	// Protected routes
-
 	protected := r.Group("/api")
-	protected.Use(middleware.AuthMiddleware())
+		protected.Use(middleware.AuthMiddleware())
 
-	protected.POST("/grades", middleware.RoleMiddleware("admin"), gradeController.CreateGrade)
+		protected.POST("/grades", middleware.RoleMiddleware("admin"), gradeController.CreateGrade)
 
-	// New update routes
-	protected.PUT("/grades/:id", middleware.RoleMiddleware("admin"), gradeController.UpdateGrade)
+		// New update routes
+		protected.PUT("/grades/:id", middleware.RoleMiddleware("admin"), gradeController.UpdateGrade)
 }

@@ -514,6 +514,75 @@ definitions:
       error:
         type: string
     type: object
+  models.GradeFilters:
+    properties:
+      assignment_id:
+        type: string
+      course_id:
+        type: string
+      end_date:
+        type: string
+      grade:
+        enum:
+        - A
+        - B
+        - C
+        - D
+        - F
+        - A+
+        - A-
+        - B+
+        - B-
+        - C+
+        - C-
+        - D+
+        - D-
+        type: string
+      limit:
+        maximum: 100
+        minimum: 1
+        type: integer
+      max_score:
+        maximum: 100
+        minimum: 0
+        type: number
+      min_score:
+        maximum: 100
+        minimum: 0
+        type: number
+      page:
+        description: Pagination
+        minimum: 1
+        type: integer
+      search:
+        description: Search in remarks
+        type: string
+      sort_by:
+        enum:
+        - created_at
+        - updated_at
+        - score
+        - student
+        - course
+        type: string
+      sort_order:
+        enum:
+        - asc
+        - desc
+        - ASC
+        - DESC
+        type: string
+      start_date:
+        type: string
+      student_id:
+        type: string
+      tutor_id:
+        description: Teacher/tutor who can view grades
+        type: string
+      with_details:
+        description: Include student/course details
+        type: boolean
+    type: object
   models.GradeInput:
     properties:
       assignment_id:
@@ -570,6 +639,21 @@ definitions:
         type: string
       updated_at:
         type: string
+    type: object
+  models.GradeStats:
+    properties:
+      average_score:
+        type: number
+      grade_distribution:
+        additionalProperties:
+          type: integer
+        type: object
+      highest_score:
+        type: number
+      lowest_score:
+        type: number
+      total_count:
+        type: integer
     type: object
   models.GradeUpdateInput:
     properties:
@@ -690,6 +774,23 @@ definitions:
     properties:
       error:
         type: string
+    type: object
+  models.PaginatedGradesResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.GradeResponse'
+        type: array
+      filters:
+        $ref: '#/definitions/models.GradeFilters'
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
     type: object
   models.PaginatedTopicsResponse:
     properties:
@@ -2870,6 +2971,192 @@ paths:
       summary: Get enrollment by ID
       tags:
       - Enrollments
+  /grades:
+    get:
+      consumes:
+      - application/json
+      description: Get grades with filtering, sorting, and pagination
+      parameters:
+      - description: Filter by student ID
+        in: query
+        name: student_id
+        type: string
+      - description: Filter by course ID
+        in: query
+        name: course_id
+        type: string
+      - description: Filter by assignment ID
+        in: query
+        name: assignment_id
+        type: string
+      - description: Filter by tutor ID
+        in: query
+        name: tutor_id
+        type: string
+      - description: Minimum score
+        in: query
+        maximum: 100
+        minimum: 0
+        name: min_score
+        type: number
+      - description: Maximum score
+        in: query
+        maximum: 100
+        minimum: 0
+        name: max_score
+        type: number
+      - description: Filter by grade letter (A, B, C, D, F)
+        in: query
+        name: grade
+        type: string
+      - description: Start date (YYYY-MM-DD)
+        in: query
+        name: start_date
+        type: string
+      - description: End date (YYYY-MM-DD)
+        in: query
+        name: end_date
+        type: string
+      - description: Search in remarks
+        in: query
+        name: search
+        type: string
+      - description: Include student/course details
+        in: query
+        name: with_details
+        type: boolean
+      - default: 1
+        description: Page number
+        in: query
+        minimum: 1
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        maximum: 100
+        minimum: 1
+        name: limit
+        type: integer
+      - description: Sort field
+        enum:
+        - created_at
+        - updated_at
+        - score
+        - student
+        - course
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort order
+        enum:
+        - asc
+        - desc
+        - ASC
+        - DESC
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.PaginatedGradesResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all grades
+      tags:
+      - grades
+  /grades/courses/{course_id}/grades:
+    get:
+      consumes:
+      - application/json
+      description: Get all grades for a course
+      parameters:
+      - description: Course ID
+        in: path
+        name: course_id
+        required: true
+        type: string
+      - description: Include student details
+        in: query
+        name: with_details
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.GradeResponse'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Get grades for a specific course
+      tags:
+      - grades
+  /grades/stats:
+    get:
+      consumes:
+      - application/json
+      description: Get statistics for filtered grades
+      parameters:
+      - description: Filter by student ID
+        in: query
+        name: student_id
+        type: string
+      - description: Filter by course ID
+        in: query
+        name: course_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GradeStats'
+      security:
+      - BearerAuth: []
+      summary: Get grade statistics
+      tags:
+      - grades
+  /grades/student/{student_id}/grades:
+    get:
+      consumes:
+      - application/json
+      description: Get all grades for a student
+      parameters:
+      - description: Student ID
+        in: path
+        name: student_id
+        required: true
+        type: string
+      - description: Include course details
+        in: query
+        name: with_details
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.GradeResponse'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Get grades for a specific student
+      tags:
+      - grades
   /lessons:
     get:
       description: Get all lessons, optionally filtered by course or chapter
