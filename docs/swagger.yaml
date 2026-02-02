@@ -326,20 +326,6 @@ definitions:
     - slug
     - title
     type: object
-  models.BulkGradeUpdate:
-    properties:
-      grade_id:
-        type: string
-      remarks:
-        maxLength: 500
-        type: string
-      score:
-        maximum: 100
-        minimum: 0
-        type: number
-    required:
-    - grade_id
-    type: object
   models.Category:
     properties:
       created_at:
@@ -1879,70 +1865,6 @@ paths:
       security:
       - BearerAuth: []
       summary: Update a grade
-      tags:
-      - grades
-  /api/grades/bulk:
-    post:
-      consumes:
-      - application/json
-      description: Create grades in bulk
-      parameters:
-      - description: Array of grade data
-        in: body
-        name: grades
-        required: true
-        schema:
-          items:
-            $ref: '#/definitions/models.GradeInput'
-          type: array
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            items:
-              $ref: '#/definitions/models.GradeResponse'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Create multiple grades
-      tags:
-      - grades
-  /api/grades/bulk/update:
-    put:
-      consumes:
-      - application/json
-      description: Update multiple grades at once
-      parameters:
-      - description: Array of grade updates
-        in: body
-        name: grades
-        required: true
-        schema:
-          items:
-            $ref: '#/definitions/models.BulkGradeUpdate'
-          type: array
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.GradeResponse'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Bulk update grades
       tags:
       - grades
   /api/lessons:

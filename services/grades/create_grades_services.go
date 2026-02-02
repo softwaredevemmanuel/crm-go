@@ -226,30 +226,3 @@ func (s *GradeService) recalculateCourseAverage(courseID, studentID uuid.UUID) {
     fmt.Printf("Average for student %s in course %s: %.2f\n", 
         studentID, courseID, average)
 }
-
-// BulkCreateGrades - for creating multiple grades at once
-func (s *GradeService) BulkCreateGrades(requests []models.GradeInput) ([]models.GradeResponse, error) {
-    tx := s.db.Begin()
-    defer func() {
-        if r := recover(); r != nil {
-            tx.Rollback()
-        }
-    }()
-    
-    responses := make([]models.GradeResponse, 0, len(requests))
-    
-    for _, req := range requests {
-        response, err := s.CreateGradeWithTx(tx, req)
-        if err != nil {
-            tx.Rollback()
-            return nil, fmt.Errorf("failed to create grade: %v", err)
-        }
-        responses = append(responses, *response)
-    }
-    
-    if err := tx.Commit().Error; err != nil {
-        return nil, errors.New("failed to commit grades: " + err.Error())
-    }
-    
-    return responses, nil
-}

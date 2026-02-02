@@ -1466,108 +1466,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/grades/bulk": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Create grades in bulk",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "grades"
-                ],
-                "summary": "Create multiple grades",
-                "parameters": [
-                    {
-                        "description": "Array of grade data",
-                        "name": "grades",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.GradeInput"
-                            }
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.GradeResponse"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/grades/bulk/update": {
-            "put": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Update multiple grades at once",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "grades"
-                ],
-                "summary": "Bulk update grades",
-                "parameters": [
-                    {
-                        "description": "Array of grade updates",
-                        "name": "grades",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.BulkGradeUpdate"
-                            }
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.GradeResponse"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/api/grades/{id}": {
             "put": {
                 "security": [
@@ -3926,26 +3824,6 @@ const docTemplate = `{
                 },
                 "type": {
                     "type": "string"
-                }
-            }
-        },
-        "models.BulkGradeUpdate": {
-            "type": "object",
-            "required": [
-                "grade_id"
-            ],
-            "properties": {
-                "grade_id": {
-                    "type": "string"
-                },
-                "remarks": {
-                    "type": "string",
-                    "maxLength": 500
-                },
-                "score": {
-                    "type": "number",
-                    "maximum": 100,
-                    "minimum": 0
                 }
             }
         },

@@ -3,7 +3,6 @@ package services
 
 import (
     "errors"
-    "fmt"
     "strings"
     "time"
     
@@ -107,41 +106,6 @@ func (s *GradeService) UpdateGradeWithTx(tx *gorm.DB, gradeID uuid.UUID, req mod
     // Return response
     return s.gradeToResponse(&grade), nil
 }
-
-// BulkUpdateGrades - update multiple grades
-func (s *GradeService) BulkUpdateGrades(updates []models.BulkGradeUpdate) ([]models.GradeResponse, error) {
-    tx := s.db.Begin()
-    defer func() {
-        if r := recover(); r != nil {
-            tx.Rollback()
-        }
-    }()
-    
-    responses := make([]models.GradeResponse, 0, len(updates))
-    
-    for _, update := range updates {
-        // Convert BulkGradeUpdate to GradeUpdateInput
-        req := models.GradeUpdateInput{
-            Score:   update.Score,
-            Remarks: update.Remarks,
-        }
-        
-        response, err := s.UpdateGradeWithTx(tx, update.GradeID, req)
-        if err != nil {
-            tx.Rollback()
-            return nil, fmt.Errorf("failed to update grade %s: %v", update.GradeID, err)
-        }
-        
-        responses = append(responses, *response)
-    }
-    
-    if err := tx.Commit().Error; err != nil {
-        return nil, errors.New("failed to commit grade updates: " + err.Error())
-    }
-    
-    return responses, nil
-}
-
 
 
 // GetGradeHistory - get update history for a grade

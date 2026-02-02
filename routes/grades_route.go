@@ -24,9 +24,7 @@ func GradeRoutes(r *gin.Engine, db *gorm.DB) {
 	protected.Use(middleware.AuthMiddleware())
 
 	protected.POST("/grades", middleware.RoleMiddleware("admin"), gradeController.CreateGrade)
-	protected.POST("/grades/bulk", middleware.RoleMiddleware("admin"), gradeController.BulkCreateGrades)
 
 	// New update routes
 	protected.PUT("/grades/:id", middleware.RoleMiddleware("admin"), gradeController.UpdateGrade)
-	protected.PUT("/grades/bulk/update", middleware.RoleMiddleware("admin"), gradeController.BulkUpdateGrades)
 }
