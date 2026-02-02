@@ -326,6 +326,20 @@ definitions:
     - slug
     - title
     type: object
+  models.BulkGradeUpdate:
+    properties:
+      grade_id:
+        type: string
+      remarks:
+        maxLength: 500
+        type: string
+      score:
+        maximum: 100
+        minimum: 0
+        type: number
+    required:
+    - grade_id
+    type: object
   models.Category:
     properties:
       created_at:
@@ -530,10 +544,13 @@ definitions:
         type: number
       student_id:
         type: string
+      tutor_id:
+        type: string
     required:
     - course_id
     - score
     - student_id
+    - tutor_id
     type: object
   models.GradeResponse:
     properties:
@@ -563,7 +580,26 @@ definitions:
       student_name:
         description: Optional, can be populated
         type: string
+      tutor_id:
+        type: string
       updated_at:
+        type: string
+    type: object
+  models.GradeUpdateInput:
+    properties:
+      assignment_id:
+        description: Can change assignment link
+        type: string
+      remarks:
+        description: Pointer for optional update
+        maxLength: 500
+        type: string
+      score:
+        description: Pointer to distinguish between 0 and not provided
+        maximum: 100
+        minimum: 0
+        type: number
+      tutor_id:
         type: string
     type: object
   models.LessonInput:
@@ -1808,6 +1844,43 @@ paths:
       summary: Create a new grade
       tags:
       - grades
+  /api/grades/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update an existing grade
+      parameters:
+      - description: Grade ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Grade update data
+        in: body
+        name: grade
+        required: true
+        schema:
+          $ref: '#/definitions/models.GradeUpdateInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GradeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a grade
+      tags:
+      - grades
   /api/grades/bulk:
     post:
       consumes:
@@ -1838,6 +1911,38 @@ paths:
       security:
       - BearerAuth: []
       summary: Create multiple grades
+      tags:
+      - grades
+  /api/grades/bulk/update:
+    put:
+      consumes:
+      - application/json
+      description: Update multiple grades at once
+      parameters:
+      - description: Array of grade updates
+        in: body
+        name: grades
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/models.BulkGradeUpdate'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.GradeResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Bulk update grades
       tags:
       - grades
   /api/lessons:

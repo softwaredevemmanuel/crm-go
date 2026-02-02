@@ -5,7 +5,7 @@ import (
     "net/http"
     
     "crm-go/models"
-    "crm-go/services"
+    "crm-go/services/grades"
     "crm-go/services/activity"
     "github.com/gin-gonic/gin"
     "gorm.io/gorm"

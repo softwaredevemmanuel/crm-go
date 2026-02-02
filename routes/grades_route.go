@@ -4,8 +4,8 @@ package routes
 import (
 	"crm-go/controllers/grades"
 	"crm-go/middleware"
-	"crm-go/services"
 	"crm-go/services/activity"
+	"crm-go/services/grades"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -25,4 +25,8 @@ func GradeRoutes(r *gin.Engine, db *gorm.DB) {
 
 	protected.POST("/grades", middleware.RoleMiddleware("admin"), gradeController.CreateGrade)
 	protected.POST("/grades/bulk", middleware.RoleMiddleware("admin"), gradeController.BulkCreateGrades)
+
+	// New update routes
+	protected.PUT("/grades/:id", middleware.RoleMiddleware("admin"), gradeController.UpdateGrade)
+	protected.PUT("/grades/bulk/update", middleware.RoleMiddleware("admin"), gradeController.BulkUpdateGrades)
 }

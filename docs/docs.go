@@ -1517,6 +1517,115 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/grades/bulk/update": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update multiple grades at once",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "grades"
+                ],
+                "summary": "Bulk update grades",
+                "parameters": [
+                    {
+                        "description": "Array of grade updates",
+                        "name": "grades",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.BulkGradeUpdate"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.GradeResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/grades/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update an existing grade",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "grades"
+                ],
+                "summary": "Update a grade",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Grade ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Grade update data",
+                        "name": "grade",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.GradeUpdateInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.GradeResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/lessons": {
             "post": {
                 "security": [
@@ -3820,6 +3929,26 @@ const docTemplate = `{
                 }
             }
         },
+        "models.BulkGradeUpdate": {
+            "type": "object",
+            "required": [
+                "grade_id"
+            ],
+            "properties": {
+                "grade_id": {
+                    "type": "string"
+                },
+                "remarks": {
+                    "type": "string",
+                    "maxLength": 500
+                },
+                "score": {
+                    "type": "number",
+                    "maximum": 100,
+                    "minimum": 0
+                }
+            }
+        },
         "models.Category": {
             "type": "object",
             "properties": {
@@ -4111,7 +4240,8 @@ const docTemplate = `{
             "required": [
                 "course_id",
                 "score",
-                "student_id"
+                "student_id",
+                "tutor_id"
             ],
             "properties": {
                 "assignment_id": {
@@ -4131,6 +4261,9 @@ const docTemplate = `{
                     "minimum": 0
                 },
                 "student_id": {
+                    "type": "string"
+                },
+                "tutor_id": {
                     "type": "string"
                 }
             }
@@ -4175,7 +4308,33 @@ const docTemplate = `{
                     "description": "Optional, can be populated",
                     "type": "string"
                 },
+                "tutor_id": {
+                    "type": "string"
+                },
                 "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.GradeUpdateInput": {
+            "type": "object",
+            "properties": {
+                "assignment_id": {
+                    "description": "Can change assignment link",
+                    "type": "string"
+                },
+                "remarks": {
+                    "description": "Pointer for optional update",
+                    "type": "string",
+                    "maxLength": 500
+                },
+                "score": {
+                    "description": "Pointer to distinguish between 0 and not provided",
+                    "type": "number",
+                    "maximum": 100,
+                    "minimum": 0
+                },
+                "tutor_id": {
                     "type": "string"
                 }
             }

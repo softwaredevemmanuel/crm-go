@@ -61,7 +61,7 @@ func (a *GradeActivity) Updated(
 			UserID:   userID,
 			Action:   models.ActionGradeUpdate,
 			EntityID: grade.ID,
-			EntityType: "grade",
+			EntityType: "grades",
 			Details:  fmt.Sprintf("Updated grade for student: %s", grade.StudentID),
 			Metadata: metadata,
 		},

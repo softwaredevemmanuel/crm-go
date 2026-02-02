@@ -53,3 +53,28 @@ type GradeResponse struct {
     CreatedAt    time.Time  `json:"created_at"`
     UpdatedAt    time.Time  `json:"updated_at"`
 }
+
+// GradeUpdateInput - for updating grades
+type GradeUpdateInput struct {
+    TutorID      uuid.UUID  `json:"tutor_id"`
+    Score        *float64   `json:"score" binding:"omitempty,min=0,max=100"` // Pointer to distinguish between 0 and not provided
+    Remarks      *string    `json:"remarks" binding:"omitempty,max=500"`     // Pointer for optional update
+    AssignmentID *uuid.UUID `json:"assignment_id"`                           // Can change assignment link
+}
+
+// models/grade.go - add these
+type BulkGradeUpdate struct {
+    GradeID uuid.UUID  `json:"grade_id" binding:"required"`
+    Score   *float64   `json:"score" binding:"omitempty,min=0,max=100"`
+    Remarks *string    `json:"remarks" binding:"omitempty,max=500"`
+}
+
+type GradeHistory struct {
+    ID        uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
+    GradeID   uuid.UUID `gorm:"type:uuid;not null"`
+    Field     string    `gorm:"type:varchar(50);not null"` // "score", "remarks", etc.
+    OldValue  string    `gorm:"type:text"`
+    NewValue  string    `gorm:"type:text;not null"`
+    ChangedBy uuid.UUID `gorm:"type:uuid;not null"` // User who made change
+    CreatedAt time.Time
+}
