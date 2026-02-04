@@ -1692,6 +1692,51 @@
                 }
             }
         },
+        "/api/live-classes": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a scheduled live class with meeting setup",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "live-classes"
+                ],
+                "summary": "Create a new live class",
+                "parameters": [
+                    {
+                        "description": "Live class data",
+                        "name": "live_class",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.LiveClassInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.LiveClassResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/products": {
             "post": {
                 "security": [
@@ -4686,6 +4731,337 @@
                 },
                 "updated_at": {
                     "type": "string"
+                }
+            }
+        },
+        "models.LiveClassInput": {
+            "type": "object",
+            "required": [
+                "course_id",
+                "end_time",
+                "start_time",
+                "title",
+                "tutor_id"
+            ],
+            "properties": {
+                "access_level": {
+                    "type": "string",
+                    "enum": [
+                        "enrolled",
+                        "premium",
+                        "invite_only",
+                        "public"
+                    ]
+                },
+                "agenda": {
+                    "description": "Preparation \u0026 Materials",
+                    "type": "string",
+                    "maxLength": 5000
+                },
+                "auto_publish_recordings": {
+                    "type": "boolean"
+                },
+                "chapter_id": {
+                    "description": "Optional relationships",
+                    "type": "string"
+                },
+                "course_id": {
+                    "description": "Required fields",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "Optional details",
+                    "type": "string",
+                    "maxLength": 2000
+                },
+                "duration": {
+                    "description": "15 min to 8 hours",
+                    "type": "integer",
+                    "maximum": 480,
+                    "minimum": 15
+                },
+                "end_time": {
+                    "type": "string"
+                },
+                "host_notes": {
+                    "description": "Host notes",
+                    "type": "string",
+                    "maxLength": 2000
+                },
+                "learning_objectives": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "lesson_id": {
+                    "type": "string"
+                },
+                "max_attendees": {
+                    "description": "Capacity \u0026 Access",
+                    "type": "integer",
+                    "maximum": 1000,
+                    "minimum": 1
+                },
+                "min_attendees": {
+                    "type": "integer",
+                    "maximum": 1000,
+                    "minimum": 1
+                },
+                "platform": {
+                    "description": "Meeting Platform",
+                    "type": "string",
+                    "enum": [
+                        "zoom",
+                        "teams",
+                        "google_meet",
+                        "custom",
+                        "bigbluebutton",
+                        "jitsi"
+                    ]
+                },
+                "prerequisites": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "recommended_setup": {
+                    "type": "string",
+                    "maxLength": 2000
+                },
+                "record_automatically": {
+                    "description": "Recording",
+                    "type": "boolean"
+                },
+                "recording_retention": {
+                    "type": "integer",
+                    "maximum": 365,
+                    "minimum": 1
+                },
+                "recording_storage": {
+                    "type": "string",
+                    "enum": [
+                        "platform",
+                        "s3",
+                        "gcs",
+                        "local"
+                    ]
+                },
+                "recurrence_end_date": {
+                    "type": "string"
+                },
+                "recurrence_rule": {
+                    "type": "string",
+                    "maxLength": 200
+                },
+                "recurrence_type": {
+                    "description": "Recurrence",
+                    "type": "string",
+                    "enum": [
+                        "none",
+                        "daily",
+                        "weekly",
+                        "monthly"
+                    ]
+                },
+                "requires_approval": {
+                    "type": "boolean"
+                },
+                "short_description": {
+                    "type": "string",
+                    "maxLength": 500
+                },
+                "start_time": {
+                    "type": "string"
+                },
+                "tech_requirements": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "timezone": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "minLength": 3
+                },
+                "topic_id": {
+                    "type": "string"
+                },
+                "tutor_id": {
+                    "type": "string"
+                },
+                "waitlist_capacity": {
+                    "type": "integer",
+                    "maximum": 100,
+                    "minimum": 0
+                },
+                "waitlist_enabled": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "models.LiveClassResponse": {
+            "type": "object",
+            "properties": {
+                "access_level": {
+                    "type": "string"
+                },
+                "agenda": {
+                    "type": "string"
+                },
+                "approved_at": {
+                    "type": "string"
+                },
+                "auto_publish_recordings": {
+                    "type": "boolean"
+                },
+                "available_seats": {
+                    "description": "Computed fields",
+                    "type": "integer"
+                },
+                "chapter_id": {
+                    "type": "string"
+                },
+                "course_id": {
+                    "type": "string"
+                },
+                "course_name": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "duration": {
+                    "type": "integer"
+                },
+                "end_time": {
+                    "type": "string"
+                },
+                "host_notes": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_live_now": {
+                    "type": "boolean"
+                },
+                "is_upcoming": {
+                    "type": "boolean"
+                },
+                "learning_objectives": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "lesson_id": {
+                    "type": "string"
+                },
+                "max_attendees": {
+                    "type": "integer"
+                },
+                "meeting_id": {
+                    "type": "string"
+                },
+                "meeting_password": {
+                    "type": "string"
+                },
+                "meeting_url": {
+                    "type": "string"
+                },
+                "min_attendees": {
+                    "type": "integer"
+                },
+                "platform": {
+                    "type": "string"
+                },
+                "prerequisites": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "recommended_setup": {
+                    "type": "string"
+                },
+                "record_automatically": {
+                    "type": "boolean"
+                },
+                "recording_retention": {
+                    "type": "integer"
+                },
+                "recording_storage": {
+                    "type": "string"
+                },
+                "recurrence_end_date": {
+                    "type": "string"
+                },
+                "recurrence_rule": {
+                    "type": "string"
+                },
+                "recurrence_type": {
+                    "type": "string"
+                },
+                "requires_approval": {
+                    "type": "boolean"
+                },
+                "short_description": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "start_time": {
+                    "type": "string"
+                },
+                "status": {
+                    "description": "scheduled, ongoing, completed, cancelled",
+                    "type": "string"
+                },
+                "tech_requirements": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "test_url": {
+                    "type": "string"
+                },
+                "timezone": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "topic_id": {
+                    "type": "string"
+                },
+                "total_enrolled": {
+                    "type": "integer"
+                },
+                "tutor_id": {
+                    "type": "string"
+                },
+                "tutor_name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "waitlist_capacity": {
+                    "type": "integer"
+                },
+                "waitlist_enabled": {
+                    "type": "boolean"
                 }
             }
         },

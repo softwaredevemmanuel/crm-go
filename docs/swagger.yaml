@@ -727,6 +727,242 @@ definitions:
       updated_at:
         type: string
     type: object
+  models.LiveClassInput:
+    properties:
+      access_level:
+        enum:
+        - enrolled
+        - premium
+        - invite_only
+        - public
+        type: string
+      agenda:
+        description: Preparation & Materials
+        maxLength: 5000
+        type: string
+      auto_publish_recordings:
+        type: boolean
+      chapter_id:
+        description: Optional relationships
+        type: string
+      course_id:
+        description: Required fields
+        type: string
+      description:
+        description: Optional details
+        maxLength: 2000
+        type: string
+      duration:
+        description: 15 min to 8 hours
+        maximum: 480
+        minimum: 15
+        type: integer
+      end_time:
+        type: string
+      host_notes:
+        description: Host notes
+        maxLength: 2000
+        type: string
+      learning_objectives:
+        items:
+          type: string
+        type: array
+      lesson_id:
+        type: string
+      max_attendees:
+        description: Capacity & Access
+        maximum: 1000
+        minimum: 1
+        type: integer
+      min_attendees:
+        maximum: 1000
+        minimum: 1
+        type: integer
+      platform:
+        description: Meeting Platform
+        enum:
+        - zoom
+        - teams
+        - google_meet
+        - custom
+        - bigbluebutton
+        - jitsi
+        type: string
+      prerequisites:
+        items:
+          type: string
+        type: array
+      recommended_setup:
+        maxLength: 2000
+        type: string
+      record_automatically:
+        description: Recording
+        type: boolean
+      recording_retention:
+        maximum: 365
+        minimum: 1
+        type: integer
+      recording_storage:
+        enum:
+        - platform
+        - s3
+        - gcs
+        - local
+        type: string
+      recurrence_end_date:
+        type: string
+      recurrence_rule:
+        maxLength: 200
+        type: string
+      recurrence_type:
+        description: Recurrence
+        enum:
+        - none
+        - daily
+        - weekly
+        - monthly
+        type: string
+      requires_approval:
+        type: boolean
+      short_description:
+        maxLength: 500
+        type: string
+      start_time:
+        type: string
+      tech_requirements:
+        items:
+          type: string
+        type: array
+      timezone:
+        type: string
+      title:
+        maxLength: 255
+        minLength: 3
+        type: string
+      topic_id:
+        type: string
+      tutor_id:
+        type: string
+      waitlist_capacity:
+        maximum: 100
+        minimum: 0
+        type: integer
+      waitlist_enabled:
+        type: boolean
+    required:
+    - course_id
+    - end_time
+    - start_time
+    - title
+    - tutor_id
+    type: object
+  models.LiveClassResponse:
+    properties:
+      access_level:
+        type: string
+      agenda:
+        type: string
+      approved_at:
+        type: string
+      auto_publish_recordings:
+        type: boolean
+      available_seats:
+        description: Computed fields
+        type: integer
+      chapter_id:
+        type: string
+      course_id:
+        type: string
+      course_name:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      duration:
+        type: integer
+      end_time:
+        type: string
+      host_notes:
+        type: string
+      id:
+        type: string
+      is_live_now:
+        type: boolean
+      is_upcoming:
+        type: boolean
+      learning_objectives:
+        items:
+          type: string
+        type: array
+      lesson_id:
+        type: string
+      max_attendees:
+        type: integer
+      meeting_id:
+        type: string
+      meeting_password:
+        type: string
+      meeting_url:
+        type: string
+      min_attendees:
+        type: integer
+      platform:
+        type: string
+      prerequisites:
+        items:
+          type: string
+        type: array
+      recommended_setup:
+        type: string
+      record_automatically:
+        type: boolean
+      recording_retention:
+        type: integer
+      recording_storage:
+        type: string
+      recurrence_end_date:
+        type: string
+      recurrence_rule:
+        type: string
+      recurrence_type:
+        type: string
+      requires_approval:
+        type: boolean
+      short_description:
+        type: string
+      slug:
+        type: string
+      start_time:
+        type: string
+      status:
+        description: scheduled, ongoing, completed, cancelled
+        type: string
+      tech_requirements:
+        items:
+          type: string
+        type: array
+      test_url:
+        type: string
+      timezone:
+        type: string
+      title:
+        type: string
+      topic_id:
+        type: string
+      total_enrolled:
+        type: integer
+      tutor_id:
+        type: string
+      tutor_name:
+        type: string
+      updated_at:
+        type: string
+      waitlist_capacity:
+        type: integer
+      waitlist_enabled:
+        type: boolean
+    type: object
   models.LoginInput:
     description: Login request payload
     properties:
@@ -2077,6 +2313,34 @@ paths:
       summary: Update lesson
       tags:
       - Lessons
+  /api/live-classes:
+    post:
+      consumes:
+      - application/json
+      description: Create a scheduled live class with meeting setup
+      parameters:
+      - description: Live class data
+        in: body
+        name: live_class
+        required: true
+        schema:
+          $ref: '#/definitions/models.LiveClassInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.LiveClassResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new live class
+      tags:
+      - live-classes
   /api/products:
     post:
       consumes:

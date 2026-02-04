@@ -64,6 +64,10 @@ const (
     ActionGradeUpdate      = "grade_update"
     ActionGradeDelete      = "grade_delete"
 
+    ActionLiveClassCreate      = "live_class_create"
+    ActionLiveClassUpdate      = "live_class_update"
+    ActionLiveClassDelete      = "live_class_delete"
+
     ActionPaymentSuccess      = "payment_success"
     ActionPaymentFailed       = "payment_failed"
     ActionSubscriptionStart   = "subscription_start"
