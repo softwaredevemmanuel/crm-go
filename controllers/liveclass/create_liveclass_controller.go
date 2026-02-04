@@ -39,7 +39,6 @@ func NewLiveClassController(db *gorm.DB, liveClassService *services.LiveClassSer
 // @Router /api/live-classes [post]
 // @Security BearerAuth
 func (ctl *LiveClassController) CreateLiveClass(c *gin.Context) {
-		    fmt.Println("here 1")
 
     var req models.LiveClassInput
     
@@ -58,7 +57,6 @@ func (ctl *LiveClassController) CreateLiveClass(c *gin.Context) {
             tx.Rollback()
         }
     }()
-	    fmt.Println("here 1")
 
     
     // Create live class

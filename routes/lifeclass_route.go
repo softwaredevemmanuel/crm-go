@@ -17,6 +17,8 @@ func LiveClassRoutes(r *gin.Engine, db *gorm.DB) {
     liveClassRoutes := r.Group("/api/live-classes")
     {
         liveClassRoutes.POST("", liveClassController.CreateLiveClass)
+        liveClassRoutes.PUT("/:id", liveClassController.UpdateLiveClass)
+        liveClassRoutes.POST("/:id/cancel", liveClassController.CancelLiveClass)
         // Add other routes: GET, PUT, DELETE, etc.
     }
     

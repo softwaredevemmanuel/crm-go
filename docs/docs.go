@@ -1740,6 +1740,107 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/live-classes/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update live class details. Some fields can only be updated before class starts.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "live-classes"
+                ],
+                "summary": "Update a live class",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Live Class ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update data",
+                        "name": "update",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.LiveClassUpdateInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.LiveClassResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/live-classes/{id}/cancel": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Cancel a live class that hasn't started yet",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "live-classes"
+                ],
+                "summary": "Cancel a live class",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Live Class ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Include course details",
+                        "name": "with_details",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.LiveClassResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/products": {
             "post": {
                 "security": [
@@ -4778,10 +4879,7 @@ const docTemplate = `{
                     "maxLength": 2000
                 },
                 "duration": {
-                    "description": "15 min to 8 hours",
-                    "type": "integer",
-                    "maximum": 480,
-                    "minimum": 15
+                    "type": "integer"
                 },
                 "end_time": {
                     "type": "string"
@@ -4790,12 +4888,6 @@ const docTemplate = `{
                     "description": "Host notes",
                     "type": "string",
                     "maxLength": 2000
-                },
-                "learning_objectives": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
                 },
                 "lesson_id": {
                     "type": "string"
@@ -4823,12 +4915,6 @@ const docTemplate = `{
                         "jitsi"
                     ]
                 },
-                "prerequisites": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
                 "recommended_setup": {
                     "type": "string",
                     "maxLength": 2000
@@ -4836,11 +4922,6 @@ const docTemplate = `{
                 "record_automatically": {
                     "description": "Recording",
                     "type": "boolean"
-                },
-                "recording_retention": {
-                    "type": "integer",
-                    "maximum": 365,
-                    "minimum": 1
                 },
                 "recording_storage": {
                     "type": "string",
@@ -4851,38 +4932,11 @@ const docTemplate = `{
                         "local"
                     ]
                 },
-                "recurrence_end_date": {
-                    "type": "string"
-                },
-                "recurrence_rule": {
-                    "type": "string",
-                    "maxLength": 200
-                },
-                "recurrence_type": {
-                    "description": "Recurrence",
-                    "type": "string",
-                    "enum": [
-                        "none",
-                        "daily",
-                        "weekly",
-                        "monthly"
-                    ]
-                },
                 "requires_approval": {
                     "type": "boolean"
                 },
-                "short_description": {
-                    "type": "string",
-                    "maxLength": 500
-                },
                 "start_time": {
                     "type": "string"
-                },
-                "tech_requirements": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
                 },
                 "timezone": {
                     "type": "string"
@@ -4915,9 +4969,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "agenda": {
-                    "type": "string"
-                },
-                "approved_at": {
                     "type": "string"
                 },
                 "auto_publish_recordings": {
@@ -4999,26 +5050,11 @@ const docTemplate = `{
                 "record_automatically": {
                     "type": "boolean"
                 },
-                "recording_retention": {
-                    "type": "integer"
-                },
                 "recording_storage": {
-                    "type": "string"
-                },
-                "recurrence_end_date": {
-                    "type": "string"
-                },
-                "recurrence_rule": {
-                    "type": "string"
-                },
-                "recurrence_type": {
                     "type": "string"
                 },
                 "requires_approval": {
                     "type": "boolean"
-                },
-                "short_description": {
-                    "type": "string"
                 },
                 "slug": {
                     "type": "string"
@@ -5062,6 +5098,119 @@ const docTemplate = `{
                 },
                 "waitlist_capacity": {
                     "type": "integer"
+                },
+                "waitlist_enabled": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "models.LiveClassUpdateInput": {
+            "type": "object",
+            "properties": {
+                "access_level": {
+                    "description": "Access control (only before start)",
+                    "type": "string",
+                    "enum": [
+                        "enrolled",
+                        "premium",
+                        "invite_only",
+                        "public"
+                    ]
+                },
+                "agenda": {
+                    "description": "Content (can update anytime)",
+                    "type": "string"
+                },
+                "auto_publish_recordings": {
+                    "type": "boolean"
+                },
+                "chapter_id": {
+                    "description": "Relationships (only before start)",
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "duration": {
+                    "type": "integer"
+                },
+                "end_time": {
+                    "description": "String for parsing",
+                    "type": "string"
+                },
+                "host_notes": {
+                    "type": "string"
+                },
+                "is_cancelled": {
+                    "description": "Cancellation (can update anytime)",
+                    "type": "boolean",
+                    "default": false
+                },
+                "lesson_id": {
+                    "type": "string"
+                },
+                "max_attendees": {
+                    "description": "Capacity (only before start)",
+                    "type": "integer",
+                    "maximum": 1000,
+                    "minimum": 1
+                },
+                "min_attendees": {
+                    "type": "integer",
+                    "maximum": 1000,
+                    "minimum": 1
+                },
+                "platform": {
+                    "description": "Meeting platform (only before start)",
+                    "type": "string",
+                    "enum": [
+                        "zoom",
+                        "teams",
+                        "google_meet",
+                        "custom",
+                        "bigbluebutton",
+                        "jitsi"
+                    ]
+                },
+                "recommended_setup": {
+                    "type": "string"
+                },
+                "record_automatically": {
+                    "description": "Recording (can update anytime before class ends)",
+                    "type": "boolean"
+                },
+                "recording_storage": {
+                    "type": "string",
+                    "enum": [
+                        "platform",
+                        "s3",
+                        "gcs",
+                        "local"
+                    ]
+                },
+                "start_time": {
+                    "description": "Rescheduling (only before start)",
+                    "type": "string"
+                },
+                "timezone": {
+                    "type": "string"
+                },
+                "title": {
+                    "description": "Basic info (only updatable before start)",
+                    "type": "string",
+                    "maxLength": 255,
+                    "minLength": 3
+                },
+                "topic_id": {
+                    "type": "string"
+                },
+                "tutor_id": {
+                    "type": "string"
+                },
+                "waitlist_capacity": {
+                    "type": "integer",
+                    "maximum": 100,
+                    "minimum": 0
                 },
                 "waitlist_enabled": {
                     "type": "boolean"

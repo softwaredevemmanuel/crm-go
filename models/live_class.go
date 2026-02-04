@@ -17,17 +17,13 @@ type LiveClass struct {
     Title              string         `gorm:"type:varchar(255);not null"`
     Description        string         `gorm:"type:text"`
     Slug               string         `gorm:"type:varchar(300);uniqueIndex;not null"`
-    ShortDescription   string         `gorm:"type:varchar(500)"`
     
     // Scheduling
     StartTime          time.Time      `gorm:"not null;index"` // Scheduled start time
     EndTime            time.Time      `gorm:"not null;index"` // Scheduled end time
     Duration           int            `gorm:"default:60"` // Minutes
     Timezone           string         `gorm:"type:varchar(50);default:'UTC'"`
-    RecurrenceRule     string         `gorm:"type:varchar(200)"` // RRULE for recurring classes
-    RecurrenceType     string         `gorm:"type:varchar(20);default:'none';check:recurrence_type IN ('none', 'daily', 'weekly', 'monthly')"`
-    RecurrenceEndDate  *time.Time     // End date for recurring series
-    
+  
     // Host Information
     TutorID            uuid.UUID      `gorm:"type:uuid;not null;index"` // Primary instructor
     HostNotes          string         `gorm:"type:text"` // Private notes for host
@@ -38,7 +34,6 @@ type LiveClass struct {
     WaitlistEnabled    bool           `gorm:"default:true"`
     WaitlistCapacity   int            `gorm:"default:20"` // Additional waitlist spots
     AccessLevel        string         `gorm:"type:varchar(20);default:'enrolled';check:access_level IN ('enrolled', 'premium', 'invite_only', 'public')"`
-    RequiresApproval   bool           `gorm:"default:false"` // Manual approval needed
     
     // Meeting Configuration
     Platform           string         `gorm:"type:varchar(50);default:'zoom';check:platform IN ('zoom', 'teams', 'google_meet', 'custom', 'bigbluebutton', 'jitsi')"`
@@ -58,7 +53,6 @@ type LiveClass struct {
     RecordAutomatically bool          `gorm:"default:false"`
     RecordingStorage   string         `gorm:"type:varchar(50);default:'platform';check:recording_storage IN ('platform', 's3', 'gcs', 'local')"`
     AutoPublishRecordings bool        `gorm:"default:false"`
-    RecordingRetention int            `gorm:"default:30"` // Days to keep recordings
     
     // Relationships
     Course             Course         `gorm:"foreignKey:CourseID"`
@@ -69,6 +63,8 @@ type LiveClass struct {
     // Timestamps
     CreatedAt          time.Time
     UpdatedAt          time.Time
+    IsCancelled        *bool      `json:"is_cancelled" default:"false"` // Set to true to cancel
+
 }
 
 
@@ -88,15 +84,9 @@ type LiveClassInput struct {
     
     // Optional details
     Description      string      `json:"description" binding:"max=2000"`
-    ShortDescription string      `json:"short_description" binding:"max=500"`
-    Duration         int         `json:"duration" binding:"min=15,max=480"` // 15 min to 8 hours
+    Duration         int         `json:"duration" binding:"omitempty"` 
     Timezone         string      `json:"timezone" binding:"omitempty,timezone"`
-    
-    // Recurrence
-    RecurrenceType   string      `json:"recurrence_type" binding:"omitempty,oneof=none daily weekly monthly"`
-    RecurrenceRule   string      `json:"recurrence_rule" binding:"omitempty,max=200"`
-    RecurrenceEndDate *time.Time `json:"recurrence_end_date"`
-    
+
     // Capacity & Access
     MaxAttendees     int         `json:"max_attendees" binding:"min=1,max=1000"`
     MinAttendees     int         `json:"min_attendees" binding:"min=1,max=1000"`
@@ -110,16 +100,12 @@ type LiveClassInput struct {
     
     // Preparation & Materials
     Agenda           string      `json:"agenda" binding:"max=5000"`
-    LearningObjectives []string  `json:"learning_objectives"`
-    Prerequisites    []string    `json:"prerequisites"`
-    TechRequirements []string    `json:"tech_requirements"`
     RecommendedSetup string      `json:"recommended_setup" binding:"max=2000"`
     
     // Recording
     RecordAutomatically bool     `json:"record_automatically"`
     RecordingStorage   string    `json:"recording_storage" binding:"omitempty,oneof=platform s3 gcs local"`
     AutoPublishRecordings bool   `json:"auto_publish_recordings"`
-    RecordingRetention int       `json:"recording_retention" binding:"min=1,max=365"`
     
     // Host notes
     HostNotes        string      `json:"host_notes" binding:"max=2000"`
@@ -136,14 +122,10 @@ type LiveClassResponse struct {
     Title              string         `json:"title"`
     Description        string         `json:"description"`
     Slug               string         `json:"slug"`
-    ShortDescription   string         `json:"short_description"`
     StartTime          time.Time      `json:"start_time"`
     EndTime            time.Time      `json:"end_time"`
     Duration           int            `json:"duration"`
     Timezone           string         `json:"timezone"`
-    RecurrenceType     string         `json:"recurrence_type"`
-    RecurrenceRule     string         `json:"recurrence_rule,omitempty"`
-    RecurrenceEndDate  *time.Time     `json:"recurrence_end_date,omitempty"`
     TutorID            uuid.UUID      `json:"tutor_id"`
     TutorName          string         `json:"tutor_name,omitempty"`
     MaxAttendees       int            `json:"max_attendees"`
@@ -165,7 +147,6 @@ type LiveClassResponse struct {
     RecordAutomatically bool          `json:"record_automatically"`
     RecordingStorage   string         `json:"recording_storage"`
     AutoPublishRecordings bool        `json:"auto_publish_recordings"`
-    RecordingRetention int            `json:"recording_retention"`
     HostNotes          string         `json:"host_notes,omitempty"`
     Status             string         `json:"status"` // scheduled, ongoing, completed, cancelled
     CreatedAt          time.Time      `json:"created_at"`
@@ -176,6 +157,52 @@ type LiveClassResponse struct {
     TotalEnrolled      int            `json:"total_enrolled,omitempty"`
     IsUpcoming         bool           `json:"is_upcoming"`
     IsLiveNow          bool           `json:"is_live_now"`
+}
+
+
+// LiveClassUpdateInput - for updating live classes
+type LiveClassUpdateInput struct {
+    // Basic info (only updatable before start)
+    Title            *string    `json:"title" binding:"omitempty,min=3,max=255"`
+    Description      *string    `json:"description"`
+    
+    // Rescheduling (only before start)
+    StartTime        *string    `json:"start_time"` // String for parsing
+    EndTime          *string    `json:"end_time"`   // String for parsing
+    Duration         *int       `json:"duration" binding:"omitempty"`
+    Timezone         *string    `json:"timezone" binding:"omitempty,timezone"`
+    
+    // Relationships (only before start)
+    ChapterID        *uuid.UUID `json:"chapter_id"`
+    TopicID          *uuid.UUID `json:"topic_id"`
+    LessonID         *uuid.UUID `json:"lesson_id"`
+    TutorID          *uuid.UUID `json:"tutor_id"`
+    
+    // Capacity (only before start)
+    MaxAttendees     *int       `json:"max_attendees" binding:"omitempty,min=1,max=1000"`
+    MinAttendees     *int       `json:"min_attendees" binding:"omitempty,min=1,max=1000"`
+    WaitlistEnabled  *bool      `json:"waitlist_enabled"`
+    WaitlistCapacity *int       `json:"waitlist_capacity" binding:"omitempty,min=0,max=100"`
+    
+    // Access control (only before start)
+    AccessLevel      *string    `json:"access_level" binding:"omitempty,oneof=enrolled premium invite_only public"`
+    
+    // Meeting platform (only before start)
+    Platform         *string    `json:"platform" binding:"omitempty,oneof=zoom teams google_meet custom bigbluebutton jitsi"`
+    
+    // Content (can update anytime)
+    Agenda           *string    `json:"agenda"`
+    RecommendedSetup *string    `json:"recommended_setup"`
+    HostNotes        *string    `json:"host_notes"`
+    
+    // Recording (can update anytime before class ends)
+    RecordAutomatically *bool   `json:"record_automatically"`
+    RecordingStorage   *string  `json:"recording_storage" binding:"omitempty,oneof=platform s3 gcs local"`
+    AutoPublishRecordings *bool `json:"auto_publish_recordings"`
+    
+    // Cancellation (can update anytime)
+    IsCancelled        *bool      `json:"is_cancelled" default:"false"` // Set to true to cancel
+
 }
 
 // TableName specifies the table name

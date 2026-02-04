@@ -753,9 +753,6 @@ definitions:
         maxLength: 2000
         type: string
       duration:
-        description: 15 min to 8 hours
-        maximum: 480
-        minimum: 15
         type: integer
       end_time:
         type: string
@@ -763,10 +760,6 @@ definitions:
         description: Host notes
         maxLength: 2000
         type: string
-      learning_objectives:
-        items:
-          type: string
-        type: array
       lesson_id:
         type: string
       max_attendees:
@@ -788,20 +781,12 @@ definitions:
         - bigbluebutton
         - jitsi
         type: string
-      prerequisites:
-        items:
-          type: string
-        type: array
       recommended_setup:
         maxLength: 2000
         type: string
       record_automatically:
         description: Recording
         type: boolean
-      recording_retention:
-        maximum: 365
-        minimum: 1
-        type: integer
       recording_storage:
         enum:
         - platform
@@ -809,30 +794,10 @@ definitions:
         - gcs
         - local
         type: string
-      recurrence_end_date:
-        type: string
-      recurrence_rule:
-        maxLength: 200
-        type: string
-      recurrence_type:
-        description: Recurrence
-        enum:
-        - none
-        - daily
-        - weekly
-        - monthly
-        type: string
       requires_approval:
         type: boolean
-      short_description:
-        maxLength: 500
-        type: string
       start_time:
         type: string
-      tech_requirements:
-        items:
-          type: string
-        type: array
       timezone:
         type: string
       title:
@@ -861,8 +826,6 @@ definitions:
       access_level:
         type: string
       agenda:
-        type: string
-      approved_at:
         type: string
       auto_publish_recordings:
         type: boolean
@@ -917,20 +880,10 @@ definitions:
         type: string
       record_automatically:
         type: boolean
-      recording_retention:
-        type: integer
       recording_storage:
-        type: string
-      recurrence_end_date:
-        type: string
-      recurrence_rule:
-        type: string
-      recurrence_type:
         type: string
       requires_approval:
         type: boolean
-      short_description:
-        type: string
       slug:
         type: string
       start_time:
@@ -959,6 +912,91 @@ definitions:
       updated_at:
         type: string
       waitlist_capacity:
+        type: integer
+      waitlist_enabled:
+        type: boolean
+    type: object
+  models.LiveClassUpdateInput:
+    properties:
+      access_level:
+        description: Access control (only before start)
+        enum:
+        - enrolled
+        - premium
+        - invite_only
+        - public
+        type: string
+      agenda:
+        description: Content (can update anytime)
+        type: string
+      auto_publish_recordings:
+        type: boolean
+      chapter_id:
+        description: Relationships (only before start)
+        type: string
+      description:
+        type: string
+      duration:
+        type: integer
+      end_time:
+        description: String for parsing
+        type: string
+      host_notes:
+        type: string
+      is_cancelled:
+        default: false
+        description: Cancellation (can update anytime)
+        type: boolean
+      lesson_id:
+        type: string
+      max_attendees:
+        description: Capacity (only before start)
+        maximum: 1000
+        minimum: 1
+        type: integer
+      min_attendees:
+        maximum: 1000
+        minimum: 1
+        type: integer
+      platform:
+        description: Meeting platform (only before start)
+        enum:
+        - zoom
+        - teams
+        - google_meet
+        - custom
+        - bigbluebutton
+        - jitsi
+        type: string
+      recommended_setup:
+        type: string
+      record_automatically:
+        description: Recording (can update anytime before class ends)
+        type: boolean
+      recording_storage:
+        enum:
+        - platform
+        - s3
+        - gcs
+        - local
+        type: string
+      start_time:
+        description: Rescheduling (only before start)
+        type: string
+      timezone:
+        type: string
+      title:
+        description: Basic info (only updatable before start)
+        maxLength: 255
+        minLength: 3
+        type: string
+      topic_id:
+        type: string
+      tutor_id:
+        type: string
+      waitlist_capacity:
+        maximum: 100
+        minimum: 0
         type: integer
       waitlist_enabled:
         type: boolean
@@ -2339,6 +2377,71 @@ paths:
       security:
       - BearerAuth: []
       summary: Create a new live class
+      tags:
+      - live-classes
+  /api/live-classes/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update live class details. Some fields can only be updated before
+        class starts.
+      parameters:
+      - description: Live Class ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update data
+        in: body
+        name: update
+        required: true
+        schema:
+          $ref: '#/definitions/models.LiveClassUpdateInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.LiveClassResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a live class
+      tags:
+      - live-classes
+  /api/live-classes/{id}/cancel:
+    post:
+      consumes:
+      - application/json
+      description: Cancel a live class that hasn't started yet
+      parameters:
+      - description: Live Class ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Include course details
+        in: query
+        name: with_details
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.LiveClassResponse'
+      security:
+      - BearerAuth: []
+      summary: Cancel a live class
       tags:
       - live-classes
   /api/products:
