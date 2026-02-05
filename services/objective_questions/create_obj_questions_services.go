@@ -127,7 +127,22 @@ func (s *ObjectiveQuestionService) CreateObjectiveQuestion(req models.ObjectiveQ
     if req.Points == 0 {
         req.Points = 1
     }
-    
+
+    // Check if question already exists for the same course/topic/text
+    topicID := uuid.Nil
+    if req.TopicID != nil {
+        topicID = *req.TopicID
+    }
+    exists, err := s.questionExists(req.CourseID, topicID, strings.TrimSpace(req.QuestionText))
+    if err != nil {
+        return nil, err
+    }
+    if exists {
+        return nil, errors.New("question already exists")
+    }
+
+    fmt.Println("Starting transaction no duplicate found")
+
     // Start transaction
     tx := s.db.Begin()
     defer func() {
@@ -212,6 +227,21 @@ func (s *ObjectiveQuestionService) CreateObjectiveQuestionWithTx(tx *gorm.DB, re
     if req.QuestionType == "" { req.QuestionType = "multiple_choice" }
     if req.DifficultyLevel == "" { req.DifficultyLevel = "medium" }
     if req.Points == 0 { req.Points = 1 }
+    
+      // Check if question already exists for the same course/topic/text
+    topicID := uuid.Nil
+    if req.TopicID != nil {
+        topicID = *req.TopicID
+    }
+    exists, err := s.questionExists(req.CourseID, topicID, strings.TrimSpace(req.QuestionText))
+    if err != nil {
+        return nil, err
+    }
+    if exists {
+        return nil, errors.New("question already exists")
+    }
+
+    fmt.Println("Starting transaction no duplicate found")
     
     // Create question
     question := models.ObjectiveQuestion{
@@ -443,3 +473,17 @@ func (s *ObjectiveQuestionService) validateMultipleResponseAnswer(questionID uui
     // Implementation for multiple response validation
     return false, nil
 }
+
+// Check if question already exists (for same course, topic)
+func (s *ObjectiveQuestionService) questionExists(courseID, topicID uuid.UUID, questionText string) (bool, error) {
+    var count int64
+    query := s.db.Model(&models.ObjectiveQuestion{}).
+        Where("course_id = ? AND topic_id = ? AND question_text = ?", courseID, topicID, questionText)
+
+    if err := query.Count(&count).Error; err != nil {
+        return false, err
+    }
+
+    return count > 0, nil
+}
+   
