@@ -422,14 +422,6 @@ func (s *LiveClassService) liveClassToResponse(liveClass *models.LiveClass, with
 			response.TutorName = fmt.Sprintf("%s %s", tutor.FirstName, tutor.LastName)
 		}
 
-		// Get enrollment count
-		var enrollmentCount int64
-		s.db.Model(&models.LiveClassEnrollment{}).
-			Where("live_class_id = ? AND status = ?", liveClass.ID, "confirmed").
-			Count(&enrollmentCount)
-
-		response.TotalEnrolled = int(enrollmentCount)
-		response.AvailableSeats = liveClass.MaxAttendees - int(enrollmentCount)
 	}
 
 	return response

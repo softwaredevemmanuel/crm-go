@@ -2036,6 +2036,102 @@
                 }
             }
         },
+        "/api/questions/objective": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create objective question with options",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "questions"
+                ],
+                "summary": "Create a new objective question",
+                "parameters": [
+                    {
+                        "description": "Question data",
+                        "name": "question",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ObjectiveQuestionInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.ObjectiveQuestionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/questions/objective/bulk": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create multiple questions in bulk",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "questions"
+                ],
+                "summary": "Create multiple questions",
+                "parameters": [
+                    {
+                        "description": "Array of question data",
+                        "name": "questions",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ObjectiveQuestionInput"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ObjectiveQuestionResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/topics": {
             "post": {
                 "security": [
@@ -5282,6 +5378,178 @@
                 }
             }
         },
+        "models.ObjectiveQuestionInput": {
+            "type": "object",
+            "required": [
+                "course_id",
+                "created_by",
+                "question_text"
+            ],
+            "properties": {
+                "answer_explanation": {
+                    "description": "Answer configuration",
+                    "type": "string",
+                    "maxLength": 2000
+                },
+                "chapter_id": {
+                    "description": "Content relationships",
+                    "type": "string"
+                },
+                "course_id": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "string"
+                },
+                "difficulty_level": {
+                    "type": "string",
+                    "enum": [
+                        "easy",
+                        "medium",
+                        "hard",
+                        "expert"
+                    ]
+                },
+                "hint": {
+                    "type": "string",
+                    "maxLength": 500
+                },
+                "image_url": {
+                    "description": "Media support",
+                    "type": "string",
+                    "maxLength": 500
+                },
+                "is_approved": {
+                    "description": "Approval",
+                    "type": "boolean"
+                },
+                "options": {
+                    "description": "Options for multiple choice questions",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.QuestionOptionInput"
+                    }
+                },
+                "points": {
+                    "type": "integer",
+                    "maximum": 100,
+                    "minimum": 0
+                },
+                "question_text": {
+                    "description": "Required fields",
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 10
+                },
+                "question_type": {
+                    "description": "Optional fields with defaults",
+                    "type": "string",
+                    "enum": [
+                        "multiple_choice",
+                        "true_false",
+                        "multiple_response",
+                        "matching",
+                        "ordering"
+                    ]
+                },
+                "solution_steps": {
+                    "type": "string",
+                    "maxLength": 2000
+                },
+                "topic_id": {
+                    "type": "string"
+                },
+                "video_url": {
+                    "type": "string",
+                    "maxLength": 500
+                }
+            }
+        },
+        "models.ObjectiveQuestionResponse": {
+            "type": "object",
+            "properties": {
+                "answer_explanation": {
+                    "type": "string"
+                },
+                "chapter_id": {
+                    "type": "string"
+                },
+                "chapter_name": {
+                    "type": "string"
+                },
+                "correct_attempts": {
+                    "type": "integer"
+                },
+                "course_id": {
+                    "type": "string"
+                },
+                "course_name": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "string"
+                },
+                "creator_name": {
+                    "type": "string"
+                },
+                "difficulty_level": {
+                    "type": "string"
+                },
+                "hint": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "is_approved": {
+                    "type": "boolean"
+                },
+                "options": {
+                    "description": "Options (for multiple choice questions)",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.QuestionOptionResponse"
+                    }
+                },
+                "points": {
+                    "type": "integer"
+                },
+                "question_text": {
+                    "type": "string"
+                },
+                "question_type": {
+                    "type": "string"
+                },
+                "solution_steps": {
+                    "type": "string"
+                },
+                "success_rate": {
+                    "type": "number"
+                },
+                "topic_id": {
+                    "type": "string"
+                },
+                "topic_name": {
+                    "type": "string"
+                },
+                "total_attempts": {
+                    "description": "Statistics (optional)",
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "video_url": {
+                    "type": "string"
+                }
+            }
+        },
         "models.PaginatedGradesResponse": {
             "type": "object",
             "properties": {
@@ -5402,6 +5670,53 @@
                         "inactive",
                         "discontinued"
                     ]
+                }
+            }
+        },
+        "models.QuestionOptionInput": {
+            "type": "object",
+            "required": [
+                "option_text"
+            ],
+            "properties": {
+                "explanation": {
+                    "type": "string",
+                    "maxLength": 500
+                },
+                "is_correct": {
+                    "type": "boolean"
+                },
+                "option_text": {
+                    "type": "string",
+                    "maxLength": 500,
+                    "minLength": 1
+                },
+                "sort_order": {
+                    "type": "integer",
+                    "minimum": 0
+                }
+            }
+        },
+        "models.QuestionOptionResponse": {
+            "type": "object",
+            "properties": {
+                "explanation": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_correct": {
+                    "type": "boolean"
+                },
+                "option_text": {
+                    "type": "string"
+                },
+                "question_id": {
+                    "type": "string"
+                },
+                "sort_order": {
+                    "type": "integer"
                 }
             }
         },

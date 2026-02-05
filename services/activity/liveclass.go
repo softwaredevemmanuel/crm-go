@@ -52,6 +52,7 @@ func (a *LiveClassActivity) Updated(
 		"live_class_id": liveClass.ID,
 		"tutor_id":      liveClass.TutorID,
 		"course_id":     liveClass.CourseID,
+		
 	}
 
 	return a.logger.LogWithTx(

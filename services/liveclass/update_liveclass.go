@@ -248,54 +248,7 @@ func (s *LiveClassService) UpdateLiveClass(liveClassID uuid.UUID, req models.Liv
             changes = append(changes, "lesson")
         }
         
-        // Capacity - Max Attendees
-        if req.MaxAttendees != nil {
-            newMax := *req.MaxAttendees
-            if newMax < 1 || newMax > 1000 {
-                return nil, errors.New("max attendees must be between 1 and 1000")
-            }
-            
-            // Validate against current enrollments
-            var confirmedCount int64
-            s.db.Model(&models.LiveClassEnrollment{}).
-                Where("live_class_id = ? AND status = 'confirmed'", liveClassID).
-                Count(&confirmedCount)
-            
-            if int(confirmedCount) > newMax {
-                return nil, fmt.Errorf("cannot reduce capacity below %d confirmed enrollments", confirmedCount)
-            }
-            
-            // Ensure min attendees doesn't exceed new max
-            if req.MinAttendees == nil && newMax < liveClass.MinAttendees {
-                return nil, fmt.Errorf("max attendees cannot be less than current min attendees (%d)", liveClass.MinAttendees)
-            }
-            
-            liveClass.MaxAttendees = newMax
-            updates["max_attendees"] = newMax
-            changes = append(changes, "max_attendees")
-        }
-        
-        // Capacity - Min Attendees
-        if req.MinAttendees != nil {
-            newMin := *req.MinAttendees
-            if newMin < 1 || newMin > 1000 {
-                return nil, errors.New("min attendees must be between 1 and 1000")
-            }
-            
-            // Ensure min doesn't exceed max
-            currentMax := liveClass.MaxAttendees
-            if req.MaxAttendees != nil {
-                currentMax = *req.MaxAttendees
-            }
-            
-            if newMin > currentMax {
-                return nil, fmt.Errorf("min attendees cannot exceed max attendees (%d)", currentMax)
-            }
-            
-            liveClass.MinAttendees = newMin
-            updates["min_attendees"] = newMin
-            changes = append(changes, "min_attendees")
-        }
+     
         
         // Waitlist Enabled
         if req.WaitlistEnabled != nil {

@@ -9,6 +9,7 @@ type Service struct {
 	Topics      *TopicActivity
 	Grades      *GradeActivity
 	LiveClasses *LiveClassActivity
+	ObjectiveQuestions  *ObjectiveActivity
 }
 
 func NewService(db *gorm.DB) *Service {
@@ -21,6 +22,7 @@ func NewService(db *gorm.DB) *Service {
 		Topics:      &TopicActivity{logger},
 		Grades:      &GradeActivity{logger},
 		LiveClasses: &LiveClassActivity{logger},
+		ObjectiveQuestions:  &ObjectiveActivity{logger},
 	}
 }
 

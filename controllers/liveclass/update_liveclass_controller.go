@@ -2,12 +2,14 @@
 package controllers
 
 import (
-    "net/http"
-    "strconv"
-    "crm-go/models"
-    "github.com/gin-gonic/gin"
-    "github.com/google/uuid"
+	"crm-go/models"
+	"fmt"
+	"net/http"
+	"strconv"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 // UpdateLiveClass handler
@@ -127,7 +129,7 @@ func (ctl *LiveClassController) CancelLiveClass(c *gin.Context) {
     }
     
     updatedBy := uuid.Nil
-    if userID, exists := c.Get("user_id"); exists {
+    if userID, exists := c.Get("tutor_id"); exists {
         if id, ok := userID.(uuid.UUID); ok {
             updatedBy = id
         }
@@ -145,16 +147,16 @@ func (ctl *LiveClassController) CancelLiveClass(c *gin.Context) {
     }
     
     // Log activity
-    if updatedBy != uuid.Nil {
         liveClassModel := models.LiveClass{
             ID:        updatedClass.ID,
             CourseID:  updatedClass.CourseID,
             Title:     updatedClass.Title,
             TutorID:   updatedClass.TutorID,
         }
-        _ = ctl.activity.LiveClasses.Updated(tx, updatedBy, liveClassModel)
-    }
-    
+        _ = ctl.activity.LiveClasses.Updated(tx, liveClassModel.TutorID, liveClassModel)
+
+        fmt.Println("Live class updated:", liveClassModel.TutorID)
+
     if err := tx.Commit().Error; err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{
             "error": "Failed to cancel class: " + err.Error(),

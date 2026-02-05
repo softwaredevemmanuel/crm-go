@@ -68,6 +68,10 @@ const (
     ActionLiveClassUpdate      = "live_class_update"
     ActionLiveClassDelete      = "live_class_delete"
 
+    ActionObjectiveCreate      = "objective_create"
+    ActionObjectiveUpdate      = "objective_update"
+    ActionObjectiveDelete      = "objective_delete"
+
     ActionPaymentSuccess      = "payment_success"
     ActionPaymentFailed       = "payment_failed"
     ActionSubscriptionStart   = "subscription_start"
