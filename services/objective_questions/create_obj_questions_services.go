@@ -27,10 +27,10 @@ func (s *ObjectiveQuestionService) validateQuestionInput(req models.ObjectiveQue
         return errors.New("course not found")
     }
     
-    // Validate creator exists
-    var creator models.User
-    if err := s.db.First(&creator, "id = ?", req.CreatedBy).Error; err != nil {
-        return errors.New("creator not found")
+    // Validate tutor exists
+    var tutor models.User
+    if err := s.db.First(&tutor, "id = ?", req.TutorID).Error; err != nil {
+        return errors.New("tutor not found")
     }
     
     // Validate chapter if provided
@@ -95,11 +95,6 @@ func (s *ObjectiveQuestionService) validateQuestionInput(req models.ObjectiveQue
             }
         }
         
-    case "true_false":
-        // True/false questions don't need options
-        if len(req.Options) > 0 {
-            return errors.New("true/false questions should not have options")
-        }
         
     case "matching", "ordering":
         if len(req.Options) < 3 {
@@ -166,7 +161,7 @@ func (s *ObjectiveQuestionService) CreateObjectiveQuestion(req models.ObjectiveQ
         AnswerExplanation: strings.TrimSpace(req.AnswerExplanation),
         SolutionSteps:     strings.TrimSpace(req.SolutionSteps),
         Hint:              strings.TrimSpace(req.Hint),
-        CreatedBy:         req.CreatedBy,
+        TutorID:           req.TutorID,
         CreatedAt:         time.Now(),
         UpdatedAt:         time.Now(),
         IsApproved:        req.IsApproved,
@@ -258,7 +253,7 @@ func (s *ObjectiveQuestionService) CreateObjectiveQuestionWithTx(tx *gorm.DB, re
         AnswerExplanation: strings.TrimSpace(req.AnswerExplanation),
         SolutionSteps:     strings.TrimSpace(req.SolutionSteps),
         Hint:              strings.TrimSpace(req.Hint),
-        CreatedBy:         req.CreatedBy,
+        TutorID:           req.TutorID,
         CreatedAt:         time.Now(),
         UpdatedAt:         time.Now(),
         IsApproved:        req.IsApproved,
@@ -340,7 +335,7 @@ func (s *ObjectiveQuestionService) questionToResponse(question *models.Objective
         AnswerExplanation: question.AnswerExplanation,
         SolutionSteps:     question.SolutionSteps,
         Hint:              question.Hint,
-        CreatedBy:         question.CreatedBy,
+        TutorID:           question.TutorID,
         CreatedAt:         question.CreatedAt,
         UpdatedAt:         question.UpdatedAt,
         IsApproved:        question.IsApproved,
@@ -384,7 +379,7 @@ func (s *ObjectiveQuestionService) questionToResponse(question *models.Objective
         
         // Get creator name
         var creator models.User
-        if err := s.db.First(&creator, "id = ?", question.CreatedBy).Error; err == nil {
+        if err := s.db.First(&creator, "id = ?", question.TutorID).Error; err == nil {
             response.CreatorName = fmt.Sprintf("%s %s", creator.FirstName, creator.LastName)
         }
         
@@ -413,29 +408,6 @@ func (s *ObjectiveQuestionService) questionToResponse(question *models.Objective
     return response
 }
 
-// GenerateOptionsForTrueFalse - auto-generate options for true/false questions
-func (s *ObjectiveQuestionService) generateTrueFalseOptions(questionID uuid.UUID) []models.QuestionOption {
-    return []models.QuestionOption{
-        {
-            ID:         uuid.New(),
-            QuestionID: questionID,
-            OptionText: "True",
-            IsCorrect:  true, // Assuming answer is True
-            SortOrder:      1,
-            CreatedAt:  time.Now(),
-            UpdatedAt:  time.Now(),
-        },
-        {
-            ID:         uuid.New(),
-            QuestionID: questionID,
-            OptionText: "False",
-            IsCorrect:  false,
-            SortOrder:      2,
-            CreatedAt:  time.Now(),
-            UpdatedAt:  time.Now(),
-        },
-    }
-}
 
 // ValidateQuestionAnswer - validate answer for a question
 func (s *ObjectiveQuestionService) ValidateQuestionAnswer(questionID uuid.UUID, answer interface{}) (bool, error) {

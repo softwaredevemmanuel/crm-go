@@ -31,7 +31,7 @@ type ObjectiveQuestion struct {
 
  
     // Metadata
-    CreatedBy          uuid.UUID      `gorm:"type:uuid;not null" json:"created_by"`
+    TutorID            uuid.UUID      `gorm:"type:uuid;not null" json:"tutor_id"`
     CreatedAt          time.Time      `json:"created_at"`
     UpdatedAt          time.Time      `json:"updated_at"`
     IsApproved         bool           `json:"is_approved"`
@@ -46,8 +46,8 @@ type ObjectiveQuestionInput struct {
     // Required fields
     QuestionText    string    `json:"question_text" binding:"required,min=10,max=1000"`
     CourseID        uuid.UUID `json:"course_id" binding:"required"`
-    CreatedBy       uuid.UUID `json:"created_by" binding:"required"`
-    
+    TutorID        uuid.UUID `json:"tutor_id" binding:"required"`
+
     // Optional fields with defaults
     QuestionType    string    `json:"question_type" binding:"omitempty,oneof=multiple_choice true_false multiple_response matching ordering"`
     DifficultyLevel string    `json:"difficulty_level" binding:"omitempty,oneof=easy medium hard expert"`
@@ -102,8 +102,8 @@ type ObjectiveQuestionResponse struct {
     AnswerExplanation  string                  `json:"answer_explanation,omitempty"`
     SolutionSteps      string                  `json:"solution_steps,omitempty"`
     Hint               string                  `json:"hint,omitempty"`
-    
-    CreatedBy          uuid.UUID               `json:"created_by"`
+
+    TutorID            uuid.UUID               `json:"tutor_id"`
     CreatorName        string                  `json:"creator_name,omitempty"`
     CreatedAt          time.Time               `json:"created_at"`
     UpdatedAt          time.Time               `json:"updated_at"`

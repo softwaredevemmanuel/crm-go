@@ -51,7 +51,7 @@ func (ctl *ObjectiveQuestionController) CreateObjectiveQuestion(c *gin.Context) 
     // Get user ID from context (creator)
     if userID, exists := c.Get("user_id"); exists {
         if id, ok := userID.(uuid.UUID); ok {
-            req.CreatedBy = id
+            req.TutorID = id
         }
     }
     
@@ -84,7 +84,7 @@ func (ctl *ObjectiveQuestionController) CreateObjectiveQuestion(c *gin.Context) 
         ID:        question.ID,
         CourseID:  question.CourseID,
     }
-    _ = ctl.activity.ObjectiveQuestions.Created(tx, req.CreatedBy, objectiveQuestionModel)
+    _ = ctl.activity.ObjectiveQuestions.Created(tx, req.TutorID, objectiveQuestionModel)
 
     if err := tx.Commit().Error; err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{
@@ -139,7 +139,7 @@ func (ctl *ObjectiveQuestionController) CreateBulkQuestions(c *gin.Context) {
     if userID, exists := c.Get("user_id"); exists {
         if id, ok := userID.(uuid.UUID); ok {
             for i := range requests {
-                requests[i].CreatedBy = id
+                requests[i].TutorID = id
                 if !requests[i].IsApproved {
                     requests[i].IsApproved = false
                 }

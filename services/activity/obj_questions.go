@@ -22,7 +22,7 @@ func (a *ObjectiveActivity) Created(
 
 	metadata := map[string]interface{}{
 		"objective_id": objective.ID,
-		"creator_id":   objective.CreatedBy,
+		"tutor_id":   objective.TutorID,
 		"course_id":    objective.CourseID,
 	}
 
