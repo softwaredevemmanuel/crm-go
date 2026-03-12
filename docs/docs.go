@@ -667,14 +667,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/chapters": {
+        "/api/modules": {
             "post": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Create a new chapter",
+                "description": "Create a new module",
                 "consumes": [
                     "application/json"
                 ],
@@ -682,17 +682,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Chapters"
+                    "Modules"
                 ],
-                "summary": "Create a new chapters",
+                "summary": "Create a new modules",
                 "parameters": [
                     {
-                        "description": "Chapter",
-                        "name": "chapter",
+                        "description": "Module",
+                        "name": "module",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.ChapterInput"
+                            "$ref": "#/definitions/models.ModuleInput"
                         }
                     }
                 ],
@@ -724,9 +724,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/chapters/{id}": {
+        "/api/modules/{id}": {
             "put": {
-                "description": "Update an existing chapter",
+                "description": "Update an existing module",
                 "consumes": [
                     "application/json"
                 ],
@@ -734,24 +734,24 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Chapters"
+                    "Modules"
                 ],
-                "summary": "Update an existing chapter",
+                "summary": "Update an existing module",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Chapter ID",
+                        "description": "Module ID",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Chapter",
-                        "name": "chapter",
+                        "description": "Module",
+                        "name": "module",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.ChapterInput"
+                            "$ref": "#/definitions/models.ModuleInput"
                         }
                     }
                 ],
@@ -783,7 +783,7 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "Delete an existing chapter",
+                "description": "Delete an existing module",
                 "consumes": [
                     "application/json"
                 ],
@@ -791,13 +791,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Chapters"
+                    "Modules"
                 ],
-                "summary": "Delete an existing chapter",
+                "summary": "Delete an existing module",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Chapter ID",
+                        "description": "Module ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -852,7 +852,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "Course Material",
-                        "name": "chapter",
+                        "name": "module",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -1529,14 +1529,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/lessons": {
+        "/api/topics": {
             "post": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Create a new lesson under a chapter",
+                "description": "Create a new topic under a module",
                 "consumes": [
                     "application/json"
                 ],
@@ -1544,17 +1544,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Lessons"
+                    "Topics"
                 ],
-                "summary": "Create a lesson",
+                "summary": "Create a topic",
                 "parameters": [
                     {
-                        "description": "Lesson payload",
-                        "name": "lesson",
+                        "description": "Topic payload",
+                        "name": "topic",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.LessonInput"
+                            "$ref": "#/definitions/models.TopicInput"
                         }
                     }
                 ],
@@ -1586,14 +1586,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/lessons/{id}": {
+        "/api/topics/{id}": {
             "put": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Update lesson details",
+                "description": "Update topic details",
                 "consumes": [
                     "application/json"
                 ],
@@ -1601,24 +1601,24 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Lessons"
+                    "Topics"
                 ],
-                "summary": "Update lesson",
+                "summary": "Update topic",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Lesson ID",
+                        "description": "Topic ID",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Lesson payload",
-                        "name": "lesson",
+                        "description": "Topic payload",
+                        "name": "topic",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.LessonInput"
+                            "$ref": "#/definitions/models.TopicInput"
                         }
                     }
                 ],
@@ -1626,7 +1626,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.LessonResponse"
+                            "$ref": "#/definitions/models.TopicResponse"
                         }
                     },
                     "400": {
@@ -1655,18 +1655,18 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Delete lesson by ID",
+                "description": "Delete topic by ID",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Lessons"
+                    "Topics"
                 ],
-                "summary": "Delete lesson",
+                "summary": "Delete topic",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Lesson ID",
+                        "description": "Topic ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -2140,14 +2140,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/topics": {
+        "/api/lessons": {
             "post": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Create a new topic",
+                "description": "Create a new lesson",
                 "consumes": [
                     "application/json"
                 ],
@@ -2155,23 +2155,23 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "topics"
+                    "lessons"
                 ],
-                "summary": "Create a new topic",
+                "summary": "Create a new lesson",
                 "parameters": [
                     {
-                        "description": "Topic",
-                        "name": "topic",
+                        "description": "Lesson",
+                        "name": "lesson",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.TopicInput"
+                            "$ref": "#/definitions/models.LessonInput"
                         }
                     }
                 ],
                 "responses": {
                     "201": {
-                        "description": "Topic created successfully",
+                        "description": "Lesson created successfully",
                         "schema": {
                             "$ref": "#/definitions/models.SuccessResponse"
                         }
@@ -2185,14 +2185,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/topics/{id}": {
+        "/api/lessons/{id}": {
             "put": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Update a topic by ID",
+                "description": "Update a lesson by ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -2200,32 +2200,32 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "topics"
+                    "lessons"
                 ],
-                "summary": "Update a topic",
+                "summary": "Update a lesson",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Topic ID",
+                        "description": "Lesson ID",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Topic",
-                        "name": "topic",
+                        "description": "Lesson",
+                        "name": "lesson",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.TopicInput"
+                            "$ref": "#/definitions/models.LessonInput"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Topic updated successfully",
+                        "description": "Lesson updated successfully",
                         "schema": {
-                            "$ref": "#/definitions/models.TopicResponse"
+                            "$ref": "#/definitions/models.LessonResponse"
                         }
                     },
                     "400": {
@@ -2854,9 +2854,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/chapters": {
+        "/modules": {
             "get": {
-                "description": "Get all chapters",
+                "description": "Get all modules",
                 "consumes": [
                     "application/json"
                 ],
@@ -2864,9 +2864,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Chapters"
+                    "Modules"
                 ],
-                "summary": "Get all chapters",
+                "summary": "Get all modules",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -2883,9 +2883,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/chapters/{id}": {
+        "/modules/{id}": {
             "get": {
-                "description": "Get a single chapter by ID",
+                "description": "Get a single module by ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -2893,13 +2893,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Chapters"
+                    "Modules"
                 ],
-                "summary": "Get a single chapter by ID",
+                "summary": "Get a single module by ID",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Chapter ID",
+                        "description": "Module ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -2935,7 +2935,7 @@ const docTemplate = `{
         },
         "/course-materials": {
             "get": {
-                "description": "Get all course materials, optionally filtered by course, chapter, or lesson",
+                "description": "Get all course materials, optionally filtered by course, module, or topic",
                 "produces": [
                     "application/json"
                 ],
@@ -2952,14 +2952,14 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Chapter ID",
-                        "name": "chapter_id",
+                        "description": "Module ID",
+                        "name": "module_id",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "Lesson ID",
-                        "name": "lesson_id",
+                        "description": "Topic ID",
+                        "name": "topic_id",
                         "in": "query"
                     },
                     {
@@ -2996,7 +2996,7 @@ const docTemplate = `{
         },
         "/course-materials/{id}": {
             "get": {
-                "description": "Get course material with chapter and lesson details",
+                "description": "Get course material with module and topic details",
                 "produces": [
                     "application/json"
                 ],
@@ -3585,16 +3585,16 @@ const docTemplate = `{
                 }
             }
         },
-        "/lessons": {
+        "/topics": {
             "get": {
-                "description": "Get all lessons, optionally filtered by course or chapter",
+                "description": "Get all topics, optionally filtered by course or module",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Lessons"
+                    "Topics"
                 ],
-                "summary": "Get lessons",
+                "summary": "Get topics",
                 "parameters": [
                     {
                         "type": "string",
@@ -3604,8 +3604,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Chapter ID",
-                        "name": "chapter_id",
+                        "description": "Module ID",
+                        "name": "module_id",
                         "in": "query"
                     }
                 ],
@@ -3615,7 +3615,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.LessonResponse"
+                                "$ref": "#/definitions/models.TopicResponse"
                             }
                         }
                     },
@@ -3628,20 +3628,20 @@ const docTemplate = `{
                 }
             }
         },
-        "/lessons/{id}": {
+        "/topics/{id}": {
             "get": {
-                "description": "Get lesson with chapter and course details",
+                "description": "Get topic with module and course details",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Lessons"
+                    "Topics"
                 ],
-                "summary": "Get lesson details",
+                "summary": "Get topic details",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Lesson ID",
+                        "description": "Topic ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -3651,7 +3651,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.LessonResponse"
+                            "$ref": "#/definitions/models.TopicResponse"
                         }
                     },
                     "400": {
@@ -3798,14 +3798,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/topics": {
+        "/lessons": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get all topics with optional filtering",
+                "description": "Get all lessons with optional filtering",
                 "consumes": [
                     "application/json"
                 ],
@@ -3813,9 +3813,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "topics"
+                    "lessons"
                 ],
-                "summary": "Get all topics",
+                "summary": "Get all lessons",
                 "parameters": [
                     {
                         "type": "string",
@@ -3825,8 +3825,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Chapter ID",
-                        "name": "chapter_id",
+                        "description": "Module ID",
+                        "name": "module_id",
                         "in": "query"
                     },
                     {
@@ -3866,7 +3866,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.PaginatedTopicsResponse"
+                            "$ref": "#/definitions/models.PaginatedLessonsResponse"
                         }
                     },
                     "400": {
@@ -4274,7 +4274,7 @@ const docTemplate = `{
                 "title"
             ],
             "properties": {
-                "chapter_id": {
+                "module_id": {
                     "type": "string"
                 },
                 "content": {
@@ -4289,7 +4289,7 @@ const docTemplate = `{
                 "due_date": {
                     "type": "string"
                 },
-                "lesson_id": {
+                "topic_id": {
                     "type": "string"
                 },
                 "publisher_id": {
@@ -4321,7 +4321,7 @@ const docTemplate = `{
                 "title"
             ],
             "properties": {
-                "chapter_id": {
+                "module_id": {
                     "type": "string"
                 },
                 "content": {
@@ -4336,7 +4336,7 @@ const docTemplate = `{
                 "due_date": {
                     "type": "string"
                 },
-                "lesson_id": {
+                "topic_id": {
                     "type": "string"
                 },
                 "slug": {
@@ -4390,7 +4390,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.ChapterInput": {
+        "models.ModuleInput": {
             "type": "object",
             "required": [
                 "course_id",
@@ -4398,7 +4398,7 @@ const docTemplate = `{
                 "title"
             ],
             "properties": {
-                "chapter_number": {
+                "module_number": {
                     "type": "integer"
                 },
                 "course_id": {
@@ -4425,10 +4425,10 @@ const docTemplate = `{
                 }
             }
         },
-        "models.ChapterMiniResponse": {
+        "models.ModuleMiniResponse": {
             "type": "object",
             "properties": {
-                "chapter_number": {
+                "module_number": {
                     "type": "integer"
                 },
                 "id": {
@@ -4450,7 +4450,7 @@ const docTemplate = `{
         "models.CourseMaterialResponse": {
             "type": "object",
             "properties": {
-                "chapter_id": {
+                "module_id": {
                     "type": "string"
                 },
                 "course_id": {
@@ -4468,7 +4468,7 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "lesson_id": {
+                "topic_id": {
                     "type": "string"
                 },
                 "slug": {
@@ -4488,10 +4488,10 @@ const docTemplate = `{
         "models.CourseMaterialViewResponse": {
             "type": "object",
             "properties": {
-                "chapter": {
-                    "$ref": "#/definitions/models.ChapterMiniResponse"
+                "module": {
+                    "$ref": "#/definitions/models.ModuleMiniResponse"
                 },
-                "chapter_id": {
+                "module_id": {
                     "type": "string"
                 },
                 "course": {
@@ -4517,10 +4517,10 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "lesson": {
-                    "$ref": "#/definitions/models.LessonMiniResponse"
+                "topic": {
+                    "$ref": "#/definitions/models.TopicMiniResponse"
                 },
-                "lesson_id": {
+                "topic_id": {
                     "type": "string"
                 },
                 "slug": {
@@ -4571,7 +4571,7 @@ const docTemplate = `{
                 "type"
             ],
             "properties": {
-                "chapter_id": {
+                "module_id": {
                     "type": "string"
                 },
                 "course_id": {
@@ -4583,7 +4583,7 @@ const docTemplate = `{
                 "file_url": {
                     "type": "string"
                 },
-                "lesson_id": {
+                "topic_id": {
                     "type": "string"
                 },
                 "status": {
@@ -4858,18 +4858,18 @@ const docTemplate = `{
                 }
             }
         },
-        "models.LessonInput": {
+        "models.TopicInput": {
             "type": "object",
             "required": [
-                "chapter_id",
+                "module_id",
                 "content_type",
                 "content_url",
                 "course_id",
                 "title",
-                "topic_id"
+                "lesson_id"
             ],
             "properties": {
-                "chapter_id": {
+                "module_id": {
                     "type": "string"
                 },
                 "content_type": {
@@ -4885,12 +4885,12 @@ const docTemplate = `{
                 "title": {
                     "type": "string"
                 },
-                "topic_id": {
+                "lesson_id": {
                     "type": "string"
                 }
             }
         },
-        "models.LessonMiniResponse": {
+        "models.TopicMiniResponse": {
             "type": "object",
             "properties": {
                 "content_type": {
@@ -4907,10 +4907,10 @@ const docTemplate = `{
                 }
             }
         },
-        "models.LessonResponse": {
+        "models.TopicResponse": {
             "type": "object",
             "properties": {
-                "chapter_id": {
+                "module_id": {
                     "type": "string"
                 },
                 "content_type": {
@@ -4931,7 +4931,7 @@ const docTemplate = `{
                 "title": {
                     "type": "string"
                 },
-                "topic_id": {
+                "lesson_id": {
                     "type": "string"
                 },
                 "updated_at": {
@@ -4966,7 +4966,7 @@ const docTemplate = `{
                 "auto_publish_recordings": {
                     "type": "boolean"
                 },
-                "chapter_id": {
+                "module_id": {
                     "description": "Optional relationships",
                     "type": "string"
                 },
@@ -4990,7 +4990,7 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 2000
                 },
-                "lesson_id": {
+                "topic_id": {
                     "type": "string"
                 },
                 "max_attendees": {
@@ -5047,7 +5047,7 @@ const docTemplate = `{
                     "maxLength": 255,
                     "minLength": 3
                 },
-                "topic_id": {
+                "lesson_id": {
                     "type": "string"
                 },
                 "tutor_id": {
@@ -5079,7 +5079,7 @@ const docTemplate = `{
                     "description": "Computed fields",
                     "type": "integer"
                 },
-                "chapter_id": {
+                "module_id": {
                     "type": "string"
                 },
                 "course_id": {
@@ -5118,7 +5118,7 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
-                "lesson_id": {
+                "topic_id": {
                     "type": "string"
                 },
                 "max_attendees": {
@@ -5182,7 +5182,7 @@ const docTemplate = `{
                 "title": {
                     "type": "string"
                 },
-                "topic_id": {
+                "lesson_id": {
                     "type": "string"
                 },
                 "total_enrolled": {
@@ -5225,7 +5225,7 @@ const docTemplate = `{
                 "auto_publish_recordings": {
                     "type": "boolean"
                 },
-                "chapter_id": {
+                "module_id": {
                     "description": "Relationships (only before start)",
                     "type": "string"
                 },
@@ -5247,7 +5247,7 @@ const docTemplate = `{
                     "type": "boolean",
                     "default": false
                 },
-                "lesson_id": {
+                "topic_id": {
                     "type": "string"
                 },
                 "max_attendees": {
@@ -5302,7 +5302,7 @@ const docTemplate = `{
                     "maxLength": 255,
                     "minLength": 3
                 },
-                "topic_id": {
+                "lesson_id": {
                     "type": "string"
                 },
                 "tutor_id": {
@@ -5399,7 +5399,7 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 2000
                 },
-                "chapter_id": {
+                "module_id": {
                     "description": "Content relationships",
                     "type": "string"
                 },
@@ -5461,7 +5461,7 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 2000
                 },
-                "topic_id": {
+                "lesson_id": {
                     "type": "string"
                 },
                 "tutor_id": {
@@ -5479,10 +5479,10 @@ const docTemplate = `{
                 "answer_explanation": {
                     "type": "string"
                 },
-                "chapter_id": {
+                "module_id": {
                     "type": "string"
                 },
-                "chapter_name": {
+                "module_name": {
                     "type": "string"
                 },
                 "correct_attempts": {
@@ -5537,10 +5537,10 @@ const docTemplate = `{
                 "success_rate": {
                     "type": "number"
                 },
-                "topic_id": {
+                "lesson_id": {
                     "type": "string"
                 },
-                "topic_name": {
+                "lesson_name": {
                     "type": "string"
                 },
                 "total_attempts": {
@@ -5584,13 +5584,13 @@ const docTemplate = `{
                 }
             }
         },
-        "models.PaginatedTopicsResponse": {
+        "models.PaginatedLessonsResponse": {
             "type": "object",
             "properties": {
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.TopicResponse"
+                        "$ref": "#/definitions/models.LessonResponse"
                     }
                 },
                 "limit": {
@@ -5771,10 +5771,10 @@ const docTemplate = `{
                 }
             }
         },
-        "models.TopicInput": {
+        "models.LessonInput": {
             "type": "object",
             "required": [
-                "chapter_id",
+                "module_id",
                 "course_id",
                 "description",
                 "order",
@@ -5782,7 +5782,7 @@ const docTemplate = `{
                 "tutor_id"
             ],
             "properties": {
-                "chapter_id": {
+                "module_id": {
                     "type": "string"
                 },
                 "course_id": {
@@ -5802,10 +5802,10 @@ const docTemplate = `{
                 }
             }
         },
-        "models.TopicResponse": {
+        "models.LessonResponse": {
             "type": "object",
             "properties": {
-                "chapter_id": {
+                "module_id": {
                     "type": "string"
                 },
                 "course_id": {
@@ -5841,7 +5841,7 @@ const docTemplate = `{
                 "type"
             ],
             "properties": {
-                "chapter_id": {
+                "module_id": {
                     "type": "string"
                 },
                 "description": {
@@ -5850,7 +5850,7 @@ const docTemplate = `{
                 "file_url": {
                     "type": "string"
                 },
-                "lesson_id": {
+                "topic_id": {
                     "type": "string"
                 },
                 "status": {

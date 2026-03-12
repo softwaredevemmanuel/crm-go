@@ -664,14 +664,14 @@
                 }
             }
         },
-        "/api/chapters": {
+        "/api/modules": {
             "post": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Create a new chapter",
+                "description": "Create a new module",
                 "consumes": [
                     "application/json"
                 ],
@@ -679,17 +679,17 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Chapters"
+                    "Modules"
                 ],
-                "summary": "Create a new chapters",
+                "summary": "Create a new modules",
                 "parameters": [
                     {
-                        "description": "Chapter",
-                        "name": "chapter",
+                        "description": "Module",
+                        "name": "module",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.ChapterInput"
+                            "$ref": "#/definitions/models.ModuleInput"
                         }
                     }
                 ],
@@ -721,9 +721,9 @@
                 }
             }
         },
-        "/api/chapters/{id}": {
+        "/api/modules/{id}": {
             "put": {
-                "description": "Update an existing chapter",
+                "description": "Update an existing module",
                 "consumes": [
                     "application/json"
                 ],
@@ -731,24 +731,24 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Chapters"
+                    "Modules"
                 ],
-                "summary": "Update an existing chapter",
+                "summary": "Update an existing module",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Chapter ID",
+                        "description": "Module ID",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Chapter",
-                        "name": "chapter",
+                        "description": "Module",
+                        "name": "module",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.ChapterInput"
+                            "$ref": "#/definitions/models.ModuleInput"
                         }
                     }
                 ],
@@ -780,7 +780,7 @@
                 }
             },
             "delete": {
-                "description": "Delete an existing chapter",
+                "description": "Delete an existing module",
                 "consumes": [
                     "application/json"
                 ],
@@ -788,13 +788,13 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Chapters"
+                    "Modules"
                 ],
-                "summary": "Delete an existing chapter",
+                "summary": "Delete an existing module",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Chapter ID",
+                        "description": "Module ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -849,7 +849,7 @@
                 "parameters": [
                     {
                         "description": "Course Material",
-                        "name": "chapter",
+                        "name": "module",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -1526,14 +1526,14 @@
                 }
             }
         },
-        "/api/lessons": {
+        "/api/topics": {
             "post": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Create a new lesson under a chapter",
+                "description": "Create a new topic under a module",
                 "consumes": [
                     "application/json"
                 ],
@@ -1541,17 +1541,17 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Lessons"
+                    "Topics"
                 ],
-                "summary": "Create a lesson",
+                "summary": "Create a topic",
                 "parameters": [
                     {
-                        "description": "Lesson payload",
-                        "name": "lesson",
+                        "description": "Topic payload",
+                        "name": "topic",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.LessonInput"
+                            "$ref": "#/definitions/models.TopicInput"
                         }
                     }
                 ],
@@ -1583,14 +1583,14 @@
                 }
             }
         },
-        "/api/lessons/{id}": {
+        "/api/topics/{id}": {
             "put": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Update lesson details",
+                "description": "Update topic details",
                 "consumes": [
                     "application/json"
                 ],
@@ -1598,24 +1598,24 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Lessons"
+                    "Topics"
                 ],
-                "summary": "Update lesson",
+                "summary": "Update topic",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Lesson ID",
+                        "description": "Topic ID",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Lesson payload",
-                        "name": "lesson",
+                        "description": "Topic payload",
+                        "name": "topic",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.LessonInput"
+                            "$ref": "#/definitions/models.TopicInput"
                         }
                     }
                 ],
@@ -1623,7 +1623,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.LessonResponse"
+                            "$ref": "#/definitions/models.TopicResponse"
                         }
                     },
                     "400": {
@@ -1652,18 +1652,18 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Delete lesson by ID",
+                "description": "Delete topic by ID",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Lessons"
+                    "Topics"
                 ],
-                "summary": "Delete lesson",
+                "summary": "Delete topic",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Lesson ID",
+                        "description": "Topic ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -2137,14 +2137,14 @@
                 }
             }
         },
-        "/api/topics": {
+        "/api/lessons": {
             "post": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Create a new topic",
+                "description": "Create a new lesson",
                 "consumes": [
                     "application/json"
                 ],
@@ -2152,23 +2152,23 @@
                     "application/json"
                 ],
                 "tags": [
-                    "topics"
+                    "lessons"
                 ],
-                "summary": "Create a new topic",
+                "summary": "Create a new lesson",
                 "parameters": [
                     {
-                        "description": "Topic",
-                        "name": "topic",
+                        "description": "Lesson",
+                        "name": "lesson",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.TopicInput"
+                            "$ref": "#/definitions/models.LessonInput"
                         }
                     }
                 ],
                 "responses": {
                     "201": {
-                        "description": "Topic created successfully",
+                        "description": "Lesson created successfully",
                         "schema": {
                             "$ref": "#/definitions/models.SuccessResponse"
                         }
@@ -2182,14 +2182,14 @@
                 }
             }
         },
-        "/api/topics/{id}": {
+        "/api/lessons/{id}": {
             "put": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Update a topic by ID",
+                "description": "Update a lesson by ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -2197,32 +2197,32 @@
                     "application/json"
                 ],
                 "tags": [
-                    "topics"
+                    "lessons"
                 ],
-                "summary": "Update a topic",
+                "summary": "Update a lesson",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Topic ID",
+                        "description": "Lesson ID",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Topic",
-                        "name": "topic",
+                        "description": "Lesson",
+                        "name": "lesson",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.TopicInput"
+                            "$ref": "#/definitions/models.LessonInput"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Topic updated successfully",
+                        "description": "Lesson updated successfully",
                         "schema": {
-                            "$ref": "#/definitions/models.TopicResponse"
+                            "$ref": "#/definitions/models.LessonResponse"
                         }
                     },
                     "400": {
@@ -2851,9 +2851,9 @@
                 }
             }
         },
-        "/chapters": {
+        "/modules": {
             "get": {
-                "description": "Get all chapters",
+                "description": "Get all modules",
                 "consumes": [
                     "application/json"
                 ],
@@ -2861,9 +2861,9 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Chapters"
+                    "Modules"
                 ],
-                "summary": "Get all chapters",
+                "summary": "Get all modules",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -2880,9 +2880,9 @@
                 }
             }
         },
-        "/chapters/{id}": {
+        "/modules/{id}": {
             "get": {
-                "description": "Get a single chapter by ID",
+                "description": "Get a single module by ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -2890,13 +2890,13 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Chapters"
+                    "Modules"
                 ],
-                "summary": "Get a single chapter by ID",
+                "summary": "Get a single module by ID",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Chapter ID",
+                        "description": "Module ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -2932,7 +2932,7 @@
         },
         "/course-materials": {
             "get": {
-                "description": "Get all course materials, optionally filtered by course, chapter, or lesson",
+                "description": "Get all course materials, optionally filtered by course, module, or topic",
                 "produces": [
                     "application/json"
                 ],
@@ -2949,14 +2949,14 @@
                     },
                     {
                         "type": "string",
-                        "description": "Chapter ID",
-                        "name": "chapter_id",
+                        "description": "Module ID",
+                        "name": "module_id",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "Lesson ID",
-                        "name": "lesson_id",
+                        "description": "Topic ID",
+                        "name": "topic_id",
                         "in": "query"
                     },
                     {
@@ -2993,7 +2993,7 @@
         },
         "/course-materials/{id}": {
             "get": {
-                "description": "Get course material with chapter and lesson details",
+                "description": "Get course material with module and topic details",
                 "produces": [
                     "application/json"
                 ],
@@ -3582,16 +3582,16 @@
                 }
             }
         },
-        "/lessons": {
+        "/topics": {
             "get": {
-                "description": "Get all lessons, optionally filtered by course or chapter",
+                "description": "Get all topics, optionally filtered by course or module",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Lessons"
+                    "Topics"
                 ],
-                "summary": "Get lessons",
+                "summary": "Get topics",
                 "parameters": [
                     {
                         "type": "string",
@@ -3601,8 +3601,8 @@
                     },
                     {
                         "type": "string",
-                        "description": "Chapter ID",
-                        "name": "chapter_id",
+                        "description": "Module ID",
+                        "name": "module_id",
                         "in": "query"
                     }
                 ],
@@ -3612,7 +3612,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.LessonResponse"
+                                "$ref": "#/definitions/models.TopicResponse"
                             }
                         }
                     },
@@ -3625,20 +3625,20 @@
                 }
             }
         },
-        "/lessons/{id}": {
+        "/topics/{id}": {
             "get": {
-                "description": "Get lesson with chapter and course details",
+                "description": "Get topic with module and course details",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Lessons"
+                    "Topics"
                 ],
-                "summary": "Get lesson details",
+                "summary": "Get topic details",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Lesson ID",
+                        "description": "Topic ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -3648,7 +3648,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.LessonResponse"
+                            "$ref": "#/definitions/models.TopicResponse"
                         }
                     },
                     "400": {
@@ -3795,14 +3795,14 @@
                 }
             }
         },
-        "/topics": {
+        "/lessons": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get all topics with optional filtering",
+                "description": "Get all lessons with optional filtering",
                 "consumes": [
                     "application/json"
                 ],
@@ -3810,9 +3810,9 @@
                     "application/json"
                 ],
                 "tags": [
-                    "topics"
+                    "lessons"
                 ],
-                "summary": "Get all topics",
+                "summary": "Get all lessons",
                 "parameters": [
                     {
                         "type": "string",
@@ -3822,8 +3822,8 @@
                     },
                     {
                         "type": "string",
-                        "description": "Chapter ID",
-                        "name": "chapter_id",
+                        "description": "Module ID",
+                        "name": "module_id",
                         "in": "query"
                     },
                     {
@@ -3863,7 +3863,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.PaginatedTopicsResponse"
+                            "$ref": "#/definitions/models.PaginatedLessonsResponse"
                         }
                     },
                     "400": {
@@ -4271,7 +4271,7 @@
                 "title"
             ],
             "properties": {
-                "chapter_id": {
+                "module_id": {
                     "type": "string"
                 },
                 "content": {
@@ -4286,7 +4286,7 @@
                 "due_date": {
                     "type": "string"
                 },
-                "lesson_id": {
+                "topic_id": {
                     "type": "string"
                 },
                 "publisher_id": {
@@ -4318,7 +4318,7 @@
                 "title"
             ],
             "properties": {
-                "chapter_id": {
+                "module_id": {
                     "type": "string"
                 },
                 "content": {
@@ -4333,7 +4333,7 @@
                 "due_date": {
                     "type": "string"
                 },
-                "lesson_id": {
+                "topic_id": {
                     "type": "string"
                 },
                 "slug": {
@@ -4387,7 +4387,7 @@
                 }
             }
         },
-        "models.ChapterInput": {
+        "models.ModuleInput": {
             "type": "object",
             "required": [
                 "course_id",
@@ -4395,7 +4395,7 @@
                 "title"
             ],
             "properties": {
-                "chapter_number": {
+                "module_number": {
                     "type": "integer"
                 },
                 "course_id": {
@@ -4422,10 +4422,10 @@
                 }
             }
         },
-        "models.ChapterMiniResponse": {
+        "models.ModuleMiniResponse": {
             "type": "object",
             "properties": {
-                "chapter_number": {
+                "module_number": {
                     "type": "integer"
                 },
                 "id": {
@@ -4447,7 +4447,7 @@
         "models.CourseMaterialResponse": {
             "type": "object",
             "properties": {
-                "chapter_id": {
+                "module_id": {
                     "type": "string"
                 },
                 "course_id": {
@@ -4465,7 +4465,7 @@
                 "id": {
                     "type": "string"
                 },
-                "lesson_id": {
+                "topic_id": {
                     "type": "string"
                 },
                 "slug": {
@@ -4485,10 +4485,10 @@
         "models.CourseMaterialViewResponse": {
             "type": "object",
             "properties": {
-                "chapter": {
-                    "$ref": "#/definitions/models.ChapterMiniResponse"
+                "module": {
+                    "$ref": "#/definitions/models.ModuleMiniResponse"
                 },
-                "chapter_id": {
+                "module_id": {
                     "type": "string"
                 },
                 "course": {
@@ -4514,10 +4514,10 @@
                 "id": {
                     "type": "string"
                 },
-                "lesson": {
-                    "$ref": "#/definitions/models.LessonMiniResponse"
+                "topic": {
+                    "$ref": "#/definitions/models.TopicMiniResponse"
                 },
-                "lesson_id": {
+                "topic_id": {
                     "type": "string"
                 },
                 "slug": {
@@ -4568,7 +4568,7 @@
                 "type"
             ],
             "properties": {
-                "chapter_id": {
+                "module_id": {
                     "type": "string"
                 },
                 "course_id": {
@@ -4580,7 +4580,7 @@
                 "file_url": {
                     "type": "string"
                 },
-                "lesson_id": {
+                "topic_id": {
                     "type": "string"
                 },
                 "status": {
@@ -4855,18 +4855,18 @@
                 }
             }
         },
-        "models.LessonInput": {
+        "models.TopicInput": {
             "type": "object",
             "required": [
-                "chapter_id",
+                "module_id",
                 "content_type",
                 "content_url",
                 "course_id",
                 "title",
-                "topic_id"
+                "lesson_id"
             ],
             "properties": {
-                "chapter_id": {
+                "module_id": {
                     "type": "string"
                 },
                 "content_type": {
@@ -4882,12 +4882,12 @@
                 "title": {
                     "type": "string"
                 },
-                "topic_id": {
+                "lesson_id": {
                     "type": "string"
                 }
             }
         },
-        "models.LessonMiniResponse": {
+        "models.TopicMiniResponse": {
             "type": "object",
             "properties": {
                 "content_type": {
@@ -4904,10 +4904,10 @@
                 }
             }
         },
-        "models.LessonResponse": {
+        "models.TopicResponse": {
             "type": "object",
             "properties": {
-                "chapter_id": {
+                "module_id": {
                     "type": "string"
                 },
                 "content_type": {
@@ -4928,7 +4928,7 @@
                 "title": {
                     "type": "string"
                 },
-                "topic_id": {
+                "lesson_id": {
                     "type": "string"
                 },
                 "updated_at": {
@@ -4963,7 +4963,7 @@
                 "auto_publish_recordings": {
                     "type": "boolean"
                 },
-                "chapter_id": {
+                "module_id": {
                     "description": "Optional relationships",
                     "type": "string"
                 },
@@ -4987,7 +4987,7 @@
                     "type": "string",
                     "maxLength": 2000
                 },
-                "lesson_id": {
+                "topic_id": {
                     "type": "string"
                 },
                 "max_attendees": {
@@ -5044,7 +5044,7 @@
                     "maxLength": 255,
                     "minLength": 3
                 },
-                "topic_id": {
+                "lesson_id": {
                     "type": "string"
                 },
                 "tutor_id": {
@@ -5076,7 +5076,7 @@
                     "description": "Computed fields",
                     "type": "integer"
                 },
-                "chapter_id": {
+                "module_id": {
                     "type": "string"
                 },
                 "course_id": {
@@ -5115,7 +5115,7 @@
                         "type": "string"
                     }
                 },
-                "lesson_id": {
+                "topic_id": {
                     "type": "string"
                 },
                 "max_attendees": {
@@ -5179,7 +5179,7 @@
                 "title": {
                     "type": "string"
                 },
-                "topic_id": {
+                "lesson_id": {
                     "type": "string"
                 },
                 "total_enrolled": {
@@ -5222,7 +5222,7 @@
                 "auto_publish_recordings": {
                     "type": "boolean"
                 },
-                "chapter_id": {
+                "module_id": {
                     "description": "Relationships (only before start)",
                     "type": "string"
                 },
@@ -5244,7 +5244,7 @@
                     "type": "boolean",
                     "default": false
                 },
-                "lesson_id": {
+                "topic_id": {
                     "type": "string"
                 },
                 "max_attendees": {
@@ -5299,7 +5299,7 @@
                     "maxLength": 255,
                     "minLength": 3
                 },
-                "topic_id": {
+                "lesson_id": {
                     "type": "string"
                 },
                 "tutor_id": {
@@ -5396,7 +5396,7 @@
                     "type": "string",
                     "maxLength": 2000
                 },
-                "chapter_id": {
+                "module_id": {
                     "description": "Content relationships",
                     "type": "string"
                 },
@@ -5458,7 +5458,7 @@
                     "type": "string",
                     "maxLength": 2000
                 },
-                "topic_id": {
+                "lesson_id": {
                     "type": "string"
                 },
                 "tutor_id": {
@@ -5476,10 +5476,10 @@
                 "answer_explanation": {
                     "type": "string"
                 },
-                "chapter_id": {
+                "module_id": {
                     "type": "string"
                 },
-                "chapter_name": {
+                "module_name": {
                     "type": "string"
                 },
                 "correct_attempts": {
@@ -5534,10 +5534,10 @@
                 "success_rate": {
                     "type": "number"
                 },
-                "topic_id": {
+                "lesson_id": {
                     "type": "string"
                 },
-                "topic_name": {
+                "lesson_name": {
                     "type": "string"
                 },
                 "total_attempts": {
@@ -5581,13 +5581,13 @@
                 }
             }
         },
-        "models.PaginatedTopicsResponse": {
+        "models.PaginatedLessonsResponse": {
             "type": "object",
             "properties": {
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.TopicResponse"
+                        "$ref": "#/definitions/models.LessonResponse"
                     }
                 },
                 "limit": {
@@ -5768,10 +5768,10 @@
                 }
             }
         },
-        "models.TopicInput": {
+        "models.LessonInput": {
             "type": "object",
             "required": [
-                "chapter_id",
+                "module_id",
                 "course_id",
                 "description",
                 "order",
@@ -5779,7 +5779,7 @@
                 "tutor_id"
             ],
             "properties": {
-                "chapter_id": {
+                "module_id": {
                     "type": "string"
                 },
                 "course_id": {
@@ -5799,10 +5799,10 @@
                 }
             }
         },
-        "models.TopicResponse": {
+        "models.LessonResponse": {
             "type": "object",
             "properties": {
-                "chapter_id": {
+                "module_id": {
                     "type": "string"
                 },
                 "course_id": {
@@ -5838,7 +5838,7 @@
                 "type"
             ],
             "properties": {
-                "chapter_id": {
+                "module_id": {
                     "type": "string"
                 },
                 "description": {
@@ -5847,7 +5847,7 @@
                 "file_url": {
                     "type": "string"
                 },
-                "lesson_id": {
+                "topic_id": {
                     "type": "string"
                 },
                 "status": {

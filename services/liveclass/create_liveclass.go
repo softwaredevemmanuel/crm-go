@@ -5,10 +5,11 @@ import (
 	"crm-go/models"
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
-	"gorm.io/gorm"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type LiveClassService struct {
@@ -77,31 +78,20 @@ func (s *LiveClassService) validateLiveClass(req models.LiveClassInput) error {
 		return errors.New("tutor does not teach this course")
 	}
 
-	// Validate chapter if provided
-	if req.ChapterID != nil && *req.ChapterID != uuid.Nil {
-		var chapter models.Chapter
-		if err := s.db.First(&chapter, "id = ?", req.ChapterID).Error; err != nil {
-			return errors.New("chapter not found")
+	// Validate module if provided
+	if req.ModuleID != nil && *req.ModuleID != uuid.Nil {
+		var module models.Module
+		if err := s.db.First(&module, "id = ?", req.ModuleID).Error; err != nil {
+			return errors.New("module not found")
 		}
-		if chapter.CourseID != req.CourseID {
-			return errors.New("chapter does not belong to this course")
-		}
-	}
-
-	// Validate topic if provided
-	if req.TopicID != nil && *req.TopicID != uuid.Nil {
-		var topic models.Topic
-		if err := s.db.First(&topic, "id = ?", req.TopicID).Error; err != nil {
-			return errors.New("topic not found")
-		}
-		if topic.CourseID != req.CourseID {
-			return errors.New("topic does not belong to this course")
+		if module.CourseID != req.CourseID {
+			return errors.New("module does not belong to this course")
 		}
 	}
 
 	// Validate lesson if provided
 	if req.LessonID != nil && *req.LessonID != uuid.Nil {
-		var lesson models.Lessons
+		var lesson models.Lesson
 		if err := s.db.First(&lesson, "id = ?", req.LessonID).Error; err != nil {
 			return errors.New("lesson not found")
 		}
@@ -110,7 +100,16 @@ func (s *LiveClassService) validateLiveClass(req models.LiveClassInput) error {
 		}
 	}
 
-	
+	// Validate topic if provided
+	if req.TopicID != nil && *req.TopicID != uuid.Nil {
+		var topic models.Topics
+		if err := s.db.First(&topic, "id = ?", req.TopicID).Error; err != nil {
+			return errors.New("topic not found")
+		}
+		if topic.CourseID != req.CourseID {
+			return errors.New("topic does not belong to this course")
+		}
+	}
 
 	// Time validation
 	if !req.StartTime.IsZero() || !req.EndTime.IsZero() {
@@ -162,14 +161,14 @@ func (s *LiveClassService) validateLiveClass(req models.LiveClassInput) error {
 	}
 
 	// Check for overlapping classes for same course
-	if req.ChapterID != nil {
+	if req.ModuleID != nil {
 		err = s.db.Model(&models.LiveClass{}).
-			Where("course_id = ? AND chapter_id = ?", req.CourseID, req.ChapterID).
+			Where("course_id = ? AND module_id = ?", req.CourseID, req.ModuleID).
 			Where("(start_time, end_time) OVERLAPS (?, ?)", req.StartTime, req.EndTime).
 			Count(&overlappingCount).Error
 
 		if err == nil && overlappingCount > 0 {
-			return errors.New("this chapter already has a class scheduled at this time")
+			return errors.New("this module already has a class scheduled at this time")
 		}
 	}
 
@@ -241,9 +240,9 @@ func (s *LiveClassService) CreateLiveClass(req models.LiveClassInput) (*models.L
 	liveClass := models.LiveClass{
 		ID:                    uuid.New(),
 		CourseID:              req.CourseID,
-		ChapterID:             req.ChapterID,
-		TopicID:               req.TopicID,
+		ModuleID:              req.ModuleID,
 		LessonID:              req.LessonID,
+		TopicID:               req.TopicID,
 		Title:                 strings.TrimSpace(req.Title),
 		Description:           strings.TrimSpace(req.Description),
 		Slug:                  slug,
@@ -320,9 +319,9 @@ func (s *LiveClassService) CreateLiveClassWithTx(tx *gorm.DB, req models.LiveCla
 	liveClass := models.LiveClass{
 		ID:                    uuid.New(),
 		CourseID:              req.CourseID,
-		ChapterID:             req.ChapterID,
-		TopicID:               req.TopicID,
+		ModuleID:              req.ModuleID,
 		LessonID:              req.LessonID,
+		TopicID:               req.TopicID,
 		Title:                 strings.TrimSpace(req.Title),
 		Description:           strings.TrimSpace(req.Description),
 		Slug:                  slug,
@@ -365,9 +364,9 @@ func (s *LiveClassService) liveClassToResponse(liveClass *models.LiveClass, with
 	response := &models.LiveClassResponse{
 		ID:                    liveClass.ID,
 		CourseID:              liveClass.CourseID,
-		ChapterID:             liveClass.ChapterID,
-		TopicID:               liveClass.TopicID,
+		ModuleID:              liveClass.ModuleID,
 		LessonID:              liveClass.LessonID,
+		TopicID:               liveClass.TopicID,
 		Title:                 liveClass.Title,
 		Description:           liveClass.Description,
 		Slug:                  liveClass.Slug,

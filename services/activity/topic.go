@@ -10,57 +10,56 @@ import (
 	"gorm.io/gorm"
 )
 
-type TopicActivity struct {
+type LessonActivity struct {
 	logger *Logger
 }
 
-func (a *TopicActivity) Created(
+func (a *LessonActivity) Created(
 	tx *gorm.DB,
 	userID uuid.UUID,
-	topic models.Topic,
+	lesson models.Lesson,
 ) error {
 
 	metadata := map[string]interface{}{
-		"topic_id": topic.ID,
-		"course_id": topic.CourseID,
+		"lesson_id": lesson.ID,
+		"course_id": lesson.CourseID,
 	}
 
 	return a.logger.LogWithTx(
 		context.Background(),
 		tx,
 		Event{
-			UserID:   userID,
-			Action:   models.ActionTopicCreate,
-			EntityID: topic.ID,
-			EntityType: "topic",
-			Details:  fmt.Sprintf("Created topic: %s", topic.Title),
-			Metadata: metadata,
+			UserID:     userID,
+			Action:     models.ActionLessonCreate,
+			EntityID:   lesson.ID,
+			EntityType: "lesson",
+			Details:    fmt.Sprintf("Created lesson: %s", lesson.Title),
+			Metadata:   metadata,
 		},
 	)
 }
 
-
-func (a *TopicActivity) Updated(
+func (a *LessonActivity) Updated(
 	tx *gorm.DB,
 	userID uuid.UUID,
-	topic models.Topic,
+	lesson models.Lesson,
 ) error {
 
 	metadata := map[string]interface{}{
-		"topic_id": topic.ID,
-		"course_id": topic.CourseID,
+		"lesson_id": lesson.ID,
+		"course_id": lesson.CourseID,
 	}
 
 	return a.logger.LogWithTx(
 		context.Background(),
 		tx,
 		Event{
-			UserID:   userID,
-			Action:   models.ActionTopicUpdate,
-			EntityID: topic.ID,
-			EntityType: "topic",
-			Details:  fmt.Sprintf("Updated topic: %s", topic.Title),
-			Metadata: metadata,
+			UserID:     userID,
+			Action:     models.ActionLessonUpdate,
+			EntityID:   lesson.ID,
+			EntityType: "lesson",
+			Details:    fmt.Sprintf("Updated lesson: %s", lesson.Title),
+			Metadata:   metadata,
 		},
 	)
 }

@@ -8,7 +8,8 @@ import (
 	"crm-go/routes"
 	"flag"
 
-	_ "crm-go/docs" 
+	_ "crm-go/docs"
+
 	"github.com/gin-gonic/gin"
 
 	swaggerFiles "github.com/swaggo/files"
@@ -79,10 +80,10 @@ func main() {
 	routes.AnnouncementRoutes(r)
 	routes.AssignmentRoutes(r)
 	routes.AssignmentSubmissionRoutes(r, config.DB)
-	routes.TopicRoutes(r, config.DB)
+	routes.LessonRoutes(r, config.DB)
 	routes.GradeRoutes(r, config.DB)
-	routes.ChapterRoutes(r)
-	routes.LessonRoutes(r)
+	routes.ModuleRoutes(r)
+	routes.TopicRoutes(r)
 	routes.CourseMaterialRoutes(r)
 	routes.LiveClassRoutes(r, config.DB)
 	routes.ObjectiveQuestionRoutes(r, config.DB)
@@ -156,7 +157,7 @@ func main() {
 		seeds.SeedCourseProductsTable()
 		seeds.SeedProducts()
 		seeds.SeedAnnouncements()
-		seeds.SeedChapters()
+		seeds.SeedModules()
 		return
 	}
 

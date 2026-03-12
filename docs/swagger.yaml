@@ -266,7 +266,7 @@ definitions:
     type: object
   models.AssignmentInput:
     properties:
-      chapter_id:
+      module_id:
         type: string
       content:
         type: string
@@ -276,7 +276,7 @@ definitions:
         type: string
       due_date:
         type: string
-      lesson_id:
+      topic_id:
         type: string
       publisher_id:
         type: string
@@ -298,7 +298,7 @@ definitions:
     type: object
   models.AssignmentUpdateInput:
     properties:
-      chapter_id:
+      module_id:
         type: string
       content:
         type: string
@@ -308,7 +308,7 @@ definitions:
         type: string
       due_date:
         type: string
-      lesson_id:
+      topic_id:
         type: string
       slug:
         type: string
@@ -348,9 +348,9 @@ definitions:
     required:
     - name
     type: object
-  models.ChapterInput:
+  models.ModuleInput:
     properties:
-      chapter_number:
+      module_number:
         type: integer
       course_id:
         type: string
@@ -372,9 +372,9 @@ definitions:
     - slug
     - title
     type: object
-  models.ChapterMiniResponse:
+  models.ModuleMiniResponse:
     properties:
-      chapter_number:
+      module_number:
         type: integer
       id:
         type: string
@@ -388,7 +388,7 @@ definitions:
     type: object
   models.CourseMaterialResponse:
     properties:
-      chapter_id:
+      module_id:
         type: string
       course_id:
         type: string
@@ -400,7 +400,7 @@ definitions:
         type: string
       id:
         type: string
-      lesson_id:
+      topic_id:
         type: string
       slug:
         type: string
@@ -413,9 +413,9 @@ definitions:
     type: object
   models.CourseMaterialViewResponse:
     properties:
-      chapter:
-        $ref: '#/definitions/models.ChapterMiniResponse'
-      chapter_id:
+      module:
+        $ref: '#/definitions/models.ModuleMiniResponse'
+      module_id:
         type: string
       course:
         allOf:
@@ -431,9 +431,9 @@ definitions:
         type: string
       id:
         type: string
-      lesson:
-        $ref: '#/definitions/models.LessonMiniResponse'
-      lesson_id:
+      topic:
+        $ref: '#/definitions/models.TopicMiniResponse'
+      topic_id:
         type: string
       slug:
         type: string
@@ -463,7 +463,7 @@ definitions:
     type: object
   models.CreateCourseMaterialRequest:
     properties:
-      chapter_id:
+      module_id:
         type: string
       course_id:
         type: string
@@ -471,7 +471,7 @@ definitions:
         type: string
       file_url:
         type: string
-      lesson_id:
+      topic_id:
         type: string
       status:
         type: string
@@ -672,9 +672,9 @@ definitions:
       tutor_id:
         type: string
     type: object
-  models.LessonInput:
+  models.TopicInput:
     properties:
-      chapter_id:
+      module_id:
         type: string
       content_type:
         description: video, pdf, text, quiz
@@ -685,17 +685,17 @@ definitions:
         type: string
       title:
         type: string
-      topic_id:
+      lesson_id:
         type: string
     required:
-    - chapter_id
+    - module_id
     - content_type
     - content_url
     - course_id
     - title
-    - topic_id
+    - lesson_id
     type: object
-  models.LessonMiniResponse:
+  models.TopicMiniResponse:
     properties:
       content_type:
         type: string
@@ -706,9 +706,9 @@ definitions:
       title:
         type: string
     type: object
-  models.LessonResponse:
+  models.TopicResponse:
     properties:
-      chapter_id:
+      module_id:
         type: string
       content_type:
         type: string
@@ -722,7 +722,7 @@ definitions:
         type: string
       title:
         type: string
-      topic_id:
+      lesson_id:
         type: string
       updated_at:
         type: string
@@ -742,7 +742,7 @@ definitions:
         type: string
       auto_publish_recordings:
         type: boolean
-      chapter_id:
+      module_id:
         description: Optional relationships
         type: string
       course_id:
@@ -760,7 +760,7 @@ definitions:
         description: Host notes
         maxLength: 2000
         type: string
-      lesson_id:
+      topic_id:
         type: string
       max_attendees:
         description: Capacity & Access
@@ -804,7 +804,7 @@ definitions:
         maxLength: 255
         minLength: 3
         type: string
-      topic_id:
+      lesson_id:
         type: string
       tutor_id:
         type: string
@@ -832,7 +832,7 @@ definitions:
       available_seats:
         description: Computed fields
         type: integer
-      chapter_id:
+      module_id:
         type: string
       course_id:
         type: string
@@ -858,7 +858,7 @@ definitions:
         items:
           type: string
         type: array
-      lesson_id:
+      topic_id:
         type: string
       max_attendees:
         type: integer
@@ -901,7 +901,7 @@ definitions:
         type: string
       title:
         type: string
-      topic_id:
+      lesson_id:
         type: string
       total_enrolled:
         type: integer
@@ -931,7 +931,7 @@ definitions:
         type: string
       auto_publish_recordings:
         type: boolean
-      chapter_id:
+      module_id:
         description: Relationships (only before start)
         type: string
       description:
@@ -947,7 +947,7 @@ definitions:
         default: false
         description: Cancellation (can update anytime)
         type: boolean
-      lesson_id:
+      topic_id:
         type: string
       max_attendees:
         description: Capacity (only before start)
@@ -990,7 +990,7 @@ definitions:
         maxLength: 255
         minLength: 3
         type: string
-      topic_id:
+      lesson_id:
         type: string
       tutor_id:
         type: string
@@ -1055,7 +1055,7 @@ definitions:
         description: Answer configuration
         maxLength: 2000
         type: string
-      chapter_id:
+      module_id:
         description: Content relationships
         type: string
       course_id:
@@ -1103,7 +1103,7 @@ definitions:
       solution_steps:
         maxLength: 2000
         type: string
-      topic_id:
+      lesson_id:
         type: string
       tutor_id:
         type: string
@@ -1119,9 +1119,9 @@ definitions:
     properties:
       answer_explanation:
         type: string
-      chapter_id:
+      module_id:
         type: string
-      chapter_name:
+      module_name:
         type: string
       correct_attempts:
         type: integer
@@ -1158,9 +1158,9 @@ definitions:
         type: string
       success_rate:
         type: number
-      topic_id:
+      lesson_id:
         type: string
-      topic_name:
+      lesson_name:
         type: string
       total_attempts:
         description: Statistics (optional)
@@ -1189,11 +1189,11 @@ definitions:
       total_pages:
         type: integer
     type: object
-  models.PaginatedTopicsResponse:
+  models.PaginatedLessonsResponse:
     properties:
       data:
         items:
-          $ref: '#/definitions/models.TopicResponse'
+          $ref: '#/definitions/models.LessonResponse'
         type: array
       limit:
         type: integer
@@ -1318,9 +1318,9 @@ definitions:
       message:
         type: string
     type: object
-  models.TopicInput:
+  models.LessonInput:
     properties:
-      chapter_id:
+      module_id:
         type: string
       course_id:
         type: string
@@ -1333,16 +1333,16 @@ definitions:
       tutor_id:
         type: string
     required:
-    - chapter_id
+    - module_id
     - course_id
     - description
     - order
     - title
     - tutor_id
     type: object
-  models.TopicResponse:
+  models.LessonResponse:
     properties:
-      chapter_id:
+      module_id:
         type: string
       course_id:
         type: string
@@ -1363,13 +1363,13 @@ definitions:
     type: object
   models.UpdateCourseMaterialRequest:
     properties:
-      chapter_id:
+      module_id:
         type: string
       description:
         type: string
       file_url:
         type: string
-      lesson_id:
+      topic_id:
         type: string
       status:
         type: string
@@ -1845,18 +1845,18 @@ paths:
       summary: Delete a course category relationship
       tags:
       - Course Categories
-  /api/chapters:
+  /api/modules:
     post:
       consumes:
       - application/json
-      description: Create a new chapter
+      description: Create a new module
       parameters:
-      - description: Chapter
+      - description: Module
         in: body
-        name: chapter
+        name: module
         required: true
         schema:
-          $ref: '#/definitions/models.ChapterInput'
+          $ref: '#/definitions/models.ModuleInput'
       produces:
       - application/json
       responses:
@@ -1878,16 +1878,16 @@ paths:
             $ref: '#/definitions/models.FailureResponse'
       security:
       - BearerAuth: []
-      summary: Create a new chapters
+      summary: Create a new modules
       tags:
-      - Chapters
-  /api/chapters/{id}:
+      - Modules
+  /api/modules/{id}:
     delete:
       consumes:
       - application/json
-      description: Delete an existing chapter
+      description: Delete an existing module
       parameters:
-      - description: Chapter ID
+      - description: Module ID
         in: path
         name: id
         required: true
@@ -1911,25 +1911,25 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.FailureResponse'
-      summary: Delete an existing chapter
+      summary: Delete an existing module
       tags:
-      - Chapters
+      - Modules
     put:
       consumes:
       - application/json
-      description: Update an existing chapter
+      description: Update an existing module
       parameters:
-      - description: Chapter ID
+      - description: Module ID
         in: path
         name: id
         required: true
         type: string
-      - description: Chapter
+      - description: Module
         in: body
-        name: chapter
+        name: module
         required: true
         schema:
-          $ref: '#/definitions/models.ChapterInput'
+          $ref: '#/definitions/models.ModuleInput'
       produces:
       - application/json
       responses:
@@ -1949,9 +1949,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.FailureResponse'
-      summary: Update an existing chapter
+      summary: Update an existing module
       tags:
-      - Chapters
+      - Modules
   /api/course-materials:
     post:
       consumes:
@@ -1960,7 +1960,7 @@ paths:
       parameters:
       - description: Course Material
         in: body
-        name: chapter
+        name: module
         required: true
         schema:
           $ref: '#/definitions/models.CreateCourseMaterialRequest'
@@ -2399,18 +2399,18 @@ paths:
       summary: Update a grade
       tags:
       - grades
-  /api/lessons:
+  /api/topics:
     post:
       consumes:
       - application/json
-      description: Create a new lesson under a chapter
+      description: Create a new topic under a module
       parameters:
-      - description: Lesson payload
+      - description: Topic payload
         in: body
-        name: lesson
+        name: topic
         required: true
         schema:
-          $ref: '#/definitions/models.LessonInput'
+          $ref: '#/definitions/models.TopicInput'
       produces:
       - application/json
       responses:
@@ -2432,14 +2432,14 @@ paths:
             $ref: '#/definitions/models.FailureResponse'
       security:
       - BearerAuth: []
-      summary: Create a lesson
+      summary: Create a topic
       tags:
-      - Lessons
-  /api/lessons/{id}:
+      - Topics
+  /api/topics/{id}:
     delete:
-      description: Delete lesson by ID
+      description: Delete topic by ID
       parameters:
-      - description: Lesson ID
+      - description: Topic ID
         in: path
         name: id
         required: true
@@ -2465,32 +2465,32 @@ paths:
             $ref: '#/definitions/models.FailureResponse'
       security:
       - BearerAuth: []
-      summary: Delete lesson
+      summary: Delete topic
       tags:
-      - Lessons
+      - Topics
     put:
       consumes:
       - application/json
-      description: Update lesson details
+      description: Update topic details
       parameters:
-      - description: Lesson ID
+      - description: Topic ID
         in: path
         name: id
         required: true
         type: string
-      - description: Lesson payload
+      - description: Topic payload
         in: body
-        name: lesson
+        name: topic
         required: true
         schema:
-          $ref: '#/definitions/models.LessonInput'
+          $ref: '#/definitions/models.TopicInput'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.LessonResponse'
+            $ref: '#/definitions/models.TopicResponse'
         "400":
           description: Bad Request
           schema:
@@ -2505,9 +2505,9 @@ paths:
             $ref: '#/definitions/models.FailureResponse'
       security:
       - BearerAuth: []
-      summary: Update lesson
+      summary: Update topic
       tags:
-      - Lessons
+      - Topics
   /api/live-classes:
     post:
       consumes:
@@ -2788,23 +2788,23 @@ paths:
       summary: Create multiple questions
       tags:
       - questions
-  /api/topics:
+  /api/lessons:
     post:
       consumes:
       - application/json
-      description: Create a new topic
+      description: Create a new lesson
       parameters:
-      - description: Topic
+      - description: Lesson
         in: body
-        name: topic
+        name: lesson
         required: true
         schema:
-          $ref: '#/definitions/models.TopicInput'
+          $ref: '#/definitions/models.LessonInput'
       produces:
       - application/json
       responses:
         "201":
-          description: Topic created successfully
+          description: Lesson created successfully
           schema:
             $ref: '#/definitions/models.SuccessResponse'
         "400":
@@ -2813,33 +2813,33 @@ paths:
             $ref: '#/definitions/models.ErrorResponse'
       security:
       - BearerAuth: []
-      summary: Create a new topic
+      summary: Create a new lesson
       tags:
-      - topics
-  /api/topics/{id}:
+      - lessons
+  /api/lessons/{id}:
     put:
       consumes:
       - application/json
-      description: Update a topic by ID
+      description: Update a lesson by ID
       parameters:
-      - description: Topic ID
+      - description: Lesson ID
         in: path
         name: id
         required: true
         type: string
-      - description: Topic
+      - description: Lesson
         in: body
-        name: topic
+        name: lesson
         required: true
         schema:
-          $ref: '#/definitions/models.TopicInput'
+          $ref: '#/definitions/models.LessonInput'
       produces:
       - application/json
       responses:
         "200":
-          description: Topic updated successfully
+          description: Lesson updated successfully
           schema:
-            $ref: '#/definitions/models.TopicResponse'
+            $ref: '#/definitions/models.LessonResponse'
         "400":
           description: Bad Request
           schema:
@@ -2850,9 +2850,9 @@ paths:
             $ref: '#/definitions/models.ErrorResponse'
       security:
       - BearerAuth: []
-      summary: Update a topic
+      summary: Update a lesson
       tags:
-      - topics
+      - lessons
   /assignments:
     get:
       consumes:
@@ -3257,11 +3257,11 @@ paths:
       summary: Category Details with Related Courses
       tags:
       - Categories
-  /chapters:
+  /modules:
     get:
       consumes:
       - application/json
-      description: Get all chapters
+      description: Get all modules
       produces:
       - application/json
       responses:
@@ -3273,16 +3273,16 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.FailureResponse'
-      summary: Get all chapters
+      summary: Get all modules
       tags:
-      - Chapters
-  /chapters/{id}:
+      - Modules
+  /modules/{id}:
     get:
       consumes:
       - application/json
-      description: Get a single chapter by ID
+      description: Get a single module by ID
       parameters:
-      - description: Chapter ID
+      - description: Module ID
         in: path
         name: id
         required: true
@@ -3306,25 +3306,25 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.FailureResponse'
-      summary: Get a single chapter by ID
+      summary: Get a single module by ID
       tags:
-      - Chapters
+      - Modules
   /course-materials:
     get:
-      description: Get all course materials, optionally filtered by course, chapter,
-        or lesson
+      description: Get all course materials, optionally filtered by course, module,
+        or topic
       parameters:
       - description: Course ID
         in: query
         name: course_id
         type: string
-      - description: Chapter ID
+      - description: Module ID
         in: query
-        name: chapter_id
+        name: module_id
         type: string
-      - description: Lesson ID
+      - description: Topic ID
         in: query
-        name: lesson_id
+        name: topic_id
         type: string
       - description: Status
         in: query
@@ -3352,7 +3352,7 @@ paths:
       - Course Materials
   /course-materials/{id}:
     get:
-      description: Get course material with chapter and lesson details
+      description: Get course material with module and topic details
       parameters:
       - description: Course Material ID
         in: path
@@ -3741,17 +3741,17 @@ paths:
       summary: Get grades for a specific student
       tags:
       - grades
-  /lessons:
+  /topics:
     get:
-      description: Get all lessons, optionally filtered by course or chapter
+      description: Get all topics, optionally filtered by course or module
       parameters:
       - description: Course ID
         in: query
         name: course_id
         type: string
-      - description: Chapter ID
+      - description: Module ID
         in: query
-        name: chapter_id
+        name: module_id
         type: string
       produces:
       - application/json
@@ -3760,20 +3760,20 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.LessonResponse'
+              $ref: '#/definitions/models.TopicResponse'
             type: array
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      summary: Get lessons
+      summary: Get topics
       tags:
-      - Lessons
-  /lessons/{id}:
+      - Topics
+  /topics/{id}:
     get:
-      description: Get lesson with chapter and course details
+      description: Get topic with module and course details
       parameters:
-      - description: Lesson ID
+      - description: Topic ID
         in: path
         name: id
         required: true
@@ -3784,7 +3784,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.LessonResponse'
+            $ref: '#/definitions/models.TopicResponse'
         "400":
           description: Bad Request
           schema:
@@ -3793,9 +3793,9 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/models.NotFoundResponse'
-      summary: Get lesson details
+      summary: Get topic details
       tags:
-      - Lessons
+      - Topics
   /products:
     get:
       description: Retrieve a list of all products
@@ -3882,19 +3882,19 @@ paths:
       summary: Get related courses with product ID
       tags:
       - Products
-  /topics:
+  /lessons:
     get:
       consumes:
       - application/json
-      description: Get all topics with optional filtering
+      description: Get all lessons with optional filtering
       parameters:
       - description: Course ID
         in: query
         name: course_id
         type: string
-      - description: Chapter ID
+      - description: Module ID
         in: query
-        name: chapter_id
+        name: module_id
         type: string
       - description: Search term
         in: query
@@ -3924,16 +3924,16 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.PaginatedTopicsResponse'
+            $ref: '#/definitions/models.PaginatedLessonsResponse'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       security:
       - BearerAuth: []
-      summary: Get all topics
+      summary: Get all lessons
       tags:
-      - topics
+      - lessons
 schemes:
 - http
 securityDefinitions:

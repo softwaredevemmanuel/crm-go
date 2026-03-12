@@ -17,11 +17,11 @@ course_categories - Course categorization
 
 course_prerequisites - Course requirements
 
-chapters - Course chapters/modules
+modules - Course modules/modules
 
-lessons - Individual lessons (pre-recorded)
+topics - Individual topics (pre-recorded)
 
-lesson_content - Lesson materials (videos, PDFs, etc.)
+topic_content - Topic materials (videos, PDFs, etc.)
 
 live_classes - Scheduled live sessions
 

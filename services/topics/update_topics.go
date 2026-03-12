@@ -1,72 +1,72 @@
 package services
 
 import (
-    "errors"
-    "time"
+	"errors"
+	"time"
 
-    "crm-go/models"
-    "github.com/google/uuid"
-    "gorm.io/gorm"
+	"crm-go/models"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
-type UpdateTopicService struct {
-    db *gorm.DB
+type UpdateLessonService struct {
+	db *gorm.DB
 }
 
-func NewUpdateTopicService(db *gorm.DB) *UpdateTopicService {
-    return &UpdateTopicService{db: db}
+func NewUpdateLessonService(db *gorm.DB) *UpdateLessonService {
+	return &UpdateLessonService{db: db}
 }
 
-// UpdateTopicWithTx - for use with transactions
-func (s *UpdateTopicService) UpdateTopicWithTx(tx *gorm.DB, topicID uuid.UUID, req models.TopicInput) (*models.TopicResponse, error) {
-    // Fetch existing topic
-    var topic models.Topic
-    if err := tx.First(&topic, "id = ?", topicID).Error; err != nil {
-        return nil, errors.New("topic not found")
-    }
-    
-    // Validate chapter exists
-    var chapter models.Chapter
-    if err := tx.First(&chapter, "id = ?", req.ChapterID).Error; err != nil {
-        return nil, errors.New("chapter not found")
-    }
-    
-    // Ensure chapter belongs to course
-    if chapter.CourseID != req.CourseID {
-        return nil, errors.New("chapter does not belong to this course")
-    }
-    
-    // Update fields
-    topic.CourseID = req.CourseID
-    topic.ChapterID = req.ChapterID
-    topic.TutorID = req.TutorID
-    topic.Title = req.Title
-    topic.Description = req.Description
-    topic.Order = req.Order
-    topic.UpdatedAt = time.Now()
-    
-    // Save changes
-    if err := tx.Save(&topic).Error; err != nil {
-        return nil, err
-    }
-    
-    // Convert to response
-    response := s.topicToResponse(&topic, req.TutorID)
-    return response, nil
+// UpdateLessonWithTx - for use with transactions
+func (s *UpdateLessonService) UpdateLessonWithTx(tx *gorm.DB, lessonID uuid.UUID, req models.LessonInput) (*models.LessonResponse, error) {
+	// Fetch existing lesson
+	var lesson models.Lesson
+	if err := tx.First(&lesson, "id = ?", lessonID).Error; err != nil {
+		return nil, errors.New("lesson not found")
+	}
+
+	// Validate module exists
+	var module models.Module
+	if err := tx.First(&module, "id = ?", req.ModuleID).Error; err != nil {
+		return nil, errors.New("module not found")
+	}
+
+	// Ensure module belongs to course
+	if module.CourseID != req.CourseID {
+		return nil, errors.New("module does not belong to this course")
+	}
+
+	// Update fields
+	lesson.CourseID = req.CourseID
+	lesson.ModuleID = req.ModuleID
+	lesson.TutorID = req.TutorID
+	lesson.Title = req.Title
+	lesson.Description = req.Description
+	lesson.Order = req.Order
+	lesson.UpdatedAt = time.Now()
+
+	// Save changes
+	if err := tx.Save(&lesson).Error; err != nil {
+		return nil, err
+	}
+
+	// Convert to response
+	response := s.lessonToResponse(&lesson, req.TutorID)
+	return response, nil
 }
 
-
-// Helper function to convert Topic to TopicResponse
-func (s *UpdateTopicService) topicToResponse(topic *models.Topic, tutorID uuid.UUID) *models.TopicResponse {
-    return &models.TopicResponse{
-        ID:          topic.ID,
-        CourseID:    topic.CourseID,
-        ChapterID:   topic.ChapterID,
-        TutorID:     tutorID,
-        Title:       topic.Title,
-        Description: topic.Description,
-        Order:       topic.Order,
-        CreatedAt:   topic.CreatedAt,
-        UpdatedAt:   topic.UpdatedAt,
-    }
+// Helper function to convert Lesson to LessonResponse
+func (s *UpdateLessonService) lessonToResponse(lesson *models.Lesson, tutorID uuid.UUID) *models.LessonResponse {
+	return &models.LessonResponse{
+		ID:          lesson.ID,
+		CourseID:    lesson.CourseID,
+		ModuleID:    lesson.ModuleID,
+		TutorID:     tutorID,
+		Title:       lesson.Title,
+		Description: lesson.Description,
+		Order:       lesson.Order,
+		CreatedAt:   lesson.CreatedAt,
+		UpdatedAt:   lesson.UpdatedAt,
+	}
 }

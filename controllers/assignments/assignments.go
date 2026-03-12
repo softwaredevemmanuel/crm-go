@@ -3,9 +3,10 @@ package assignments
 import (
 	"crm-go/config"
 	"crm-go/models"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"net/http"
 )
 
 // CreateAssignment handles the creation of a new assignment
@@ -38,31 +39,31 @@ func CreateAssignment(c *gin.Context) {
 		return
 	}
 
-	// 🔍 Optional chapter validation
-	if input.ChapterID != nil {
-		var chapter models.Chapter
-		if err := config.DB.First(&chapter, "id = ?", *input.ChapterID).Error; err != nil {
+	// 🔍 Optional module validation
+	if input.ModuleID != nil {
+		var module models.Module
+		if err := config.DB.First(&module, "id = ?", *input.ModuleID).Error; err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse{
-				Error: "Invalid chapter_id",
+				Error: "Invalid module_id",
 			})
 			return
 		}
 	}
 
 	assignment := models.Assignment{
-		ID:               uuid.New(),
-		CourseID:         input.CourseID,
-		ChapterID:        input.ChapterID,
-		LessonID:         input.LessonID,
-		PublisherID:      input.PublisherID,
-		Title:            input.Title,
-		Slug:             input.Slug,
-		Description:      input.Description,
-		Type:             input.Type,
-		SubmissionType:   input.SubmissionType,
-		Content:          input.Content,
-		DueDate:          input.DueDate,
-		Status:           input.Status,	
+		ID:             uuid.New(),
+		CourseID:       input.CourseID,
+		ModuleID:       input.ModuleID,
+		TopicID:        input.TopicID,
+		PublisherID:    input.PublisherID,
+		Title:          input.Title,
+		Slug:           input.Slug,
+		Description:    input.Description,
+		Type:           input.Type,
+		SubmissionType: input.SubmissionType,
+		Content:        input.Content,
+		DueDate:        input.DueDate,
+		Status:         input.Status,
 	}
 
 	if err := config.DB.Create(&assignment).Error; err != nil {
@@ -92,8 +93,8 @@ func GetAssignments(c *gin.Context) {
 		Select(`
 			id,
 			course_id,
-			chapter_id,
-			lesson_id,
+			module_id,
+			topic_id,
 			publisher_id,
 			title,
 			slug,
@@ -148,8 +149,8 @@ func GetAssignmentByID(c *gin.Context) {
 
 	err = config.DB.
 		Preload("Course").
-		Preload("Chapter").
-		Preload("Lesson").
+		Preload("Module").
+		Preload("Topic").
 		// Preload("Submissions").
 		Preload("Publisher").
 		First(&assignment, "id = ?", assignmentID).Error
@@ -163,17 +164,17 @@ func GetAssignmentByID(c *gin.Context) {
 
 	// 🔹 Map to response DTO
 	response := models.AssignmentViewResponse{
-		ID:               assignment.ID,
-		Title:            assignment.Title,
-		Slug:             assignment.Slug,
-		Description:      assignment.Description,
-		Content:          assignment.Content,
-		Type:             assignment.Type,
-		SubmissionType:   assignment.SubmissionType,
-		Status:           assignment.Status,
-		DueDate:          assignment.DueDate,
-		CreatedAt:        assignment.CreatedAt,
-		UpdatedAt:        assignment.UpdatedAt,
+		ID:             assignment.ID,
+		Title:          assignment.Title,
+		Slug:           assignment.Slug,
+		Description:    assignment.Description,
+		Content:        assignment.Content,
+		Type:           assignment.Type,
+		SubmissionType: assignment.SubmissionType,
+		Status:         assignment.Status,
+		DueDate:        assignment.DueDate,
+		CreatedAt:      assignment.CreatedAt,
+		UpdatedAt:      assignment.UpdatedAt,
 
 		Course: models.CourseResponse{
 			ID:               assignment.Course.ID,
@@ -194,32 +195,32 @@ func GetAssignmentByID(c *gin.Context) {
 		},
 	}
 
-	if assignment.ChapterID != nil {
-		response.Chapter = &models.ChapterResponse{
-			ID:            assignment.Chapter.ID,
-			CourseID:      assignment.Chapter.CourseID,
-			Title:         assignment.Chapter.Title,
-			Slug:          assignment.Chapter.Slug,
-			Description:   assignment.Chapter.Description,
-			ChapterNumber: assignment.Chapter.ChapterNumber,
-			IsFree:        assignment.Chapter.IsFree,
-			Status:        assignment.Chapter.Status,
-			EstimatedTime: assignment.Chapter.EstimatedTime,
-			TotalLessons:  assignment.Chapter.TotalLessons,
-			TotalDuration: assignment.Chapter.TotalDuration,
+	if assignment.ModuleID != nil {
+		response.Module = &models.ModuleResponse{
+			ID:            assignment.Module.ID,
+			CourseID:      assignment.Module.CourseID,
+			Title:         assignment.Module.Title,
+			Slug:          assignment.Module.Slug,
+			Description:   assignment.Module.Description,
+			ModuleNumber:  assignment.Module.ModuleNumber,
+			IsFree:        assignment.Module.IsFree,
+			Status:        assignment.Module.Status,
+			EstimatedTime: assignment.Module.EstimatedTime,
+			TotalTopics:   assignment.Module.TotalTopics,
+			TotalDuration: assignment.Module.TotalDuration,
 		}
 	}
 
-	if assignment.LessonID != nil {
-		response.Lesson = &models.LessonResponse{
-			ID:          assignment.Lesson.ID,
-			ChapterID:   assignment.Lesson.ChapterID,
-			CourseID:    assignment.Lesson.CourseID,
-			Title:       assignment.Lesson.Title,
-			ContentType: assignment.Lesson.ContentType,
-			ContentURL:  assignment.Lesson.ContentURL,
-			CreatedAt:   assignment.Lesson.CreatedAt,
-			UpdatedAt:   assignment.Lesson.UpdatedAt,
+	if assignment.TopicID != nil {
+		response.Topic = &models.TopicResponse{
+			ID:          assignment.Topic.ID,
+			ModuleID:    assignment.Topic.ModuleID,
+			CourseID:    assignment.Topic.CourseID,
+			Title:       assignment.Topic.Title,
+			ContentType: assignment.Topic.ContentType,
+			ContentURL:  assignment.Topic.ContentURL,
+			CreatedAt:   assignment.Topic.CreatedAt,
+			UpdatedAt:   assignment.Topic.UpdatedAt,
 		}
 	}
 
@@ -228,58 +229,57 @@ func GetAssignmentByID(c *gin.Context) {
 
 func ToAssignmentResponse(a models.Assignment) models.AssignmentViewResponse {
 	response := models.AssignmentViewResponse{
-		ID:     a.ID,
-		Title:  a.Title,
-		Status: a.Status,
-		Slug:   a.Slug,
+		ID:          a.ID,
+		Title:       a.Title,
+		Status:      a.Status,
+		Slug:        a.Slug,
 		Description: a.Description,
-		Type: a.Type,
-		DueDate: a.DueDate,
+		Type:        a.Type,
+		DueDate:     a.DueDate,
 		Course: models.CourseResponse{
-			ID:    a.Course.ID,
-			Title: a.Course.Title,
-			Description: a.Course.Description,
-			Image: a.Course.Image,
-			VideoURL: a.Course.VideoURL,
-			TutorID: a.Course.TutorID,
+			ID:               a.Course.ID,
+			Title:            a.Course.Title,
+			Description:      a.Course.Description,
+			Image:            a.Course.Image,
+			VideoURL:         a.Course.VideoURL,
+			TutorID:          a.Course.TutorID,
 			LearningOutcomes: a.Course.LearningOutcomes,
-			Requirements: a.Course.Requirements,
+			Requirements:     a.Course.Requirements,
 		},
 		Publisher: models.UserResponse{
 			ID:        a.Publisher.ID,
 			FirstName: a.Publisher.FirstName,
 			LastName:  a.Publisher.LastName,
 			Email:     a.Publisher.Email,
-			Role: 	a.Publisher.Role,
+			Role:      a.Publisher.Role,
 		},
-
 	}
 
-	if a.ChapterID != nil {
-		response.Chapter = &models.ChapterResponse{
-			ID:    a.Chapter.ID,
-			Title: a.Chapter.Title,
-			Slug:  a.Chapter.Slug,
-			Description: a.Chapter.Description,
-			ChapterNumber: a.Chapter.ChapterNumber,
-			IsFree: a.Chapter.IsFree,
-			Status: a.Chapter.Status,
-			EstimatedTime: a.Chapter.EstimatedTime,
-			TotalLessons: a.Chapter.TotalLessons,
-			TotalDuration: a.Chapter.TotalDuration,
+	if a.ModuleID != nil {
+		response.Module = &models.ModuleResponse{
+			ID:            a.Module.ID,
+			Title:         a.Module.Title,
+			Slug:          a.Module.Slug,
+			Description:   a.Module.Description,
+			ModuleNumber:  a.Module.ModuleNumber,
+			IsFree:        a.Module.IsFree,
+			Status:        a.Module.Status,
+			EstimatedTime: a.Module.EstimatedTime,
+			TotalTopics:   a.Module.TotalTopics,
+			TotalDuration: a.Module.TotalDuration,
 		}
 	}
 
-	if a.LessonID != nil {
-		response.Lesson = &models.LessonResponse{
-			ID:    a.Lesson.ID,
-			ChapterID: a.Lesson.ChapterID,
-			CourseID:  a.Lesson.CourseID,
-			Title: a.Lesson.Title,
-			ContentType: a.Lesson.ContentType,
-			ContentURL:  a.Lesson.ContentURL,
-			CreatedAt:   a.Lesson.CreatedAt,
-			UpdatedAt:   a.Lesson.UpdatedAt,
+	if a.TopicID != nil {
+		response.Topic = &models.TopicResponse{
+			ID:          a.Topic.ID,
+			ModuleID:    a.Topic.ModuleID,
+			CourseID:    a.Topic.CourseID,
+			Title:       a.Topic.Title,
+			ContentType: a.Topic.ContentType,
+			ContentURL:  a.Topic.ContentURL,
+			CreatedAt:   a.Topic.CreatedAt,
+			UpdatedAt:   a.Topic.UpdatedAt,
 		}
 	}
 
@@ -340,8 +340,8 @@ func UpdateAssignment(c *gin.Context) {
 			"Type",
 			"DueDate",
 			"CourseID",
-			"ChapterID",
-			"LessonID",
+			"ModuleID",
+			"TopicID",
 		).
 		Updates(input).Error; err != nil {
 
@@ -354,8 +354,8 @@ func UpdateAssignment(c *gin.Context) {
 	// 5️⃣ Reload assignment with relations
 	if err := config.DB.
 		Preload("Course").
-		Preload("Chapter").
-		Preload("Lesson").
+		Preload("Module").
+		Preload("Topic").
 		Preload("Publisher").
 		First(&assignment, "id = ?", assignmentID).Error; err != nil {
 
@@ -371,8 +371,6 @@ func UpdateAssignment(c *gin.Context) {
 	// 7️⃣ Return response
 	c.JSON(http.StatusOK, response)
 }
-
-
 
 // DeleteAssignment handles the deletion of an existing assignment
 // @Summary Delete an existing assignment

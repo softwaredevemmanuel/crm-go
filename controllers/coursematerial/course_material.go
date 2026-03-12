@@ -5,12 +5,13 @@ import (
 	"crm-go/models"
 	"encoding/json"
 	"errors"
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
-	"gorm.io/gorm"
 	"net/http"
 	"regexp"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 // CreateCourseMaterial handles the creation of a new course material
@@ -19,7 +20,7 @@ import (
 // @Tags Course Materials
 // @Accept json
 // @Produce json
-// @Param chapter body models.CreateCourseMaterialRequest true "Course Material"
+// @Param module body models.CreateCourseMaterialRequest true "Course Material"
 // @Success 201 {object} models.SuccessResponse
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 409 {object} models.ConflictResponse
@@ -80,8 +81,8 @@ func CreateCourseMaterial(c *gin.Context) {
 
 	material := models.CourseMaterial{
 		CourseID:    req.CourseID,
-		ChapterID:   req.ChapterID,
-		LessonID:    req.LessonID,
+		ModuleID:    req.ModuleID,
+		TopicID:     req.TopicID,
 		Title:       req.Title,
 		Description: req.Description,
 		Slug:        generateSlug(req.Title),
@@ -107,12 +108,12 @@ func CreateCourseMaterial(c *gin.Context) {
 
 // GetCourseMaterials godoc
 // @Summary      Get course materials
-// @Description  Get all course materials, optionally filtered by course, chapter, or lesson
+// @Description  Get all course materials, optionally filtered by course, module, or topic
 // @Tags         Course Materials
 // @Produce      json
 // @Param        course_id   query   string  false  "Course ID"
-// @Param        chapter_id  query   string  false  "Chapter ID"
-// @Param        lesson_id   query   string  false  "Lesson ID"
+// @Param        module_id  query   string  false  "Module ID"
+// @Param        topic_id   query   string  false  "Topic ID"
 // @Param        status      query   string  false  "Status"
 // @Param        type        query   string  false  "Material Type"
 // @Success      200 {array}  models.SuccessResponse
@@ -124,8 +125,8 @@ func GetCourseMaterials(c *gin.Context) {
 
 	// Query params
 	courseID := c.Query("course_id")
-	chapterID := c.Query("chapter_id")
-	lessonID := c.Query("lesson_id")
+	moduleID := c.Query("module_id")
+	topicID := c.Query("topic_id")
 	status := c.Query("status")
 	materialType := c.Query("type")
 
@@ -141,22 +142,22 @@ func GetCourseMaterials(c *gin.Context) {
 		query = query.Where("course_id = ?", id)
 	}
 
-	if chapterID != "" {
-		id, err := uuid.Parse(chapterID)
+	if moduleID != "" {
+		id, err := uuid.Parse(moduleID)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid chapter_id"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid module_id"})
 			return
 		}
-		query = query.Where("chapter_id = ?", id)
+		query = query.Where("module_id = ?", id)
 	}
 
-	if lessonID != "" {
-		id, err := uuid.Parse(lessonID)
+	if topicID != "" {
+		id, err := uuid.Parse(topicID)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid lesson_id"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid topic_id"})
 			return
 		}
-		query = query.Where("lesson_id = ?", id)
+		query = query.Where("topic_id = ?", id)
 	}
 
 	if status != "" {
@@ -183,8 +184,8 @@ func GetCourseMaterials(c *gin.Context) {
 		responses = append(responses, models.CourseMaterialResponse{
 			ID:          m.ID,
 			CourseID:    m.CourseID,
-			ChapterID:   m.ChapterID,
-			LessonID:    m.LessonID,
+			ModuleID:    m.ModuleID,
+			TopicID:     m.TopicID,
 			Title:       m.Title,
 			Description: m.Description,
 			Slug:        m.Slug,
@@ -200,7 +201,7 @@ func GetCourseMaterials(c *gin.Context) {
 
 // GetCourseMaterialByID godoc
 // @Summary      Get course material details
-// @Description  Get course material with chapter and lesson details
+// @Description  Get course material with module and topic details
 // @Tags         Course Materials
 // @Produce      json
 // @Param        id path string true "Course Material ID"
@@ -223,8 +224,8 @@ func GetCourseMaterialByID(c *gin.Context) {
 
 	if err := config.DB.
 		Preload("Course").
-		Preload("Chapter").
-		Preload("Lesson").
+		Preload("Module").
+		Preload("Topic").
 		First(&material, "id = ?", materialID).Error; err != nil {
 
 		c.JSON(http.StatusNotFound, gin.H{
@@ -237,8 +238,8 @@ func GetCourseMaterialByID(c *gin.Context) {
 	response := models.CourseMaterialViewResponse{
 		ID:          material.ID,
 		CourseID:    material.CourseID,
-		ChapterID:   material.ChapterID,
-		LessonID:    material.LessonID,
+		ModuleID:    material.ModuleID,
+		TopicID:     material.TopicID,
 		Title:       material.Title,
 		Description: material.Description,
 		Slug:        material.Slug,
@@ -253,22 +254,22 @@ func GetCourseMaterialByID(c *gin.Context) {
 		},
 	}
 
-	// Optional Chapter
-	if material.ChapterID != nil {
-		response.Chapter = &models.ChapterMiniResponse{
-			ID:            material.Chapter.ID,
-			Title:         material.Chapter.Title,
-			ChapterNumber: material.Chapter.ChapterNumber,
+	// Optional Module
+	if material.ModuleID != nil {
+		response.Module = &models.ModuleMiniResponse{
+			ID:           material.Module.ID,
+			Title:        material.Module.Title,
+			ModuleNumber: material.Module.ModuleNumber,
 		}
 	}
 
-	// Optional Lesson
-	if material.LessonID != nil {
-		response.Lesson = &models.LessonMiniResponse{
-			ID:          material.Lesson.ID,
-			Title:       material.Lesson.Title,
-			ContentType: material.Lesson.ContentType,
-			ContentURL:  material.Lesson.ContentURL,
+	// Optional Topic
+	if material.TopicID != nil {
+		response.Topic = &models.TopicMiniResponse{
+			ID:          material.Topic.ID,
+			Title:       material.Topic.Title,
+			ContentType: material.Topic.ContentType,
+			ContentURL:  material.Topic.ContentURL,
 		}
 	}
 
@@ -344,8 +345,8 @@ func UpdateCourseMaterial(c *gin.Context) {
 	material.Type = req.Type
 	material.FileURL = req.FileURL
 	material.Status = req.Status
-	material.ChapterID = req.ChapterID
-	material.LessonID = req.LessonID
+	material.ModuleID = req.ModuleID
+	material.TopicID = req.TopicID
 
 	if err := config.DB.Save(&material).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -357,8 +358,8 @@ func UpdateCourseMaterial(c *gin.Context) {
 	// Reload relations
 	if err := config.DB.
 		Preload("Course").
-		Preload("Chapter").
-		Preload("Lesson").
+		Preload("Module").
+		Preload("Topic").
 		First(&material, "id = ?", material.ID).Error; err != nil {
 
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -371,8 +372,8 @@ func UpdateCourseMaterial(c *gin.Context) {
 	response := models.CourseMaterialViewResponse{
 		ID:          material.ID,
 		CourseID:    material.CourseID,
-		ChapterID:   material.ChapterID,
-		LessonID:    material.LessonID,
+		ModuleID:    material.ModuleID,
+		TopicID:     material.TopicID,
 		Title:       material.Title,
 		Description: material.Description,
 		Slug:        material.Slug,
@@ -387,29 +388,27 @@ func UpdateCourseMaterial(c *gin.Context) {
 		},
 	}
 
-	// Optional Chapter
-	if material.ChapterID != nil {
-		response.Chapter = &models.ChapterMiniResponse{
-			ID:            material.Chapter.ID,
-			Title:         material.Chapter.Title,
-			ChapterNumber: material.Chapter.ChapterNumber,
+	// Optional Module
+	if material.ModuleID != nil {
+		response.Module = &models.ModuleMiniResponse{
+			ID:           material.Module.ID,
+			Title:        material.Module.Title,
+			ModuleNumber: material.Module.ModuleNumber,
 		}
 	}
 
-	// Optional Lesson
-	if material.LessonID != nil {
-		response.Lesson = &models.LessonMiniResponse{
-			ID:          material.Lesson.ID,
-			Title:       material.Lesson.Title,
-			ContentType: material.Lesson.ContentType,
-			ContentURL:  material.Lesson.ContentURL,
+	// Optional Topic
+	if material.TopicID != nil {
+		response.Topic = &models.TopicMiniResponse{
+			ID:          material.Topic.ID,
+			Title:       material.Topic.Title,
+			ContentType: material.Topic.ContentType,
+			ContentURL:  material.Topic.ContentURL,
 		}
 	}
 
 	c.JSON(http.StatusOK, response)
 }
-
-
 
 func GetUserIDFromContext(c *gin.Context) *uuid.UUID {
 	v, exists := c.Get("user_id")
@@ -466,8 +465,8 @@ func DeleteCourseMaterial(c *gin.Context) {
 	materialResponse := models.CourseMaterialResponse{
 		ID:          material.ID,
 		CourseID:    material.CourseID,
-		ChapterID:   material.ChapterID,
-		LessonID:    material.LessonID,
+		ModuleID:    material.ModuleID,
+		TopicID:     material.TopicID,
 		Title:       material.Title,
 		Description: material.Description,
 		Slug:        material.Slug,
@@ -550,8 +549,8 @@ func RestoreCourseMaterial(c *gin.Context) {
 	material := models.CourseMaterial{
 		ID:          archived.ID,
 		CourseID:    archived.CourseID,
-		ChapterID:   archived.ChapterID,
-		LessonID:    archived.LessonID,
+		ModuleID:    archived.ModuleID,
+		TopicID:     archived.TopicID,
 		Title:       archived.Title,
 		Description: archived.Description,
 		Slug:        archived.Slug,

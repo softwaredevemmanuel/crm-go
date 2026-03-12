@@ -5,13 +5,13 @@ import (
 	"log"
 
 	"crm-go/config"
+	"crm-go/models"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"crm-go/models"
 )
 
 var cfg = config.LoadEnv()
-
 
 func MigrateDatabase() {
 	// Connect to database
@@ -29,10 +29,10 @@ func MigrateDatabase() {
 	if err != nil {
 		log.Fatalf("❌ Failed to connect to database: %v", err)
 	}
-	   
+
 	// Run migrations to database
-    db.AutoMigrate(&models.User{})
-    db.AutoMigrate(&models.PasswordReset{})
+	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&models.PasswordReset{})
 	db.AutoMigrate(&models.Course{})
 	db.AutoMigrate(&models.Product{})
 	db.AutoMigrate(&models.Category{})
@@ -44,11 +44,11 @@ func MigrateDatabase() {
 	db.AutoMigrate(&models.Announcement{})
 	db.AutoMigrate(&models.Assignment{})
 	db.AutoMigrate(&models.AssignmentSubmission{})
-	db.AutoMigrate(&models.Chapter{})
-	db.AutoMigrate(&models.Lessons{})
+	db.AutoMigrate(&models.Module{})
+	db.AutoMigrate(&models.Topics{})
 	db.AutoMigrate(&models.CourseMaterial{})
 	db.AutoMigrate(&models.DeletedRecord{})
-	db.AutoMigrate(&models.Topic{})
+	db.AutoMigrate(&models.Lesson{})
 	db.AutoMigrate(&models.Grade{})
 	db.AutoMigrate(&models.LiveClass{})
 	db.AutoMigrate(&models.ObjectiveQuestion{})

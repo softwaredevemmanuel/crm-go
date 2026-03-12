@@ -2,43 +2,42 @@ package models
 
 import (
 	"time"
+
 	"github.com/google/uuid"
 )
 
-type Lessons struct {
-	ID          uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	CourseID    uuid.UUID `gorm:"type:uuid;not null;index"`
-	ChapterID   uuid.UUID `gorm:"type:uuid;not null;index"`
-	TopicID     uuid.UUID `gorm:"type:uuid;index"`
+type Topics struct {
+	ID       uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	CourseID uuid.UUID `gorm:"type:uuid;not null;index"`
+	ModuleID uuid.UUID `gorm:"type:uuid;not null;index"`
+	LessonID uuid.UUID `gorm:"type:uuid;index"`
 
-	Title       string    `gorm:"type:varchar(255);not null"`
-	ContentType string    `gorm:"type:varchar(50);not null"`
-	ContentURL  string    `gorm:"type:varchar(500);not null"`
+	Title       string `gorm:"type:varchar(255);not null"`
+	ContentType string `gorm:"type:varchar(50);not null"`
+	ContentURL  string `gorm:"type:varchar(500);not null"`
 
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	CreatedAt time.Time
+	UpdatedAt time.Time
 
 	// Relationships
-	Chapter Chapter `gorm:"foreignKey:ChapterID"`
-	Topic   Topic   `gorm:"foreignKey:TopicID"`
+	Module Module `gorm:"foreignKey:ModuleID"`
+	Lesson Lesson `gorm:"foreignKey:LessonID"`
 }
 
-
-type LessonInput struct {
+type TopicInput struct {
 	CourseID    uuid.UUID `json:"course_id" binding:"required"`
-	ChapterID   uuid.UUID `json:"chapter_id" binding:"required"`
-	TopicID     uuid.UUID `json:"topic_id" binding:"required"`
+	ModuleID    uuid.UUID `json:"module_id" binding:"required"`
+	LessonID    uuid.UUID `json:"lesson_id" binding:"required"`
 	Title       string    `json:"title" binding:"required"`
 	ContentType string    `json:"content_type" binding:"required"` // video, pdf, text, quiz
 	ContentURL  string    `json:"content_url" binding:"required"`
 }
 
-
-type LessonResponse struct {
+type TopicResponse struct {
 	ID          uuid.UUID `json:"id"`
 	CourseID    uuid.UUID `json:"course_id"`
-	ChapterID   uuid.UUID `json:"chapter_id"`
-	TopicID     uuid.UUID `json:"topic_id"`
+	ModuleID    uuid.UUID `json:"module_id"`
+	LessonID    uuid.UUID `json:"lesson_id"`
 	Title       string    `json:"title"`
 	ContentType string    `json:"content_type"`
 	ContentURL  string    `json:"content_url"`
@@ -46,34 +45,33 @@ type LessonResponse struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
-type LessonMiniResponse struct {
+type TopicMiniResponse struct {
 	ID          uuid.UUID `json:"id"`
 	Title       string    `json:"title"`
 	ContentType string    `json:"content_type"`
 	ContentURL  string    `json:"content_url"`
-
 }
-type LessonViewResponse struct {
-	ID          uuid.UUID `json:"id"`
-	CourseID    uuid.UUID `json:"course_id"`
-	ChapterID   uuid.UUID `json:"chapter_id"`
-	TopicID     uuid.UUID `json:"topic_id"`
-	Title       string    `json:"title"`
-	ContentType string    `json:"content_type"`
-	ContentURL  string    `json:"content_url"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
-	Course      CourseMiniResponse                   `json:"course"`
-	Chapter     *ChapterMiniResponse                 `json:"chapter,omitempty"`
+type TopicViewResponse struct {
+	ID          uuid.UUID           `json:"id"`
+	CourseID    uuid.UUID           `json:"course_id"`
+	ModuleID    uuid.UUID           `json:"module_id"`
+	LessonID    uuid.UUID           `json:"lesson_id"`
+	Title       string              `json:"title"`
+	ContentType string              `json:"content_type"`
+	ContentURL  string              `json:"content_url"`
+	CreatedAt   time.Time           `json:"created_at"`
+	UpdatedAt   time.Time           `json:"updated_at"`
+	Course      CourseMiniResponse  `json:"course"`
+	Module      *ModuleMiniResponse `json:"module,omitempty"`
 }
 
-type LessonUpdateInput struct {
-	Title       string    `json:"title" binding:"required"`
-	ContentType string    `json:"content_type" binding:"required"` // video, pdf, text, quiz
-	ContentURL  string    `json:"content_url" binding:"required"`
+type TopicUpdateInput struct {
+	Title       string `json:"title" binding:"required"`
+	ContentType string `json:"content_type" binding:"required"` // video, pdf, text, quiz
+	ContentURL  string `json:"content_url" binding:"required"`
 }
 
 // TableName specifies the table name
-func (Lessons) TableName() string {
-    return "lessons"
+func (Topics) TableName() string {
+	return "topics"
 }
