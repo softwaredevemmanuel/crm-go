@@ -6,72 +6,87 @@ import (
 	"github.com/google/uuid"
 )
 
-type Topics struct {
+type Lesson struct {
 	ID       uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	CourseID uuid.UUID `gorm:"type:uuid;not null;index"`
 	ModuleID uuid.UUID `gorm:"type:uuid;not null;index"`
-	LessonID uuid.UUID `gorm:"type:uuid;index"`
+	TutorID  uuid.UUID `gorm:"type:uuid;not null;index"`
 
 	Title       string `gorm:"type:varchar(255);not null"`
-	ContentType string `gorm:"type:varchar(50);not null"`
-	ContentURL  string `gorm:"type:varchar(500);not null"`
+	Description string `gorm:"type:text"`
+	Order       int    `gorm:"not null"` // Controls lesson sequence within a module
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
 	// Relationships
-	Module Module `gorm:"foreignKey:ModuleID"`
-	Lesson Lesson `gorm:"foreignKey:LessonID"`
+	Course Course   `gorm:"foreignKey:CourseID"`
+	Module Module   `gorm:"foreignKey:ModuleID"`
+	Topics []Topics `gorm:"foreignKey:LessonID"`
 }
 
-type TopicInput struct {
+type LessonInput struct {
 	CourseID    uuid.UUID `json:"course_id" binding:"required"`
 	ModuleID    uuid.UUID `json:"module_id" binding:"required"`
-	LessonID    uuid.UUID `json:"lesson_id" binding:"required"`
+	TutorID     uuid.UUID `json:"tutor_id" binding:"required"`
 	Title       string    `json:"title" binding:"required"`
-	ContentType string    `json:"content_type" binding:"required"` // video, pdf, text, quiz
-	ContentURL  string    `json:"content_url" binding:"required"`
+	Description string    `json:"description" binding:"required"`
+	Order       int       `json:"order" binding:"required"`
 }
 
-type TopicResponse struct {
+type LessonResponse struct {
 	ID          uuid.UUID `json:"id"`
 	CourseID    uuid.UUID `json:"course_id"`
 	ModuleID    uuid.UUID `json:"module_id"`
-	LessonID    uuid.UUID `json:"lesson_id"`
+	TutorID     uuid.UUID `json:"tutor_id"`
 	Title       string    `json:"title"`
-	ContentType string    `json:"content_type"`
-	ContentURL  string    `json:"content_url"`
+	Description string    `json:"description"`
+	Order       int       `json:"order"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
-type TopicMiniResponse struct {
-	ID          uuid.UUID `json:"id"`
-	Title       string    `json:"title"`
-	ContentType string    `json:"content_type"`
-	ContentURL  string    `json:"content_url"`
+type LessonMiniResponse struct {
+	ID        uuid.UUID `json:"id"`
+	Title     string    `json:"title"`
+	Order     int       `json:"order"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
-type TopicViewResponse struct {
+
+type LessonViewResponse struct {
 	ID          uuid.UUID           `json:"id"`
 	CourseID    uuid.UUID           `json:"course_id"`
 	ModuleID    uuid.UUID           `json:"module_id"`
-	LessonID    uuid.UUID           `json:"lesson_id"`
+	TutorID     uuid.UUID           `json:"tutor_id"`
 	Title       string              `json:"title"`
-	ContentType string              `json:"content_type"`
-	ContentURL  string              `json:"content_url"`
+	Description string              `json:"description"`
+	Order       int                 `json:"order"`
 	CreatedAt   time.Time           `json:"created_at"`
 	UpdatedAt   time.Time           `json:"updated_at"`
 	Course      CourseMiniResponse  `json:"course"`
 	Module      *ModuleMiniResponse `json:"module,omitempty"`
+	Tutor       *UserResponse       `json:"tutor,omitempty"`
+	Topics      []TopicMiniResponse `json:"topics,omitempty"`
 }
 
-type TopicUpdateInput struct {
-	Title       string `json:"title" binding:"required"`
-	ContentType string `json:"content_type" binding:"required"` // video, pdf, text, quiz
-	ContentURL  string `json:"content_url" binding:"required"`
+// LessonFilters for querying lessons
+type LessonFilters struct {
+	CourseID  uuid.UUID `form:"course_id"`
+	ModuleID  uuid.UUID `form:"module_id"`
+	TutorID   uuid.UUID
+	Search    string `form:"search"`
+	SortBy    string `form:"sort_by"`    // title, order, created_at, updated_at
+	SortOrder string `form:"sort_order"` // asc, desc
+	Page      int    `form:"page,default=1"`
+	Limit     int    `form:"limit,default=10"`
 }
 
-// TableName specifies the table name
-func (Topics) TableName() string {
-	return "topics"
+// PaginatedLessonsResponse for paginated results
+type PaginatedLessonsResponse struct {
+	Data       []LessonResponse `json:"data"`
+	Total      int64            `json:"total"`
+	Page       int              `json:"page"`
+	Limit      int              `json:"limit"`
+	TotalPages int              `json:"total_pages"`
 }

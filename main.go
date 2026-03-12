@@ -158,6 +158,7 @@ func main() {
 		seeds.SeedProducts()
 		seeds.SeedAnnouncements()
 		seeds.SeedModules()
+		seeds.SeedLessons()
 		return
 	}
 

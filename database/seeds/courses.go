@@ -22,7 +22,7 @@ func SeedCourses() {
 
 	if err != nil {
 		log.Fatalf("❌ Invalid tutor UUID: %v", err)
-	}	
+	}
 	if err1 != nil {
 		log.Fatalf("❌ Invalid tutor UUID: %v", err1)
 	}
@@ -41,56 +41,55 @@ func SeedCourses() {
 
 	courses := []models.Course{
 		{
-			ID:          courseID1,
-			Title:       "Introduction to Golang",
-			Description: "Learn the basics of the Go programming language.",
-			Image:       "https://example.com/images/golang.png",
-			VideoURL:    "https://example.com/videos/golang-intro.mp4",
-			TutorID:     tutorID, 
+			ID:               courseID1,
+			Title:            "Introduction to Golang",
+			Description:      "Learn the basics of the Go programming language.",
+			Image:            "https://example.com/images/golang.png",
+			VideoURL:         "https://example.com/videos/golang-intro.mp4",
+			TutorID:          tutorID,
 			LearningOutcomes: datatypes.JSON([]byte(`["Understand Go syntax", "Work with Go routines", "Build a simple web server"]`)),
-			Requirements: datatypes.JSON([]byte(`["Basic programming knowledge", "Familiarity with command line", "Willingness to learn", "No prior Go experience required"]`)),
+			Requirements:     datatypes.JSON([]byte(`["Basic programming knowledge", "Familiarity with command line", "Willingness to learn", "No prior Go experience required"]`)),
 		},
 		{
-			ID:          courseID2,
-			Title:       "Advanced React",
-			Description: "Deep dive into advanced patterns in React.js.",
-			Image:       "https://example.com/images/react.png",
-			VideoURL:    "https://example.com/videos/react-advanced.mp4",
-			TutorID:     tutorID,
+			ID:               courseID2,
+			Title:            "Advanced React",
+			Description:      "Deep dive into advanced patterns in React.js.",
+			Image:            "https://example.com/images/react.png",
+			VideoURL:         "https://example.com/videos/react-advanced.mp4",
+			TutorID:          tutorID,
 			LearningOutcomes: datatypes.JSON([]byte(`["Understand advanced React patterns", "State management with Redux", "Performance optimization"]`)),
-			Requirements: datatypes.JSON([]byte(`["Basic React knowledge", "Familiarity with JavaScript ES6+", "Understanding of web development concepts", "Experience with building React applications"]`)),
+			Requirements:     datatypes.JSON([]byte(`["Basic React knowledge", "Familiarity with JavaScript ES6+", "Understanding of web development concepts", "Experience with building React applications"]`)),
 		},
 		{
-			ID:          courseID3,
-			Title:       "Python for Data Science",
-			Description: "Learn Python programming with a focus on data science applications.",
-			Image:       "https://example.com/images/python.png",
-			VideoURL:    "https://example.com/videos/python-data-science.mp4",
-			TutorID:     tutorID,
+			ID:               courseID3,
+			Title:            "Python for Data Science",
+			Description:      "Learn Python programming with a focus on data science applications.",
+			Image:            "https://example.com/images/python.png",
+			VideoURL:         "https://example.com/videos/python-data-science.mp4",
+			TutorID:          tutorID,
 			LearningOutcomes: datatypes.JSON([]byte(`["Understand Python basics", "Data manipulation with Pandas", "Data visualization with Matplotlib"]`)),
-			Requirements: datatypes.JSON([]byte(`["Basic programming knowledge", "Familiarity with command line", "Willingness to learn", "No prior Python experience required"]`)),
+			Requirements:     datatypes.JSON([]byte(`["Basic programming knowledge", "Familiarity with command line", "Willingness to learn", "No prior Python experience required"]`)),
 		},
 		{
 			ID:          courseID4,
-			Title:       "Web Development with Django",
-			Description: "Build robust web applications using the Django framework.",
-			Image:       "https://example.com/images/django.png",
-			VideoURL:    "https://example.com/videos/django-web-dev.mp4",
+			Title:       "Building APIs with FastAPI",
+			Description: "Learn how to develop high-performance APIs using Python FastAPI framework.",
+			Image:       "https://example.com/images/fastapi.png",
+			VideoURL:    "https://example.com/videos/fastapi-web-dev.mp4",
 			TutorID:     tutorID,
-			LearningOutcomes: datatypes.JSON([]byte(`["Set up Django project", "Create models and views", "Deploy Django applications"]`)),
-			Requirements: datatypes.JSON([]byte(`["Basic Python knowledge", "Familiarity with web development concepts", "Understanding of MVC architecture", "No prior Django experience required"]`)),
+			LearningOutcomes: datatypes.JSON([]byte(`[ "Set up FastAPI project", "Create API endpoints", "Validate requests with Pydantic", "Handle path and query parameters", "Deploy FastAPI applications"]`)),
+			Requirements: datatypes.JSON([]byte(`[ "Basic Python knowledge", "Familiarity with web development concepts", "Understanding of REST APIs", "No prior FastAPI experience required"]`)),
 		},
 		{
 			ID:          courseID5,
-			Title:       "Machine Learning Basics",
-			Description: "An introduction to machine learning concepts and techniques.",
-			Image:       "https://example.com/images/machine-learning.png",
-			VideoURL:    "https://example.com/videos/machine-learning-basics.mp4",
+			Title:       "Data Analysis with Python",
+			Description: "Learn to analyze and visualize data effectively using Python libraries.",
+			Image:       "https://example.com/images/data-analysis.png",
+			VideoURL:    "https://example.com/videos/data-analysis-basics.mp4",
 			TutorID:     tutorID,
-			LearningOutcomes: datatypes.JSON([]byte(`["Understand ML concepts", "Implement algorithms", "Evaluate model performance"]`)),
-			Requirements: datatypes.JSON([]byte(`["Basic programming knowledge", "Familiarity with statistics", "Willingness to learn", "No prior ML experience required"]`)),
+			LearningOutcomes: datatypes.JSON([]byte(`[ "Collect and clean datasets", "Perform exploratory data analysis", "Use Python libraries like Pandas and Matplotlib", "Create insightful data visualizations", "Draw actionable conclusions from data"]`)),
+			Requirements: datatypes.JSON([]byte(`[ "Basic Python knowledge", "Familiarity with spreadsheets or data concepts", "Willingness to learn Python libraries", "No prior data analysis experience required"]`)),
 		},
-		
 	}
 
 	for _, course := range courses {
@@ -101,4 +100,3 @@ func SeedCourses() {
 		}
 	}
 }
-
