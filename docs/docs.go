@@ -5385,8 +5385,8 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "course_id",
-                "created_by",
-                "question_text"
+                "question_text",
+                "tutor_id"
             ],
             "properties": {
                 "answer_explanation": {
@@ -5399,9 +5399,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "course_id": {
-                    "type": "string"
-                },
-                "created_by": {
                     "type": "string"
                 },
                 "difficulty_level": {
@@ -5462,6 +5459,9 @@ const docTemplate = `{
                 "topic_id": {
                     "type": "string"
                 },
+                "tutor_id": {
+                    "type": "string"
+                },
                 "video_url": {
                     "type": "string",
                     "maxLength": 500
@@ -5490,9 +5490,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "created_at": {
-                    "type": "string"
-                },
-                "created_by": {
                     "type": "string"
                 },
                 "creator_name": {
@@ -5544,6 +5541,9 @@ const docTemplate = `{
                 "total_attempts": {
                     "description": "Statistics (optional)",
                     "type": "integer"
+                },
+                "tutor_id": {
+                    "type": "string"
                 },
                 "updated_at": {
                     "type": "string"

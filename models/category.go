@@ -25,7 +25,7 @@ type CategoryInput struct {
 }
 
 type CourseCategoryTable struct {
-    ID         uuid.UUID `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+    ID         uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid();primaryKey" json:"id"`
     CourseID   uuid.UUID `gorm:"type:uuid;not null;constraint:OnDelete:CASCADE;" `
     CategoryID uuid.UUID `gorm:"type:uuid;not null;constraint:OnDelete:CASCADE;" `
     CreatedAt  time.Time

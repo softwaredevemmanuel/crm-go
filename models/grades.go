@@ -7,7 +7,7 @@ import (
 
 )
 type Grade struct {
-    ID         uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
+    ID         uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
     StudentID  uuid.UUID `gorm:"type:uuid;not null"`   // link to student
     CourseID   uuid.UUID `gorm:"type:uuid;not null"`   // link to course
     TutorID    uuid.UUID `gorm:"type:uuid;not null"`   // link to tutor

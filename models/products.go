@@ -22,7 +22,7 @@ type Product struct {
 }
 
 type CourseProductTable struct {
-    ID         uuid.UUID `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+    ID         uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid();primaryKey"`
    	CourseID   uuid.UUID `gorm:"type:uuid;not null;constraint:OnDelete:CASCADE;" `
 	ProductID uuid.UUID `gorm:"type:uuid;not null;constraint:OnDelete:CASCADE;" `
     CreatedAt  time.Time

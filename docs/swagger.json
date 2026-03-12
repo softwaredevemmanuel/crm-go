@@ -5382,8 +5382,8 @@
             "type": "object",
             "required": [
                 "course_id",
-                "created_by",
-                "question_text"
+                "question_text",
+                "tutor_id"
             ],
             "properties": {
                 "answer_explanation": {
@@ -5396,9 +5396,6 @@
                     "type": "string"
                 },
                 "course_id": {
-                    "type": "string"
-                },
-                "created_by": {
                     "type": "string"
                 },
                 "difficulty_level": {
@@ -5459,6 +5456,9 @@
                 "topic_id": {
                     "type": "string"
                 },
+                "tutor_id": {
+                    "type": "string"
+                },
                 "video_url": {
                     "type": "string",
                     "maxLength": 500
@@ -5487,9 +5487,6 @@
                     "type": "string"
                 },
                 "created_at": {
-                    "type": "string"
-                },
-                "created_by": {
                     "type": "string"
                 },
                 "creator_name": {
@@ -5541,6 +5538,9 @@
                 "total_attempts": {
                     "description": "Statistics (optional)",
                     "type": "integer"
+                },
+                "tutor_id": {
+                    "type": "string"
                 },
                 "updated_at": {
                     "type": "string"

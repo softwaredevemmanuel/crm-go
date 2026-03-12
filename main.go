@@ -155,6 +155,7 @@ func main() {
 		seeds.SeedCourseCategories()
 		seeds.SeedCourseProductsTable()
 		seeds.SeedProducts()
+		seeds.SeedAnnouncements()
 		return
 	}
 
