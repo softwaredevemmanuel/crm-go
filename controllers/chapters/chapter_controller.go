@@ -22,25 +22,44 @@ import (
 //@Failure 409 {object} models.ConflictResponse
 //@Failure 500 {object} models.FailureResponse
 //@Router /api/chapters [post]
+// @Security BearerAuth
 func CreateChapter(c *gin.Context) {
 	var input models.ChapterInput
+	db := config.DB
+
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// 🔍 Check for duplicate chapter number per course
 	var existingChapter models.Chapter
-	err := config.DB.
+	
+	// ✅ Check for duplicate by chapter number within the same course
+
+	err := db.
 		Where("course_id = ? AND chapter_number = ?", input.CourseID, input.ChapterNumber).
 		First(&existingChapter).Error
 
 	if err == nil {
-		// Record found → duplicate
 		c.JSON(http.StatusConflict, models.ConflictResponse{Error: "Chapter number already exists for this course"})
 		return
 	}
+	// ✅ Check for duplicate by title
+	var existingCourse models.Chapter
+	if err := db.Where("title = ?", input.Title).First(&existingCourse).Error; err == nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "Chapter with the same title already exists"})
+		return
+	}
+
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		// Real DB error
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to validate chapter number",
+		})
+		return
+	}
+
 
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		// Real DB error

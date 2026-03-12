@@ -669,6 +669,11 @@ const docTemplate = `{
         },
         "/api/chapters": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new chapter",
                 "consumes": [
                     "application/json"

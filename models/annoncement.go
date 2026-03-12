@@ -26,6 +26,24 @@ type Announcement struct {
     UserDetails    User   `gorm:"foreignKey:CreatedBy" json:"user_details,omitempty"`
 }
 
+
+type AnnouncementResponse struct {
+	ID        uuid.UUID `json:"id"`
+	Title     string    `json:"title"`
+	Message   string    `json:"message"`
+	Type      string    `json:"type"`
+	Audience  string    `json:"audience"`
+	CreatedBy uuid.UUID `json:"created_by"`
+
+	StartDate *time.Time `json:"start_date,omitempty"`
+	EndDate   *time.Time `json:"end_date,omitempty"`
+
+	IsPinned bool `json:"is_pinned"`
+
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
 func (Announcement) TableName() string {
 	return "announcements"
 }	

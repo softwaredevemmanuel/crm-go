@@ -100,7 +100,10 @@ func GetAnnouncements(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, announcements)
+	c.JSON(http.StatusOK, gin.H{
+		"message": "annoucements fetched successfully",
+		"data":    announcements,
+	})
 }
 
 

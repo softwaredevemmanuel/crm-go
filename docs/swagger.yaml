@@ -1876,6 +1876,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.FailureResponse'
+      security:
+      - BearerAuth: []
       summary: Create a new chapters
       tags:
       - Chapters
