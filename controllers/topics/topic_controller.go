@@ -48,9 +48,13 @@ func CreateTopic(c *gin.Context) {
 		ID:          uuid.New(),
 		CourseID:    input.CourseID,
 		ModuleID:    input.ModuleID,
+		LessonID:    input.LessonID,
+		TutorID:     input.TutorID,
 		Title:       input.Title,
 		ContentType: input.ContentType,
 		ContentURL:  input.ContentURL,
+		ContentText: input.ContentText,
+		Order:         input.Order,
 	}
 
 	if err := config.DB.Create(&topic).Error; err != nil {
@@ -107,8 +111,12 @@ func GetAllTopics(c *gin.Context) {
 			ModuleID:    topic.ModuleID,
 			CourseID:    topic.CourseID,
 			Title:       topic.Title,
+			LessonID:    topic.LessonID,
+			TutorID:     topic.TutorID,
+			ContentText: topic.ContentText,
 			ContentType: topic.ContentType,
 			ContentURL:  topic.ContentURL,
+			Order:       topic.Order,
 			CreatedAt:   topic.CreatedAt,
 			UpdatedAt:   topic.UpdatedAt,
 		})
@@ -159,8 +167,12 @@ func GetTopicByID(c *gin.Context) {
 		ModuleID:    topic.ModuleID,
 		CourseID:    topic.CourseID,
 		Title:       topic.Title,
+		LessonID:    topic.LessonID,
+		TutorID:     topic.TutorID,
+		ContentText: topic.ContentText,
 		ContentType: topic.ContentType,
 		ContentURL:  topic.ContentURL,
+		Order:       topic.Order,
 		CreatedAt:   topic.CreatedAt,
 		UpdatedAt:   topic.UpdatedAt,
 		Course: models.CourseMiniResponse{
@@ -247,8 +259,12 @@ func UpdateTopic(c *gin.Context) {
 		ModuleID:    topic.ModuleID,
 		CourseID:    topic.CourseID,
 		Title:       topic.Title,
+		LessonID:    topic.LessonID,
+		TutorID:     topic.TutorID,
+		ContentText: topic.ContentText,
 		ContentType: topic.ContentType,
 		ContentURL:  topic.ContentURL,
+		Order:       topic.Order,
 		CreatedAt:   topic.CreatedAt,
 		UpdatedAt:   topic.UpdatedAt,
 

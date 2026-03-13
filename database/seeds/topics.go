@@ -4,12 +4,120 @@ import (
 	"log"
 	"crm-go/config"
 	"crm-go/models"
-
 	"github.com/google/uuid"
 )
 
 func SeedTopics() {
 	db := config.GetDB()
+
+
+	// ✅ Validate UUIDs for GoLang Lessons
+	topicID1, err01 := uuid.Parse("891b6645-db95-40dd-afff-8f68d8f34308")
+	topicID2, err02 := uuid.Parse("a021a2fb-4df3-4e39-807d-fc42085a4b6d")
+	topicID3, err03 := uuid.Parse("adb33026-ca07-4e25-8267-32a1020ccd90")
+	topicID4, err04 := uuid.Parse("90325dd4-bc1e-4bf6-968b-9b83431de290")
+	topicID5, err05 := uuid.Parse("fe1a5ac4-6111-4aeb-a1a4-b02650034a56")
+
+	topicID6, err06 := uuid.Parse("991382ee-4a6c-44aa-a03a-2b4829e2acfe")
+	topicID7, err07 := uuid.Parse("c96a12d1-3fd0-44c0-983c-f5442447f476")
+	topicID8, err08 := uuid.Parse("a32f44d2-c319-4ff0-b391-cc0b6706ff93")
+	topicID9, err09 := uuid.Parse("055db742-eef8-4f68-af62-47b3599bdd51")
+	topicID10, err010 := uuid.Parse("52a5ca4d-bf6f-4ad4-acd9-7dcd5c1fa495")
+
+	topicID11, err011 := uuid.Parse("1ab597d3-9867-4279-b2d7-ba093e36f090")
+	topicID12, err012 := uuid.Parse("59861855-3bd3-4fd9-bc99-4210f4c0c5a0")
+	topicID13, err013 := uuid.Parse("91bdc63f-79ce-42f0-bed5-14d95b0d7d36")
+	topicID14, err014 := uuid.Parse("95ebe91c-f9c7-46c5-b58b-a98f295f6bc1")
+	topicID15, err015 := uuid.Parse("8fde828b-9b7f-4c5d-8d81-811d7222195d")
+
+	topicID16, err016 := uuid.Parse("21aa3941-a16b-4fa1-9c22-95e3e977e5f5")
+	topicID17, err017 := uuid.Parse("252709a7-4f10-4147-90cb-a532657ecfa9")
+	topicID18, err018 := uuid.Parse("9d9167c8-c408-4052-a0cf-8bb77c5b63c0")
+	topicID19, err019 := uuid.Parse("d276a99d-95f0-4986-b084-f77ff2cb5fad")
+	topicID20, err020 := uuid.Parse("414c6d5e-afb3-4e29-91fb-a840f281b477")
+
+	topicID21, err021 := uuid.Parse("c1d73505-bedf-4470-8549-8808abefd902")
+	topicID22, err022 := uuid.Parse("3a25d579-e144-4d21-9bcb-75b6ca9484aa")
+	topicID23, err023 := uuid.Parse("93d8cc90-e126-4fd1-b443-7e51406e8a9e")
+	topicID24, err024 := uuid.Parse("31ed53dd-c99f-41a5-ae92-ad23f1b4e3bc")
+	topicID25, err025 := uuid.Parse("39428970-c68f-445b-9e26-4cd08365e834")
+
+	if err01 != nil {
+		log.Fatalf("❌ Invalid topic 1 UUID: %v", err01)
+	}
+	if err02 != nil {
+		log.Fatalf("❌ Invalid topic 2 UUID: %v", err02)
+	}
+	if err03 != nil {
+		log.Fatalf("❌ Invalid topic 3 UUID: %v", err03)
+	}
+	if err04 != nil {
+		log.Fatalf("❌ Invalid topic 4 UUID: %v", err04)
+	}
+	if err05 != nil {
+		log.Fatalf("❌ Invalid topic 5 UUID: %v", err05)
+	}
+	if err06 != nil {
+		log.Fatalf("❌ Invalid topic 6 UUID: %v", err06)
+	}
+	if err07 != nil {
+		log.Fatalf("❌ Invalid topic 7 UUID: %v", err07)
+	}
+	if err08 != nil {
+		log.Fatalf("❌ Invalid topic 8 UUID: %v", err08)
+	}
+	if err09 != nil {
+		log.Fatalf("❌ Invalid topic 9 UUID: %v", err09)
+	}
+	if err010 != nil {
+		log.Fatalf("❌ Invalid topic 10 UUID: %v", err010)
+	}
+	if err011 != nil {
+		log.Fatalf("❌ Invalid topic 11 UUID: %v", err011)
+	}
+	if err012 != nil {
+		log.Fatalf("❌ Invalid topic 12 UUID: %v", err012)
+	}
+	if err013 != nil {
+		log.Fatalf("❌ Invalid topic 13 UUID: %v", err013)
+	}
+	if err014 != nil {
+		log.Fatalf("❌ Invalid topic 14 UUID: %v", err014)
+	}
+	if err015 != nil {
+		log.Fatalf("❌ Invalid topic 15 UUID: %v", err015)
+	}
+	if err016 != nil {
+		log.Fatalf("❌ Invalid topic 16 UUID: %v", err016)
+	}
+	if err017 != nil {
+		log.Fatalf("❌ Invalid topic 17 UUID: %v", err017)
+	}
+	if err018 != nil {
+		log.Fatalf("❌ Invalid topic 18 UUID: %v", err018)
+	}
+	if err019 != nil {
+		log.Fatalf("❌ Invalid topic 19 UUID: %v", err019)
+	}
+	if err020 != nil {
+		log.Fatalf("❌ Invalid topic 20 UUID: %v", err020)
+	}
+	if err021 != nil {
+		log.Fatalf("❌ Invalid topic 21 UUID: %v", err021)
+	}
+	if err022 != nil {
+		log.Fatalf("❌ Invalid topic 22 UUID: %v", err022)
+	}
+	if err023 != nil {
+		log.Fatalf("❌ Invalid topic 23 UUID: %v", err023)
+	}
+	if err024 != nil {
+		log.Fatalf("❌ Invalid topic 24 UUID: %v", err024)
+	}
+	if err025 != nil {
+		log.Fatalf("❌ Invalid topic 25 UUID: %v", err025)
+	}
+
 
 	// ✅ Validate UUIDs for GoLang Lessons
 	lessonID1, err1 := uuid.Parse("05d294c9-80f1-4203-8e78-d5f2c6d74c2c")
@@ -271,232 +379,306 @@ func SeedTopics() {
 			CourseID: courseId1,
 			ModuleID:   moduleID31,
 			TutorID:  createdByID,
-			Title:     "What is Go?",
-			Description:     "This lesson explains the history of Go, why it was created, and the key advantages it provides for modern software development. Students will learn about Go’s simplicity, performance, and built-in support for concurrency. By the end of this lesson, learners will understand where Go is commonly used, including backend services, cloud infrastructure, and distributed systems.",
+			Title:     "Overview of the Go Language",
+			ContentType:     "article",
+			ContentURL: "https://example.com/go-introduction",
+			ContentText: "Go, also known as Golang, is an open-source programming language designed at Google to build simple, reliable, and efficient software. It is widely used for backend development, cloud services, and distributed systems. Go's syntax is clean and concise, making it easy to learn for developers coming from other languages. It features built-in support for concurrent programming, allowing developers to write programs that can efficiently utilize multiple CPU cores. Go also has a strong standard library that provides a wide range of functionalities, from web servers to cryptography. With its focus on performance and simplicity, Go has become a popular choice for building scalable and high-performance applications.",
 			Order:      1,
 		},
 		{
-			ID:        lessonID2,
+			ID:        topicID2,
+			LessonID:        lessonID2,
 			CourseID: courseId1,
 			ModuleID:   moduleID32,
 			TutorID:  createdByID,
-			Title:     "Installing Go",
-			Description:     "Students will learn how to download and install Go on their computer and verify the installation using the Go command line tool.",
+			Title:     "Installing and Verifying Go",
+			ContentType:     "video",
+			ContentURL: "https://example.com/go-installation-video",
+			ContentText: "To install Go, download the installer from the official Go website and follow the installation instructions for your operating system. After installation, run go version in the terminal to confirm that Go has been installed successfully. You should see the installed Go version displayed, indicating that Go is ready to use on your system.",
 			Order:      2,
 		},
 			{
-			ID:        lessonID3,
+			ID:        topicID3,
+			LessonID:        lessonID3,
 			CourseID: courseId1,
 			ModuleID:   moduleID33,
 			TutorID:  createdByID,
-			Title:     "Working with Variables",
-			Description:     "Students will learn how to declare variables and use Go's built-in data types to store information. This lesson covers variable declaration, initialization, and the different data types available in Go. By the end of this lesson, learners will be able to create and manipulate variables to hold data in their Go programs.",
+			Title:     "Declaring Variables in Go",
+			ContentType:     "article",
+			ContentURL: "https://example.com/go-installation-video",
+			ContentText: "Variables in Go can be declared using the var keyword or the shorthand := syntax. Go also supports several basic data types such as integers, floats, strings, and booleans. Example: <> var name string = 'Gopher' age := 10 </>" ,
 			Order:      3,
 		},
 		{
-			ID:        lessonID4,
+			ID: 		topicID4,
+			LessonID:        lessonID4,
 			CourseID: courseId1,
 			ModuleID:   moduleID34,
 			TutorID:  createdByID,
-			Title:     "Conditional Statements",
-			Description:     "Students will learn how to use conditional statements to make decisions within a Go program. This includes if statements, else if statements, and switch statements. By the end of this lesson, learners will be able to control the flow of their Go programs based on different conditions.",
+			Title:     "Using If Statements in Go",
+			ContentType:     "article",
+			ContentURL: "https://example.com/go-if-statements",
+			ContentText: "The if statement in Go allows a program to execute code based on condition Example age :=  if age >= 18 { fmt.Println('You are an adult')}" ,
 			Order:      4,
 		},
 		{
-			ID:        lessonID5,
+			ID: 		topicID5,
+			LessonID:        lessonID5,
 			CourseID: courseId1,
 			ModuleID:   moduleID35,
 			TutorID:  createdByID,
-			Title:     "Creating Functions",
-			Description:     "Students will learn how to define functions, pass parameters, and return values in Go. This lesson covers the basics of function syntax and how to use functions to organize code and promote reusability. By the end of this lesson, learners will be able to create their own functions to perform specific tasks within their Go programs.",
+			Title:     "Writing Your First Function in Go",
+			ContentType:     "article",
+			ContentURL: "https://example.com/go-functions",
+			ContentText: "Functions in Go allow developers to group related code together. A function is defined using the func keyword. Example: func greet(name string) string { return 'Hello' + name} Calling the function: message := greet('Emmanuel') fmt.Println(message)" ,
 			Order:      5,
 		},
 
 			// React Course
 		{
-			ID:        lessonID6,
+			ID:        topicID6,
+			LessonID:        lessonID6,
 			CourseID: courseId2,
 			ModuleID:   moduleID36,
 			TutorID:  createdByID,
-			Title:     "What is React?",
-			Description:     "This lesson explains the fundamentals of React, how it works, and why developers use it to build modern web applications.",
+			Title:     "Overview of React",
+			ContentType:     "article",
+			ContentURL: "https://example.com/react-introduction",
+			ContentText: "React is a JavaScript library used for building user interfaces, especially single-page applications. It allows developers to build reusable UI components and efficiently update the user interface using a virtual DOM. React is maintained by Facebook and has a large community of developers. It uses a component-based architecture, where each component manages its own state and can be composed to create complex UIs. React also supports features like hooks, which allow developers to use state and other React features without writing class components. With its focus on performance and developer experience, React has become one of the most popular libraries for frontend development." ,
 			Order:      1,
 		},
 		{
-			ID:        lessonID7,
+			ID:        topicID7,
+			LessonID:        lessonID7,
 			CourseID: courseId2,
 			ModuleID:   moduleID37,
 			TutorID:  createdByID,
-			Title:     "Creating Your First React App",
-			Description:     "Students will learn how to set up a new React application and understand the basic folder structure of a React project.",
+			Title:     "Creating a React App with Vite",
+			ContentType:     "article",
+			ContentURL: "https://example.com/react-vite",
+			ContentText: "To create a React project using Vite, run the following command in your terminal: npm create vite@latest my-react-app Then install dependencies and start the development server. cd my-react-ap npm instal npm run dev This will start the React development server and open the project in your browser. Vite is a build tool that provides a faster and leaner development experience for modern web projects. It offers instant server start, fast hot module replacement (HMR), and optimized production builds. When creating a React app with Vite, developers can leverage its features to enhance their development workflow and improve the overall performance of their applications." ,
 			Order:      2,
 		},
 			{
-			ID:        lessonID8,
+			ID:        topicID8,
+			LessonID:        lessonID8,
 			CourseID: courseId2,
 			ModuleID:   moduleID38,
 			TutorID:  createdByID,
 			Title:     "Creating Components",
-			Description:     "Students will learn how to create functional components and structure their React applications using reusable UI pieces.",
+			ContentType:     "article",
+			ContentURL: "https://example.com/react-component",
+			ContentText: "Components are the building blocks of a React application. A functional component is simply a JavaScript function that returns JSX. Example: function Welcome() { return <h1>Hello, React!</h1>; } export default Welcome; Components help organize UI and make code reusable." ,
 			Order:      3,
 		},
 		{
-			ID:        lessonID9,
+			ID:        topicID9,
+			LessonID:        lessonID9,
 			CourseID: courseId2,
 			ModuleID:   moduleID39,
 			TutorID:  createdByID,
-			Title:     "Understanding Props",
-			Description:     "Students will learn how to pass data from one component to another using props.",
+			Title:     "Passing Data with Props",
+			ContentType:     "article",
+			ContentURL: "https://example.com/react-props",
+			ContentText: "Props allow components to receive data from their parent components.Example: function Greeting(props) { return <h1>Hello {props.name}</h1>;} <Greeting name='Emmanuel' /> Props make components flexible and reusable. Props (short for properties) are a way to pass data from a parent component to a child component in React. They are read-only and help in making components reusable and maintainable." ,
 			Order:      4,
 		},
 		{
-			ID:        lessonID10,
+			ID:        topicID10,
+			LessonID:        lessonID10,
 			CourseID: courseId2,
 			ModuleID:   moduleID40,
 			TutorID:  createdByID,
-			Title:     "React Event Handling",
-			Description:     "Students will learn how to handle user actions like button clicks and input changes in React components.",
+			Title:     "Handling Click Events",
+			ContentType:     "article",
+			ContentURL: "https://example.com/react-react-events",
+			ContentText: "React handles events similar to HTML but uses camelCase syntax. Example: function Button() { function handleClick() {alert('Button clicked!');} return <button onClick={handleClick}>Click Me</button>;} Event handling allows React applications to respond to user actions. Event handling in React is similar to handling events in regular HTML, but with some differences. In React, event handlers are functions that are called when an event occurs. For example, to handle a button click, you would define a function and pass it to the button's onClick prop." ,
 			Order:      5,
 		},
 
 		// Python Course
 		{
-			ID:        lessonID11,
+			ID:        topicID11,
+			LessonID:        lessonID11,
 			CourseID: courseId3,
 			ModuleID:   moduleID41,
 			TutorID:  createdByID,
-			Title:     "What is Python?",
-			Description:     "This lesson explains the basics of Python, its history, and why developers choose it for building applications.",
+			Title:     "Overview of Python",
+			ContentType:     "article",
+			ContentURL: "https://example.com/python-introduction",
+			ContentText: "Python is a high-level programming language known for its simple syntax and readability. It is widely used for web development, automation, machine learning, and data analysis. Python allows developers to write powerful programs with fewer lines of code compared to many other programming languages." ,
 			Order:      1,
 		},
 		{
-			ID:        lessonID12,
+			ID:        topicID12,
+			LessonID:        lessonID12,
 			CourseID: courseId3,
 			ModuleID:   moduleID42,
 			TutorID:  createdByID,
-			Title:     "Installing Python",
-			Description:     "Students will learn how to install Python on their computer and verify that it is working correctly.",
+			Title:     "Installing and Running Python",
+			ContentType:     "article",
+			ContentURL: "https://example.com/python-installation",
+			ContentText: "To install Python, visit the official Python website and download the latest version for your operating system. Once installed, you can run Python scripts from the command line or use an integrated development environment (IDE) like PyCharm or Visual Studio Code. To install Python, download the installer from the official Python website and follow the installation steps for your operating system. After installation, open the terminal and run: python --version This command confirms that Python has been successfully installed on your system." ,
 			Order:      2,
 		},
 			{
-			ID:        lessonID13,
+			ID:        topicID13,
+			LessonID:        lessonID13,
 			CourseID: courseId3,
 			ModuleID:   moduleID43,
 			TutorID:  createdByID,
-			Title:     "Working with Variables",
-			Description:     "Students will learn how to create variables and assign values in Python programs.",
+			Title:     "Declaring Variables in Python",
+			ContentType:     "article",
+			ContentURL: "https://example.com/python-variables",
+			ContentText: "In Python, variables are declared by simply assigning a value to a name. For example, x = 5 declares a variable named x and assigns it the value 5. Variables in Python are dynamically typed, meaning you don't need to explicitly declare their type." ,
 			Order:      3,
 		},
 		{
-			ID:        lessonID14,
+			ID:        topicID14,
+			LessonID:        lessonID14,
 			CourseID: courseId3,
 			ModuleID:   moduleID44,
 			TutorID:  createdByID,
-			Title:     "Conditional Statements",
-			Description:     "Students will learn how to use if, elif, and else statements to control program logic.",
+			Title:     "Using If Statements in Python",
+			ContentType:     "article",
+			ContentURL: "https://example.com/python-if-statements",
+			ContentText: "In Python, if statements are used to execute code based on certain conditions. The basic syntax is: if condition: # code to execute if condition is true. Conditional statements allow Python programs to make decisions. Example: age = 18 if age >= 18: print('You are an adult') else: print('You are a minor') These conditions help programs respond to different inputs and situations." ,
 			Order:      4,
 		},
 		{
-			ID:        lessonID15,
+			ID:        topicID15,
+			LessonID:        lessonID15,
 			CourseID: courseId3,
 			ModuleID:   moduleID45,
 			TutorID:  createdByID,
-			Title:     "Creating Functions",
-			Description:     "Students will learn how to define and use functions to make Python programs more organized and reusable.",
+			Title:     "Writing Your First Function in Python",
+			ContentType:     "article",
+			ContentURL: "https://example.com/python-functions",
+			ContentText: "In Python, functions are defined using the def keyword. Example: def greet(name): print(f'Hello, {name}!') This function takes a parameter and prints a greeting. Functions help organize code into reusable blocks." ,
 			Order:      5,
 		},
 
 			// Fast API Course
 		{
-			ID:        lessonID16,
+			ID:        topicID16,
+			LessonID:        lessonID16,
 			CourseID: courseId4,
 			ModuleID:   moduleID46,
 			TutorID:  createdByID,
-			Title:     "What is FastAPI?",
-			Description:     "Students will learn what FastAPI is, why it is popular for backend development, and how it compares with other Python frameworks.",
+			Title:     "Overview of FastAPI",
+			ContentType:     "article",
+			ContentURL: "https://example.com/fastapi-introduction",
+			ContentText: "FastAPI is a modern web framework for building APIs with Python. It is known for its speed, simplicity, and automatic API documentation. FastAPI uses Python type hints to validate data and generate interactive API documentation automatically." ,
 			Order:      1,
 		},
 		{
-			ID:        lessonID17,
+			ID:        topicID17,
+			LessonID:        lessonID17,
 			CourseID: courseId4,
 			ModuleID:   moduleID47,
 			TutorID:  createdByID,
-			Title:     "Installing FastAPI",
-			Description:     "Students will learn how to install FastAPI and run their first FastAPI application.",
+			Title:     "Installing FastAPI and Uvicorn",
+			ContentType:     "video",
+			ContentURL: "https://example.com/install-fastapi-video",
+			ContentText: "To install FastAPI, you can use pip, the Python package installer. Run the following command in your terminal: pip install fastapi[all] This command will install FastAPI along with all its dependencies, including Uvicorn, which is an ASGI server used to run FastAPI applications. To install FastAPI, use pip to install the required packages: pip install fastapi uvicorn After installation, you can start building APIs and run them using the Uvicorn server." ,
 			Order:      2,
 		},
 			{
-			ID:        lessonID18,
+			ID:        topicID18,
+			LessonID:        lessonID18,
 			CourseID: courseId4,
 			ModuleID:   moduleID48,
 			TutorID:  createdByID,
-			Title:     "Building a Basic API Endpoint",
-			Description:     "Students will learn how to create a simple API route that returns data.",
+			Title:     "Creating a Simple GET Endpoint",
+			ContentType:     "article",
+			ContentURL: "https://example.com/fastapi-get-endpoint",
+			ContentText: "In FastAPI, you can create API endpoints using the @app.get(), @app.post(), and other decorators. Example: @app.get('/users') def get_users(): return {'users': []} This endpoint handles GET requests to the /users route." ,
 			Order:      3,
 		},
 		{
-			ID:        lessonID19,
+			ID:        topicID19,
+			LessonID:        lessonID19,
 			CourseID: courseId4,
 			ModuleID:   moduleID49,
 			TutorID:  createdByID,
-			Title:     "Working with Request Data",
-			Description:     "Students will learn how to accept parameters and request data in FastAPI endpoints.",
+			Title:     "Path Parameters in FastAPI",
+			ContentType:     "article",
+			ContentURL: "https://example.com/fastapi-path-parameters",
+			ContentText: "In FastAPI, you can access request data using path parameters, query parameters, and request bodies. Example: @app.get('/users/{user_id}') def get_user(user_id: int): return {'user_id': user_id} This endpoint handles GET requests to the /users/{user_id} route." ,
 			Order:      4,
 		},
 		{
-			ID:        lessonID20,
+			ID:        topicID20,
+			LessonID:        lessonID20,
 			CourseID: courseId4,
 			ModuleID:   moduleID50,
 			TutorID:  createdByID,
-			Title:     "Creating Data Models",
-			Description:     "Students will learn how to define request and response models using Pydantic.",
+			Title:     "Defining a Pydantic Model",
+			ContentType:     "article",
+			ContentURL: "https://example.com/fastapi-pydantic-models",
+			ContentText: "FastAPI uses Pydantic models to validate incoming request data automatically. Example: from pydantic import BaseModel class User(BaseModel): name: str age: int @app.post('/users') def create_user(user: User): return user This ensures that incoming data matches the expected structure before processing it." ,
 			Order:      5,
 		},
 		
 			// Data Science Course
 		{
-			ID:        lessonID21,
+			ID:        topicID21,
+			LessonID:        lessonID21,
 			CourseID: courseId5,
 			ModuleID:   moduleID51,
 			TutorID:  createdByID,
-			Title:     "What is Data Analysis?",
-			Description:     "Students will learn what data analysis is, why it matters in business and research, and the steps involved in analyzing data effectively.",
+			Title:     "Overview of Data Analysis",
+			ContentType:     "article",
+			ContentURL: "https://example.com/data-analysis-introduction",
+			ContentText: "Data analysis is the process of inspecting, cleaning, transforming, and modeling data to discover useful information, draw conclusions, and support decision-making. It is widely used in business, science, and engineering." ,
 			Order:      1,
 		},
 		{
-			ID:        lessonID22,
+			ID:        topicID22,
+			LessonID:        lessonID22,
 			CourseID: courseId5,
 			ModuleID:   moduleID52,
 			TutorID:  createdByID,
-			Title:     "Collecting and Cleaning Data",
-			Description:     "Students will learn how to import datasets, handle missing values, and clean data for accurate analysis.",
+			Title:     "Handling Missing Data and Data Cleaning",
+			ContentType:     "article",
+			ContentURL: "https://example.com/data-cleaning",
+			ContentText: "Before analyzing data, it is important to clean it. Missing or inconsistent values can lead to incorrect results. Techniques include removing missing values, filling them with defaults, or using statistical methods to impute missing data. Example in Python: import pandas as pd df = pd.read_csv('data.csv') df.fillna(0, inplace=True)",
 			Order:      2,
 		},
 			{
-			ID:        lessonID23,
+			ID:        topicID23,
+			LessonID:        lessonID23,
 			CourseID: courseId5,
 			ModuleID:   moduleID53,
 			TutorID:  createdByID,
-			Title:     "Exploring and Summarizing Data",
-			Description:     "Students will learn to calculate basic statistics and use charts to visualize data trends and distributions.",
+			Title:     "Descriptive Statistics and Visualization",
+			ContentType:     "video",
+			ContentURL: "https://example.com/eda-video",
+			ContentText: "Exploratory Data Analysis (EDA) helps uncover patterns in data. Common techniques include calculating mean, median, standard deviation, and plotting histograms, scatter plots, and box plots using libraries like Pandas and Matplotlib. Example: import pandas as pd import matplotlib.pyplot as plt df = pd.read_csv('data.csv') df['age'].hist() plt.show()",
 			Order:      3,
 		},
 		{
-			ID:        lessonID24,
+			ID:        topicID24,
+			LessonID:        lessonID24,
 			CourseID: courseId5,
 			ModuleID:   moduleID54,
 			TutorID:  createdByID,
-			Title:     "Using Python Libraries for Data Analysis",
-			Description:     "Students will learn how to manipulate datasets using Pandas and perform numerical operations using NumPy.",
+			Title:     "Data Manipulation with Pandas and NumPy",
+			ContentType:     "article",
+			ContentURL: "https://example.com/pandas-data-manipulation",
+			ContentText: "Pandas is a powerful library for data manipulation and analysis. You can read, filter, group, and summarize data easily. Example: import pandas as pddf = pd.read_csv('data.csv') print(df.head()) print(df['salary'].mean())",
 			Order:      4,
 		},
 		{
-			ID:        lessonID25,
+			ID:        topicID25,
+			LessonID:        lessonID25,
 			CourseID: courseId5,
 			ModuleID:   moduleID55,
 			TutorID:  createdByID,
-			Title:     "Creating Visualizations",
-			Description:     "Students will learn how to create charts and graphs using Python libraries to communicate findings effectively.",
+			Title:     "Visualizing Data with Matplotlib and Seaborn",
+			ContentType:     "video",
+			ContentURL: "https://example.com/matplotlib-visualization",
+			ContentText: "Visualizations make it easier to interpret and communicate data insights. Matplotlib is a Python library that can create line plots, bar charts, scatter plots, and more. Example: import matplotlib.pyplot as plt x = [1, 2, 3, 4] y = [10, 20, 15, 25] plt.plot(x, y) plt.title('Sample Line Chart') plt.xlabel('X Axis') plt.ylabel('Y Axis') plt.show()",
 			Order:      5,
 		},
 		

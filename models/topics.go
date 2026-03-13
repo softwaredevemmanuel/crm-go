@@ -12,11 +12,11 @@ type Topics struct {
 	ModuleID uuid.UUID `gorm:"type:uuid;not null;index"`
 	LessonID uuid.UUID `gorm:"type:uuid;index"`
 	TutorID  uuid.UUID `gorm:"type:uuid;not null;index"`
-
 	Title       string `gorm:"type:varchar(255);not null"`
 	ContentType string `gorm:"type:varchar(50);not null"`
 	ContentURL  string `gorm:"type:varchar(500);not null"`
-	ContentText string `gorm:"type:longtext;not null"`
+	ContentText string `gorm:"type:text;not null"`
+	Order       int    				`gorm:"not null"` // Controls topic sequence within a lesson
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
@@ -34,6 +34,7 @@ type TopicInput struct {
 	ContentType string    `json:"content_type" binding:"required"` // video, pdf, text, quiz
 	ContentURL  string    `json:"content_url" binding:"required"`
 	ContentText string    `json:"content_text" binding:"required"`
+	Order       int       `json:"order" binding:"required"`
 }
 
 type TopicResponse struct {
@@ -46,6 +47,7 @@ type TopicResponse struct {
 	ContentType string    `json:"content_type"`
 	ContentURL  string    `json:"content_url"`
 	ContentText string    `json:"content_text"`
+	Order       int       `json:"order"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
@@ -66,6 +68,7 @@ type TopicViewResponse struct {
 	ContentType string              `json:"content_type"`
 	ContentURL  string              `json:"content_url"`
 	ContentText string              `json:"content_text"`
+	Order 	 	int                 `json:"order"`
 	CreatedAt   time.Time           `json:"created_at"`
 	UpdatedAt   time.Time           `json:"updated_at"`
 	Course      CourseMiniResponse  `json:"course"`
@@ -77,6 +80,7 @@ type TopicUpdateInput struct {
 	ContentType string `json:"content_type" binding:"required"` // video, pdf, text, quiz
 	ContentURL  string `json:"content_url" binding:"required"`
 	ContentText string `json:"content_text" binding:"required"`
+	Order       int    `json:"order" binding:"required"`
 }
 
 // TableName specifies the table name

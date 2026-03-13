@@ -159,6 +159,7 @@ func main() {
 		seeds.SeedAnnouncements()
 		seeds.SeedModules()
 		seeds.SeedLessons()
+		seeds.SeedTopics()
 		return
 	}
 
