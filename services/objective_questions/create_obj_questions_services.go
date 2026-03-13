@@ -35,7 +35,7 @@ func (s *ObjectiveQuestionService) validateQuestionInput(req models.ObjectiveQue
 	}
 
 	// Validate module if provided
-	if req.ModuleID != nil && *req.ModuleID != uuid.Nil {
+	if req.ModuleID !=  uuid.Nil {
 		var module models.Module
 		if err := s.db.First(&module, "id = ?", req.ModuleID).Error; err != nil {
 			return errors.New("module not found")
@@ -46,7 +46,7 @@ func (s *ObjectiveQuestionService) validateQuestionInput(req models.ObjectiveQue
 	}
 
 	// Validate lesson if provided
-	if req.LessonID != nil && *req.LessonID != uuid.Nil {
+	if req.LessonID != uuid.Nil {
 		var lesson models.Lesson
 		if err := s.db.First(&lesson, "id = ?", req.LessonID).Error; err != nil {
 			return errors.New("lesson not found")
@@ -56,7 +56,7 @@ func (s *ObjectiveQuestionService) validateQuestionInput(req models.ObjectiveQue
 		}
 
 		// If module is provided, ensure lesson belongs to module
-		if req.ModuleID != nil && *req.ModuleID != uuid.Nil && lesson.ModuleID != *req.ModuleID {
+		if req.ModuleID != uuid.Nil && lesson.ModuleID != req.ModuleID {
 			return errors.New("lesson does not belong to the specified module")
 		}
 	}
@@ -125,8 +125,8 @@ func (s *ObjectiveQuestionService) CreateObjectiveQuestion(req models.ObjectiveQ
 
 	// Check if question already exists for the same course/lesson/text
 	lessonID := uuid.Nil
-	if req.LessonID != nil {
-		lessonID = *req.LessonID
+	if req.LessonID != uuid.Nil {
+		lessonID = req.LessonID
 	}
 	exists, err := s.questionExists(req.CourseID, lessonID, strings.TrimSpace(req.QuestionText))
 	if err != nil {
@@ -231,8 +231,8 @@ func (s *ObjectiveQuestionService) CreateObjectiveQuestionWithTx(tx *gorm.DB, re
 
 	// Check if question already exists for the same course/lesson/text
 	lessonID := uuid.Nil
-	if req.LessonID != nil {
-		lessonID = *req.LessonID
+	if req.LessonID != uuid.Nil {
+		lessonID = req.LessonID
 	}
 	exists, err := s.questionExists(req.CourseID, lessonID, strings.TrimSpace(req.QuestionText))
 	if err != nil {
@@ -336,8 +336,6 @@ func (s *ObjectiveQuestionService) questionToResponse(question *models.Objective
 		ImageURL:          question.ImageURL,
 		VideoURL:          question.VideoURL,
 		CourseID:          question.CourseID,
-		ModuleID:          question.ModuleID,
-		LessonID:          question.LessonID,
 		AnswerExplanation: question.AnswerExplanation,
 		SolutionSteps:     question.SolutionSteps,
 		Hint:              question.Hint,
@@ -368,7 +366,7 @@ func (s *ObjectiveQuestionService) questionToResponse(question *models.Objective
 		}
 
 		// Get module name if exists
-		if question.ModuleID != nil && *question.ModuleID != uuid.Nil {
+		if question.ModuleID != uuid.Nil {
 			var module models.Module
 			if err := s.db.First(&module, "id = ?", question.ModuleID).Error; err == nil {
 				response.ModuleName = module.Title
@@ -376,7 +374,7 @@ func (s *ObjectiveQuestionService) questionToResponse(question *models.Objective
 		}
 
 		// Get lesson name if exists
-		if question.LessonID != nil && *question.LessonID != uuid.Nil {
+		if question.LessonID != uuid.Nil {
 			var lesson models.Lesson
 			if err := s.db.First(&lesson, "id = ?", question.LessonID).Error; err == nil {
 				response.LessonName = lesson.Title

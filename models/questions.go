@@ -16,7 +16,7 @@ type Question struct {
 
 	// Course Relationship
 	CourseID uuid.UUID  `gorm:"type:uuid;not null;index"`
-	ModuleID *uuid.UUID `gorm:"type:uuid;index"`
+	ModuleID uuid.UUID `gorm:"type:uuid;index"`
 
 	// Options & Answers
 	Options        map[string]interface{} `gorm:"type:jsonb;not null"` // Multiple choice options

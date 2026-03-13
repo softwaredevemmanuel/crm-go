@@ -160,6 +160,8 @@ func main() {
 		seeds.SeedModules()
 		seeds.SeedLessons()
 		seeds.SeedTopics()
+		seeds.SeedCourseMaterials()
+		seeds.SeedObjectiveQuestions()	
 		return
 	}
 

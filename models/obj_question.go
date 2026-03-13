@@ -19,8 +19,8 @@ type ObjectiveQuestion struct {
 
 	// Content Relationships
 	CourseID uuid.UUID  `gorm:"type:uuid;not null" json:"course_id"`
-	ModuleID *uuid.UUID `gorm:"type:uuid" json:"module_id,omitempty"`
-	LessonID *uuid.UUID `gorm:"type:uuid" json:"lesson_id,omitempty"`
+	ModuleID uuid.UUID `gorm:"type:uuid" json:"module_id"`
+	LessonID uuid.UUID `gorm:"type:uuid" json:"lesson_id"`
 
 	// Answer Configuration
 	AnswerExplanation string `gorm:"type:text" json:"answer_explanation,omitempty"`
@@ -34,6 +34,8 @@ type ObjectiveQuestion struct {
 	IsApproved bool      `json:"is_approved"`
 	// Relationships
 	Course Course `gorm:"foreignKey:CourseID" json:"course,omitempty"`
+	Options []QuestionOption `gorm:"foreignKey:QuestionID"`
+
 }
 
 // ObjectiveQuestionInput - for creating objective questions
@@ -53,8 +55,8 @@ type ObjectiveQuestionInput struct {
 	VideoURL string `json:"video_url" binding:"omitempty,url,max=500"`
 
 	// Content relationships
-	ModuleID *uuid.UUID `json:"module_id"`
-	LessonID *uuid.UUID `json:"lesson_id"`
+	ModuleID uuid.UUID `json:"module_id"`
+	LessonID uuid.UUID `json:"lesson_id"`
 
 	// Answer configuration
 	AnswerExplanation string `json:"answer_explanation" binding:"max=2000"`
