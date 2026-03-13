@@ -667,170 +667,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/modules": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Create a new module",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Modules"
-                ],
-                "summary": "Create a new modules",
-                "parameters": [
-                    {
-                        "description": "Module",
-                        "name": "module",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.ModuleInput"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "409": {
-                        "description": "Conflict",
-                        "schema": {
-                            "$ref": "#/definitions/models.ConflictResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.FailureResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/modules/{id}": {
-            "put": {
-                "description": "Update an existing module",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Modules"
-                ],
-                "summary": "Update an existing module",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Module ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Module",
-                        "name": "module",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.ModuleInput"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/models.NotFoundResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.FailureResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete an existing module",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Modules"
-                ],
-                "summary": "Delete an existing module",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Module ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.DeleteSuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/models.NotFoundResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.FailureResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/api/course-materials": {
             "post": {
                 "security": [
@@ -1529,14 +1365,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/topics": {
+        "/api/lessons": {
             "post": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Create a new topic under a module",
+                "description": "Create a new lesson",
                 "consumes": [
                     "application/json"
                 ],
@@ -1544,56 +1380,44 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Topics"
+                    "lessons"
                 ],
-                "summary": "Create a topic",
+                "summary": "Create a new lesson",
                 "parameters": [
                     {
-                        "description": "Topic payload",
-                        "name": "topic",
+                        "description": "Lesson",
+                        "name": "lesson",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.TopicInput"
+                            "$ref": "#/definitions/models.LessonInput"
                         }
                     }
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created",
+                        "description": "Lesson created successfully",
                         "schema": {
                             "$ref": "#/definitions/models.SuccessResponse"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Bad request",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "409": {
-                        "description": "Conflict",
-                        "schema": {
-                            "$ref": "#/definitions/models.ConflictResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.FailureResponse"
                         }
                     }
                 }
             }
         },
-        "/api/topics/{id}": {
+        "/api/lessons/{id}": {
             "put": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Update topic details",
+                "description": "Update a lesson by ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -1601,32 +1425,32 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Topics"
+                    "lessons"
                 ],
-                "summary": "Update topic",
+                "summary": "Update a lesson",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Topic ID",
+                        "description": "Lesson ID",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Topic payload",
-                        "name": "topic",
+                        "description": "Lesson",
+                        "name": "lesson",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.TopicInput"
+                            "$ref": "#/definitions/models.LessonInput"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Lesson updated successfully",
                         "schema": {
-                            "$ref": "#/definitions/models.TopicResponse"
+                            "$ref": "#/definitions/models.LessonResponse"
                         }
                     },
                     "400": {
@@ -1638,63 +1462,7 @@ const docTemplate = `{
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/models.NotFoundResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.FailureResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Delete topic by ID",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Topics"
-                ],
-                "summary": "Delete topic",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Topic ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/models.NotFoundResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.FailureResponse"
                         }
                     }
                 }
@@ -1841,6 +1609,170 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.LiveClassResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/modules": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new module",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Modules"
+                ],
+                "summary": "Create a new modules",
+                "parameters": [
+                    {
+                        "description": "Module",
+                        "name": "module",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ModuleInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/models.ConflictResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.FailureResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/modules/{id}": {
+            "put": {
+                "description": "Update an existing module",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Modules"
+                ],
+                "summary": "Update an existing module",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Module ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Module",
+                        "name": "module",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ModuleInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.FailureResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete an existing module",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Modules"
+                ],
+                "summary": "Delete an existing module",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Module ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.DeleteSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.FailureResponse"
                         }
                     }
                 }
@@ -2140,14 +2072,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/lessons": {
+        "/api/topics": {
             "post": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Create a new lesson",
+                "description": "Create a new topic under a module",
                 "consumes": [
                     "application/json"
                 ],
@@ -2155,44 +2087,56 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "lessons"
+                    "Topics"
                 ],
-                "summary": "Create a new lesson",
+                "summary": "Create a topic",
                 "parameters": [
                     {
-                        "description": "Lesson",
-                        "name": "lesson",
+                        "description": "Topic payload",
+                        "name": "topic",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.LessonInput"
+                            "$ref": "#/definitions/models.TopicInput"
                         }
                     }
                 ],
                 "responses": {
                     "201": {
-                        "description": "Lesson created successfully",
+                        "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/models.SuccessResponse"
                         }
                     },
                     "400": {
-                        "description": "Bad request",
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/models.ConflictResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.FailureResponse"
                         }
                     }
                 }
             }
         },
-        "/api/lessons/{id}": {
+        "/api/topics/{id}": {
             "put": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Update a lesson by ID",
+                "description": "Update topic details",
                 "consumes": [
                     "application/json"
                 ],
@@ -2200,32 +2144,32 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "lessons"
+                    "Topics"
                 ],
-                "summary": "Update a lesson",
+                "summary": "Update topic",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Lesson ID",
+                        "description": "Topic ID",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Lesson",
-                        "name": "lesson",
+                        "description": "Topic payload",
+                        "name": "topic",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.LessonInput"
+                            "$ref": "#/definitions/models.TopicInput"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Lesson updated successfully",
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.LessonResponse"
+                            "$ref": "#/definitions/models.TopicResponse"
                         }
                     },
                     "400": {
@@ -2237,7 +2181,63 @@ const docTemplate = `{
                     "404": {
                         "description": "Not Found",
                         "schema": {
+                            "$ref": "#/definitions/models.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.FailureResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Delete topic by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Topics"
+                ],
+                "summary": "Delete topic",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Topic ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.FailureResponse"
                         }
                     }
                 }
@@ -2849,85 +2849,6 @@ const docTemplate = `{
                             "additionalProperties": {
                                 "type": "string"
                             }
-                        }
-                    }
-                }
-            }
-        },
-        "/modules": {
-            "get": {
-                "description": "Get all modules",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Modules"
-                ],
-                "summary": "Get all modules",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.FailureResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/modules/{id}": {
-            "get": {
-                "description": "Get a single module by ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Modules"
-                ],
-                "summary": "Get a single module by ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Module ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/models.NotFoundResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.FailureResponse"
                         }
                     }
                 }
@@ -3585,16 +3506,24 @@ const docTemplate = `{
                 }
             }
         },
-        "/topics": {
+        "/lessons": {
             "get": {
-                "description": "Get all topics, optionally filtered by course or module",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all lessons with optional filtering",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Topics"
+                    "lessons"
                 ],
-                "summary": "Get topics",
+                "summary": "Get all lessons",
                 "parameters": [
                     {
                         "type": "string",
@@ -3607,16 +3536,45 @@ const docTemplate = `{
                         "description": "Module ID",
                         "name": "module_id",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search term",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort field (title, order, created_at, updated_at)",
+                        "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort order (asc, desc)",
+                        "name": "sort_order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.TopicResponse"
-                            }
+                            "$ref": "#/definitions/models.PaginatedLessonsResponse"
                         }
                     },
                     "400": {
@@ -3628,20 +3586,52 @@ const docTemplate = `{
                 }
             }
         },
-        "/topics/{id}": {
+        "/modules": {
             "get": {
-                "description": "Get topic with module and course details",
+                "description": "Get all modules",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Topics"
+                    "Modules"
                 ],
-                "summary": "Get topic details",
+                "summary": "Get all modules",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.FailureResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/modules/{id}": {
+            "get": {
+                "description": "Get a single module by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Modules"
+                ],
+                "summary": "Get a single module by ID",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Topic ID",
+                        "description": "Module ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -3651,7 +3641,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.TopicResponse"
+                            "$ref": "#/definitions/models.SuccessResponse"
                         }
                     },
                     "400": {
@@ -3664,6 +3654,12 @@ const docTemplate = `{
                         "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/models.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.FailureResponse"
                         }
                     }
                 }
@@ -3798,24 +3794,16 @@ const docTemplate = `{
                 }
             }
         },
-        "/lessons": {
+        "/topics": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all lessons with optional filtering",
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "Get all topics, optionally filtered by course or module",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "lessons"
+                    "Topics"
                 ],
-                "summary": "Get all lessons",
+                "summary": "Get topics",
                 "parameters": [
                     {
                         "type": "string",
@@ -3828,51 +3816,63 @@ const docTemplate = `{
                         "description": "Module ID",
                         "name": "module_id",
                         "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Search term",
-                        "name": "search",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Sort field (title, order, created_at, updated_at)",
-                        "name": "sort_by",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Sort order (asc, desc)",
-                        "name": "sort_order",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 10,
-                        "description": "Items per page",
-                        "name": "limit",
-                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.PaginatedLessonsResponse"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TopicResponse"
+                            }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/topics/{id}": {
+            "get": {
+                "description": "Get topic with module and course details",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Topics"
+                ],
+                "summary": "Get topic details",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Topic ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TopicResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.NotFoundResponse"
                         }
                     }
                 }
@@ -4274,9 +4274,6 @@ const docTemplate = `{
                 "title"
             ],
             "properties": {
-                "module_id": {
-                    "type": "string"
-                },
                 "content": {
                     "type": "string"
                 },
@@ -4289,7 +4286,7 @@ const docTemplate = `{
                 "due_date": {
                     "type": "string"
                 },
-                "topic_id": {
+                "module_id": {
                     "type": "string"
                 },
                 "publisher_id": {
@@ -4307,6 +4304,9 @@ const docTemplate = `{
                 "title": {
                     "type": "string"
                 },
+                "topic_id": {
+                    "type": "string"
+                },
                 "type": {
                     "type": "string"
                 }
@@ -4321,9 +4321,6 @@ const docTemplate = `{
                 "title"
             ],
             "properties": {
-                "module_id": {
-                    "type": "string"
-                },
                 "content": {
                     "type": "string"
                 },
@@ -4336,7 +4333,7 @@ const docTemplate = `{
                 "due_date": {
                     "type": "string"
                 },
-                "topic_id": {
+                "module_id": {
                     "type": "string"
                 },
                 "slug": {
@@ -4349,6 +4346,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "title": {
+                    "type": "string"
+                },
+                "topic_id": {
                     "type": "string"
                 },
                 "type": {
@@ -4390,55 +4390,6 @@ const docTemplate = `{
                 }
             }
         },
-        "models.ModuleInput": {
-            "type": "object",
-            "required": [
-                "course_id",
-                "slug",
-                "title"
-            ],
-            "properties": {
-                "module_number": {
-                    "type": "integer"
-                },
-                "course_id": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "estimated_time": {
-                    "type": "integer"
-                },
-                "is_free": {
-                    "type": "boolean"
-                },
-                "slug": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string",
-                    "default": "draft"
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.ModuleMiniResponse": {
-            "type": "object",
-            "properties": {
-                "module_number": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
         "models.ConflictResponse": {
             "type": "object",
             "properties": {
@@ -4450,9 +4401,6 @@ const docTemplate = `{
         "models.CourseMaterialResponse": {
             "type": "object",
             "properties": {
-                "module_id": {
-                    "type": "string"
-                },
                 "course_id": {
                     "type": "string"
                 },
@@ -4466,12 +4414,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
-                    "type": "string"
-                },
-                "topic_id": {
-                    "type": "string"
-                },
-                "slug": {
                     "type": "string"
                 },
                 "status": {
@@ -4488,12 +4430,6 @@ const docTemplate = `{
         "models.CourseMaterialViewResponse": {
             "type": "object",
             "properties": {
-                "module": {
-                    "$ref": "#/definitions/models.ModuleMiniResponse"
-                },
-                "module_id": {
-                    "type": "string"
-                },
                 "course": {
                     "description": "Relationships",
                     "allOf": [
@@ -4515,15 +4451,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
-                    "type": "string"
-                },
-                "topic": {
-                    "$ref": "#/definitions/models.TopicMiniResponse"
-                },
-                "topic_id": {
-                    "type": "string"
-                },
-                "slug": {
                     "type": "string"
                 },
                 "status": {
@@ -4571,9 +4498,6 @@ const docTemplate = `{
                 "type"
             ],
             "properties": {
-                "module_id": {
-                    "type": "string"
-                },
                 "course_id": {
                     "type": "string"
                 },
@@ -4581,9 +4505,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "file_url": {
-                    "type": "string"
-                },
-                "topic_id": {
                     "type": "string"
                 },
                 "status": {
@@ -4858,80 +4779,62 @@ const docTemplate = `{
                 }
             }
         },
-        "models.TopicInput": {
+        "models.LessonInput": {
             "type": "object",
             "required": [
-                "module_id",
-                "content_type",
-                "content_url",
                 "course_id",
+                "description",
+                "module_id",
+                "order",
                 "title",
-                "lesson_id"
+                "tutor_id"
             ],
             "properties": {
-                "module_id": {
-                    "type": "string"
-                },
-                "content_type": {
-                    "description": "video, pdf, text, quiz",
-                    "type": "string"
-                },
-                "content_url": {
-                    "type": "string"
-                },
                 "course_id": {
                     "type": "string"
                 },
-                "title": {
+                "description": {
                     "type": "string"
                 },
-                "lesson_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.TopicMiniResponse": {
-            "type": "object",
-            "properties": {
-                "content_type": {
-                    "type": "string"
-                },
-                "content_url": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.TopicResponse": {
-            "type": "object",
-            "properties": {
                 "module_id": {
                     "type": "string"
                 },
-                "content_type": {
+                "order": {
+                    "type": "integer"
+                },
+                "title": {
                     "type": "string"
                 },
-                "content_url": {
+                "tutor_id": {
                     "type": "string"
-                },
+                }
+            }
+        },
+        "models.LessonResponse": {
+            "type": "object",
+            "properties": {
                 "course_id": {
                     "type": "string"
                 },
                 "created_at": {
                     "type": "string"
                 },
+                "description": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
+                },
+                "module_id": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "integer"
                 },
                 "title": {
                     "type": "string"
                 },
-                "lesson_id": {
+                "tutor_id": {
                     "type": "string"
                 },
                 "updated_at": {
@@ -4966,10 +4869,6 @@ const docTemplate = `{
                 "auto_publish_recordings": {
                     "type": "boolean"
                 },
-                "module_id": {
-                    "description": "Optional relationships",
-                    "type": "string"
-                },
                 "course_id": {
                     "description": "Required fields",
                     "type": "string"
@@ -4990,7 +4889,7 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 2000
                 },
-                "topic_id": {
+                "lesson_id": {
                     "type": "string"
                 },
                 "max_attendees": {
@@ -5003,6 +4902,10 @@ const docTemplate = `{
                     "type": "integer",
                     "maximum": 1000,
                     "minimum": 1
+                },
+                "module_id": {
+                    "description": "Optional relationships",
+                    "type": "string"
                 },
                 "platform": {
                     "description": "Meeting Platform",
@@ -5047,7 +4950,7 @@ const docTemplate = `{
                     "maxLength": 255,
                     "minLength": 3
                 },
-                "lesson_id": {
+                "topic_id": {
                     "type": "string"
                 },
                 "tutor_id": {
@@ -5078,9 +4981,6 @@ const docTemplate = `{
                 "available_seats": {
                     "description": "Computed fields",
                     "type": "integer"
-                },
-                "module_id": {
-                    "type": "string"
                 },
                 "course_id": {
                     "type": "string"
@@ -5118,7 +5018,7 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
-                "topic_id": {
+                "lesson_id": {
                     "type": "string"
                 },
                 "max_attendees": {
@@ -5135,6 +5035,9 @@ const docTemplate = `{
                 },
                 "min_attendees": {
                     "type": "integer"
+                },
+                "module_id": {
+                    "type": "string"
                 },
                 "platform": {
                     "type": "string"
@@ -5182,7 +5085,7 @@ const docTemplate = `{
                 "title": {
                     "type": "string"
                 },
-                "lesson_id": {
+                "topic_id": {
                     "type": "string"
                 },
                 "total_enrolled": {
@@ -5225,10 +5128,6 @@ const docTemplate = `{
                 "auto_publish_recordings": {
                     "type": "boolean"
                 },
-                "module_id": {
-                    "description": "Relationships (only before start)",
-                    "type": "string"
-                },
                 "description": {
                     "type": "string"
                 },
@@ -5247,7 +5146,7 @@ const docTemplate = `{
                     "type": "boolean",
                     "default": false
                 },
-                "topic_id": {
+                "lesson_id": {
                     "type": "string"
                 },
                 "max_attendees": {
@@ -5260,6 +5159,10 @@ const docTemplate = `{
                     "type": "integer",
                     "maximum": 1000,
                     "minimum": 1
+                },
+                "module_id": {
+                    "description": "Relationships (only before start)",
+                    "type": "string"
                 },
                 "platform": {
                     "description": "Meeting platform (only before start)",
@@ -5302,7 +5205,7 @@ const docTemplate = `{
                     "maxLength": 255,
                     "minLength": 3
                 },
-                "lesson_id": {
+                "topic_id": {
                     "type": "string"
                 },
                 "tutor_id": {
@@ -5378,6 +5281,41 @@ const docTemplate = `{
                 }
             }
         },
+        "models.ModuleInput": {
+            "type": "object",
+            "required": [
+                "course_id",
+                "slug",
+                "title"
+            ],
+            "properties": {
+                "course_id": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "estimated_time": {
+                    "type": "integer"
+                },
+                "is_free": {
+                    "type": "boolean"
+                },
+                "module_number": {
+                    "type": "integer"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string",
+                    "default": "draft"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "models.NotFoundResponse": {
             "type": "object",
             "properties": {
@@ -5398,10 +5336,6 @@ const docTemplate = `{
                     "description": "Answer configuration",
                     "type": "string",
                     "maxLength": 2000
-                },
-                "module_id": {
-                    "description": "Content relationships",
-                    "type": "string"
                 },
                 "course_id": {
                     "type": "string"
@@ -5427,6 +5361,13 @@ const docTemplate = `{
                 "is_approved": {
                     "description": "Approval",
                     "type": "boolean"
+                },
+                "lesson_id": {
+                    "type": "string"
+                },
+                "module_id": {
+                    "description": "Content relationships",
+                    "type": "string"
                 },
                 "options": {
                     "description": "Options for multiple choice questions",
@@ -5461,9 +5402,6 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 2000
                 },
-                "lesson_id": {
-                    "type": "string"
-                },
                 "tutor_id": {
                     "type": "string"
                 },
@@ -5477,12 +5415,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "answer_explanation": {
-                    "type": "string"
-                },
-                "module_id": {
-                    "type": "string"
-                },
-                "module_name": {
                     "type": "string"
                 },
                 "correct_attempts": {
@@ -5515,6 +5447,18 @@ const docTemplate = `{
                 "is_approved": {
                     "type": "boolean"
                 },
+                "lesson_id": {
+                    "type": "string"
+                },
+                "lesson_name": {
+                    "type": "string"
+                },
+                "module_id": {
+                    "type": "string"
+                },
+                "module_name": {
+                    "type": "string"
+                },
                 "options": {
                     "description": "Options (for multiple choice questions)",
                     "type": "array",
@@ -5536,12 +5480,6 @@ const docTemplate = `{
                 },
                 "success_rate": {
                     "type": "number"
-                },
-                "lesson_id": {
-                    "type": "string"
-                },
-                "lesson_name": {
-                    "type": "string"
                 },
                 "total_attempts": {
                     "description": "Statistics (optional)",
@@ -5771,24 +5709,37 @@ const docTemplate = `{
                 }
             }
         },
-        "models.LessonInput": {
+        "models.TopicInput": {
             "type": "object",
             "required": [
-                "module_id",
+                "content_text",
+                "content_type",
+                "content_url",
                 "course_id",
-                "description",
+                "lesson_id",
+                "module_id",
                 "order",
                 "title",
                 "tutor_id"
             ],
             "properties": {
-                "module_id": {
+                "content_text": {
+                    "type": "string"
+                },
+                "content_type": {
+                    "description": "video, pdf, text, quiz",
+                    "type": "string"
+                },
+                "content_url": {
                     "type": "string"
                 },
                 "course_id": {
                     "type": "string"
                 },
-                "description": {
+                "lesson_id": {
+                    "type": "string"
+                },
+                "module_id": {
                     "type": "string"
                 },
                 "order": {
@@ -5802,10 +5753,16 @@ const docTemplate = `{
                 }
             }
         },
-        "models.LessonResponse": {
+        "models.TopicResponse": {
             "type": "object",
             "properties": {
-                "module_id": {
+                "content_text": {
+                    "type": "string"
+                },
+                "content_type": {
+                    "type": "string"
+                },
+                "content_url": {
                     "type": "string"
                 },
                 "course_id": {
@@ -5814,10 +5771,13 @@ const docTemplate = `{
                 "created_at": {
                     "type": "string"
                 },
-                "description": {
+                "id": {
                     "type": "string"
                 },
-                "id": {
+                "lesson_id": {
+                    "type": "string"
+                },
+                "module_id": {
                     "type": "string"
                 },
                 "order": {
@@ -5841,16 +5801,13 @@ const docTemplate = `{
                 "type"
             ],
             "properties": {
-                "module_id": {
-                    "type": "string"
-                },
                 "description": {
                     "type": "string"
                 },
                 "file_url": {
                     "type": "string"
                 },
-                "topic_id": {
+                "module_id": {
                     "type": "string"
                 },
                 "status": {

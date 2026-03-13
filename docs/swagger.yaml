@@ -266,8 +266,6 @@ definitions:
     type: object
   models.AssignmentInput:
     properties:
-      module_id:
-        type: string
       content:
         type: string
       course_id:
@@ -276,7 +274,7 @@ definitions:
         type: string
       due_date:
         type: string
-      topic_id:
+      module_id:
         type: string
       publisher_id:
         type: string
@@ -288,6 +286,8 @@ definitions:
         type: string
       title:
         type: string
+      topic_id:
+        type: string
       type:
         type: string
     required:
@@ -298,8 +298,6 @@ definitions:
     type: object
   models.AssignmentUpdateInput:
     properties:
-      module_id:
-        type: string
       content:
         type: string
       course_id:
@@ -308,7 +306,7 @@ definitions:
         type: string
       due_date:
         type: string
-      topic_id:
+      module_id:
         type: string
       slug:
         type: string
@@ -317,6 +315,8 @@ definitions:
       submission_type:
         type: string
       title:
+        type: string
+      topic_id:
         type: string
       type:
         type: string
@@ -348,39 +348,6 @@ definitions:
     required:
     - name
     type: object
-  models.ModuleInput:
-    properties:
-      module_number:
-        type: integer
-      course_id:
-        type: string
-      description:
-        type: string
-      estimated_time:
-        type: integer
-      is_free:
-        type: boolean
-      slug:
-        type: string
-      status:
-        default: draft
-        type: string
-      title:
-        type: string
-    required:
-    - course_id
-    - slug
-    - title
-    type: object
-  models.ModuleMiniResponse:
-    properties:
-      module_number:
-        type: integer
-      id:
-        type: string
-      title:
-        type: string
-    type: object
   models.ConflictResponse:
     properties:
       error:
@@ -388,8 +355,6 @@ definitions:
     type: object
   models.CourseMaterialResponse:
     properties:
-      module_id:
-        type: string
       course_id:
         type: string
       createdAt:
@@ -400,10 +365,6 @@ definitions:
         type: string
       id:
         type: string
-      topic_id:
-        type: string
-      slug:
-        type: string
       status:
         type: string
       title:
@@ -413,10 +374,6 @@ definitions:
     type: object
   models.CourseMaterialViewResponse:
     properties:
-      module:
-        $ref: '#/definitions/models.ModuleMiniResponse'
-      module_id:
-        type: string
       course:
         allOf:
         - $ref: '#/definitions/models.CourseMiniResponse'
@@ -430,12 +387,6 @@ definitions:
       file_url:
         type: string
       id:
-        type: string
-      topic:
-        $ref: '#/definitions/models.TopicMiniResponse'
-      topic_id:
-        type: string
-      slug:
         type: string
       status:
         type: string
@@ -463,15 +414,11 @@ definitions:
     type: object
   models.CreateCourseMaterialRequest:
     properties:
-      module_id:
-        type: string
       course_id:
         type: string
       description:
         type: string
       file_url:
-        type: string
-      topic_id:
         type: string
       status:
         type: string
@@ -672,57 +619,45 @@ definitions:
       tutor_id:
         type: string
     type: object
-  models.TopicInput:
+  models.LessonInput:
     properties:
-      module_id:
-        type: string
-      content_type:
-        description: video, pdf, text, quiz
-        type: string
-      content_url:
-        type: string
       course_id:
         type: string
-      title:
+      description:
         type: string
-      lesson_id:
-        type: string
-    required:
-    - module_id
-    - content_type
-    - content_url
-    - course_id
-    - title
-    - lesson_id
-    type: object
-  models.TopicMiniResponse:
-    properties:
-      content_type:
-        type: string
-      content_url:
-        type: string
-      id:
-        type: string
-      title:
-        type: string
-    type: object
-  models.TopicResponse:
-    properties:
       module_id:
         type: string
-      content_type:
+      order:
+        type: integer
+      title:
         type: string
-      content_url:
+      tutor_id:
         type: string
+    required:
+    - course_id
+    - description
+    - module_id
+    - order
+    - title
+    - tutor_id
+    type: object
+  models.LessonResponse:
+    properties:
       course_id:
         type: string
       created_at:
         type: string
+      description:
+        type: string
       id:
         type: string
+      module_id:
+        type: string
+      order:
+        type: integer
       title:
         type: string
-      lesson_id:
+      tutor_id:
         type: string
       updated_at:
         type: string
@@ -742,9 +677,6 @@ definitions:
         type: string
       auto_publish_recordings:
         type: boolean
-      module_id:
-        description: Optional relationships
-        type: string
       course_id:
         description: Required fields
         type: string
@@ -760,7 +692,7 @@ definitions:
         description: Host notes
         maxLength: 2000
         type: string
-      topic_id:
+      lesson_id:
         type: string
       max_attendees:
         description: Capacity & Access
@@ -771,6 +703,9 @@ definitions:
         maximum: 1000
         minimum: 1
         type: integer
+      module_id:
+        description: Optional relationships
+        type: string
       platform:
         description: Meeting Platform
         enum:
@@ -804,7 +739,7 @@ definitions:
         maxLength: 255
         minLength: 3
         type: string
-      lesson_id:
+      topic_id:
         type: string
       tutor_id:
         type: string
@@ -832,8 +767,6 @@ definitions:
       available_seats:
         description: Computed fields
         type: integer
-      module_id:
-        type: string
       course_id:
         type: string
       course_name:
@@ -858,7 +791,7 @@ definitions:
         items:
           type: string
         type: array
-      topic_id:
+      lesson_id:
         type: string
       max_attendees:
         type: integer
@@ -870,6 +803,8 @@ definitions:
         type: string
       min_attendees:
         type: integer
+      module_id:
+        type: string
       platform:
         type: string
       prerequisites:
@@ -901,7 +836,7 @@ definitions:
         type: string
       title:
         type: string
-      lesson_id:
+      topic_id:
         type: string
       total_enrolled:
         type: integer
@@ -931,9 +866,6 @@ definitions:
         type: string
       auto_publish_recordings:
         type: boolean
-      module_id:
-        description: Relationships (only before start)
-        type: string
       description:
         type: string
       duration:
@@ -947,7 +879,7 @@ definitions:
         default: false
         description: Cancellation (can update anytime)
         type: boolean
-      topic_id:
+      lesson_id:
         type: string
       max_attendees:
         description: Capacity (only before start)
@@ -958,6 +890,9 @@ definitions:
         maximum: 1000
         minimum: 1
         type: integer
+      module_id:
+        description: Relationships (only before start)
+        type: string
       platform:
         description: Meeting platform (only before start)
         enum:
@@ -990,7 +925,7 @@ definitions:
         maxLength: 255
         minLength: 3
         type: string
-      lesson_id:
+      topic_id:
         type: string
       tutor_id:
         type: string
@@ -1044,6 +979,30 @@ definitions:
         example: logged_out
         type: string
     type: object
+  models.ModuleInput:
+    properties:
+      course_id:
+        type: string
+      description:
+        type: string
+      estimated_time:
+        type: integer
+      is_free:
+        type: boolean
+      module_number:
+        type: integer
+      slug:
+        type: string
+      status:
+        default: draft
+        type: string
+      title:
+        type: string
+    required:
+    - course_id
+    - slug
+    - title
+    type: object
   models.NotFoundResponse:
     properties:
       error:
@@ -1054,9 +1013,6 @@ definitions:
       answer_explanation:
         description: Answer configuration
         maxLength: 2000
-        type: string
-      module_id:
-        description: Content relationships
         type: string
       course_id:
         type: string
@@ -1077,6 +1033,11 @@ definitions:
       is_approved:
         description: Approval
         type: boolean
+      lesson_id:
+        type: string
+      module_id:
+        description: Content relationships
+        type: string
       options:
         description: Options for multiple choice questions
         items:
@@ -1103,8 +1064,6 @@ definitions:
       solution_steps:
         maxLength: 2000
         type: string
-      lesson_id:
-        type: string
       tutor_id:
         type: string
       video_url:
@@ -1118,10 +1077,6 @@ definitions:
   models.ObjectiveQuestionResponse:
     properties:
       answer_explanation:
-        type: string
-      module_id:
-        type: string
-      module_name:
         type: string
       correct_attempts:
         type: integer
@@ -1143,6 +1098,14 @@ definitions:
         type: string
       is_approved:
         type: boolean
+      lesson_id:
+        type: string
+      lesson_name:
+        type: string
+      module_id:
+        type: string
+      module_name:
+        type: string
       options:
         description: Options (for multiple choice questions)
         items:
@@ -1158,10 +1121,6 @@ definitions:
         type: string
       success_rate:
         type: number
-      lesson_id:
-        type: string
-      lesson_name:
-        type: string
       total_attempts:
         description: Statistics (optional)
         type: integer
@@ -1318,13 +1277,20 @@ definitions:
       message:
         type: string
     type: object
-  models.LessonInput:
+  models.TopicInput:
     properties:
-      module_id:
+      content_text:
+        type: string
+      content_type:
+        description: video, pdf, text, quiz
+        type: string
+      content_url:
         type: string
       course_id:
         type: string
-      description:
+      lesson_id:
+        type: string
+      module_id:
         type: string
       order:
         type: integer
@@ -1333,24 +1299,33 @@ definitions:
       tutor_id:
         type: string
     required:
-    - module_id
+    - content_text
+    - content_type
+    - content_url
     - course_id
-    - description
+    - lesson_id
+    - module_id
     - order
     - title
     - tutor_id
     type: object
-  models.LessonResponse:
+  models.TopicResponse:
     properties:
-      module_id:
+      content_text:
+        type: string
+      content_type:
+        type: string
+      content_url:
         type: string
       course_id:
         type: string
       created_at:
         type: string
-      description:
-        type: string
       id:
+        type: string
+      lesson_id:
+        type: string
+      module_id:
         type: string
       order:
         type: integer
@@ -1363,13 +1338,11 @@ definitions:
     type: object
   models.UpdateCourseMaterialRequest:
     properties:
-      module_id:
-        type: string
       description:
         type: string
       file_url:
         type: string
-      topic_id:
+      module_id:
         type: string
       status:
         type: string
@@ -1845,113 +1818,6 @@ paths:
       summary: Delete a course category relationship
       tags:
       - Course Categories
-  /api/modules:
-    post:
-      consumes:
-      - application/json
-      description: Create a new module
-      parameters:
-      - description: Module
-        in: body
-        name: module
-        required: true
-        schema:
-          $ref: '#/definitions/models.ModuleInput'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/models.SuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "409":
-          description: Conflict
-          schema:
-            $ref: '#/definitions/models.ConflictResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.FailureResponse'
-      security:
-      - BearerAuth: []
-      summary: Create a new modules
-      tags:
-      - Modules
-  /api/modules/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Delete an existing module
-      parameters:
-      - description: Module ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.DeleteSuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.NotFoundResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.FailureResponse'
-      summary: Delete an existing module
-      tags:
-      - Modules
-    put:
-      consumes:
-      - application/json
-      description: Update an existing module
-      parameters:
-      - description: Module ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Module
-        in: body
-        name: module
-        required: true
-        schema:
-          $ref: '#/definitions/models.ModuleInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.SuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.NotFoundResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.FailureResponse'
-      summary: Update an existing module
-      tags:
-      - Modules
   /api/course-materials:
     post:
       consumes:
@@ -2399,98 +2265,58 @@ paths:
       summary: Update a grade
       tags:
       - grades
-  /api/topics:
+  /api/lessons:
     post:
       consumes:
       - application/json
-      description: Create a new topic under a module
+      description: Create a new lesson
       parameters:
-      - description: Topic payload
+      - description: Lesson
         in: body
-        name: topic
+        name: lesson
         required: true
         schema:
-          $ref: '#/definitions/models.TopicInput'
+          $ref: '#/definitions/models.LessonInput'
       produces:
       - application/json
       responses:
         "201":
-          description: Created
+          description: Lesson created successfully
           schema:
             $ref: '#/definitions/models.SuccessResponse'
         "400":
-          description: Bad Request
+          description: Bad request
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-        "409":
-          description: Conflict
-          schema:
-            $ref: '#/definitions/models.ConflictResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.FailureResponse'
       security:
       - BearerAuth: []
-      summary: Create a topic
+      summary: Create a new lesson
       tags:
-      - Topics
-  /api/topics/{id}:
-    delete:
-      description: Delete topic by ID
-      parameters:
-      - description: Topic ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.SuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.NotFoundResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.FailureResponse'
-      security:
-      - BearerAuth: []
-      summary: Delete topic
-      tags:
-      - Topics
+      - lessons
+  /api/lessons/{id}:
     put:
       consumes:
       - application/json
-      description: Update topic details
+      description: Update a lesson by ID
       parameters:
-      - description: Topic ID
+      - description: Lesson ID
         in: path
         name: id
         required: true
         type: string
-      - description: Topic payload
+      - description: Lesson
         in: body
-        name: topic
+        name: lesson
         required: true
         schema:
-          $ref: '#/definitions/models.TopicInput'
+          $ref: '#/definitions/models.LessonInput'
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Lesson updated successfully
           schema:
-            $ref: '#/definitions/models.TopicResponse'
+            $ref: '#/definitions/models.LessonResponse'
         "400":
           description: Bad Request
           schema:
@@ -2498,16 +2324,12 @@ paths:
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/models.NotFoundResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.FailureResponse'
+            $ref: '#/definitions/models.ErrorResponse'
       security:
       - BearerAuth: []
-      summary: Update topic
+      summary: Update a lesson
       tags:
-      - Topics
+      - lessons
   /api/live-classes:
     post:
       consumes:
@@ -2601,6 +2423,113 @@ paths:
       summary: Cancel a live class
       tags:
       - live-classes
+  /api/modules:
+    post:
+      consumes:
+      - application/json
+      description: Create a new module
+      parameters:
+      - description: Module
+        in: body
+        name: module
+        required: true
+        schema:
+          $ref: '#/definitions/models.ModuleInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/models.ConflictResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.FailureResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new modules
+      tags:
+      - Modules
+  /api/modules/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an existing module
+      parameters:
+      - description: Module ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.DeleteSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.FailureResponse'
+      summary: Delete an existing module
+      tags:
+      - Modules
+    put:
+      consumes:
+      - application/json
+      description: Update an existing module
+      parameters:
+      - description: Module ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Module
+        in: body
+        name: module
+        required: true
+        schema:
+          $ref: '#/definitions/models.ModuleInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.FailureResponse'
+      summary: Update an existing module
+      tags:
+      - Modules
   /api/products:
     post:
       consumes:
@@ -2788,58 +2717,58 @@ paths:
       summary: Create multiple questions
       tags:
       - questions
-  /api/lessons:
+  /api/topics:
     post:
       consumes:
       - application/json
-      description: Create a new lesson
+      description: Create a new topic under a module
       parameters:
-      - description: Lesson
+      - description: Topic payload
         in: body
-        name: lesson
+        name: topic
         required: true
         schema:
-          $ref: '#/definitions/models.LessonInput'
+          $ref: '#/definitions/models.TopicInput'
       produces:
       - application/json
       responses:
         "201":
-          description: Lesson created successfully
+          description: Created
           schema:
             $ref: '#/definitions/models.SuccessResponse'
         "400":
-          description: Bad request
+          description: Bad Request
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/models.ConflictResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.FailureResponse'
       security:
       - BearerAuth: []
-      summary: Create a new lesson
+      summary: Create a topic
       tags:
-      - lessons
-  /api/lessons/{id}:
-    put:
-      consumes:
-      - application/json
-      description: Update a lesson by ID
+      - Topics
+  /api/topics/{id}:
+    delete:
+      description: Delete topic by ID
       parameters:
-      - description: Lesson ID
+      - description: Topic ID
         in: path
         name: id
         required: true
         type: string
-      - description: Lesson
-        in: body
-        name: lesson
-        required: true
-        schema:
-          $ref: '#/definitions/models.LessonInput'
       produces:
       - application/json
       responses:
         "200":
-          description: Lesson updated successfully
+          description: OK
           schema:
-            $ref: '#/definitions/models.LessonResponse'
+            $ref: '#/definitions/models.SuccessResponse'
         "400":
           description: Bad Request
           schema:
@@ -2847,12 +2776,56 @@ paths:
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/models.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.FailureResponse'
       security:
       - BearerAuth: []
-      summary: Update a lesson
+      summary: Delete topic
       tags:
-      - lessons
+      - Topics
+    put:
+      consumes:
+      - application/json
+      description: Update topic details
+      parameters:
+      - description: Topic ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Topic payload
+        in: body
+        name: topic
+        required: true
+        schema:
+          $ref: '#/definitions/models.TopicInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TopicResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.FailureResponse'
+      security:
+      - BearerAuth: []
+      summary: Update topic
+      tags:
+      - Topics
   /assignments:
     get:
       consumes:
@@ -3257,58 +3230,6 @@ paths:
       summary: Category Details with Related Courses
       tags:
       - Categories
-  /modules:
-    get:
-      consumes:
-      - application/json
-      description: Get all modules
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.SuccessResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.FailureResponse'
-      summary: Get all modules
-      tags:
-      - Modules
-  /modules/{id}:
-    get:
-      consumes:
-      - application/json
-      description: Get a single module by ID
-      parameters:
-      - description: Module ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.SuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.NotFoundResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.FailureResponse'
-      summary: Get a single module by ID
-      tags:
-      - Modules
   /course-materials:
     get:
       description: Get all course materials, optionally filtered by course, module,
@@ -3741,9 +3662,11 @@ paths:
       summary: Get grades for a specific student
       tags:
       - grades
-  /topics:
+  /lessons:
     get:
-      description: Get all topics, optionally filtered by course or module
+      consumes:
+      - application/json
+      description: Get all lessons with optional filtering
       parameters:
       - description: Course ID
         in: query
@@ -3753,27 +3676,70 @@ paths:
         in: query
         name: module_id
         type: string
+      - description: Search term
+        in: query
+        name: search
+        type: string
+      - description: Sort field (title, order, created_at, updated_at)
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort order (asc, desc)
+        in: query
+        name: sort_order
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/models.TopicResponse'
-            type: array
+            $ref: '#/definitions/models.PaginatedLessonsResponse'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      summary: Get topics
+      security:
+      - BearerAuth: []
+      summary: Get all lessons
       tags:
-      - Topics
-  /topics/{id}:
+      - lessons
+  /modules:
     get:
-      description: Get topic with module and course details
+      consumes:
+      - application/json
+      description: Get all modules
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.FailureResponse'
+      summary: Get all modules
+      tags:
+      - Modules
+  /modules/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a single module by ID
       parameters:
-      - description: Topic ID
+      - description: Module ID
         in: path
         name: id
         required: true
@@ -3784,7 +3750,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.TopicResponse'
+            $ref: '#/definitions/models.SuccessResponse'
         "400":
           description: Bad Request
           schema:
@@ -3793,9 +3759,13 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/models.NotFoundResponse'
-      summary: Get topic details
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.FailureResponse'
+      summary: Get a single module by ID
       tags:
-      - Topics
+      - Modules
   /products:
     get:
       description: Retrieve a list of all products
@@ -3882,11 +3852,9 @@ paths:
       summary: Get related courses with product ID
       tags:
       - Products
-  /lessons:
+  /topics:
     get:
-      consumes:
-      - application/json
-      description: Get all lessons with optional filtering
+      description: Get all topics, optionally filtered by course or module
       parameters:
       - description: Course ID
         in: query
@@ -3896,44 +3864,49 @@ paths:
         in: query
         name: module_id
         type: string
-      - description: Search term
-        in: query
-        name: search
-        type: string
-      - description: Sort field (title, order, created_at, updated_at)
-        in: query
-        name: sort_by
-        type: string
-      - description: Sort order (asc, desc)
-        in: query
-        name: sort_order
-        type: string
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        type: integer
-      - default: 10
-        description: Items per page
-        in: query
-        name: limit
-        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.PaginatedLessonsResponse'
+            items:
+              $ref: '#/definitions/models.TopicResponse'
+            type: array
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Get all lessons
+      summary: Get topics
       tags:
-      - lessons
+      - Topics
+  /topics/{id}:
+    get:
+      description: Get topic with module and course details
+      parameters:
+      - description: Topic ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TopicResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.NotFoundResponse'
+      summary: Get topic details
+      tags:
+      - Topics
 schemes:
 - http
 securityDefinitions:

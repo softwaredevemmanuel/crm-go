@@ -4,14 +4,9 @@ import (
 	"crm-go/config"
 	"crm-go/models"
 	"encoding/json"
-	"errors"
 	"net/http"
-	"regexp"
-	"strings"
-
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
 // CreateCourseMaterial handles the creation of a new course material
@@ -27,15 +22,9 @@ import (
 // @Failure 500 {object} models.FailureResponse
 // @Router /api/course-materials [post]
 // @Security BearerAuth
-func generateSlug(title string) string {
-	slug := strings.ToLower(title)
-	slug = strings.ReplaceAll(slug, " ", "-")
-	slug = regexp.MustCompile(`[^a-z0-9\-]`).ReplaceAllString(slug, "")
-	return slug
-}
-
 func CreateCourseMaterial(c *gin.Context) {
 	var req models.CreateCourseMaterialRequest
+	db := config.DB
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -45,24 +34,19 @@ func CreateCourseMaterial(c *gin.Context) {
 	}
 
 	var existing models.CourseMaterial
-
-	err := config.DB.
-		Where("course_id = ? AND title = ?", req.CourseID, req.Title).
-		First(&existing).Error
-
-	if err == nil {
+	if err := db.Where("course_id = ? AND title = ?", req.CourseID, req.Title).
+		First(&existing).Error; err == nil {
 		c.JSON(http.StatusConflict, gin.H{
-			"error": "A course material with this title already exists for this course",
-		})
+			"error": "A course material with this title already exists for this course"})
+		return
+	}
+	// ✅ Check for duplicate by title
+	var existingTitle models.CourseMaterial
+	if err := db.Where("title = ?", req.Title).First(&existingTitle).Error; err == nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "Course material with same title already exists"})
 		return
 	}
 
-	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Database error while checking duplicates",
-		})
-		return
-	}
 
 	// Optional: validate material type
 	validTypes := map[string]bool{
@@ -81,11 +65,8 @@ func CreateCourseMaterial(c *gin.Context) {
 
 	material := models.CourseMaterial{
 		CourseID:    req.CourseID,
-		ModuleID:    req.ModuleID,
-		TopicID:     req.TopicID,
 		Title:       req.Title,
 		Description: req.Description,
-		Slug:        generateSlug(req.Title),
 		Type:        req.Type,
 		FileURL:     req.FileURL,
 		Status:      req.Status,
@@ -184,11 +165,8 @@ func GetCourseMaterials(c *gin.Context) {
 		responses = append(responses, models.CourseMaterialResponse{
 			ID:          m.ID,
 			CourseID:    m.CourseID,
-			ModuleID:    m.ModuleID,
-			TopicID:     m.TopicID,
 			Title:       m.Title,
 			Description: m.Description,
-			Slug:        m.Slug,
 			Type:        m.Type,
 			FileURL:     m.FileURL,
 			Status:      m.Status,
@@ -238,11 +216,8 @@ func GetCourseMaterialByID(c *gin.Context) {
 	response := models.CourseMaterialViewResponse{
 		ID:          material.ID,
 		CourseID:    material.CourseID,
-		ModuleID:    material.ModuleID,
-		TopicID:     material.TopicID,
 		Title:       material.Title,
 		Description: material.Description,
-		Slug:        material.Slug,
 		Type:        material.Type,
 		FileURL:     material.FileURL,
 		Status:      material.Status,
@@ -254,24 +229,7 @@ func GetCourseMaterialByID(c *gin.Context) {
 		},
 	}
 
-	// Optional Module
-	if material.ModuleID != nil {
-		response.Module = &models.ModuleMiniResponse{
-			ID:           material.Module.ID,
-			Title:        material.Module.Title,
-			ModuleNumber: material.Module.ModuleNumber,
-		}
-	}
 
-	// Optional Topic
-	if material.TopicID != nil {
-		response.Topic = &models.TopicMiniResponse{
-			ID:          material.Topic.ID,
-			Title:       material.Topic.Title,
-			ContentType: material.Topic.ContentType,
-			ContentURL:  material.Topic.ContentURL,
-		}
-	}
 
 	c.JSON(http.StatusOK, response)
 }
@@ -345,8 +303,6 @@ func UpdateCourseMaterial(c *gin.Context) {
 	material.Type = req.Type
 	material.FileURL = req.FileURL
 	material.Status = req.Status
-	material.ModuleID = req.ModuleID
-	material.TopicID = req.TopicID
 
 	if err := config.DB.Save(&material).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -372,11 +328,8 @@ func UpdateCourseMaterial(c *gin.Context) {
 	response := models.CourseMaterialViewResponse{
 		ID:          material.ID,
 		CourseID:    material.CourseID,
-		ModuleID:    material.ModuleID,
-		TopicID:     material.TopicID,
 		Title:       material.Title,
 		Description: material.Description,
-		Slug:        material.Slug,
 		Type:        material.Type,
 		FileURL:     material.FileURL,
 		Status:      material.Status,
@@ -388,24 +341,7 @@ func UpdateCourseMaterial(c *gin.Context) {
 		},
 	}
 
-	// Optional Module
-	if material.ModuleID != nil {
-		response.Module = &models.ModuleMiniResponse{
-			ID:           material.Module.ID,
-			Title:        material.Module.Title,
-			ModuleNumber: material.Module.ModuleNumber,
-		}
-	}
 
-	// Optional Topic
-	if material.TopicID != nil {
-		response.Topic = &models.TopicMiniResponse{
-			ID:          material.Topic.ID,
-			Title:       material.Topic.Title,
-			ContentType: material.Topic.ContentType,
-			ContentURL:  material.Topic.ContentURL,
-		}
-	}
 
 	c.JSON(http.StatusOK, response)
 }
@@ -465,11 +401,8 @@ func DeleteCourseMaterial(c *gin.Context) {
 	materialResponse := models.CourseMaterialResponse{
 		ID:          material.ID,
 		CourseID:    material.CourseID,
-		ModuleID:    material.ModuleID,
-		TopicID:     material.TopicID,
 		Title:       material.Title,
 		Description: material.Description,
-		Slug:        material.Slug,
 		Type:        material.Type,
 		FileURL:     material.FileURL,
 		Status:      material.Status,
@@ -549,11 +482,8 @@ func RestoreCourseMaterial(c *gin.Context) {
 	material := models.CourseMaterial{
 		ID:          archived.ID,
 		CourseID:    archived.CourseID,
-		ModuleID:    archived.ModuleID,
-		TopicID:     archived.TopicID,
 		Title:       archived.Title,
 		Description: archived.Description,
-		Slug:        archived.Slug,
 		Type:        archived.Type,
 		FileURL:     archived.FileURL,
 		Status:      archived.Status,
