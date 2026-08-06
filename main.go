@@ -7,6 +7,8 @@ import (
 	"crm-go/middleware"
 	"crm-go/routes"
 	"flag"
+	"github.com/gin-contrib/cors"
+	"time"
 
 	_ "crm-go/docs"
 
@@ -52,6 +54,14 @@ func main() {
 	r.SetTrustedProxies(nil) // trust no proxies in dev
 	r.Use(middleware.SessionMiddleware())
 
+		r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "email"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+
 	// ✅ Swagger documentation route
 	//r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
@@ -64,7 +74,7 @@ func main() {
 	// @Router / [get]
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
-			"message": "Welcome to GO CRM 🚀",
+			"message": "Welcome to GO CRM 🚀. For Swagger Documentation, visit: http://localhost:8080/swagger/index.html#",
 		})
 	})
 

@@ -2658,6 +2658,59 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/login/id": {
+            "post": {
+                "description": "Authenticates user using email from header and password from body",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Login with ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Email",
+                        "name": "email",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Login credentials",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.LoginIdInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.LoginIdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/logout": {
             "post": {
                 "security": [
@@ -4106,6 +4159,26 @@ const docTemplate = `{
                 },
                 "title": {
                     "type": "string"
+                }
+            }
+        },
+        "controllers.LoginIdInput": {
+            "type": "object",
+            "required": [
+                "password"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "controllers.LoginIdResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Login successful"
                 }
             }
         },
@@ -5839,6 +5912,9 @@ const docTemplate = `{
                 "last_name": {
                     "type": "string"
                 },
+                "login_id": {
+                    "type": "string"
+                },
                 "picture": {
                     "type": "string"
                 },
@@ -5861,13 +5937,17 @@ const docTemplate = `{
                     "type": "string",
                     "example": "user@example.com"
                 },
+                "first_name": {
+                    "type": "string",
+                    "example": "John"
+                },
                 "id": {
                     "type": "string",
                     "example": "550e8400-e29b-41d4-a716-446655440000"
                 },
-                "name": {
+                "last_name": {
                     "type": "string",
-                    "example": "John Doe"
+                    "example": "Doe"
                 },
                 "role": {
                     "type": "string",

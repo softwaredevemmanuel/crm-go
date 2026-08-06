@@ -10,6 +10,7 @@ func RegisterAuthRoutes(r *gin.Engine) {
 	{
 		auth.POST("/signup", controllers.SignUp)
 		auth.POST("/login", controllers.Login)
+		auth.POST("/login/id", controllers.LoginId)
 		auth.POST("/logout", controllers.Logout)
 		auth.GET("/google/login", controllers.GoogleLoginHandler)
 		auth.GET("/google/callback", controllers.GoogleCallbackHandler)

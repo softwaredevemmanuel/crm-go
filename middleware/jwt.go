@@ -90,3 +90,74 @@ func AuthMiddleware() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+// verifyTokenWithEmail validates the JWT token and checks if the email matches
+func VerifyTokenWithEmail(tokenString string, expectedEmail string) (bool, uint, error) {
+	// Parse token
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Validate signing method
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, jwt.ErrSignatureInvalid
+		}
+		// Use the same secret as your middleware
+		return []byte("supersecretkey"), nil // Should come from env
+	})
+
+	if err != nil {
+		return false, 0, err
+	}
+
+	// Extract claims
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		// Check if token is expired
+		if exp, ok := claims["exp"].(float64); ok {
+			if int64(exp) < time.Now().Unix() {
+				return false, 0, jwt.ErrTokenExpired
+			}
+		}
+
+		// Get email from claims (assuming it's stored as "email" or "localEmail")
+		email, emailOk := claims["email"].(string)
+		if !emailOk {
+			// Try alternative claim name
+			email, emailOk = claims["localEmail"].(string)
+			if !emailOk {
+				return false, 0, jwt.ErrInvalidType
+			}
+		}
+
+		// Verify email matches
+		if email != expectedEmail {
+			return false, 0, errors.New("email mismatch")
+		}
+
+		// Get user_id from claims
+		userIDFloat, userIDOk := claims["user_id"].(float64)
+		if !userIDOk {
+			// Try int format
+			userIDInt, ok := claims["user_id"].(int)
+			if !ok {
+				return false, 0, jwt.ErrInvalidType
+			}
+			return true, uint(userIDInt), nil
+		}
+		return true, uint(userIDFloat), nil
+	}
+
+	return false, 0, jwt.ErrTokenInvalidClaims
+}
+
+// Optional: Helper function to generate tokens (for testing)
+func GenerateTestToken(userID uint, email string, role string) (string, error) {
+	claims := jwt.MapClaims{
+		"user_id":  userID,
+		"email":    email,
+		"role":     role,
+		"exp":      time.Now().Add(24 * time.Hour).Unix(),
+		"iat":      time.Now().Unix(),
+		"issuer":   "crm-go",
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte("supersecretkey"))
+}

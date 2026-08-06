@@ -13,6 +13,8 @@ type LoginInput struct {
 	Password string `json:"password" binding:"required" example:"123456"`
 }
 
+
+
 // LoginResponse represents login response
 // @Description Login response with token and session information
 type LoginResponse struct {
@@ -27,7 +29,8 @@ type LoginResponse struct {
 // @Description User information
 type UserInfo struct {
 	ID    uuid.UUID `json:"id" example:"550e8400-e29b-41d4-a716-446655440000"`
-	Name  string    `json:"name" example:"John Doe"`
+	FirstName  string    `json:"first_name" example:"John"`
+	LastName string    `json:"last_name" example:"Doe"`
 	Email string    `json:"email" example:"user@example.com"`
 	Role  string    `json:"role" example:"student"`
 }

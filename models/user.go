@@ -20,6 +20,7 @@ type User struct {
 	LastName  string    `gorm:"type:varchar(100);not null" json:"last_name"`
 	Email     string    `gorm:"type:varchar(255);uniqueIndex;not null" json:"email"`
 	Password  string    `gorm:"type:text" json:"-"` // - means exclude from JSON
+	LoginId	  string    `gorm:"type:text" json:"login_id,omitempty"`
 	Picture   string    `gorm:"type:text" json:"picture,omitempty"`
 	Provider  string    `gorm:"type:varchar(50);default:'local'" json:"provider"`
 	Role      Role      `gorm:"type:varchar(10);not null"`

@@ -3,6 +3,7 @@ package config
 import (
     "log"
     "os"
+    "time"
 
     "gorm.io/driver/postgres"
     "gorm.io/gorm"
@@ -20,6 +21,25 @@ func ConnectDB() {
     if err != nil {
         log.Fatalf("❌ Failed to connect database: %v", err)
     }
+
+    // Get the underlying *sql.DB to configure the connection pool
+	sqlDB, err := database.DB()
+	if err != nil {
+		log.Fatalf("❌ Failed to get database instance: %v", err)
+	}
+
+	// Configure connection pool
+	sqlDB.SetMaxOpenConns(20)             // Maximum number of open connections
+	sqlDB.SetMaxIdleConns(5)              // Maximum number of idle connections
+	sqlDB.SetConnMaxLifetime(time.Hour)   // Recreate connections after 1 hour
+	sqlDB.SetConnMaxIdleTime(30 * time.Minute)
+
+	// Verify the connection
+	if err := sqlDB.Ping(); err != nil {
+		log.Fatalf("❌ Database ping failed: %v", err)
+	}
+
+
     DB= database
     log.Println("✅ Database connected")
     
