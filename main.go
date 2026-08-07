@@ -9,6 +9,8 @@ import (
 	"flag"
 	"github.com/gin-contrib/cors"
 	"time"
+	"os"
+	"log"
 
 	_ "crm-go/docs"
 
@@ -54,7 +56,7 @@ func main() {
 	r.SetTrustedProxies(nil) // trust no proxies in dev
 	r.Use(middleware.SessionMiddleware())
 
-		r.Use(cors.New(cors.Config{
+	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "email"},
@@ -171,13 +173,22 @@ func main() {
 		seeds.SeedLessons()
 		seeds.SeedTopics()
 		seeds.SeedCourseMaterials()
-		seeds.SeedObjectiveQuestions()	
+		seeds.SeedObjectiveQuestions()
 		return
 	}
 
 	SetupSwagger(r)
 
-	r.Run(":8080")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" // local default
+	}
+
+	log.Printf("Server starting on port %s", port)
+
+	if err := r.Run(":" + port); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func SetupSwagger(r *gin.Engine) {
