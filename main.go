@@ -57,7 +57,7 @@ func main() {
 	r.Use(middleware.SessionMiddleware())
 
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowOrigins:     []string{"http://localhost:3000", "https://hr-app-emmadsaxlegends-projects.vercel.app"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "email"},
 		AllowCredentials: true,
