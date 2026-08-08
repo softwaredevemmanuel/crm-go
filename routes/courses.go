@@ -9,7 +9,7 @@ import (
 func CourseRoutes(r *gin.Engine) {
 	{
 		courses := r.Group("/courses")
-		courses.GET("/", courseController.GetCourses)
+		courses.GET("", courseController.GetCourses)
 		courses.GET("/:id", courseController.GetCourseByID)
 		courses.GET("/:id/products", courseController.GetProductsWithRalatedCourseID)
 

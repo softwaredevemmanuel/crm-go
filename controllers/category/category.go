@@ -34,40 +34,39 @@ type ListCategoryCourses struct {
 func CreateCategory(c *gin.Context) {
 	var category models.Category
 
-	// Bind JSON request
 	if err := c.ShouldBindJSON(&category); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Validation Error",
+			"message": err.Error(),
+		})
 		return
 	}
 
 	db := config.DB
 
-	// ✅ Check if category with the same name already exists
+	// Check for duplicate
 	var existing models.Category
 	if err := db.Where("name = ?", category.Name).First(&existing).Error; err == nil {
-		// Found a duplicate
-		c.JSON(http.StatusConflict, models.ErrorResponse{
-			Error:   "Duplicate Error",
-			Message: "Category with this name already exists",
+		c.JSON(http.StatusConflict, gin.H{
+			"error":   "Duplicate Error",
+			"message": "Category with this name already exists",
 		})
 		return
 	}
 
-	// ✅ Create new category
 	if err := db.Create(&category).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, models.Category{
-			ID:   category.ID,
-			Name: category.Name,
-			Description: category.Description,
-			CreatedAt: category.CreatedAt,
-			UpdatedAt: category.UpdatedAt,
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Creation Failed",
+			"message": "Failed to create category",
 		})
 		return
 	}
 
-	c.JSON(http.StatusCreated, category)
+	// Return only success message
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "Category Created Successfully",
+	})
 }
-
 
 // Get All Categories 
 // @Summary Get all categories

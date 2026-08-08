@@ -39,6 +39,7 @@ import (
 // @name Authorization
 // @description Type "Bearer" followed by a space and JWT token.
 
+
 func main() {
 	// Migrate to database
 	database.MigrateDatabase()
@@ -54,15 +55,16 @@ func main() {
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 	r.SetTrustedProxies(nil) // trust no proxies in dev
-	r.Use(middleware.SessionMiddleware())
-
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000", "https://hr-app-ecru-nine.vercel.app"},
+		AllowOrigins:     []string{"http://localhost:3000", "http://localhost:8080", "https://hr-app-ecru-nine.vercel.app"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "email"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Accept", "email"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
+	r.Use(middleware.SessionMiddleware())
+
+
 
 	// ✅ Swagger documentation route
 	//r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
