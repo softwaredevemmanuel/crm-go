@@ -534,7 +534,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Admin creates a relationship between a course and a category",
+                "description": "Admin creates relationships between multiple courses and a category. Accepts an array of course IDs.",
                 "consumes": [
                     "application/json"
                 ],
@@ -544,7 +544,7 @@ const docTemplate = `{
                 "tags": [
                     "Course Categories"
                 ],
-                "summary": "Create a Course-Category relationship",
+                "summary": "Create Course-Category relationships",
                 "parameters": [
                     {
                         "description": "Course-Category Payload",
@@ -557,47 +557,32 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "additionalProperties": true
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
                             "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "additionalProperties": true
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
                             "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "additionalProperties": true
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -4232,6 +4217,9 @@ const docTemplate = `{
                 "course_id": {
                     "type": "string"
                 },
+                "created_at": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -4239,6 +4227,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "title": {
+                    "type": "string"
+                },
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -4559,7 +4550,10 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "course_id": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },

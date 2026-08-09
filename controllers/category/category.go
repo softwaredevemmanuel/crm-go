@@ -14,6 +14,8 @@ type ListCategoryCourses struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	Image       string `json:"image"`
+	CreatedAt	string  `json:"created_at"`
+	UpdatedAt	string  `json:"updated_at"`
 }
 
 
@@ -123,6 +125,8 @@ func CategoryDetailsWithRelatedCourses(c *gin.Context) {
 			Title:       course.Title,
 			Description: course.Description,
 			Image:       course.Image,
+			CreatedAt:   course.CreatedAt.String(),
+			UpdatedAt:   course.UpdatedAt.String(),
 		})
 	}
 
@@ -132,6 +136,8 @@ func CategoryDetailsWithRelatedCourses(c *gin.Context) {
 		"name":        category.Name,
 		"description": category.Description,
 		"courses":     relatedCourses,
+		"created_at":  category.CreatedAt.String(),
+		"updated_at":  category.UpdatedAt.String(),
 	}
 
 	c.JSON(http.StatusOK, response)

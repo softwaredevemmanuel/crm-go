@@ -16,38 +16,40 @@ import (
 
 
 // CreateCourseCategory godoc
-// @Summary Create a Course-Category relationship
-// @Description Admin creates a relationship between a course and a category
+// @Summary Create Course-Category relationships
+// @Description Admin creates relationships between multiple courses and a category. Accepts an array of course IDs.
 // @Tags Course Categories
 // @Accept json
 // @Produce json
 // @Param request body models.CreateCourseCategoryRequest true "Course-Category Payload"
-// @Success 201 {object} map[string]interface{}
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 409 {object} map[string]string
-// @Failure 500 {object} map[string]string
+// @Failure 400 {object} map[string]interface{}
+// @Failure 404 {object} map[string]interface{}
+// @Failure 409 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
 // @Router /api/category-courses [post]
 // @Security BearerAuth
 func CreateCourseCategory(c *gin.Context) {
     var request struct {
-        CourseID   string `json:"course_id" binding:"required,uuid4"`
-        CategoryID string `json:"category_id" binding:"required,uuid4"`
+        CourseIDs  []string `json:"course_id" binding:"required"`
+        CategoryID string   `json:"category_id" binding:"required,uuid4"`
     }
+    log.Printf("✅ value of courseId: 1")
 
     // Bind JSON request
     if err := c.ShouldBindJSON(&request); err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
     }
+    log.Printf("✅ value of courseId: 2")
 
-    // Parse UUIDs
-    courseUUID, err := uuid.Parse(request.CourseID)
-    if err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid course ID format"})
+    // Validate that course_ids array is not empty
+    if len(request.CourseIDs) == 0 {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "At least one course ID is required"})
         return
     }
+    log.Printf("✅ value of courseId: 3")
 
+    // Parse category UUID
     categoryUUID, err := uuid.Parse(request.CategoryID)
     if err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid category ID format"})
@@ -56,26 +58,22 @@ func CreateCourseCategory(c *gin.Context) {
 
     db := config.DB
 
-    // Debug log
-    log.Printf("✅ value of courseId: %v", courseUUID)
-    log.Printf("✅ value of categoryId: %v", categoryUUID)
-
-    // ✅ Check if course exists
-    var course models.Course
-    if err := db.Where("id = ?", courseUUID).First(&course).Error; err != nil {
-        log.Printf("✅ value of error: %v", err)
-
-        if errors.Is(err, gorm.ErrRecordNotFound) {
-            c.JSON(http.StatusBadRequest, gin.H{"error": "Course ID does not exist"})
-        } else {
-            c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check course existence"})
-        }
+    // ✅ Start a transaction
+    tx := db.Begin()
+    if tx.Error != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to start transaction"})
         return
     }
+    defer func() {
+        if r := recover(); r != nil {
+            tx.Rollback()
+        }
+    }()
 
     // ✅ Check if category exists
     var category models.Category
-    if err := db.Where("id = ?", categoryUUID).First(&category).Error; err != nil {
+    if err := tx.Where("id = ?", categoryUUID).First(&category).Error; err != nil {
+        tx.Rollback()
         if errors.Is(err, gorm.ErrRecordNotFound) {
             c.JSON(http.StatusBadRequest, gin.H{"error": "Category ID does not exist"})
         } else {
@@ -84,32 +82,128 @@ func CreateCourseCategory(c *gin.Context) {
         return
     }
 
-    // ✅ Check if course-category relationship already exists
-    var existing models.CourseCategoryTable
-    if err := db.Where("course_id = ? AND category_id = ?", courseUUID, categoryUUID).First(&existing).Error; err == nil {
-        c.JSON(http.StatusConflict, gin.H{"error": "Course already exists in this category"})
-        return
-    } else if !errors.Is(err, gorm.ErrRecordNotFound) {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check existing relationship"})
+    // Parse all course UUIDs and validate
+    var courseUUIDs []uuid.UUID
+    var invalidCourseIDs []string
+    
+    for _, courseID := range request.CourseIDs {
+        parsedUUID, err := uuid.Parse(courseID)
+        if err != nil {
+            invalidCourseIDs = append(invalidCourseIDs, courseID)
+            continue
+        }
+        courseUUIDs = append(courseUUIDs, parsedUUID)
+    }
+
+    if len(invalidCourseIDs) > 0 {
+        tx.Rollback()
+        c.JSON(http.StatusBadRequest, gin.H{
+            "error":              "Invalid course ID format",
+            "invalid_course_ids": invalidCourseIDs,
+        })
         return
     }
 
-    // ✅ Create new course category relationship
-    courseCategory := models.CourseCategoryTable{
-        CourseID:   courseUUID,
-        CategoryID: categoryUUID,
+    // ✅ Check if all courses exist and get their details
+    var courseDetails []models.Course
+    var nonExistentCourses []string
+    
+    for _, courseUUID := range courseUUIDs {
+        var course models.Course
+        if err := tx.Where("id = ?", courseUUID).First(&course).Error; err != nil {
+            if errors.Is(err, gorm.ErrRecordNotFound) {
+                nonExistentCourses = append(nonExistentCourses, courseUUID.String())
+            }
+        } else {
+            courseDetails = append(courseDetails, course)
+        }
     }
 
-    if err := db.Create(&courseCategory).Error; err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create course category relationship"})
+    if len(nonExistentCourses) > 0 {
+        tx.Rollback()
+        c.JSON(http.StatusBadRequest, gin.H{
+            "error":                 "Some courses do not exist",
+            "non_existent_courses": nonExistentCourses,
+        })
         return
+    }
+
+    // ✅ Check existing relationships and filter
+    var courseCategories []models.CourseCategoryTable
+    var alreadyExists []string
+    var createdCourses []models.Course
+
+    for _, course := range courseDetails {
+        var existing models.CourseCategoryTable
+        if err := tx.Where("course_id = ? AND category_id = ?", course.ID, categoryUUID).First(&existing).Error; err == nil {
+            alreadyExists = append(alreadyExists, course.ID.String())
+        } else if errors.Is(err, gorm.ErrRecordNotFound) {
+            // Create new relationship
+            courseCategories = append(courseCategories, models.CourseCategoryTable{
+                CourseID:   course.ID,
+                CategoryID: categoryUUID,
+            })
+            createdCourses = append(createdCourses, course)
+        } else {
+            tx.Rollback()
+            c.JSON(http.StatusInternalServerError, gin.H{
+                "error": "Failed to check existing relationships",
+            })
+            return
+        }
+    }
+
+    // If all courses already exist, return conflict
+    if len(courseCategories) == 0 {
+        tx.Rollback()
+        c.JSON(http.StatusConflict, gin.H{
+            "error":            "All courses already exist in this category",
+            "existing_courses": alreadyExists,
+        })
+        return
+    }
+
+    // ✅ Batch insert new relationships
+    if err := tx.Create(&courseCategories).Error; err != nil {
+        tx.Rollback()
+        c.JSON(http.StatusInternalServerError, gin.H{
+            "error": "Failed to create course category relationships",
+        })
+        return
+    }
+
+    // ✅ Commit transaction
+    if err := tx.Commit().Error; err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{
+            "error": "Failed to commit transaction",
+        })
+        return
+    }
+
+    // Return success response
+    var createdIDs []string
+    var createdCourseNames []string
+    
+    for i, cc := range courseCategories {
+        createdIDs = append(createdIDs, cc.ID.String())
+        if i < len(createdCourses) {
+            createdCourseNames = append(createdCourseNames, createdCourses[i].Title)
+        }
+    }
+
+    // Prepare response message
+    message := "Course(s) added to category successfully"
+    if len(alreadyExists) > 0 {
+        message = "Some courses were added successfully. Some already existed."
     }
 
     c.JSON(http.StatusCreated, gin.H{
-        "id":          courseCategory.ID,
-        "course_id":   courseCategory.CourseID,
-        "category_id": courseCategory.CategoryID,
-        "message":     "Course category created successfully",
+        "message":             message,
+        "created_relationships": createdIDs,
+        "added_courses":       len(courseCategories),
+        "added_course_names":  createdCourseNames,
+        "existing_courses":    alreadyExists,
+        "total_courses":       len(request.CourseIDs),
     })
 }
 

@@ -33,7 +33,7 @@ type CourseCategoryTable struct {
 }
 
 type CreateCourseCategoryRequest struct {
-    CourseID   string `json:"course_id" binding:"required,uuid4"`
+    CourseID   []string `json:"course_id" binding:"required,uuid4"`
     CategoryID string `json:"category_id" binding:"required,uuid4"`
 }
 
