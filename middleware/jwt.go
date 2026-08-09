@@ -153,7 +153,7 @@ func GenerateTestToken(userID uint, email string, role string) (string, error) {
 		"user_id":  userID,
 		"email":    email,
 		"role":     role,
-		"exp":      time.Now().Add(24 * time.Hour).Unix(),
+		"exp":      time.Now().Add(48 * time.Hour).Unix(),
 		"iat":      time.Now().Unix(),
 		"issuer":   "crm-go",
 	}
