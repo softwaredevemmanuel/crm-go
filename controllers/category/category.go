@@ -12,6 +12,7 @@ import (
 type ListCategoryCourses struct {
 	ID          string `json:"course_id"`
 	Title       string `json:"title"`
+	CourseCategoryID string `json:"id"`
 	Description string `json:"description"`
 	Image       string `json:"image"`
 	CreatedAt	string  `json:"created_at"`
@@ -108,25 +109,34 @@ func CategoryDetailsWithRelatedCourses(c *gin.Context) {
 		return
 	}
 
-	// Fetch courses under this category
-	var courses []models.Course
-	if err := db.Joins("JOIN course_category_tables ON courses.id = course_category_tables.course_id").
+	// Define a struct to hold course with category ID
+	type CourseWithCategoryID struct {
+		models.Course
+		CourseCategoryID string `gorm:"column:course_category_id"`
+	}
+
+	// Fetch courses under this category with the course_category_id
+	var coursesWithCategory []CourseWithCategoryID
+	if err := db.Table("courses").
+		Select("courses.*, course_category_tables.id as course_category_id").
+		Joins("JOIN course_category_tables ON courses.id = course_category_tables.course_id").
 		Where("course_category_tables.category_id = ?", categoryID).
-		Find(&courses).Error; err != nil {
+		Find(&coursesWithCategory).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch courses"})
 		return
 	}
 
 	// Map courses to DTO
 	var relatedCourses []ListCategoryCourses
-	for _, course := range courses {
+	for _, course := range coursesWithCategory {
 		relatedCourses = append(relatedCourses, ListCategoryCourses{
-			ID:          course.ID.String(),
-			Title:       course.Title,
-			Description: course.Description,
-			Image:       course.Image,
-			CreatedAt:   course.CreatedAt.String(),
-			UpdatedAt:   course.UpdatedAt.String(),
+			ID:               course.ID.String(),
+			CourseCategoryID: course.CourseCategoryID,
+			Title:            course.Title,
+			Description:      course.Description,
+			Image:            course.Image,
+			CreatedAt:        course.CreatedAt.String(),
+			UpdatedAt:        course.UpdatedAt.String(),
 		})
 	}
 
