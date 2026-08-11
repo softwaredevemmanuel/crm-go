@@ -211,11 +211,102 @@ definitions:
         type: string
       description:
         type: string
+      id:
+        type: string
       image:
         type: string
       title:
         type: string
       updated_at:
+        type: string
+    type: object
+  dto.CreateSubjectRequest:
+    properties:
+      code:
+        maxLength: 50
+        minLength: 2
+        type: string
+      credits:
+        maximum: 10
+        minimum: 0
+        type: integer
+      department:
+        type: string
+      description:
+        type: string
+      name:
+        maxLength: 255
+        minLength: 3
+        type: string
+      status:
+        enum:
+        - active
+        - inactive
+        type: string
+    required:
+    - code
+    - name
+    type: object
+  dto.SubjectListResponse:
+    properties:
+      limit:
+        type: integer
+      page:
+        type: integer
+      subjects:
+        items:
+          $ref: '#/definitions/dto.SubjectResponse'
+        type: array
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.SubjectResponse:
+    properties:
+      code:
+        type: string
+      created_at:
+        type: string
+      created_by:
+        type: string
+      credits:
+        type: integer
+      department:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  dto.UpdateSubjectRequest:
+    properties:
+      code:
+        maxLength: 50
+        minLength: 2
+        type: string
+      credits:
+        maximum: 10
+        minimum: 0
+        type: integer
+      department:
+        type: string
+      description:
+        type: string
+      name:
+        maxLength: 255
+        minLength: 3
+        type: string
+      status:
+        enum:
+        - active
+        - inactive
         type: string
     type: object
   enrollments.CreateEnrollmentInput:
@@ -2733,6 +2824,153 @@ paths:
       summary: Create multiple questions
       tags:
       - questions
+  /api/subjects:
+    post:
+      consumes:
+      - application/json
+      description: Create a new subject with the provided details
+      parameters:
+      - description: Subject creation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateSubjectRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.SubjectResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new subject
+      tags:
+      - Subjects
+  /api/subjects/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete a subject by ID
+      parameters:
+      - description: Subject ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a subject
+      tags:
+      - Subjects
+    put:
+      consumes:
+      - application/json
+      description: Update an existing subject by ID
+      parameters:
+      - description: Subject ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Subject update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateSubjectRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update a subject
+      tags:
+      - Subjects
   /api/topics:
     post:
       consumes:
@@ -3903,6 +4141,132 @@ paths:
       summary: Get related courses with product ID
       tags:
       - Products
+  /subjects:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of subjects with optional filtering
+      parameters:
+      - description: Search by name, code, or description
+        in: query
+        name: search
+        type: string
+      - description: Filter by department
+        in: query
+        name: department
+        type: string
+      - description: Filter by status (active, inactive)
+        in: query
+        name: status
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - default: created_at
+        description: Sort by field (name, code, department, credits, created_at, updated_at)
+        in: query
+        name: sort_by
+        type: string
+      - default: desc
+        description: Sort order (asc, desc)
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SubjectListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all subjects
+      tags:
+      - Subjects
+  /subjects/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a single subject by its ID
+      parameters:
+      - description: Subject ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get subject by ID
+      tags:
+      - Subjects
+  /subjects/departments:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all unique departments
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all subject departments
+      tags:
+      - Subjects
   /topics:
     get:
       description: Get all topics, optionally filtered by course or module

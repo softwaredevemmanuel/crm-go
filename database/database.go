@@ -53,6 +53,7 @@ func MigrateDatabase() {
 	db.AutoMigrate(&models.LiveClass{})
 	db.AutoMigrate(&models.ObjectiveQuestion{})
 	db.AutoMigrate(&models.QuestionOption{})
+	db.AutoMigrate(&models.Subject{})
 
 	log.Println("✅ Database migrated successfully")
 
