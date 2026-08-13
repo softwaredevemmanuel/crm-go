@@ -4,29 +4,32 @@ package routes
 import (
 	"crm-go/controllers/subject"
 	"crm-go/middleware"
-	"crm-go/services"
+	"crm-go/services/subjects"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
-func SubjectRoutes(r *gin.Engine, db *gorm.DB) {
+func SubjectRoutes(router *gin.RouterGroup, db *gorm.DB) {
+	service := services.NewSubjectService(db)
+	handler := controllers.NewSubjectController(service)
 
-	// Initialize services
-	subjectService := services.NewSubjectService(db)
+	subjectGroup := router.Group("/api/subjects")
+	subjectGroup.Use(middleware.AuthMiddleware()) // Your auth middleware
+	{
+		// 1. Create subject
+		subjectGroup.POST("", handler.CreateSubject)
 
-	// Initialize controller
-	subjectController := controllers.NewSubjectController(db, subjectService)
+		// 2. Get all subjects with pagination
+		subjectGroup.GET("", handler.GetAllSubjects)
 
-	subjects := r.Group("/subjects")
-	subjects.GET("", subjectController.GetAllSubjects)
-	subjects.GET("/:id", subjectController.GetSubjectByID)
-	subjects.GET("/department", subjectController.GetSubjectDepartments)
+		// 3. Get subject by ID with department and head
+		subjectGroup.GET("/department/head-of-department/:id", handler.GetSubjectWithDepartmentAndHead)
 
-	// Protected routes
-	protected := r.Group("/api")
-	protected.Use(middleware.AuthMiddleware())
-	protected.POST("/subjects", middleware.RoleMiddleware("admin"), subjectController.CreateSubject)
-	protected.PUT("/subjects/:id", middleware.RoleMiddleware("admin"), subjectController.UpdateSubject)
-	protected.DELETE("/subjects/:id", middleware.RoleMiddleware("admin"), subjectController.DeleteSubject)
+		// 4. Update subject
+		subjectGroup.PUT("/:id", handler.UpdateSubject)
 
+		// 5. Delete subject
+		subjectGroup.DELETE("/:id", handler.DeleteSubject)
+	}
 }
+

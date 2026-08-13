@@ -59,7 +59,8 @@ func main() {
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000", "https://hr-app-ecru-nine.vercel.app"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Accept", "email"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Accept", "email", "user_id"},
+		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
@@ -99,8 +100,10 @@ func main() {
 	routes.CourseMaterialRoutes(r)
 	routes.LiveClassRoutes(r, config.DB)
 	routes.ObjectiveQuestionRoutes(r, config.DB)
-	routes.SubjectRoutes(r, config.DB)
+	routes.SubjectRoutes(&r.RouterGroup, config.DB)
 	routes.ClassGradeRoutes(r, config.DB)
+	routes.SubjectGradeRoutes(r, config.DB)
+	routes.DepartmentRoutes(&r.RouterGroup, config.DB)
 
 	// Example curl command to clear DB (replace with your server address):
 	// curl -X DELETE "http://localhost:8080/admin/clear-db" \
@@ -176,6 +179,9 @@ func main() {
 		seeds.SeedTopics()
 		seeds.SeedCourseMaterials()
 		seeds.SeedObjectiveQuestions()
+		seeds.SeedClassGrades()
+		seeds.SeedDepartments()
+		seeds.SeedSubjects()
 		return
 	}
 

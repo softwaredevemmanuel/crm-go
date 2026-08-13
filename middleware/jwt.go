@@ -11,6 +11,7 @@ import (
 	"crm-go/config"
 	"crm-go/models"
 	"errors"
+	"fmt"
 	"time"
 )
 
@@ -58,16 +59,25 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		fmt.Println("========== AUTH USER ==========")
+		// fmt.Printf("User ID: %v\n", claims["user_id"])
+		// fmt.Printf("Email: %v\n", claims["email"])
+		// fmt.Printf("Role: %v\n", claims["role"])
+		// fmt.Printf("Issuer: %v\n", claims["issuer"])
+		// fmt.Printf("Issued At: %v\n", claims["iat"])
+		// fmt.Printf("Expires At: %v\n", claims["exp"])
+		// fmt.Println("===============================")
+
 		// ✅ NEW: Check if session is still active in database
 		var session models.UserSession
-		result := config.DB.Where("session_token = ? AND is_active = true AND expires_at > ?", 
+		result := config.DB.Where("session_token = ? AND is_active = true AND expires_at > ?",
 			tokenString, time.Now()).
 			First(&session)
 
 		if result.Error != nil {
 			if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 				c.JSON(http.StatusUnauthorized, gin.H{
-					"error": "Session expired or invalidated",
+					"error":   "Session expired or invalidated",
 					"message": "Please login again",
 				})
 			} else {
@@ -78,6 +88,12 @@ func AuthMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+		// fmt.Println("========== SESSION ==========")
+		// fmt.Printf("Session ID: %v\n", session.ID)
+		// fmt.Printf("Session User ID: %v\n", session.UserID)
+		// fmt.Printf("Session Active: %v\n", session.IsActive)
+		// fmt.Printf("Expires At: %v\n", session.ExpiresAt)
+		// fmt.Println("=============================")
 
 		// ✅ NEW: Update last used timestamp (optional but recommended)
 		config.DB.Model(&session).Update("last_used_at", time.Now())
@@ -150,12 +166,12 @@ func VerifyTokenWithEmail(tokenString string, expectedEmail string) (bool, uint,
 // Optional: Helper function to generate tokens (for testing)
 func GenerateTestToken(userID uint, email string, role string) (string, error) {
 	claims := jwt.MapClaims{
-		"user_id":  userID,
-		"email":    email,
-		"role":     role,
-		"exp":      time.Now().Add(48 * time.Hour).Unix(),
-		"iat":      time.Now().Unix(),
-		"issuer":   "crm-go",
+		"user_id": userID,
+		"email":   email,
+		"role":    role,
+		"exp":     time.Now().Add(48 * time.Hour).Unix(),
+		"iat":     time.Now().Unix(),
+		"issuer":  "crm-go",
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

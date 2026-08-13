@@ -220,6 +220,36 @@ definitions:
       updated_at:
         type: string
     type: object
+  dto.BulkCreateSubjectGradeRequest:
+    properties:
+      academic_year:
+        type: string
+      credits:
+        maximum: 10
+        minimum: 0
+        type: integer
+      description:
+        type: string
+      grade_id:
+        type: string
+      is_required:
+        type: boolean
+      status:
+        enum:
+        - active
+        - inactive
+        - archived
+        type: string
+      subject_ids:
+        items:
+          type: string
+        minItems: 1
+        type: array
+    required:
+    - academic_year
+    - grade_id
+    - subject_ids
+    type: object
   dto.ClassGradeListResponse:
     properties:
       class_grades:
@@ -294,6 +324,53 @@ definitions:
     - level
     - name
     type: object
+  dto.CreateDepartmentRequest:
+    properties:
+      code:
+        maxLength: 20
+        minLength: 2
+        type: string
+      description:
+        type: string
+      head_id:
+        type: string
+      name:
+        maxLength: 100
+        minLength: 2
+        type: string
+      status:
+        type: string
+    required:
+    - code
+    - name
+    type: object
+  dto.CreateSubjectGradeRequest:
+    properties:
+      academic_year:
+        type: string
+      credits:
+        maximum: 10
+        minimum: 0
+        type: integer
+      description:
+        type: string
+      grade_id:
+        type: string
+      is_required:
+        type: boolean
+      status:
+        enum:
+        - active
+        - inactive
+        - archived
+        type: string
+      subject_id:
+        type: string
+    required:
+    - academic_year
+    - grade_id
+    - subject_id
+    type: object
   dto.CreateSubjectRequest:
     properties:
       code:
@@ -304,7 +381,7 @@ definitions:
         maximum: 10
         minimum: 0
         type: integer
-      department:
+      department_id:
         type: string
       description:
         type: string
@@ -313,28 +390,66 @@ definitions:
         minLength: 3
         type: string
       status:
-        enum:
-        - active
-        - inactive
         type: string
     required:
     - code
+    - department_id
     - name
     type: object
-  dto.SubjectListResponse:
+  dto.DepartmentBriefResponse:
+    properties:
+      code:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  dto.SubjectGradeListResponse:
     properties:
       limit:
         type: integer
       page:
         type: integer
-      subjects:
+      subject_grades:
         items:
-          $ref: '#/definitions/dto.SubjectResponse'
+          $ref: '#/definitions/dto.SubjectGradeResponse'
         type: array
       total:
         type: integer
       total_pages:
         type: integer
+    type: object
+  dto.SubjectGradeResponse:
+    properties:
+      academic_year:
+        type: string
+      created_at:
+        type: string
+      created_by:
+        type: string
+      credits:
+        type: integer
+      description:
+        type: string
+      grade:
+        $ref: '#/definitions/dto.ClassGradeResponse'
+      grade_id:
+        type: string
+      id:
+        type: string
+      is_required:
+        type: boolean
+      status:
+        type: string
+      subject:
+        $ref: '#/definitions/dto.SubjectResponse'
+      subject_id:
+        type: string
+      updated_at:
+        type: string
     type: object
   dto.SubjectResponse:
     properties:
@@ -347,6 +462,8 @@ definitions:
       credits:
         type: integer
       department:
+        $ref: '#/definitions/dto.DepartmentBriefResponse'
+      department_id:
         type: string
       description:
         type: string
@@ -388,28 +505,32 @@ definitions:
         - archived
         type: string
     type: object
+  dto.UpdateDepartmentRequest:
+    properties:
+      code:
+        type: string
+      description:
+        type: string
+      head_id:
+        type: string
+      name:
+        type: string
+      status:
+        type: string
+    type: object
   dto.UpdateSubjectRequest:
     properties:
       code:
-        maxLength: 50
-        minLength: 2
         type: string
       credits:
-        maximum: 10
-        minimum: 0
         type: integer
-      department:
+      department_id:
         type: string
       description:
         type: string
       name:
-        maxLength: 255
-        minLength: 3
         type: string
       status:
-        enum:
-        - active
-        - inactive
         type: string
     type: object
   enrollments.CreateEnrollmentInput:
@@ -2695,6 +2816,224 @@ paths:
       summary: Restore deleted course material
       tags:
       - DeletedRecords
+  /api/departments:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Search by name, code, or description
+        in: query
+        name: search
+        type: string
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - default: created_at
+        description: Sort by field
+        in: query
+        name: sort_by
+        type: string
+      - default: desc
+        description: Sort order
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all departments with pagination
+      tags:
+      - Departments
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Department creation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateDepartmentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new department
+      tags:
+      - Departments
+  /api/departments/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Department ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a department (soft delete)
+      tags:
+      - Departments
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Department ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get department by ID with all details
+      tags:
+      - Departments
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Department ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateDepartmentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update a department
+      tags:
+      - Departments
+  /api/departments/{id}/head-subjects:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Department ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get department with head of department and subjects
+      tags:
+      - Departments
+  /api/departments/{id}/subjects:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Department ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get department with its subjects
+      tags:
+      - Departments
   /api/export/excel:
     get:
       description: Fetches all data from the database and exports it as an Excel (.xlsx)
@@ -3238,66 +3577,23 @@ paths:
       summary: Create multiple questions
       tags:
       - questions
-  /api/subjects:
+  /api/subject-grades:
     post:
       consumes:
       - application/json
-      description: Create a new subject with the provided details
+      description: Create a relationship between a subject and a class grade
       parameters:
-      - description: Subject creation request
+      - description: Subject-grade creation request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.CreateSubjectRequest'
+          $ref: '#/definitions/dto.CreateSubjectGradeRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
-          schema:
-            $ref: '#/definitions/dto.SubjectResponse'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "409":
-          description: Conflict
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Create a new subject
-      tags:
-      - Subjects
-  /api/subjects/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Soft delete a subject by ID
-      parameters:
-      - description: Subject ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
           schema:
             additionalProperties: true
             type: object
@@ -3328,20 +3624,391 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Delete a subject
+      summary: Create a new subject-grade relationship
       tags:
-      - Subjects
-    put:
+      - Subject Grades
+  /api/subject-grades/{id}:
+    delete:
       consumes:
       - application/json
-      description: Update an existing subject by ID
+      description: Soft delete a subject-grade relationship by ID
+      parameters:
+      - description: Subject-Grade Relationship ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a subject-grade relationship
+      tags:
+      - Subject Grades
+    get:
+      consumes:
+      - application/json
+      description: Get a single subject-grade relationship by its ID
+      parameters:
+      - description: Subject-Grade Relationship ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get subject-grade relationship by ID
+      tags:
+      - Subject Grades
+  /api/subject-grades/bulk:
+    post:
+      consumes:
+      - application/json
+      description: Create multiple subject-grade relationships for a grade
+      parameters:
+      - description: Bulk creation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BulkCreateSubjectGradeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Bulk create subject-grade relationships
+      tags:
+      - Subject Grades
+  /api/subject-grades/grade/{grade_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all subjects associated with a specific grade
+      parameters:
+      - description: Grade ID
+        in: path
+        name: grade_id
+        required: true
+        type: string
+      - description: Filter by academic year
+        in: query
+        name: academic_year
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get subjects by grade
+      tags:
+      - Subject Grades
+  /api/subject-grades/relationship:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of subject-grade relationships
+      parameters:
+      - description: Filter by subject ID
+        in: query
+        name: subject_id
+        type: string
+      - description: Filter by grade ID
+        in: query
+        name: grade_id
+        type: string
+      - description: Filter by academic year
+        in: query
+        name: academic_year
+        type: string
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - description: Filter by required status
+        in: query
+        name: is_required
+        type: boolean
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SubjectGradeListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all subject-grade relationships
+      tags:
+      - Subject Grades
+  /api/subject-grades/subject/{subject_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all grades associated with a specific subject
+      parameters:
+      - description: Subject ID
+        in: path
+        name: subject_id
+        required: true
+        type: string
+      - description: Filter by academic year
+        in: query
+        name: academic_year
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get grades by subject
+      tags:
+      - Subject Grades
+  /api/subjects:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Search by name, code, or description
+        in: query
+        name: search
+        type: string
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - description: Filter by department ID
+        in: query
+        name: department_id
+        type: string
+      - default: created_at
+        description: Sort by field
+        in: query
+        name: sort_by
+        type: string
+      - default: desc
+        description: Sort order
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all subjects with pagination
+      tags:
+      - Subjects
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Subject creation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateSubjectRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new subject
+      tags:
+      - Subjects
+  /api/subjects/{id}:
+    delete:
+      consumes:
+      - application/json
       parameters:
       - description: Subject ID
         in: path
         name: id
         required: true
         type: string
-      - description: Subject update request
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a subject (soft delete)
+      tags:
+      - Subjects
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Subject ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update request
         in: body
         name: request
         required: true
@@ -3360,8 +4027,111 @@ paths:
           schema:
             additionalProperties: true
             type: object
-        "401":
-          description: Unauthorized
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update a subject
+      tags:
+      - Subjects
+  /api/subjects/department:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Search by name, code, or description
+        in: query
+        name: search
+        type: string
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - description: Filter by department ID
+        in: query
+        name: department_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all subjects with their department details
+      tags:
+      - Subjects
+  /api/subjects/department/head-of-department:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Search by name, code, or description
+        in: query
+        name: search
+        type: string
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - description: Filter by department ID
+        in: query
+        name: department_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all subjects with department and head of department details
+      tags:
+      - Subjects
+  /api/subjects/department/head-of-department/{id}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Subject ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
           schema:
             additionalProperties: true
             type: object
@@ -3370,19 +4140,9 @@ paths:
           schema:
             additionalProperties: true
             type: object
-        "409":
-          description: Conflict
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
       security:
       - BearerAuth: []
-      summary: Update a subject
+      summary: Get subject by ID with department and head of department details
       tags:
       - Subjects
   /api/topics:
@@ -4555,132 +5315,6 @@ paths:
       summary: Get related courses with product ID
       tags:
       - Products
-  /subjects:
-    get:
-      consumes:
-      - application/json
-      description: Get a paginated list of subjects with optional filtering
-      parameters:
-      - description: Search by name, code, or description
-        in: query
-        name: search
-        type: string
-      - description: Filter by department
-        in: query
-        name: department
-        type: string
-      - description: Filter by status (active, inactive)
-        in: query
-        name: status
-        type: string
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        type: integer
-      - default: 20
-        description: Items per page
-        in: query
-        name: limit
-        type: integer
-      - default: created_at
-        description: Sort by field (name, code, department, credits, created_at, updated_at)
-        in: query
-        name: sort_by
-        type: string
-      - default: desc
-        description: Sort order (asc, desc)
-        in: query
-        name: sort_order
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.SubjectListResponse'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Get all subjects
-      tags:
-      - Subjects
-  /subjects/{id}:
-    get:
-      consumes:
-      - application/json
-      description: Get a single subject by its ID
-      parameters:
-      - description: Subject ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Get subject by ID
-      tags:
-      - Subjects
-  /subjects/departments:
-    get:
-      consumes:
-      - application/json
-      description: Get a list of all unique departments
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Get all subject departments
-      tags:
-      - Subjects
   /topics:
     get:
       description: Get all topics, optionally filtered by course or module
