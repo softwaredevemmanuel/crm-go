@@ -105,23 +105,29 @@ func (s *SubjectService) GetAllSubjects(params *dto.SubjectQueryParams) (*dto.Su
 	}
 
 	// Build query
-	query := s.db.Model(&models.Subject{}).Where("deleted_at IS NULL")
+	query := s.db.Model(&models.Subject{}).Where("subjects.deleted_at IS NULL")
 
 	// Apply filters
 	if params.Search != "" {
 		searchTerm := "%" + strings.ToLower(params.Search) + "%"
 		query = query.Where(
-			"LOWER(name) LIKE ? OR LOWER(code) LIKE ? OR LOWER(description) LIKE ?",
+			"LOWER(subjects.name) LIKE ? OR LOWER(subjects.code) LIKE ? OR LOWER(subjects.description) LIKE ?",
 			searchTerm, searchTerm, searchTerm,
 		)
 	}
 
 	if params.Status != "" {
-		query = query.Where("status = ?", params.Status)
+		query = query.Where("subjects.status = ?", params.Status)
 	}
 
-	if params.DepartmentID != "" {
-		query = query.Where("department_id = ?", params.DepartmentID)
+	// ✅ Handle department filtering - support both ID and Name
+	if params.Department != "" {
+		// Filter by department name
+		query = query.Joins("LEFT JOIN departments ON departments.id = subjects.department_id").
+			Where("LOWER(departments.name) = LOWER(?)", params.Department)
+	} else if params.DepartmentID != "" {
+		// Filter by department ID (UUID)
+		query = query.Where("subjects.department_id = ?", params.DepartmentID)
 	}
 
 	// Get total count
@@ -135,7 +141,7 @@ func (s *SubjectService) GetAllSubjects(params *dto.SubjectQueryParams) (*dto.Su
 	if strings.ToLower(params.SortOrder) == "asc" {
 		sortDirection = "ASC"
 	}
-	query = query.Order(params.SortBy + " " + sortDirection)
+	query = query.Order("subjects." + params.SortBy + " " + sortDirection)
 
 	// Apply pagination
 	offset := (params.Page - 1) * params.Limit
@@ -166,7 +172,6 @@ func (s *SubjectService) GetAllSubjects(params *dto.SubjectQueryParams) (*dto.Su
 		TotalPages: totalPages,
 	}, nil
 }
-
 
 // ============ 5. GET SUBJECT BY ID WITH DEPARTMENT AND HEAD ============
 func (s *SubjectService) GetSubjectWithDepartmentAndHead(id string) (*dto.SubjectWithDepartmentResponse, error) {

@@ -12,6 +12,7 @@ import (
 
 	"crm-go/models"
 	"crm-go/dto"
+
 )
 
 type DepartmentService struct {
@@ -196,6 +197,7 @@ func (s *DepartmentService) UpdateDepartment(id string, req *dto.UpdateDepartmen
 		return nil, fmt.Errorf("failed to fetch department: %w", err)
 	}
 
+
 	// Check duplicate name
 	if req.Name != "" && req.Name != department.Name {
 		var existing models.Department
@@ -213,11 +215,15 @@ func (s *DepartmentService) UpdateDepartment(id string, req *dto.UpdateDepartmen
 		}
 		department.Code = strings.ToUpper(strings.TrimSpace(req.Code))
 	}
+	
+				fmt.Printf("User ID: 1")
+
 
 	// Update description
 	if req.Description != "" {
 		department.Description = strings.TrimSpace(req.Description)
 	}
+				fmt.Printf("User ID: 2")
 
 	// Update HeadID
 	if req.HeadID != "" {
@@ -225,16 +231,21 @@ func (s *DepartmentService) UpdateDepartment(id string, req *dto.UpdateDepartmen
 		if err != nil {
 			return nil, errors.New("invalid head ID format")
 		}
+				fmt.Printf("User ID: 3")
 
 		var user models.User
-		if err := s.db.Where("id = ? AND deleted_at IS NULL", parsed).First(&user).Error; err != nil {
+		if err := s.db.Where("id = ?", parsed).First(&user).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				return nil, errors.New("head user not found")
 			}
+							fmt.Printf("User ID: 4")
+
 			return nil, fmt.Errorf("failed to verify head user: %w", err)
 		}
 		department.HeadOfDept = &parsed
 	}
+				fmt.Printf("User ID: 5")
+
 
 	// Update status
 	if req.Status != "" {

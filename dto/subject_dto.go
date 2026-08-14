@@ -25,14 +25,16 @@ type UpdateSubjectRequest struct {
 	Status       string `json:"status,omitempty"`
 }
 
+// dto/subject_dto.go
 type SubjectQueryParams struct {
+	Search       string `form:"search"`
+	DepartmentID string `form:"department_id"` // Keep for UUID
+	Department   string `form:"department"`    // ✅ Add for name filtering
+	Status       string `form:"status"`
 	Page         int    `form:"page" binding:"min=1"`
 	Limit        int    `form:"limit" binding:"min=1,max=100"`
-	Search       string `form:"search"`
-	Status       string `form:"status"`
-	DepartmentID string `form:"department_id"`
-	SortBy       string `form:"sort_by"`
-	SortOrder    string `form:"sort_order"`
+	SortBy       string `form:"sort_by" binding:"omitempty,oneof=name code department credits status created_at updated_at"`
+	SortOrder    string `form:"sort_order" binding:"omitempty,oneof=asc desc"`
 }
 
 // ============ RESPONSE DTOs ============
