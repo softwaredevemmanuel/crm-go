@@ -14,7 +14,7 @@ type SignUpInput struct {
 	LastName     string       `json:"last_name" binding:"required"`
 	Email    string       `json:"email" binding:"required,email"`
 	Password string       `json:"password" binding:"required,min=6"`
-	Role     models.Role  `json:"role" binding:"required"`
+	Role     string  `json:"role" binding:"required"`
 }
 
 // SignUp godoc

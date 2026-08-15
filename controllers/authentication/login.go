@@ -180,7 +180,7 @@ func LoginId(c *gin.Context) {
 	}
 
 	// Compare login IDs (password)
-	if user.LoginId != input.Password {
+	if user.LoginID != input.Password {
 		c.JSON(http.StatusUnauthorized, models.ErrorResponse{
 			Error:   "Invalid credentials",
 			Message: "Invalid email or password",

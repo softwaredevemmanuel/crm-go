@@ -119,7 +119,7 @@ func GoogleCallbackHandler(c *gin.Context) {
 			user = models.User{
 				FirstName: first_name,
 				LastName:  last_name,
-				Role:      models.Role(role),
+				Role:      role,
 				Email:     email,
 				Picture:   picture,
 				Provider:  "google",

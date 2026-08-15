@@ -195,7 +195,7 @@ definitions:
         minLength: 6
         type: string
       role:
-        $ref: '#/definitions/models.Role'
+        type: string
     required:
     - email
     - first_name
@@ -412,6 +412,58 @@ definitions:
     - code
     - name
     type: object
+  dto.CreateGuardianRequest:
+    properties:
+      address:
+        type: string
+      email:
+        type: string
+      first_name:
+        maxLength: 100
+        minLength: 2
+        type: string
+      is_emergency:
+        type: boolean
+      is_primary:
+        type: boolean
+      last_name:
+        maxLength: 100
+        minLength: 2
+        type: string
+      middle_name:
+        type: string
+      occupation:
+        type: string
+      phone:
+        type: string
+      relationship:
+        enum:
+        - Father
+        - Mother
+        - Guardian
+        - Uncle
+        - Aunt
+        - Grandfather
+        - Grandmother
+        - Brother
+        - Sister
+        - Other
+        type: string
+      status:
+        enum:
+        - active
+        - inactive
+        type: string
+      student_id:
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    - phone
+    - relationship
+    - student_id
+    type: object
   dto.CreateSubjectGradeRequest:
     properties:
       academic_year:
@@ -473,6 +525,54 @@ definitions:
       id:
         type: string
       name:
+        type: string
+    type: object
+  dto.GuardianListResponse:
+    properties:
+      guardians:
+        items:
+          $ref: '#/definitions/dto.GuardianResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.GuardianResponse:
+    properties:
+      address:
+        type: string
+      created_at:
+        type: string
+      created_by:
+        type: string
+      id:
+        type: string
+      is_emergency:
+        type: boolean
+      is_primary:
+        type: boolean
+      occupation:
+        type: string
+      relationship:
+        type: string
+      status:
+        type: string
+      student:
+        allOf:
+        - $ref: '#/definitions/dto.UserResponse'
+        description: Nested objects for complete details
+      student_id:
+        type: string
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/dto.UserResponse'
+      user_id:
         type: string
     type: object
   dto.SubjectGradeListResponse:
@@ -611,6 +711,37 @@ definitions:
       status:
         type: string
     type: object
+  dto.UpdateGuardianRequest:
+    properties:
+      address:
+        type: string
+      is_emergency:
+        type: boolean
+      is_primary:
+        type: boolean
+      occupation:
+        type: string
+      relationship:
+        enum:
+        - Father
+        - Mother
+        - Guardian
+        - Uncle
+        - Aunt
+        - Grandfather
+        - Grandmother
+        - Brother
+        - Sister
+        - Other
+        type: string
+      status:
+        enum:
+        - active
+        - inactive
+        type: string
+      student_id:
+        type: string
+    type: object
   dto.UpdateSubjectRequest:
     properties:
       code:
@@ -624,6 +755,54 @@ definitions:
       name:
         type: string
       status:
+        type: string
+    type: object
+  dto.UserListResponse:
+    properties:
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+      users:
+        items:
+          $ref: '#/definitions/dto.UserResponse'
+        type: array
+    type: object
+  dto.UserResponse:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      is_verified:
+        type: boolean
+      last_login_at:
+        type: string
+      last_name:
+        type: string
+      location:
+        type: string
+      middle_name:
+        type: string
+      phone:
+        type: string
+      picture:
+        type: string
+      role:
+        type: string
+      updated_at:
         type: string
     type: object
   enrollments.CreateEnrollmentInput:
@@ -1673,16 +1852,6 @@ definitions:
       sort_order:
         type: integer
     type: object
-  models.Role:
-    enum:
-    - student
-    - tutor
-    - admin
-    type: string
-    x-enum-varnames:
-    - Student
-    - Tutor
-    - Admin
   models.SessionInfo:
     description: Session information
     properties:
@@ -1791,16 +1960,28 @@ definitions:
         type: string
       id:
         type: string
+      is_active:
+        type: boolean
+      is_verified:
+        type: boolean
+      last_login_at:
+        type: string
       last_name:
         type: string
+      location:
+        type: string
       login_id:
+        type: string
+      middle_name:
+        type: string
+      phone:
         type: string
       picture:
         type: string
       provider:
         type: string
       role:
-        $ref: '#/definitions/models.Role'
+        type: string
       updated_at:
         type: string
     type: object
@@ -3556,6 +3737,292 @@ paths:
       summary: Update a grade
       tags:
       - grades
+  /api/guardians:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of guardians with optional filtering
+      parameters:
+      - description: Search by name, email, or phone
+        in: query
+        name: search
+        type: string
+      - description: Filter by student ID
+        in: query
+        name: student_id
+        type: string
+      - description: Filter by relationship
+        in: query
+        name: relationship
+        type: string
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - description: Filter by primary status
+        in: query
+        name: is_primary
+        type: boolean
+      - description: Filter by emergency status
+        in: query
+        name: is_emergency
+        type: boolean
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GuardianListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all guardians
+      tags:
+      - Guardians
+    post:
+      consumes:
+      - application/json
+      description: Create a new guardian for a student
+      parameters:
+      - description: Guardian creation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateGuardianRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new guardian
+      tags:
+      - Guardians
+  /api/guardians/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete a guardian by ID
+      parameters:
+      - description: Guardian ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a guardian
+      tags:
+      - Guardians
+    get:
+      consumes:
+      - application/json
+      description: Get a single guardian by its ID
+      parameters:
+      - description: Guardian ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get guardian by ID
+      tags:
+      - Guardians
+    put:
+      consumes:
+      - application/json
+      description: Update an existing guardian by ID
+      parameters:
+      - description: Guardian ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Guardian update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateGuardianRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update a guardian
+      tags:
+      - Guardians
+  /api/guardians/student/{student_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all guardians associated with a specific student
+      parameters:
+      - description: Student ID
+        in: path
+        name: student_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get guardians by student
+      tags:
+      - Guardians
   /api/lessons:
     post:
       consumes:
@@ -4605,6 +5072,162 @@ paths:
       summary: Update topic
       tags:
       - Topics
+  /api/users:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of users with optional filtering
+      parameters:
+      - description: Search by name, email, or phone
+        in: query
+        name: search
+        type: string
+      - description: Filter by role (admin, staff, student, parent, user)
+        in: query
+        name: role
+        type: string
+      - description: Filter by status (active, inactive)
+        in: query
+        name: status
+        type: string
+      - description: Filter by active status
+        in: query
+        name: is_active
+        type: boolean
+      - description: Filter by verification status
+        in: query
+        name: is_verified
+        type: boolean
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - default: created_at
+        description: Sort by field
+        in: query
+        name: sort_by
+        type: string
+      - default: desc
+        description: Sort order
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all users
+      tags:
+      - Users
+  /api/users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete a user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a user
+      tags:
+      - Users
+  /api/users/role/{role}:
+    get:
+      consumes:
+      - application/json
+      description: Get all users with a specific role
+      parameters:
+      - description: Role (admin, staff, student, parent, user)
+        in: path
+        name: role
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get users by role
+      tags:
+      - Users
   /assignments:
     get:
       consumes:
