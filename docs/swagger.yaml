@@ -220,6 +220,46 @@ definitions:
       updated_at:
         type: string
     type: object
+  dto.ArmListResponse:
+    properties:
+      arms:
+        items:
+          $ref: '#/definitions/dto.ArmResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.ArmResponse:
+    properties:
+      capacity:
+        type: integer
+      code:
+        type: string
+      created_at:
+        type: string
+      created_by:
+        type: string
+      description:
+        type: string
+      grade:
+        $ref: '#/definitions/dto.ClassGradeResponse'
+      grade_id:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+    type: object
   dto.BulkCreateSubjectGradeRequest:
     properties:
       academic_year:
@@ -289,6 +329,34 @@ definitions:
         type: string
       updated_at:
         type: string
+    type: object
+  dto.CreateArmRequest:
+    properties:
+      capacity:
+        maximum: 100
+        minimum: 1
+        type: integer
+      code:
+        maxLength: 3
+        minLength: 1
+        type: string
+      description:
+        type: string
+      grade_id:
+        type: string
+      name:
+        maxLength: 255
+        minLength: 2
+        type: string
+      status:
+        enum:
+        - active
+        - inactive
+        - archived
+        type: string
+    required:
+    - grade_id
+    - name
     type: object
   dto.CreateClassGradeRequest:
     properties:
@@ -474,6 +542,31 @@ definitions:
       status:
         type: string
       updated_at:
+        type: string
+    type: object
+  dto.UpdateArmRequest:
+    properties:
+      capacity:
+        maximum: 100
+        minimum: 1
+        type: integer
+      code:
+        maxLength: 3
+        minLength: 1
+        type: string
+      description:
+        type: string
+      grade_id:
+        type: string
+      name:
+        maxLength: 255
+        minLength: 2
+        type: string
+      status:
+        enum:
+        - active
+        - inactive
+        - archived
         type: string
     type: object
   dto.UpdateClassGradeRequest:
@@ -1904,6 +1997,344 @@ paths:
       summary: Update an announcement by ID
       tags:
       - Announcements
+  /api/arms:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of arms with optional filtering
+      parameters:
+      - description: Search by name, code, or description
+        in: query
+        name: search
+        type: string
+      - description: Filter by grade ID
+        in: query
+        name: grade_id
+        type: string
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - default: created_at
+        description: Sort by field
+        in: query
+        name: sort_by
+        type: string
+      - default: desc
+        description: Sort order
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ArmListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all arms
+      tags:
+      - Arms
+    post:
+      consumes:
+      - application/json
+      description: Create a new arm (sub-grade) with the provided details
+      parameters:
+      - description: Arm creation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateArmRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new arm
+      tags:
+      - Arms
+  /api/arms/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete an arm by ID
+      parameters:
+      - description: Arm ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete an arm
+      tags:
+      - Arms
+    get:
+      consumes:
+      - application/json
+      description: Get a single arm by its ID
+      parameters:
+      - description: Arm ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get arm by ID
+      tags:
+      - Arms
+    put:
+      consumes:
+      - application/json
+      description: Update an existing arm by ID
+      parameters:
+      - description: Arm ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Arm update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateArmRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update an arm
+      tags:
+      - Arms
+  /api/arms/grade/{grade_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all arms associated with a specific grade
+      parameters:
+      - description: Grade ID
+        in: path
+        name: grade_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get arms by grade
+      tags:
+      - Arms
+  /api/arms/permanent/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Permanent delete an arm by ID
+      parameters:
+      - description: Arm ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete an arm
+      tags:
+      - Arms
   /api/assignment_submissions:
     post:
       consumes:
@@ -4035,86 +4466,6 @@ paths:
       security:
       - BearerAuth: []
       summary: Update a subject
-      tags:
-      - Subjects
-  /api/subjects/department:
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        type: integer
-      - default: 20
-        description: Items per page
-        in: query
-        name: limit
-        type: integer
-      - description: Search by name, code, or description
-        in: query
-        name: search
-        type: string
-      - description: Filter by status
-        in: query
-        name: status
-        type: string
-      - description: Filter by department ID
-        in: query
-        name: department_id
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get all subjects with their department details
-      tags:
-      - Subjects
-  /api/subjects/department/head-of-department:
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        type: integer
-      - default: 20
-        description: Items per page
-        in: query
-        name: limit
-        type: integer
-      - description: Search by name, code, or description
-        in: query
-        name: search
-        type: string
-      - description: Filter by status
-        in: query
-        name: status
-        type: string
-      - description: Filter by department ID
-        in: query
-        name: department_id
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get all subjects with department and head of department details
       tags:
       - Subjects
   /api/subjects/department/head-of-department/{id}:
