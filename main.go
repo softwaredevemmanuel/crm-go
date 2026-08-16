@@ -102,13 +102,13 @@ func main() {
 	routes.ObjectiveQuestionRoutes(r, config.DB)
 	routes.SubjectRoutes(&r.RouterGroup, config.DB)
 	routes.ClassGradeRoutes(r, config.DB)
-	routes.SubjectGradeRoutes(r, config.DB)
 	routes.DepartmentRoutes(&r.RouterGroup, config.DB)
 	routes.ArmRoutes(&r.RouterGroup, config.DB)
 	routes.GuardianRoutes(&r.RouterGroup, config.DB)
 	routes.UserRoutes(&r.RouterGroup, config.DB)
 	routes.AddressRoutes(&r.RouterGroup, config.DB)
 	routes.AcademicSessionRoutes(&r.RouterGroup, config.DB)
+	routes.GradeSubjectRoutes(&r.RouterGroup, config.DB)
 
 	// Example curl command to clear DB (replace with your server address):
 	// curl -X DELETE "http://localhost:8080/admin/clear-db" \

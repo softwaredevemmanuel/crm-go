@@ -352,25 +352,16 @@ definitions:
       updated_at:
         type: string
     type: object
-  dto.BulkCreateSubjectGradeRequest:
+  dto.BulkCreateGradeSubjectRequest:
     properties:
-      academic_year:
-        type: string
-      credits:
-        maximum: 10
-        minimum: 0
-        type: integer
-      description:
-        type: string
       grade_id:
         type: string
-      is_required:
+      is_compulsory:
         type: boolean
       status:
         enum:
         - active
         - inactive
-        - archived
         type: string
       subject_ids:
         items:
@@ -378,7 +369,6 @@ definitions:
         minItems: 1
         type: array
     required:
-    - academic_year
     - grade_id
     - subject_ids
     type: object
@@ -570,6 +560,23 @@ definitions:
     - code
     - name
     type: object
+  dto.CreateGradeSubjectRequest:
+    properties:
+      grade_id:
+        type: string
+      is_compulsory:
+        type: boolean
+      status:
+        enum:
+        - active
+        - inactive
+        type: string
+      subject_id:
+        type: string
+    required:
+    - grade_id
+    - subject_id
+    type: object
   dto.CreateGuardianRequest:
     properties:
       address:
@@ -622,33 +629,6 @@ definitions:
     - relationship
     - student_id
     type: object
-  dto.CreateSubjectGradeRequest:
-    properties:
-      academic_year:
-        type: string
-      credits:
-        maximum: 10
-        minimum: 0
-        type: integer
-      description:
-        type: string
-      grade_id:
-        type: string
-      is_required:
-        type: boolean
-      status:
-        enum:
-        - active
-        - inactive
-        - archived
-        type: string
-      subject_id:
-        type: string
-    required:
-    - academic_year
-    - grade_id
-    - subject_id
-    type: object
   dto.CreateSubjectRequest:
     properties:
       code:
@@ -683,6 +663,46 @@ definitions:
       id:
         type: string
       name:
+        type: string
+    type: object
+  dto.GradeSubjectListResponse:
+    properties:
+      grade_subjects:
+        items:
+          $ref: '#/definitions/dto.GradeSubjectResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.GradeSubjectResponse:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: string
+      grade:
+        allOf:
+        - $ref: '#/definitions/dto.ClassGradeResponse'
+        description: Nested relationships
+      grade_id:
+        type: string
+      id:
+        type: string
+      is_compulsory:
+        type: boolean
+      status:
+        type: string
+      subject:
+        $ref: '#/definitions/dto.SubjectResponse'
+      subject_id:
+        type: string
+      updated_at:
         type: string
     type: object
   dto.GuardianListResponse:
@@ -731,50 +751,6 @@ definitions:
       user:
         $ref: '#/definitions/dto.UserResponse'
       user_id:
-        type: string
-    type: object
-  dto.SubjectGradeListResponse:
-    properties:
-      limit:
-        type: integer
-      page:
-        type: integer
-      subject_grades:
-        items:
-          $ref: '#/definitions/dto.SubjectGradeResponse'
-        type: array
-      total:
-        type: integer
-      total_pages:
-        type: integer
-    type: object
-  dto.SubjectGradeResponse:
-    properties:
-      academic_year:
-        type: string
-      created_at:
-        type: string
-      created_by:
-        type: string
-      credits:
-        type: integer
-      description:
-        type: string
-      grade:
-        $ref: '#/definitions/dto.ClassGradeResponse'
-      grade_id:
-        type: string
-      id:
-        type: string
-      is_required:
-        type: boolean
-      status:
-        type: string
-      subject:
-        $ref: '#/definitions/dto.SubjectResponse'
-      subject_id:
-        type: string
-      updated_at:
         type: string
     type: object
   dto.SubjectResponse:
@@ -921,6 +897,16 @@ definitions:
       name:
         type: string
       status:
+        type: string
+    type: object
+  dto.UpdateGradeSubjectRequest:
+    properties:
+      is_compulsory:
+        type: boolean
+      status:
+        enum:
+        - active
+        - inactive
         type: string
     type: object
   dto.UpdateGuardianRequest:
@@ -4436,6 +4422,358 @@ paths:
       summary: Export all data to Excel
       tags:
       - Export
+  /api/grade-subjects:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of grade-subject mappings with optional filtering
+      parameters:
+      - description: Filter by grade ID
+        in: query
+        name: grade_id
+        type: string
+      - description: Filter by subject ID
+        in: query
+        name: subject_id
+        type: string
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - description: Filter by compulsory status
+        in: query
+        name: is_compulsory
+        type: boolean
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GradeSubjectListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all grade-subject mappings
+      tags:
+      - Grade Subjects
+    post:
+      consumes:
+      - application/json
+      description: Create a new mapping between a grade and a subject
+      parameters:
+      - description: Grade-subject mapping request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateGradeSubjectRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a grade-subject mapping
+      tags:
+      - Grade Subjects
+  /api/grade-subjects/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete a grade-subject mapping by ID
+      parameters:
+      - description: Grade-Subject Mapping ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a grade-subject mapping
+      tags:
+      - Grade Subjects
+    get:
+      consumes:
+      - application/json
+      description: Get a single grade-subject mapping by its ID
+      parameters:
+      - description: Grade-Subject Mapping ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get grade-subject mapping by ID
+      tags:
+      - Grade Subjects
+    put:
+      consumes:
+      - application/json
+      description: Update an existing grade-subject mapping by ID
+      parameters:
+      - description: Grade-Subject Mapping ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Grade-subject update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateGradeSubjectRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update a grade-subject mapping
+      tags:
+      - Grade Subjects
+  /api/grade-subjects/bulk:
+    post:
+      consumes:
+      - application/json
+      description: Create multiple subject mappings for a grade at once
+      parameters:
+      - description: Bulk creation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BulkCreateGradeSubjectRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Bulk create grade-subject mappings
+      tags:
+      - Grade Subjects
+  /api/grade-subjects/grade/{grade_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all subjects mapped to a specific grade
+      parameters:
+      - description: Grade ID
+        in: path
+        name: grade_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get subjects by grade
+      tags:
+      - Grade Subjects
+  /api/grade-subjects/subject/{subject_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all grades mapped to a specific subject
+      parameters:
+      - description: Subject ID
+        in: path
+        name: subject_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get grades by subject
+      tags:
+      - Grade Subjects
   /api/grades:
     post:
       consumes:
@@ -5243,312 +5581,6 @@ paths:
       summary: Create multiple questions
       tags:
       - questions
-  /api/subject-grades:
-    post:
-      consumes:
-      - application/json
-      description: Create a relationship between a subject and a class grade
-      parameters:
-      - description: Subject-grade creation request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.CreateSubjectGradeRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "409":
-          description: Conflict
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Create a new subject-grade relationship
-      tags:
-      - Subject Grades
-  /api/subject-grades/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Soft delete a subject-grade relationship by ID
-      parameters:
-      - description: Subject-Grade Relationship ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Delete a subject-grade relationship
-      tags:
-      - Subject Grades
-    get:
-      consumes:
-      - application/json
-      description: Get a single subject-grade relationship by its ID
-      parameters:
-      - description: Subject-Grade Relationship ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get subject-grade relationship by ID
-      tags:
-      - Subject Grades
-  /api/subject-grades/bulk:
-    post:
-      consumes:
-      - application/json
-      description: Create multiple subject-grade relationships for a grade
-      parameters:
-      - description: Bulk creation request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.BulkCreateSubjectGradeRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Bulk create subject-grade relationships
-      tags:
-      - Subject Grades
-  /api/subject-grades/grade/{grade_id}:
-    get:
-      consumes:
-      - application/json
-      description: Get all subjects associated with a specific grade
-      parameters:
-      - description: Grade ID
-        in: path
-        name: grade_id
-        required: true
-        type: string
-      - description: Filter by academic year
-        in: query
-        name: academic_year
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get subjects by grade
-      tags:
-      - Subject Grades
-  /api/subject-grades/relationship:
-    get:
-      consumes:
-      - application/json
-      description: Get a paginated list of subject-grade relationships
-      parameters:
-      - description: Filter by subject ID
-        in: query
-        name: subject_id
-        type: string
-      - description: Filter by grade ID
-        in: query
-        name: grade_id
-        type: string
-      - description: Filter by academic year
-        in: query
-        name: academic_year
-        type: string
-      - description: Filter by status
-        in: query
-        name: status
-        type: string
-      - description: Filter by required status
-        in: query
-        name: is_required
-        type: boolean
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        type: integer
-      - default: 20
-        description: Items per page
-        in: query
-        name: limit
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.SubjectGradeListResponse'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get all subject-grade relationships
-      tags:
-      - Subject Grades
-  /api/subject-grades/subject/{subject_id}:
-    get:
-      consumes:
-      - application/json
-      description: Get all grades associated with a specific subject
-      parameters:
-      - description: Subject ID
-        in: path
-        name: subject_id
-        required: true
-        type: string
-      - description: Filter by academic year
-        in: query
-        name: academic_year
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get grades by subject
-      tags:
-      - Subject Grades
   /api/subjects:
     get:
       consumes:
