@@ -444,7 +444,7 @@ func (s *ArmService) toArmResponse(arm *models.Arm) *dto.ArmResponse {
 			Code:         arm.Grade.Code,
 			Level:        arm.Grade.Level,
 			Description:  arm.Grade.Description,
-			AcademicYear: arm.Grade.AcademicYear,
+			AcademicSessionID: string(arm.Grade.AcademicSessionID.String()),
 			Capacity:     arm.Grade.Capacity,
 			Status:       arm.Grade.Status,
 			CreatedAt:    arm.Grade.CreatedAt,

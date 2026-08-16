@@ -26,11 +26,35 @@ func (s *ClassGradeService) CreateClassGrade(req *dto.CreateClassGradeRequest, u
 		return nil, err
 	}
 
-	var existing models.ClassGrade
+	// Parse AcademicSession ID
+	academicSessionID, err := uuid.Parse(req.AcademicSessionID)
+	if err != nil {
+		return nil, errors.New("invalid academic session ID format")
+	}
 
-	// Check if class grade with same level and academic year already exists
-	if err := s.db.Where("level = ? AND academic_year = ?", req.Level, req.AcademicYear).First(&existing).Error; err == nil {
-		return nil, errors.New("class grade with this level and academic year already exists")
+	// Check if academic session exists
+	var academicSession models.AcademicSession
+	if err := s.db.Where("id = ? AND deleted_at IS NULL", academicSessionID).First(&academicSession).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("academic session not found")
+		}
+		return nil, errors.New("failed to verify academic session: " + err.Error())
+	}
+
+	// Check if class grade with same name already exists
+	var existing models.ClassGrade
+	if err := s.db.Where("name = ?", req.Name).First(&existing).Error; err == nil {
+		return nil, errors.New("class grade with this name already exists")
+	}
+
+	// Check if class grade with same code already exists
+	if err := s.db.Where("code = ?", req.Code).First(&existing).Error; err == nil {
+		return nil, errors.New("class grade with this code already exists")
+	}
+
+	// Check if class grade with same level and academic session already exists
+	if err := s.db.Where("level = ? AND academic_session_id = ?", req.Level, academicSessionID).First(&existing).Error; err == nil {
+		return nil, errors.New("class grade with this level and academic session already exists")
 	}
 
 	// Set default status if not provided
@@ -41,17 +65,17 @@ func (s *ClassGradeService) CreateClassGrade(req *dto.CreateClassGradeRequest, u
 
 	// Create new class grade
 	classGrade := &models.ClassGrade{
-		ID:           uuid.New(),
-		Name:         strings.TrimSpace(req.Name),
-		Code:         strings.ToUpper(strings.TrimSpace(req.Code)),
-		Level:        req.Level,
-		Description:  strings.TrimSpace(req.Description),
-		AcademicYear: strings.TrimSpace(req.AcademicYear),
-		Capacity:     req.Capacity,
-		Status:       status,
-		CreatedBy:    userID,
-		CreatedAt:    time.Now(),
-		UpdatedAt:    time.Now(),
+		ID:                uuid.New(),
+		Name:              strings.TrimSpace(req.Name),
+		Code:              strings.ToUpper(strings.TrimSpace(req.Code)),
+		Level:             req.Level,
+		Description:       strings.TrimSpace(req.Description),
+		AcademicSessionID: academicSessionID,
+		Capacity:          req.Capacity,
+		Status:            status,
+		CreatedBy:         userID,
+		CreatedAt:         time.Now(),
+		UpdatedAt:         time.Now(),
 	}
 
 	// Set default capacity if not provided
@@ -62,6 +86,11 @@ func (s *ClassGradeService) CreateClassGrade(req *dto.CreateClassGradeRequest, u
 	// Save to database
 	if err := s.db.Create(classGrade).Error; err != nil {
 		return nil, errors.New("failed to create class grade: " + err.Error())
+	}
+
+	// Preload AcademicSession for response
+	if err := s.db.Preload("AcademicSession").First(classGrade, classGrade.ID).Error; err != nil {
+		return nil, errors.New("failed to load class grade details: " + err.Error())
 	}
 
 	// Convert to response DTO
@@ -82,15 +111,11 @@ func (s *ClassGradeService) validateClassGradeRequest(req *dto.CreateClassGradeR
 	if len(req.Code) < 2 {
 		return errors.New("class grade code must be at least 2 characters")
 	}
-	if req.Level < 1 || req.Level > 6 {
-		return errors.New("level must be between 1 and 6")
+	if req.Level < 1 || req.Level > 12 {
+		return errors.New("level must be between 1 and 12")
 	}
-	if req.AcademicYear == "" {
-		return errors.New("academic year is required")
-	}
-	// Validate academic year format (e.g., "2024/2025")
-	if !strings.Contains(req.AcademicYear, "/") {
-		return errors.New("academic year must be in format YYYY/YYYY (e.g., 2024/2025)")
+	if req.AcademicSessionID == "" {
+		return errors.New("academic session is required")
 	}
 	if req.Capacity < 1 {
 		return errors.New("capacity must be at least 1")
@@ -106,21 +131,36 @@ func (s *ClassGradeService) validateClassGradeRequest(req *dto.CreateClassGradeR
 
 // toClassGradeResponse converts model to response DTO
 func (s *ClassGradeService) toClassGradeResponse(classGrade *models.ClassGrade) *dto.ClassGradeResponse {
-	return &dto.ClassGradeResponse{
-		ID:           classGrade.ID.String(),
-		Name:         classGrade.Name,
-		Code:         classGrade.Code,
-		Level:        classGrade.Level,
-		Description:  classGrade.Description,
-		AcademicYear: classGrade.AcademicYear,
-		Capacity:     classGrade.Capacity,
-		Status:       classGrade.Status,
-		CreatedBy:    classGrade.CreatedBy.String(),
-		CreatedAt:    classGrade.CreatedAt,
-		UpdatedAt:    classGrade.UpdatedAt,
+	response := &dto.ClassGradeResponse{
+		ID:          classGrade.ID.String(),
+		Name:        classGrade.Name,
+		Code:        classGrade.Code,
+		Level:       classGrade.Level,
+		Description: classGrade.Description,
+		AcademicSessionID: classGrade.AcademicSessionID.String(),
+		Capacity:    classGrade.Capacity,
+		Status:      classGrade.Status,
+		CreatedBy:   classGrade.CreatedBy.String(),
+		CreatedAt:   classGrade.CreatedAt,
+		UpdatedAt:   classGrade.UpdatedAt,
 	}
-}
 
+	// Add academic session details if preloaded
+	if classGrade.AcademicSession.ID != uuid.Nil {
+		response.AcademicSession = &dto.AcademicSessionResponse{
+			ID:          classGrade.AcademicSession.ID.String(),
+			AcademicYear:        classGrade.AcademicSession.AcademicYear,
+			Code:        classGrade.AcademicSession.Code,
+			StartDate:   classGrade.AcademicSession.StartDate,
+			EndDate:     classGrade.AcademicSession.EndDate,
+			Status:      classGrade.AcademicSession.Status,
+			IsCurrent:   classGrade.AcademicSession.IsCurrent,
+			Description: classGrade.AcademicSession.Description,
+		}
+	}
+
+	return response
+}
 
 // GetAllClassGrades retrieves all class grades with pagination and filters
 func (s *ClassGradeService) GetAllClassGrades(params *dto.ClassGradeQueryParams) (*dto.ClassGradeListResponse, error) {
@@ -139,27 +179,27 @@ func (s *ClassGradeService) GetAllClassGrades(params *dto.ClassGradeQueryParams)
 	}
 
 	// Build query
-	query := s.db.Model(&models.ClassGrade{}).Where("deleted_at IS NULL")
+	query := s.db.Model(&models.ClassGrade{}).Where("class_grades.deleted_at IS NULL")
 
 	// Apply filters
 	if params.Search != "" {
 		searchTerm := "%" + strings.ToLower(params.Search) + "%"
 		query = query.Where(
-			"LOWER(name) LIKE ? OR LOWER(code) LIKE ? OR LOWER(description) LIKE ?",
+			"LOWER(class_grades.name) LIKE ? OR LOWER(class_grades.code) LIKE ? OR LOWER(class_grades.description) LIKE ?",
 			searchTerm, searchTerm, searchTerm,
 		)
 	}
 
 	if params.Level > 0 {
-		query = query.Where("level = ?", params.Level)
+		query = query.Where("class_grades.level = ?", params.Level)
 	}
 
-	if params.AcademicYear != "" {
-		query = query.Where("academic_year = ?", params.AcademicYear)
+	if params.AcademicSessionID != "" {
+		query = query.Where("class_grades.academic_session_id = ?", params.AcademicSessionID)
 	}
 
 	if params.Status != "" {
-		query = query.Where("status = ?", params.Status)
+		query = query.Where("class_grades.status = ?", params.Status)
 	}
 
 	// Get total count
@@ -177,15 +217,15 @@ func (s *ClassGradeService) GetAllClassGrades(params *dto.ClassGradeQueryParams)
 	if strings.ToLower(params.SortOrder) == "asc" {
 		sortDirection = "ASC"
 	}
-	query = query.Order(sortColumn + " " + sortDirection)
+	query = query.Order("class_grades." + sortColumn + " " + sortDirection)
 
 	// Apply pagination
 	offset := (params.Page - 1) * params.Limit
 	query = query.Offset(offset).Limit(params.Limit)
 
-	// Execute query
+	// Execute query with preload
 	var classGrades []models.ClassGrade
-	if err := query.Find(&classGrades).Error; err != nil {
+	if err := query.Preload("AcademicSession").Find(&classGrades).Error; err != nil {
 		return nil, errors.New("failed to fetch class grades: " + err.Error())
 	}
 
@@ -218,7 +258,9 @@ func (s *ClassGradeService) GetClassGradeByID(id string) (*dto.ClassGradeRespons
 	}
 
 	var classGrade models.ClassGrade
-	if err := s.db.Where("id = ? AND deleted_at IS NULL", classGradeID).First(&classGrade).Error; err != nil {
+	if err := s.db.Where("id = ? AND deleted_at IS NULL", classGradeID).
+		Preload("AcademicSession").
+		First(&classGrade).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("class grade not found")
 		}
@@ -228,17 +270,27 @@ func (s *ClassGradeService) GetClassGradeByID(id string) (*dto.ClassGradeRespons
 	return s.toClassGradeResponse(&classGrade), nil
 }
 
-// GetAcademicYears retrieves all unique academic years
-func (s *ClassGradeService) GetAcademicYears() ([]string, error) {
-	var academicYears []string
-	if err := s.db.Model(&models.ClassGrade{}).
-		Where("deleted_at IS NULL").
-		Distinct("academic_year").
-		Where("academic_year IS NOT NULL AND academic_year != ''").
-		Pluck("academic_year", &academicYears).Error; err != nil {
-		return nil, errors.New("failed to fetch academic years: " + err.Error())
+// GetClassGradesByAcademicSession retrieves all class grades for a specific academic session
+func (s *ClassGradeService) GetClassGradesByAcademicSession(academicSessionID string) ([]dto.ClassGradeResponse, error) {
+	sessionID, err := uuid.Parse(academicSessionID)
+	if err != nil {
+		return nil, errors.New("invalid academic session ID")
 	}
-	return academicYears, nil
+
+	var classGrades []models.ClassGrade
+	if err := s.db.Where("academic_session_id = ? AND deleted_at IS NULL", sessionID).
+		Preload("AcademicSession").
+		Order("level ASC").
+		Find(&classGrades).Error; err != nil {
+		return nil, errors.New("failed to fetch class grades: " + err.Error())
+	}
+
+	responses := make([]dto.ClassGradeResponse, len(classGrades))
+	for i, classGrade := range classGrades {
+		responses[i] = *s.toClassGradeResponse(&classGrade)
+	}
+
+	return responses, nil
 }
 
 // GetLevels retrieves all unique levels
@@ -253,8 +305,6 @@ func (s *ClassGradeService) GetLevels() ([]int, error) {
 	}
 	return levels, nil
 }
-
-
 
 // UpdateClassGrade updates an existing class grade
 func (s *ClassGradeService) UpdateClassGrade(id string, req *dto.UpdateClassGradeRequest, userID uuid.UUID) (*dto.ClassGradeResponse, error) {
@@ -289,12 +339,16 @@ func (s *ClassGradeService) UpdateClassGrade(id string, req *dto.UpdateClassGrad
 		}
 	}
 
-	// Check for duplicate level + academic year if being updated
-	if req.Level > 0 && req.AcademicYear != "" {
+	// Check for duplicate level + academic session if being updated
+	if req.Level > 0 && req.AcademicSessionID != "" {
+		sessionID, err := uuid.Parse(req.AcademicSessionID)
+		if err != nil {
+			return nil, errors.New("invalid academic session ID format")
+		}
 		var existing models.ClassGrade
-		if err := s.db.Where("level = ? AND academic_year = ? AND id != ? AND deleted_at IS NULL", 
-			req.Level, req.AcademicYear, classGradeID).First(&existing).Error; err == nil {
-			return nil, errors.New("class grade with this level and academic year already exists")
+		if err := s.db.Where("level = ? AND academic_session_id = ? AND id != ? AND deleted_at IS NULL",
+			req.Level, sessionID, classGradeID).First(&existing).Error; err == nil {
+			return nil, errors.New("class grade with this level and academic session already exists")
 		}
 	}
 
@@ -311,8 +365,20 @@ func (s *ClassGradeService) UpdateClassGrade(id string, req *dto.UpdateClassGrad
 	if req.Description != "" {
 		classGrade.Description = strings.TrimSpace(req.Description)
 	}
-	if req.AcademicYear != "" {
-		classGrade.AcademicYear = strings.TrimSpace(req.AcademicYear)
+	if req.AcademicSessionID != "" {
+		sessionID, err := uuid.Parse(req.AcademicSessionID)
+		if err != nil {
+			return nil, errors.New("invalid academic session ID format")
+		}
+		// Verify academic session exists
+		var academicSession models.AcademicSession
+		if err := s.db.Where("id = ? AND deleted_at IS NULL", sessionID).First(&academicSession).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return nil, errors.New("academic session not found")
+			}
+			return nil, errors.New("failed to verify academic session: " + err.Error())
+		}
+		classGrade.AcademicSessionID = sessionID
 	}
 	if req.Capacity > 0 {
 		classGrade.Capacity = req.Capacity
@@ -327,6 +393,11 @@ func (s *ClassGradeService) UpdateClassGrade(id string, req *dto.UpdateClassGrad
 	// Save to database
 	if err := s.db.Save(&classGrade).Error; err != nil {
 		return nil, errors.New("failed to update class grade: " + err.Error())
+	}
+
+	// Preload AcademicSession for response
+	if err := s.db.Preload("AcademicSession").First(&classGrade, classGrade.ID).Error; err != nil {
+		return nil, errors.New("failed to load class grade details: " + err.Error())
 	}
 
 	// Convert to response DTO
@@ -367,6 +438,3 @@ func (s *ClassGradeService) DeleteClassGrade(id string, userID uuid.UUID) error 
 
 	return nil
 }
-
-
-

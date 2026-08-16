@@ -440,7 +440,7 @@ func (s *SubjectGradeService) toSubjectGradeResponse(sg *models.SubjectGrade) *d
 			Code:         sg.Grade.Code,
 			Level:        sg.Grade.Level,
 			Description:  sg.Grade.Description,
-			AcademicYear: sg.Grade.AcademicYear,
+			AcademicSessionID: sg.Grade.AcademicSessionID.String(),
 			Capacity:     sg.Grade.Capacity,
 			Status:       sg.Grade.Status,
 			CreatedAt:    sg.Grade.CreatedAt,

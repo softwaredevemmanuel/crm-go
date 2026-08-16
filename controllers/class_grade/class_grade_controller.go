@@ -28,7 +28,7 @@ func NewClassGradeController(db *gorm.DB, classGradeService *services.ClassGrade
 
 // CreateClassGrade handles the creation of a new class grade
 // @Summary Create a new class grade
-// @Description Create a new class grade with the provided details (Grade 1-6)
+// @Description Create a new class grade with the provided details (Grade 1-12)
 // @Tags Class Grades
 // @Accept json
 // @Produce json
@@ -73,7 +73,7 @@ func (h *ClassGradeController) CreateClassGrade(c *gin.Context) {
 	req.Name = strings.TrimSpace(req.Name)
 	req.Code = strings.TrimSpace(req.Code)
 	req.Description = strings.TrimSpace(req.Description)
-	req.AcademicYear = strings.TrimSpace(req.AcademicYear)
+	req.AcademicSessionID = strings.TrimSpace(req.AcademicSessionID)
 
 	// Create class grade using service
 	classGrade, err := h.classGradeService.CreateClassGrade(&req, userID)
@@ -106,7 +106,7 @@ func (h *ClassGradeController) CreateClassGrade(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param search query string false "Search by name, code, or description"
-// @Param level query int false "Filter by level (1-6)"
+// @Param level query int false "Filter by level (1-12)"
 // @Param academic_year query string false "Filter by academic year"
 // @Param status query string false "Filter by status (active, inactive, archived)"
 // @Param page query int false "Page number" default(1)
@@ -188,35 +188,11 @@ func (h *ClassGradeController) GetClassGradeByID(c *gin.Context) {
 	})
 }
 
-// GetAcademicYears handles fetching all unique academic years
-// @Summary Get all academic years
-// @Description Get a list of all unique academic years
-// @Tags Class Grades
-// @Accept json
-// @Produce json
-// @Success 200 {object} map[string]interface{}
-// @Failure 401 {object} map[string]interface{}
-// @Failure 500 {object} map[string]interface{}
-// @Security BearerAuth
-// @Router /api/class-grades/academic-years [get]
-func (h *ClassGradeController) GetAcademicYears(c *gin.Context) {
-	academicYears, err := h.classGradeService.GetAcademicYears()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message":        "Academic years retrieved successfully",
-		"academic_years": academicYears,
-	})
-}
 
 // GetLevels handles fetching all unique levels
 // @Summary Get all levels
-// @Description Get a list of all unique levels (1-6)
+// @Description Get a list of all unique levels (1-12)
 // @Tags Class Grades
 // @Accept json
 // @Produce json
@@ -296,7 +272,7 @@ func (h *ClassGradeController) UpdateClassGrade(c *gin.Context) {
 
 	// Check if at least one field is being updated
 	if req.Name == "" && req.Code == "" && req.Level == 0 && 
-		req.Description == "" && req.AcademicYear == "" && req.Capacity == 0 && req.Status == "" {
+		req.Description == "" && req.AcademicSessionID == "" && req.Capacity == 0 && req.Status == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "At least one field must be provided for update",
 		})

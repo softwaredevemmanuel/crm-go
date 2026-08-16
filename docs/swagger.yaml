@@ -220,6 +220,50 @@ definitions:
       updated_at:
         type: string
     type: object
+  dto.AcademicSessionListResponse:
+    properties:
+      limit:
+        type: integer
+      page:
+        type: integer
+      sessions:
+        items:
+          $ref: '#/definitions/dto.AcademicSessionResponse'
+        type: array
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.AcademicSessionResponse:
+    properties:
+      academic_year:
+        type: string
+      code:
+        type: string
+      created_at:
+        type: string
+      created_by:
+        type: string
+      days_remaining:
+        type: integer
+      description:
+        type: string
+      end_date:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      is_current:
+        type: boolean
+      start_date:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+    type: object
   dto.AddressListResponse:
     properties:
       addresses:
@@ -355,7 +399,9 @@ definitions:
     type: object
   dto.ClassGradeResponse:
     properties:
-      academic_year:
+      academic_session:
+        $ref: '#/definitions/dto.AcademicSessionResponse'
+      academic_session_id:
         type: string
       capacity:
         type: integer
@@ -377,6 +423,38 @@ definitions:
         type: string
       updated_at:
         type: string
+    type: object
+  dto.CreateAcademicSessionRequest:
+    properties:
+      academic_year:
+        maxLength: 20
+        minLength: 2
+        type: string
+      code:
+        maxLength: 20
+        minLength: 2
+        type: string
+      description:
+        type: string
+      end_date:
+        description: 'Format: "2006-01-02"'
+        type: string
+      is_current:
+        type: boolean
+      start_date:
+        description: 'Format: "2006-01-02"'
+        type: string
+      status:
+        enum:
+        - active
+        - inactive
+        - completed
+        type: string
+    required:
+    - academic_year
+    - code
+    - end_date
+    - start_date
     type: object
   dto.CreateAddressRequest:
     properties:
@@ -440,7 +518,7 @@ definitions:
     type: object
   dto.CreateClassGradeRequest:
     properties:
-      academic_year:
+      academic_session_id:
         type: string
       capacity:
         maximum: 100
@@ -453,7 +531,7 @@ definitions:
       description:
         type: string
       level:
-        maximum: 6
+        maximum: 12
         minimum: 1
         type: integer
       name:
@@ -467,7 +545,7 @@ definitions:
         - archived
         type: string
     required:
-    - academic_year
+    - academic_session_id
     - code
     - level
     - name
@@ -724,6 +802,33 @@ definitions:
       updated_at:
         type: string
     type: object
+  dto.UpdateAcademicSessionRequest:
+    properties:
+      academic_year:
+        maxLength: 20
+        minLength: 2
+        type: string
+      code:
+        maxLength: 20
+        minLength: 2
+        type: string
+      description:
+        type: string
+      end_date:
+        description: 'Format: "2006-01-02"'
+        type: string
+      is_current:
+        type: boolean
+      start_date:
+        description: 'Format: "2006-01-02"'
+        type: string
+      status:
+        enum:
+        - active
+        - inactive
+        - completed
+        type: string
+    type: object
   dto.UpdateAddressRequest:
     properties:
       address:
@@ -778,7 +883,7 @@ definitions:
     type: object
   dto.UpdateClassGradeRequest:
     properties:
-      academic_year:
+      academic_session_id:
         type: string
       capacity:
         maximum: 100
@@ -791,7 +896,7 @@ definitions:
       description:
         type: string
       level:
-        maximum: 6
+        maximum: 12
         minimum: 1
         type: integer
       name:
@@ -2178,6 +2283,279 @@ paths:
       summary: Get an announcement by ID
       tags:
       - Announcements
+  /api/academic-sessions:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of academic sessions with optional filtering
+      parameters:
+      - description: Search by year, code, or description
+        in: query
+        name: search
+        type: string
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - description: Filter by current status
+        in: query
+        name: is_current
+        type: boolean
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.AcademicSessionListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all academic sessions
+      tags:
+      - Academic Sessions
+    post:
+      consumes:
+      - application/json
+      description: Create a new academic session with the provided details
+      parameters:
+      - description: Academic session creation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateAcademicSessionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new academic session
+      tags:
+      - Academic Sessions
+  /api/academic-sessions/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete an academic session by ID
+      parameters:
+      - description: Academic Session ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete an academic session
+      tags:
+      - Academic Sessions
+    get:
+      consumes:
+      - application/json
+      description: Get a single academic session by its ID
+      parameters:
+      - description: Academic Session ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get academic session by ID
+      tags:
+      - Academic Sessions
+    put:
+      consumes:
+      - application/json
+      description: Update an existing academic session by ID
+      parameters:
+      - description: Academic Session ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Academic session update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateAcademicSessionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update an academic session
+      tags:
+      - Academic Sessions
+  /api/academic-sessions/current:
+    get:
+      consumes:
+      - application/json
+      description: Get the currently active academic session
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get current academic session
+      tags:
+      - Academic Sessions
   /api/addresses:
     get:
       consumes:
@@ -3189,7 +3567,7 @@ paths:
         in: query
         name: search
         type: string
-      - description: Filter by level (1-6)
+      - description: Filter by level (1-12)
         in: query
         name: level
         type: integer
@@ -3252,7 +3630,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Create a new class grade with the provided details (Grade 1-6)
+      description: Create a new class grade with the provided details (Grade 1-12)
       parameters:
       - description: Class grade creation request
         in: body
@@ -3434,39 +3812,11 @@ paths:
       summary: Update a class grade
       tags:
       - Class Grades
-  /api/class-grades/academic-years:
-    get:
-      consumes:
-      - application/json
-      description: Get a list of all unique academic years
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get all academic years
-      tags:
-      - Class Grades
   /api/class-grades/levels:
     get:
       consumes:
       - application/json
-      description: Get a list of all unique levels (1-6)
+      description: Get a list of all unique levels (1-12)
       produces:
       - application/json
       responses:

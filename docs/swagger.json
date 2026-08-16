@@ -101,6 +101,415 @@
                 }
             }
         },
+        "/api/academic-sessions": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get a paginated list of academic sessions with optional filtering",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Academic Sessions"
+                ],
+                "summary": "Get all academic sessions",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search by year, code, or description",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter by current status",
+                        "name": "is_current",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.AcademicSessionListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new academic session with the provided details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Academic Sessions"
+                ],
+                "summary": "Create a new academic session",
+                "parameters": [
+                    {
+                        "description": "Academic session creation request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateAcademicSessionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/academic-sessions/current": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get the currently active academic session",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Academic Sessions"
+                ],
+                "summary": "Get current academic session",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/academic-sessions/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get a single academic session by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Academic Sessions"
+                ],
+                "summary": "Get academic session by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Academic Session ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update an existing academic session by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Academic Sessions"
+                ],
+                "summary": "Update an academic session",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Academic Session ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Academic session update request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateAcademicSessionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Soft delete an academic session by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Academic Sessions"
+                ],
+                "summary": "Delete an academic session",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Academic Session ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/addresses": {
             "get": {
                 "security": [
@@ -1649,7 +2058,7 @@
                     },
                     {
                         "type": "integer",
-                        "description": "Filter by level (1-6)",
+                        "description": "Filter by level (1-12)",
                         "name": "level",
                         "in": "query"
                     },
@@ -1730,7 +2139,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Create a new class grade with the provided details (Grade 1-6)",
+                "description": "Create a new class grade with the provided details (Grade 1-12)",
                 "consumes": [
                     "application/json"
                 ],
@@ -1791,49 +2200,6 @@
                 }
             }
         },
-        "/api/class-grades/academic-years": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get a list of all unique academic years",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Class Grades"
-                ],
-                "summary": "Get all academic years",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
         "/api/class-grades/levels": {
             "get": {
                 "security": [
@@ -1841,7 +2207,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get a list of all unique levels (1-6)",
+                "description": "Get a list of all unique levels (1-12)",
                 "consumes": [
                     "application/json"
                 ],
@@ -7417,6 +7783,73 @@
                 }
             }
         },
+        "dto.AcademicSessionListResponse": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "sessions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.AcademicSessionResponse"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.AcademicSessionResponse": {
+            "type": "object",
+            "properties": {
+                "academic_year": {
+                    "type": "string"
+                },
+                "code": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "string"
+                },
+                "days_remaining": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "end_date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "is_current": {
+                    "type": "boolean"
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.AddressListResponse": {
             "type": "object",
             "properties": {
@@ -7621,7 +8054,10 @@
         "dto.ClassGradeResponse": {
             "type": "object",
             "properties": {
-                "academic_year": {
+                "academic_session": {
+                    "$ref": "#/definitions/dto.AcademicSessionResponse"
+                },
+                "academic_session_id": {
                     "type": "string"
                 },
                 "capacity": {
@@ -7653,6 +8089,49 @@
                 },
                 "updated_at": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.CreateAcademicSessionRequest": {
+            "type": "object",
+            "required": [
+                "academic_year",
+                "code",
+                "end_date",
+                "start_date"
+            ],
+            "properties": {
+                "academic_year": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 2
+                },
+                "code": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 2
+                },
+                "description": {
+                    "type": "string"
+                },
+                "end_date": {
+                    "description": "Format: \"2006-01-02\"",
+                    "type": "string"
+                },
+                "is_current": {
+                    "type": "boolean"
+                },
+                "start_date": {
+                    "description": "Format: \"2006-01-02\"",
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "active",
+                        "inactive",
+                        "completed"
+                    ]
                 }
             }
         },
@@ -7743,13 +8222,13 @@
         "dto.CreateClassGradeRequest": {
             "type": "object",
             "required": [
-                "academic_year",
+                "academic_session_id",
                 "code",
                 "level",
                 "name"
             ],
             "properties": {
-                "academic_year": {
+                "academic_session_id": {
                     "type": "string"
                 },
                 "capacity": {
@@ -7767,7 +8246,7 @@
                 },
                 "level": {
                     "type": "integer",
-                    "maximum": 6,
+                    "maximum": 12,
                     "minimum": 1
                 },
                 "name": {
@@ -8151,6 +8630,43 @@
                 }
             }
         },
+        "dto.UpdateAcademicSessionRequest": {
+            "type": "object",
+            "properties": {
+                "academic_year": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 2
+                },
+                "code": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 2
+                },
+                "description": {
+                    "type": "string"
+                },
+                "end_date": {
+                    "description": "Format: \"2006-01-02\"",
+                    "type": "string"
+                },
+                "is_current": {
+                    "type": "boolean"
+                },
+                "start_date": {
+                    "description": "Format: \"2006-01-02\"",
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "active",
+                        "inactive",
+                        "completed"
+                    ]
+                }
+            }
+        },
         "dto.UpdateAddressRequest": {
             "type": "object",
             "properties": {
@@ -8227,7 +8743,7 @@
         "dto.UpdateClassGradeRequest": {
             "type": "object",
             "properties": {
-                "academic_year": {
+                "academic_session_id": {
                     "type": "string"
                 },
                 "capacity": {
@@ -8245,7 +8761,7 @@
                 },
                 "level": {
                     "type": "integer",
-                    "maximum": 6,
+                    "maximum": 12,
                     "minimum": 1
                 },
                 "name": {

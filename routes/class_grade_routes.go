@@ -19,7 +19,6 @@ func ClassGradeRoutes(router *gin.Engine, db *gorm.DB) {
 	protected := router.Group("/api/class-grades")
 	protected.Use(middleware.AuthMiddleware())
 	protected.GET("", middleware.RoleMiddleware("admin"), classGradeController.GetAllClassGrades)
-	protected.GET("/academic-years", middleware.RoleMiddleware("admin"), classGradeController.GetAcademicYears)
 	protected.GET("/levels", middleware.RoleMiddleware("admin"), classGradeController.GetLevels)
 	protected.GET("/:id", middleware.RoleMiddleware("admin"), classGradeController.GetClassGradeByID)
 	protected.POST("", middleware.RoleMiddleware("admin"), classGradeController.CreateClassGrade)

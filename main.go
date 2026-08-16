@@ -108,6 +108,7 @@ func main() {
 	routes.GuardianRoutes(&r.RouterGroup, config.DB)
 	routes.UserRoutes(&r.RouterGroup, config.DB)
 	routes.AddressRoutes(&r.RouterGroup, config.DB)
+	routes.AcademicSessionRoutes(&r.RouterGroup, config.DB)
 
 	// Example curl command to clear DB (replace with your server address):
 	// curl -X DELETE "http://localhost:8080/admin/clear-db" \
@@ -183,6 +184,7 @@ func main() {
 		seeds.SeedTopics()
 		seeds.SeedCourseMaterials()
 		seeds.SeedObjectiveQuestions()
+		seeds.SeedAcademicSessions()
 		seeds.SeedClassGrades()
 		seeds.SeedDepartments()
 		seeds.SeedSubjects()
