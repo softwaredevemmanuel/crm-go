@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+
 	"crm-go/dto"
 	"crm-go/services/users"
 )
@@ -65,7 +66,47 @@ func (h *UserHandler) GetAllUsers(c *gin.Context) {
 	})
 }
 
+// ✅ GetUserByID handles fetching a single user by ID
+// @Summary Get user by ID
+// @Description Get a single user by its ID
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param id path string true "User ID"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 404 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Security BearerAuth
+// @Router /api/users/{id} [get]
+func (h *UserHandler) GetUserByID(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "User ID is required",
+		})
+		return
+	}
 
+	user, err := h.userService.GetUserByID(id)
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			c.JSON(http.StatusNotFound, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "User retrieved successfully",
+		"user":    user,
+	})
+}
 
 // GetUsersByRole handles fetching all users with a specific role
 // @Summary Get users by role
@@ -102,7 +143,58 @@ func (h *UserHandler) GetUsersByRole(c *gin.Context) {
 	})
 }
 
+// UpdateUser handles updating an existing user
+// @Summary Update a user
+// @Description Update an existing user by ID
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param id path string true "User ID"
+// @Param request body dto.UpdateUserRequest true "User update request"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Failure 404 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Security BearerAuth
+// @Router /api/users/{id} [put]
+func (h *UserHandler) UpdateUser(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "User ID is required",
+		})
+		return
+	}
 
+	var req dto.UpdateUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Invalid request body",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	user, err := h.userService.UpdateUser(id, &req)
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			c.JSON(http.StatusNotFound, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "User updated successfully",
+		"user":    user,
+	})
+}
 
 // DeleteUser handles deleting a user (soft delete)
 // @Summary Delete a user

@@ -22,13 +22,15 @@ type User struct {
 	Provider   string         `gorm:"type:varchar(50);default:'local'" json:"provider"`
 	Role       string         `gorm:"type:varchar(20);default:'user'" json:"role"`
 	Phone      string         `gorm:"type:varchar(20)" json:"phone"`
-	IsVerified bool           `gorm:"default:false" json:"is_verified"`
-	IsActive bool           `gorm:"default:false" json:"is_active"`
-	Location   string         `gorm:"type:varchar(255)" json:"location"`
-	LastLoginAt *time.Time    `json:"last_login_at"`
-	CreatedAt  time.Time      `json:"created_at"`
-	UpdatedAt  time.Time      `json:"updated_at"`
-	DeletedAt  gorm.DeletedAt `gorm:"index" json:"-"`
+	DOB 		*time.Time `gorm:"type:date" json:"dob,omitempty"`
+	IsVerified bool        `gorm:"default:false" json:"is_verified"`
+	IsActive   bool        `gorm:"default:false" json:"is_active"`
+	Location   string      `gorm:"type:varchar(255)" json:"location"`
+	LastLoginAt *time.Time `json:"last_login_at"`
+
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 
@@ -46,6 +48,8 @@ type UserResponse struct {
 	LastName  string    `json:"last_name"`
 	Email     string    `json:"email"`
 	Role      string      `json:"role"`
+	DOB        string `json:"dob"` // Format: YYYY-MM-DD
+
 }
 
 

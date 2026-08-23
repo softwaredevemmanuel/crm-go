@@ -18,6 +18,7 @@ import (
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"crm-go/scheduler"
 )
 
 // @title GO CRM API
@@ -45,7 +46,13 @@ func main() {
 
 	// Initialize DB connection
 	config.ConnectDB()
+	db := config.DB
 
+		// ✅ Initialize and start the academic session scheduler
+
+	sched := scheduler.NewAcademicSessionScheduler(db)
+	sched.Start()
+	
 	// Init Google OAuth
 	config.InitGoogleOauthConfig()
 
@@ -56,14 +63,32 @@ func main() {
 	r.SetTrustedProxies(nil) // trust no proxies in dev
 	r.Use(middleware.SessionMiddleware())
 
-	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000", "https://hr-app-ecru-nine.vercel.app"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Accept", "email", "user_id"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
-	}))
+	// Define allowed origins
+    allowedOrigins := map[string]bool{
+        "tauri://localhost":          true,
+        "http://localhost:1420":      true,
+        "http://localhost:3000":      true,
+        "https://hr-app-ecru-nine.vercel.app": true,
+    }
+r.Use(cors.New(cors.Config{
+        AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+        AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Accept", "email", "user_id"},
+        ExposeHeaders:    []string{"Content-Length"},
+        AllowCredentials: true,
+        MaxAge:           12 * time.Hour,
+        AllowOriginFunc: func(origin string) bool {
+            if allowedOrigins[origin] {
+                log.Printf("✅ Allowed: %s", origin)
+                return true
+            }else{
+            log.Printf("❌ Denied: %s", origin)
+
+				return false
+			}
+            
+        },
+    }))
+
 
 	// ✅ Swagger documentation route
 	//r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -109,6 +134,7 @@ func main() {
 	routes.AddressRoutes(&r.RouterGroup, config.DB)
 	routes.AcademicSessionRoutes(&r.RouterGroup, config.DB)
 	routes.GradeSubjectRoutes(&r.RouterGroup, config.DB)
+	routes.StudentEnrollmentRoutes(&r.RouterGroup, config.DB)
 
 	// Example curl command to clear DB (replace with your server address):
 	// curl -X DELETE "http://localhost:8080/admin/clear-db" \

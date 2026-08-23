@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -105,6 +106,27 @@ func (s *UserService) GetAllUsers(params *dto.UserQueryParams) (*dto.UserListRes
 	}, nil
 }
 
+// GetUserByID retrieves a single user by ID
+func (s *UserService) GetUserByID(id string) (*dto.UserResponse, error) {
+	// Parse UUID
+	userID, err := uuid.Parse(id)
+	if err != nil {
+		return nil, errors.New("invalid user ID format")
+	}
+
+	// Find user
+	var user models.User
+	if err := s.db.Where("id = ? AND deleted_at IS NULL", userID).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("user not found")
+		}
+		return nil, fmt.Errorf("failed to fetch user: %w", err)
+	}
+
+	// Convert to response
+	response := s.toUserResponse(&user)
+	return &response, nil
+}
 
 // GetUsersByRole retrieves all users with a specific role
 func (s *UserService) GetUsersByRole(role string) ([]dto.UserResponse, error) {
@@ -123,7 +145,62 @@ func (s *UserService) GetUsersByRole(role string) ([]dto.UserResponse, error) {
 	return responses, nil
 }
 
+// ✅ UpdateUser updates an existing user
+func (s *UserService) UpdateUser(id string, req *dto.UpdateUserRequest) (*dto.UserResponse, error) {
+	// Parse UUID
+	userID, err := uuid.Parse(id)
+	if err != nil {
+		return nil, errors.New("invalid user ID format")
+	}
 
+	// Find existing user
+	var user models.User
+	if err := s.db.Where("id = ? AND deleted_at IS NULL", userID).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("user not found")
+		}
+		return nil, errors.New("failed to fetch user: " + err.Error())
+	}
+
+	// Update fields
+	if req.FirstName != "" {
+		user.FirstName = strings.TrimSpace(req.FirstName)
+	}
+	if req.LastName != "" {
+		user.LastName = strings.TrimSpace(req.LastName)
+	}
+	if req.MiddleName != "" {
+		user.MiddleName = strings.TrimSpace(req.MiddleName)
+	}
+	if req.Phone != "" {
+		user.Phone = strings.TrimSpace(req.Phone)
+	}
+	if req.Role != "" {
+		user.Role = req.Role
+	}
+
+	if req.IsActive != nil {
+		user.IsActive = *req.IsActive
+	}
+	if req.IsVerified != nil {
+		user.IsVerified = *req.IsVerified
+	}
+	if req.Location != "" {
+		user.Location = strings.TrimSpace(req.Location)
+	}
+
+	// Update timestamp
+	user.UpdatedAt = time.Now()
+
+	// Save to database
+	if err := s.db.Save(&user).Error; err != nil {
+		return nil, errors.New("failed to update user: " + err.Error())
+	}
+
+	// Convert to response
+	response := s.toUserResponse(&user)
+	return &response, nil
+}
 
 // DeleteUser soft deletes a user
 func (s *UserService) DeleteUser(id string) error {

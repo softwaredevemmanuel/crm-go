@@ -12,7 +12,7 @@ type GradeSubject struct {
 	GradeID      uuid.UUID      `gorm:"type:uuid;not null;index:idx_grade_subject_unique,unique" json:"grade_id"`
 	SubjectID    uuid.UUID      `gorm:"type:uuid;not null;index:idx_grade_subject_unique,unique" json:"subject_id"`
 	Status       string         `gorm:"type:varchar(20);not null;default:'active';check:status IN ('active', 'inactive')" json:"status"`
-	IsCompulsory bool           `gorm:"not null;default:true" json:"is_compulsory"`
+	IsCompulsory bool           `gorm:"not null;" json:"is_compulsory"`
 	CreatedBy    uuid.UUID      `gorm:"type:uuid;not null" json:"created_by"`
 	CreatedAt    time.Time      `json:"created_at"`
 	UpdatedAt    time.Time      `json:"updated_at"`

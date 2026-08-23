@@ -23,6 +23,12 @@ func UserRoutes(router *gin.RouterGroup, db *gorm.DB) {
 		// Get users by role
 		userGroup.GET("/users/role/:role", userHandler.GetUsersByRole)
 
+		// ✅ Get user by ID
+		userGroup.GET("/users/:id", userHandler.GetUserByID)
+
+		// Update user
+		userGroup.PUT("/:id", userHandler.UpdateUser)
+
 		// Delete user
 		userGroup.DELETE("/users/:id", userHandler.DeleteUser)
 	}

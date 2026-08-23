@@ -9,6 +9,7 @@ import (
 type CreateAcademicSessionRequest struct {
 	AcademicYear        string `json:"academic_year" binding:"required,min=2,max=20"`
 	Code        string `json:"code" binding:"required,min=2,max=20"`
+	Term        string `json:"term" binding:"required,min=2,max=20"`
 	StartDate   string `json:"start_date" binding:"required"` // Format: "2006-01-02"
 	EndDate     string `json:"end_date" binding:"required"`   // Format: "2006-01-02"
 	Status      string `json:"status" binding:"omitempty,oneof=active inactive completed"`
@@ -20,6 +21,7 @@ type CreateAcademicSessionRequest struct {
 type UpdateAcademicSessionRequest struct {
 	AcademicYear        string `json:"academic_year" binding:"omitempty,min=2,max=20"`
 	Code        string `json:"code" binding:"omitempty,min=2,max=20"`
+	Term        string `json:"term" binding:"required,min=2,max=20"`
 	StartDate   string `json:"start_date"` // Format: "2006-01-02"
 	EndDate     string `json:"end_date"`   // Format: "2006-01-02"
 	Status      string `json:"status" binding:"omitempty,oneof=active inactive completed"`
@@ -32,6 +34,7 @@ type AcademicSessionResponse struct {
 	ID          string    `json:"id"`
 	AcademicYear        string    `json:"academic_year"`
 	Code        string    `json:"code"`
+	Term        string 	  `json:"term"`
 	StartDate   time.Time `json:"start_date"`
 	EndDate     time.Time `json:"end_date"`
 	Status      string    `json:"status"`

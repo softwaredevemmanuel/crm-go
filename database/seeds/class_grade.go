@@ -92,7 +92,7 @@ func SeedClassGrades() {
 			Description:  "The first year of junior secondary education, focusing on building strong foundations in core subjects and essential learning skills.",
 			AcademicSessionID:  session5,
 			Capacity:     15,
-			Status:       "active",
+			Status:       "completed",
 			CreatedBy:    adminID,
 		},
 		{
@@ -103,7 +103,7 @@ func SeedClassGrades() {
 			Description:  "The second year of junior secondary education, where students strengthen their knowledge, develop deeper understanding, and improve their academic skills.",
 			AcademicSessionID:  session5,
 			Capacity:     15,
-			Status:       "active",
+			Status:       "completed",
 			CreatedBy:    adminID,
 		},
 		{
@@ -114,7 +114,7 @@ func SeedClassGrades() {
 			Description:  "The final year of junior secondary education, preparing students for senior secondary school through advanced learning and academic assessment.",
 			AcademicSessionID:  session5,
 			Capacity:     15,
-			Status:       "active",
+			Status:       "completed",
 			CreatedBy:    adminID,
 		},
 		{
@@ -125,7 +125,7 @@ func SeedClassGrades() {
 			Description:  "The first year of senior secondary education, introducing students to more specialized subjects and preparing them for advanced academic study.",
 			AcademicSessionID:  session5,
 			Capacity:     15,
-			Status:       "active",
+			Status:       "completed",
 			CreatedBy:    adminID,
 		},
 		{
@@ -136,7 +136,7 @@ func SeedClassGrades() {
 			Description:  "The second year of senior secondary education, where students deepen their subject knowledge and develop skills needed for examinations and future careers.",
 			AcademicSessionID:  session5,
 			Capacity:     15,
-			Status:       "active",
+			Status:       "completed",
 			CreatedBy:    adminID,
 		},
 		{
@@ -147,7 +147,7 @@ func SeedClassGrades() {
 			Description:  "The final year of senior secondary education, focused on completing the secondary curriculum and preparing students for major examinations and further education.",
 			AcademicSessionID:  session5,
 			Capacity:     15,
-			Status:       "active",
+			Status:       "completed",
 			CreatedBy:    adminID,
 		},
 		{
@@ -158,7 +158,7 @@ func SeedClassGrades() {
 			Description:  "The first year of junior secondary education, focusing on building strong foundations in core subjects and essential learning skills.",
 			AcademicSessionID:  session4,
 			Capacity:     15,
-			Status:       "active",
+			Status:       "completed",
 			CreatedBy:    adminID,
 		},
 		{
@@ -169,7 +169,7 @@ func SeedClassGrades() {
 			Description:  "The second year of junior secondary education, where students strengthen their knowledge, develop deeper understanding, and improve their academic skills.",
 			AcademicSessionID:  session4,
 			Capacity:     15,
-			Status:       "active",
+			Status:       "completed",
 			CreatedBy:    adminID,
 		},
 		{
@@ -180,7 +180,7 @@ func SeedClassGrades() {
 			Description:  "The final year of junior secondary education, preparing students for senior secondary school through advanced learning and academic assessment.",
 			AcademicSessionID:  session4,
 			Capacity:     15,
-			Status:       "active",
+			Status:       "completed",
 			CreatedBy:    adminID,
 		},
 		{
@@ -191,7 +191,7 @@ func SeedClassGrades() {
 			Description:  "The first year of senior secondary education, introducing students to more specialized subjects and preparing them for advanced academic study.",
 			AcademicSessionID:  session4,
 			Capacity:     15,
-			Status:       "active",
+			Status:       "completed",
 			CreatedBy:    adminID,
 		},
 		{
@@ -202,7 +202,7 @@ func SeedClassGrades() {
 			Description:  "The second year of senior secondary education, where students deepen their subject knowledge and develop skills needed for examinations and future careers.",
 			AcademicSessionID:  session4,
 			Capacity:     15,
-			Status:       "active",
+			Status:       "completed",
 			CreatedBy:    adminID,
 		},
 		{
@@ -213,7 +213,7 @@ func SeedClassGrades() {
 			Description:  "The final year of senior secondary education, focused on completing the secondary curriculum and preparing students for major examinations and further education.",
 			AcademicSessionID:  session4,
 			Capacity:     15,
-			Status:       "active",
+			Status:       "completed",
 			CreatedBy:    adminID,
 		},
 		

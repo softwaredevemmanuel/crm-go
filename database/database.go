@@ -61,6 +61,9 @@ func MigrateDatabase() {
 	db.AutoMigrate(&models.Address{})
 	db.AutoMigrate(&models.AcademicSession{})
 	db.AutoMigrate(&models.GradeSubject{})
+	db.AutoMigrate(&models.StudentEnrollment{})
+	
+
 
 	log.Println("✅ Database migrated successfully")
 

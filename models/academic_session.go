@@ -9,8 +9,9 @@ import (
 
 type AcademicSession struct {
 	ID           uuid.UUID      `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
-	AcademicYear string         `gorm:"type:varchar(20);not null;uniqueIndex" json:"academic_year"`
-	Code         string         `gorm:"type:varchar(20);not null;uniqueIndex" json:"code"`
+	AcademicYear string         `gorm:"type:varchar(20);not null;" json:"academic_year"`
+	Code         string         `gorm:"type:varchar(20);not null;" json:"code"`
+	Term         string         `gorm:"type:varchar(20);not null;check:term IN ('first', 'second', 'third')" json:"term"`
 	StartDate    time.Time      `gorm:"type:date;not null" json:"start_date"`
 	EndDate      time.Time      `gorm:"type:date;not null" json:"end_date"`
 	Status       string         `gorm:"type:varchar(20);not null;default:'active';check:status IN ('active', 'inactive', 'completed')" json:"status"`

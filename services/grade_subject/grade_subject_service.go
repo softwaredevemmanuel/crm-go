@@ -12,6 +12,7 @@ import (
 
 	"crm-go/models"
 	"crm-go/dto"
+	"log"
 )
 
 type GradeSubjectService struct {
@@ -69,6 +70,16 @@ func (s *GradeSubjectService) CreateGradeSubject(req *dto.CreateGradeSubjectRequ
 	if status == "" {
 		status = "active"
 	}
+	compulsory := req.IsCompulsory
+	if compulsory == true{
+			log.Printf("true")
+
+	}else{
+					log.Printf("false")
+
+	}
+	
+
 
 	// Create new grade-subject mapping
 	gradeSubject := &models.GradeSubject{
@@ -76,7 +87,7 @@ func (s *GradeSubjectService) CreateGradeSubject(req *dto.CreateGradeSubjectRequ
 		GradeID:      gradeID,
 		SubjectID:    subjectID,
 		Status:       status,
-		IsCompulsory: req.IsCompulsory,
+		IsCompulsory: compulsory,
 		CreatedBy:    userID,
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),

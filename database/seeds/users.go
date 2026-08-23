@@ -20,6 +20,21 @@ func hashPassword(password string) string {
     return string(hashed)
 }
 
+
+func parseDOB(date string) *time.Time {
+	if date == "" {
+		return nil
+	}
+
+	d, err := time.Parse("2006-01-02", date)
+	if err != nil {
+		log.Printf("Invalid DOB: %s", date)
+		return nil
+	}
+
+	return &d
+}
+
 func SeedUsers() {
 	db := config.GetDB()
 
@@ -37,6 +52,8 @@ func SeedUsers() {
 	}
 
 	
+
+	
 	users := []models.User{
 		{
 			ID:          userID1,
@@ -47,6 +64,7 @@ func SeedUsers() {
 			LoginID:  "QWERTY",
 			Picture:     "https://lh3.googleusercontent.com/a/ACg8ocIucwnbi0gu-NdunUN5er6sqCwOouqNOuQ2dpU-1qR_yH0Kpw=s96-c",
 			Role:        "admin",
+			DOB:       parseDOB("2000-10-08"),
 			Provider:   "local",
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),
@@ -60,6 +78,7 @@ func SeedUsers() {
 			LoginID:  "QWERTY",
 			Picture:     "https://lh3.googleusercontent.com/a/ACg8ocIucwnbi0gu-NdunUN5er6sqCwOouqNOuQ2dpU-1qR_yH0Kpw=s96-c",
 			Role:        "staff",
+			DOB:       parseDOB("2000-10-08"),
 			Provider:   "local",
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),
@@ -73,6 +92,7 @@ func SeedUsers() {
 			LoginID:  "QWERTY",
 			Picture:     "https://lh3.googleusercontent.com/a/ACg8ocIucwnbi0gu-NdunUN5er6sqCwOouqNOuQ2dpU-1qR_yH0Kpw=s96-c",
 			Role:        "student",
+			DOB:       parseDOB("2000-10-08"),
 			Provider:   "local",
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),

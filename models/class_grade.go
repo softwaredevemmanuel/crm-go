@@ -15,7 +15,7 @@ type ClassGrade struct {
 	Description       string         `gorm:"type:text" json:"description"`
 	AcademicSessionID uuid.UUID       `gorm:"type:uuid;not null;index" json:"academic_session_id"`
 	Capacity          int            `gorm:"default:30" json:"capacity"`
-	Status            string         `gorm:"type:varchar(20);default:'active';check:status IN ('active', 'inactive', 'archived')" json:"status"`
+	Status            string         `gorm:"type:varchar(20);default:'active';check:status IN ('active', 'inactive', 'completed')" json:"status"`
 	CreatedBy         uuid.UUID      `gorm:"type:uuid;not null" json:"created_by"`
 	CreatedAt         time.Time      `json:"created_at"`
 	UpdatedAt         time.Time      `json:"updated_at"`

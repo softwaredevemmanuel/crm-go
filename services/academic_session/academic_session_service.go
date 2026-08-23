@@ -45,15 +45,28 @@ func (s *AcademicSessionService) CreateAcademicSession(req *dto.CreateAcademicSe
 		return nil, errors.New("end date must be after start date")
 	}
 
-	// Check if session with same year already exists
+	// Check if session with same academic year and term already exists
 	var existing models.AcademicSession
-	if err := s.db.Where("year = ?", req.AcademicYear).First(&existing).Error; err == nil {
-		return nil, errors.New("academic session with this year already exists")
+
+	if err := s.db.Where(
+		"academic_year = ? AND term = ?",
+		req.AcademicYear,
+		req.Term,
+	).First(&existing).Error; err == nil {
+
+		return nil, errors.New(
+			"academic session with this academic year and term already exists",
+		)
 	}
 
-	// Check if session with same code already exists
-	if err := s.db.Where("code = ?", req.Code).First(&existing).Error; err == nil {
-		return nil, errors.New("academic session with this code already exists")
+	if err := s.db.Where(
+		"is_current = ?",
+		req.IsCurrent,
+	).First(&existing).Error; err == nil {
+
+		return nil, errors.New(
+			"an academic session is currently running",
+		)
 	}
 
 	// Set default status if not provided
@@ -73,17 +86,18 @@ func (s *AcademicSessionService) CreateAcademicSession(req *dto.CreateAcademicSe
 
 	// Create new academic session
 	session := &models.AcademicSession{
-		ID:          uuid.New(),
-		AcademicYear:        strings.TrimSpace(req.AcademicYear),
-		Code:        strings.ToUpper(strings.TrimSpace(req.Code)),
-		StartDate:   startDate,
-		EndDate:     endDate,
-		Status:      status,
-		IsCurrent:   req.IsCurrent,
-		Description: strings.TrimSpace(req.Description),
-		CreatedBy:   userID,
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
+		ID:           uuid.New(),
+		AcademicYear: strings.TrimSpace(req.AcademicYear),
+		Code:         strings.ToUpper(strings.TrimSpace(req.Code)),
+		Term:         strings.TrimSpace(req.Term),
+		StartDate:    startDate,
+		EndDate:      endDate,
+		Status:       status,
+		IsCurrent:    req.IsCurrent,
+		Description:  strings.TrimSpace(req.Description),
+		CreatedBy:    userID,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
 	}
 
 	if err := s.db.Create(session).Error; err != nil {
@@ -201,7 +215,12 @@ func (s *AcademicSessionService) GetCurrentAcademicSession() (*dto.AcademicSessi
 }
 
 // UpdateAcademicSession updates an existing academic session
-func (s *AcademicSessionService) UpdateAcademicSession(id string, req *dto.UpdateAcademicSessionRequest, userID uuid.UUID) (*dto.AcademicSessionResponse, error) {
+func (s *AcademicSessionService) UpdateAcademicSession(
+	id string,
+	req *dto.UpdateAcademicSessionRequest,
+	userID uuid.UUID,
+) (*dto.AcademicSessionResponse, error) {
+
 	sessionID, err := uuid.Parse(id)
 	if err != nil {
 		return nil, errors.New("invalid academic session ID")
@@ -209,85 +228,218 @@ func (s *AcademicSessionService) UpdateAcademicSession(id string, req *dto.Updat
 
 	// Find existing session
 	var session models.AcademicSession
-	if err := s.db.Where("id = ? AND deleted_at IS NULL", sessionID).First(&session).Error; err != nil {
+
+	if err := s.db.
+		Where("id = ? AND deleted_at IS NULL", sessionID).
+		First(&session).Error; err != nil {
+
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("academic session not found")
 		}
-		return nil, errors.New("failed to fetch academic session: " + err.Error())
+
+		return nil, errors.New(
+			"failed to fetch academic session: " + err.Error(),
+		)
 	}
 
-	// Check for duplicate year if being updated
-	if req.AcademicYear != "" && req.AcademicYear != session.AcademicYear {
-		var existing models.AcademicSession
-		if err := s.db.Where("year = ? AND id != ? AND deleted_at IS NULL", req.AcademicYear, sessionID).First(&existing).Error; err == nil {
-			return nil, errors.New("academic session with this year already exists")
+	// ---------------------------------------------------------
+	// Determine the final Academic Year and Term
+	// ---------------------------------------------------------
+
+	academicYear := session.AcademicYear
+	term := session.Term
+
+	if req.AcademicYear != "" {
+		academicYear = strings.TrimSpace(req.AcademicYear)
+	}
+
+	if req.Term != "" {
+		term = strings.TrimSpace(req.Term)
+	}
+
+	// ---------------------------------------------------------
+	// Check duplicate Academic Year + Term combination
+	// ---------------------------------------------------------
+
+	var existing models.AcademicSession
+
+	result := s.db.
+		Where(
+			"academic_year = ? AND term = ? AND id != ? AND deleted_at IS NULL",
+			academicYear,
+			term,
+			sessionID,
+		).
+		First(&existing)
+
+	if result.Error == nil {
+		return nil, errors.New(
+			"academic session with this academic year and term already exists",
+		)
+	}
+
+	if !errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, errors.New(
+			"failed to check academic session: " + result.Error.Error(),
+		)
+	}
+
+
+	if err := s.db.Where(
+		"is_current = ?",
+		req.IsCurrent,
+	).First(&existing).Error; err == nil {
+
+		return nil, errors.New(
+			"an active academic session is currently running",
+		)
+	}
+	// ---------------------------------------------------------
+	// Check duplicate Code
+	// ---------------------------------------------------------
+
+	if req.Code != "" && strings.TrimSpace(req.Code) != session.Code {
+
+		code := strings.ToUpper(strings.TrimSpace(req.Code))
+
+		var existingCode models.AcademicSession
+
+		result := s.db.
+			Where(
+				"code = ? AND id != ? AND deleted_at IS NULL",
+				code,
+				sessionID,
+			).
+			First(&existingCode)
+
+		if result.Error == nil {
+			return nil, errors.New(
+				"academic session with this code already exists",
+			)
+		}
+
+		if !errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, errors.New(
+				"failed to check academic session code: " + result.Error.Error(),
+			)
 		}
 	}
 
-	// Check for duplicate code if being updated
-	if req.Code != "" && req.Code != session.Code {
-		var existing models.AcademicSession
-		if err := s.db.Where("code = ? AND id != ? AND deleted_at IS NULL", req.Code, sessionID).First(&existing).Error; err == nil {
-			return nil, errors.New("academic session with this code already exists")
-		}
-	}
-
+	// ---------------------------------------------------------
 	// Parse dates if provided
+	// ---------------------------------------------------------
+
 	var startDate, endDate time.Time
+
 	if req.StartDate != "" {
 		startDate, err = time.Parse("2006-01-02", req.StartDate)
+
 		if err != nil {
-			return nil, errors.New("invalid start date format. Use YYYY-MM-DD")
+			return nil, errors.New(
+				"invalid start date format. Use YYYY-MM-DD",
+			)
 		}
 	}
+
 	if req.EndDate != "" {
 		endDate, err = time.Parse("2006-01-02", req.EndDate)
+
 		if err != nil {
-			return nil, errors.New("invalid end date format. Use YYYY-MM-DD")
+			return nil, errors.New(
+				"invalid end date format. Use YYYY-MM-DD",
+			)
 		}
 	}
 
-	// Validate date range if both are provided
-	if req.StartDate != "" && req.EndDate != "" && endDate.Before(startDate) {
-		return nil, errors.New("end date must be after start date")
+	// ---------------------------------------------------------
+	// Validate date range
+	// ---------------------------------------------------------
+
+	finalStartDate := session.StartDate
+	finalEndDate := session.EndDate
+
+	if req.StartDate != "" {
+		finalStartDate = startDate
 	}
 
-	// If this session is set as current, unset any existing current sessions
+	if req.EndDate != "" {
+		finalEndDate = endDate
+	}
+
+	if finalEndDate.Before(finalStartDate) {
+		return nil, errors.New(
+			"end date must be after start date",
+		)
+	}
+
+	// ---------------------------------------------------------
+	// If this session becomes current,
+	// unset other current sessions
+	// ---------------------------------------------------------
+
 	if req.IsCurrent != nil && *req.IsCurrent && !session.IsCurrent {
-		if err := s.db.Model(&models.AcademicSession{}).
-			Where("is_current = ? AND id != ?", true, sessionID).
+
+		if err := s.db.
+			Model(&models.AcademicSession{}).
+			Where(
+				"is_current = ? AND id != ? AND deleted_at IS NULL",
+				true,
+				sessionID,
+			).
 			Update("is_current", false).Error; err != nil {
-			return nil, errors.New("failed to update current sessions: " + err.Error())
+
+			return nil, errors.New(
+				"failed to update current sessions: " + err.Error(),
+			)
 		}
 	}
 
+	// ---------------------------------------------------------
 	// Update fields
+	// ---------------------------------------------------------
+
 	if req.AcademicYear != "" {
-		session.AcademicYear = strings.TrimSpace(req.AcademicYear)
+		session.AcademicYear = academicYear
 	}
+
+	if req.Term != "" {
+		session.Term = term
+	}
+
 	if req.Code != "" {
 		session.Code = strings.ToUpper(strings.TrimSpace(req.Code))
 	}
+
 	if req.StartDate != "" {
 		session.StartDate = startDate
 	}
+
 	if req.EndDate != "" {
 		session.EndDate = endDate
 	}
+
 	if req.Status != "" {
 		session.Status = req.Status
 	}
+
 	if req.IsCurrent != nil {
 		session.IsCurrent = *req.IsCurrent
 	}
+
 	if req.Description != "" {
 		session.Description = strings.TrimSpace(req.Description)
 	}
 
 	session.UpdatedAt = time.Now()
 
+	// ---------------------------------------------------------
+	// Save
+	// ---------------------------------------------------------
+
 	if err := s.db.Save(&session).Error; err != nil {
-		return nil, errors.New("failed to update academic session: " + err.Error())
+		return nil, errors.New(
+			"failed to update academic session: " + err.Error(),
+		)
 	}
 
 	return s.toSessionResponse(&session), nil
@@ -360,8 +512,9 @@ func (s *AcademicSessionService) toSessionResponse(session *models.AcademicSessi
 
 	return &dto.AcademicSessionResponse{
 		ID:            session.ID.String(),
-		AcademicYear:   session.AcademicYear,
+		AcademicYear:  session.AcademicYear,
 		Code:          session.Code,
+		Term:          session.Term,
 		StartDate:     session.StartDate,
 		EndDate:       session.EndDate,
 		Status:        session.Status,
