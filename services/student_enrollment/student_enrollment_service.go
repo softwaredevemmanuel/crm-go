@@ -369,7 +369,7 @@ func (s *StudentEnrollmentService) GetStudentEnrollmentByID(id string) (*dto.Stu
 	return s.toEnrollmentResponse(&enrollment), nil
 }
 
-// GetEnrollmentsByStudent retrieves all enrollments for a specific student
+// GetEnrollmentsByStudent retrieves all verified enrollments for a specific student
 func (s *StudentEnrollmentService) GetEnrollmentsByStudent(studentID string) ([]dto.StudentEnrollmentResponse, error) {
 	sID, err := uuid.Parse(studentID)
 	if err != nil {
@@ -377,7 +377,13 @@ func (s *StudentEnrollmentService) GetEnrollmentsByStudent(studentID string) ([]
 	}
 
 	var enrollments []models.StudentEnrollment
-	if err := s.db.Where("student_id = ? AND deleted_at IS NULL", sID).
+
+	if err := s.db.
+		Where(
+			"student_id = ? AND deleted_at IS NULL AND is_verified = ?",
+			sID,
+			true,
+		).
 		Preload("Student").
 		Preload("Grade").
 		Order("created_at DESC").
@@ -386,6 +392,7 @@ func (s *StudentEnrollmentService) GetEnrollmentsByStudent(studentID string) ([]
 	}
 
 	responses := make([]dto.StudentEnrollmentResponse, len(enrollments))
+
 	for i, enrollment := range enrollments {
 		responses[i] = *s.toEnrollmentResponse(&enrollment)
 	}

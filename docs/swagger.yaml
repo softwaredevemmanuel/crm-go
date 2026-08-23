@@ -374,6 +374,53 @@ definitions:
     - grade_id
     - subject_ids
     type: object
+  dto.BulkCreateNotificationRequest:
+    properties:
+      color:
+        type: string
+      expires_at:
+        type: string
+      icon:
+        type: string
+      link:
+        type: string
+      message:
+        type: string
+      metadata:
+        type: string
+      priority:
+        enum:
+        - low
+        - normal
+        - high
+        - urgent
+        type: string
+      title:
+        maxLength: 255
+        minLength: 3
+        type: string
+      type:
+        enum:
+        - system
+        - announcement
+        - assignment
+        - grade
+        - enrollment
+        - message
+        - alert
+        - reminder
+        type: string
+      user_ids:
+        items:
+          type: string
+        minItems: 1
+        type: array
+    required:
+    - message
+    - title
+    - type
+    - user_ids
+    type: object
   dto.BulkCreateStudentEnrollmentRequest:
     properties:
       grade_id:
@@ -661,6 +708,50 @@ definitions:
     - relationship
     - student_id
     type: object
+  dto.CreateNotificationRequest:
+    properties:
+      color:
+        type: string
+      expires_at:
+        type: string
+      icon:
+        type: string
+      link:
+        type: string
+      message:
+        type: string
+      metadata:
+        type: string
+      priority:
+        enum:
+        - low
+        - normal
+        - high
+        - urgent
+        type: string
+      title:
+        maxLength: 255
+        minLength: 3
+        type: string
+      type:
+        enum:
+        - system
+        - announcement
+        - assignment
+        - grade
+        - enrollment
+        - message
+        - alert
+        - reminder
+        type: string
+      user_id:
+        type: string
+    required:
+    - message
+    - title
+    - type
+    - user_id
+    type: object
   dto.CreateStudentEnrollmentRequest:
     properties:
       grade_id:
@@ -809,6 +900,87 @@ definitions:
         $ref: '#/definitions/dto.UserResponse'
       user_id:
         type: string
+    type: object
+  dto.NotificationListResponse:
+    properties:
+      limit:
+        type: integer
+      notifications:
+        items:
+          $ref: '#/definitions/dto.NotificationResponse'
+        type: array
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+      unread_count:
+        type: integer
+    type: object
+  dto.NotificationResponse:
+    properties:
+      color:
+        type: string
+      created_at:
+        type: string
+      created_by:
+        type: string
+      dismissed_at:
+        type: string
+      expires_at:
+        type: string
+      icon:
+        type: string
+      id:
+        type: string
+      is_dismissed:
+        type: boolean
+      is_read:
+        type: boolean
+      link:
+        type: string
+      message:
+        type: string
+      metadata:
+        type: string
+      priority:
+        type: string
+      read_at:
+        type: string
+      sent_at:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/dto.UserResponse'
+      user_id:
+        type: string
+    type: object
+  dto.NotificationStatsResponse:
+    properties:
+      by_priority:
+        additionalProperties:
+          format: int64
+          type: integer
+        type: object
+      by_type:
+        additionalProperties:
+          format: int64
+          type: integer
+        type: object
+      dismissed:
+        type: integer
+      read:
+        type: integer
+      total:
+        type: integer
+      unread:
+        type: integer
     type: object
   dto.StudentEnrollmentListResponse:
     properties:
@@ -1045,6 +1217,20 @@ definitions:
         - inactive
         type: string
       student_id:
+        type: string
+    type: object
+  dto.UpdateNotificationRequest:
+    properties:
+      is_dismissed:
+        type: boolean
+      is_read:
+        type: boolean
+      priority:
+        enum:
+        - low
+        - normal
+        - high
+        - urgent
         type: string
     type: object
   dto.UpdateStudentEnrollmentRequest:
@@ -5612,6 +5798,423 @@ paths:
       summary: Update an existing module
       tags:
       - Modules
+  /api/notifications:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of notifications for the current user
+      parameters:
+      - description: Filter by type
+        in: query
+        name: type
+        type: string
+      - description: Filter by priority
+        in: query
+        name: priority
+        type: string
+      - description: Filter by read status
+        in: query
+        name: is_read
+        type: boolean
+      - description: Filter by dismissed status
+        in: query
+        name: is_dismissed
+        type: boolean
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.NotificationListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all notifications
+      tags:
+      - Notifications
+    post:
+      consumes:
+      - application/json
+      description: Create a new notification for a user
+      parameters:
+      - description: Notification request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateNotificationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a notification
+      tags:
+      - Notifications
+  /api/notifications/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete a notification by ID
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a notification
+      tags:
+      - Notifications
+    get:
+      consumes:
+      - application/json
+      description: Get a single notification by its ID
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get notification by ID
+      tags:
+      - Notifications
+    put:
+      consumes:
+      - application/json
+      description: Update an existing notification by ID
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Notification update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateNotificationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update a notification
+      tags:
+      - Notifications
+  /api/notifications/{id}/dismiss:
+    post:
+      consumes:
+      - application/json
+      description: Dismiss a specific notification
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Dismiss a notification
+      tags:
+      - Notifications
+  /api/notifications/{id}/read:
+    post:
+      consumes:
+      - application/json
+      description: Mark a specific notification as read
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Mark notification as read
+      tags:
+      - Notifications
+  /api/notifications/bulk:
+    post:
+      consumes:
+      - application/json
+      description: Create multiple notifications for multiple users
+      parameters:
+      - description: Bulk notification request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BulkCreateNotificationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Bulk create notifications
+      tags:
+      - Notifications
+  /api/notifications/read-all:
+    post:
+      consumes:
+      - application/json
+      description: Mark all notifications for the current user as read
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Mark all notifications as read
+      tags:
+      - Notifications
+  /api/notifications/stats:
+    get:
+      consumes:
+      - application/json
+      description: Get statistics for the current user's notifications
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.NotificationStatsResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get notification statistics
+      tags:
+      - Notifications
   /api/products:
     post:
       consumes:
