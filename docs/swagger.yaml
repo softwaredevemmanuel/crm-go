@@ -2551,6 +2551,23 @@ definitions:
         example: student
         type: string
     type: object
+  services.SubscriptionRequest:
+    properties:
+      subscription:
+        properties:
+          endpoint:
+            type: string
+          keys:
+            properties:
+              auth:
+                type: string
+              p256dh:
+                type: string
+            type: object
+        type: object
+      user_id:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -6342,6 +6359,110 @@ paths:
       summary: Update a product
       tags:
       - Products
+  /api/push/subscribe:
+    post:
+      consumes:
+      - application/json
+      description: Subscribe a user to push notifications
+      parameters:
+      - description: Subscription request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/services.SubscriptionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Subscribe to push notifications
+      tags:
+      - Push Notifications
+  /api/push/test:
+    post:
+      consumes:
+      - application/json
+      description: Send a test push notification to a user
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Send test push notification
+      tags:
+      - Push Notifications
+  /api/push/unsubscribe:
+    delete:
+      consumes:
+      - application/json
+      description: Unsubscribe a user from push notifications
+      parameters:
+      - description: User ID
+        in: body
+        name: user_id
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Unsubscribe from push notifications
+      tags:
+      - Push Notifications
   /api/questions/objective:
     post:
       consumes:
