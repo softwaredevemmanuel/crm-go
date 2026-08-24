@@ -12,6 +12,7 @@ import (
 
 	"crm-go/models"
 	"crm-go/dto"
+	"log"
 )
 
 type StudentEnrollmentService struct {
@@ -34,6 +35,7 @@ func (s *StudentEnrollmentService) CreateStudentEnrollment(req *dto.CreateStuden
 	if err != nil {
 		return nil, errors.New("invalid student ID format")
 	}
+		log.Println("✅ Database migrated successfully")
 
 	gradeID, err := uuid.Parse(req.GradeID)
 	if err != nil {

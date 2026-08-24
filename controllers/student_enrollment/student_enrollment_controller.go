@@ -63,6 +63,7 @@ func (h *StudentEnrollmentHandler) CreateStudentEnrollment(c *gin.Context) {
 		return
 	}
 
+
 	enrollment, err := h.enrollmentService.CreateStudentEnrollment(&req, userID)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
