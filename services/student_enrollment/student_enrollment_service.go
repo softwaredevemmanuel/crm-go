@@ -585,6 +585,7 @@ func (s *StudentEnrollmentService) toEnrollmentResponse(enrollment *models.Stude
 			Level:       enrollment.Grade.Level,
 			Description: enrollment.Grade.Description,
 			AcademicSessionID: enrollment.Grade.AcademicSessionID.String(),
+			ClassTeacherID: enrollment.Grade.ClassTeacherID.String(),
 			Capacity:    enrollment.Grade.Capacity,
 			Status:      enrollment.Grade.Status,
 			CreatedAt:   enrollment.Grade.CreatedAt,

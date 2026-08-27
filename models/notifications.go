@@ -13,8 +13,6 @@ type Notification struct {
 	Type        string         `gorm:"type:varchar(50);not null;index" json:"type"`
 	Title       string         `gorm:"type:varchar(255);not null" json:"title"`
 	Message     string         `gorm:"type:text;not null" json:"message"`
-	Icon        string         `gorm:"type:varchar(100)" json:"icon"`
-	Color       string         `gorm:"type:varchar(20)" json:"color"`
 	Link        string         `gorm:"type:varchar(500)" json:"link"`
 	IsRead      bool           `gorm:"default:false;index" json:"is_read"`
 	IsDismissed bool           `gorm:"default:false" json:"is_dismissed"`

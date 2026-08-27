@@ -10,8 +10,6 @@ type CreateNotificationRequest struct {
 	Type     string `json:"type" binding:"required,oneof=system announcement assignment grade enrollment message alert reminder"`
 	Title    string `json:"title" binding:"required,min=3,max=255"`
 	Message  string `json:"message" binding:"required"`
-	Icon     string `json:"icon"`
-	Color    string `json:"color"`
 	Link     string `json:"link"`
 	Priority string `json:"priority" binding:"omitempty,oneof=low normal high urgent"`
 	ExpiresAt string `json:"expires_at"`
@@ -24,8 +22,6 @@ type BulkCreateNotificationRequest struct {
 	Type     string   `json:"type" binding:"required,oneof=system announcement assignment grade enrollment message alert reminder"`
 	Title    string   `json:"title" binding:"required,min=3,max=255"`
 	Message  string   `json:"message" binding:"required"`
-	Icon     string   `json:"icon"`
-	Color    string   `json:"color"`
 	Link     string   `json:"link"`
 	Priority string   `json:"priority" binding:"omitempty,oneof=low normal high urgent"`
 	ExpiresAt string  `json:"expires_at"`
@@ -46,8 +42,6 @@ type NotificationResponse struct {
 	Type        string     `json:"type"`
 	Title       string     `json:"title"`
 	Message     string     `json:"message"`
-	Icon        string     `json:"icon"`
-	Color       string     `json:"color"`
 	Link        string     `json:"link"`
 	IsRead      bool       `json:"is_read"`
 	IsDismissed bool       `json:"is_dismissed"`

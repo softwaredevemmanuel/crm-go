@@ -31,6 +31,10 @@ func (s *ClassGradeService) CreateClassGrade(req *dto.CreateClassGradeRequest, u
 	if err != nil {
 		return nil, errors.New("invalid academic session ID format")
 	}
+	classTeacherID, err := uuid.Parse(req.ClassTeacherID)
+	if err != nil {
+		return nil, errors.New("invalid User ID format")
+	}
 
 	// Check if academic session exists
 	var academicSession models.AcademicSession
@@ -71,9 +75,9 @@ func (s *ClassGradeService) CreateClassGrade(req *dto.CreateClassGradeRequest, u
 		Level:             req.Level,
 		Description:       strings.TrimSpace(req.Description),
 		AcademicSessionID: academicSessionID,
+		ClassTeacherID: 	classTeacherID,
 		Capacity:          req.Capacity,
 		Status:            status,
-		CreatedBy:         userID,
 		CreatedAt:         time.Now(),
 		UpdatedAt:         time.Now(),
 	}
@@ -117,6 +121,9 @@ func (s *ClassGradeService) validateClassGradeRequest(req *dto.CreateClassGradeR
 	if req.AcademicSessionID == "" {
 		return errors.New("academic session is required")
 	}
+	if req.ClassTeacherID == "" {
+		return errors.New("Class teacher is required")
+	}
 	if req.Capacity < 1 {
 		return errors.New("capacity must be at least 1")
 	}
@@ -138,9 +145,9 @@ func (s *ClassGradeService) toClassGradeResponse(classGrade *models.ClassGrade) 
 		Level:       classGrade.Level,
 		Description: classGrade.Description,
 		AcademicSessionID: classGrade.AcademicSessionID.String(),
+		ClassTeacherID: classGrade.ClassTeacherID.String(),
 		Capacity:    classGrade.Capacity,
 		Status:      classGrade.Status,
-		CreatedBy:   classGrade.CreatedBy.String(),
 		CreatedAt:   classGrade.CreatedAt,
 		UpdatedAt:   classGrade.UpdatedAt,
 	}
