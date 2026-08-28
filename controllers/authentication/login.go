@@ -107,6 +107,7 @@ func Login(c *gin.Context) {
 			LastName: user.LastName,
 			Email: user.Email,
 			Role:  string(user.Role),
+			Position:  string(user.Position),
 		},
 		Session: models.SessionInfo{
 			ExpiresAt: session.ExpiresAt,
@@ -232,6 +233,7 @@ func Login(c *gin.Context) {
 // 			LastName:  user.LastName,
 // 			Email:     user.Email,
 // 			Role:      string(user.Role),
+// 			Position:      string(user.Position),
 // 		},
 // 		Session: models.SessionInfo{
 // 			ExpiresAt: session.ExpiresAt,

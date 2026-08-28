@@ -22,6 +22,9 @@ func UserRoutes(router *gin.RouterGroup, db *gorm.DB) {
 
 		// Get users by role
 		userGroup.GET("/users/role/:role", userHandler.GetUsersByRole)
+	
+		// Get users by position
+		userGroup.GET("/users/position/:position", userHandler.GetUsersByPosition)
 
 		// ✅ Get user by ID
 		userGroup.GET("/users/:id", userHandler.GetUserByID)

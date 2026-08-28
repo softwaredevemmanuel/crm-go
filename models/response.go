@@ -33,6 +33,7 @@ type UserInfo struct {
 	LastName string    `json:"last_name" example:"Doe"`
 	Email string    `json:"email" example:"user@example.com"`
 	Role  string    `json:"role" example:"student"`
+	Position  string    `json:"position" example:"student"`
 }
 
 // SessionInfo represents session information in login response

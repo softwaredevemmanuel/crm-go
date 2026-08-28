@@ -63,7 +63,6 @@ func (h *StudentEnrollmentHandler) CreateStudentEnrollment(c *gin.Context) {
 		return
 	}
 
-
 	enrollment, err := h.enrollmentService.CreateStudentEnrollment(&req, userID)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
@@ -300,6 +299,191 @@ func (h *StudentEnrollmentHandler) GetEnrollmentsByGrade(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message":     "Enrollments retrieved successfully",
 		"enrollments": enrollments,
+	})
+}
+
+// ============================================================
+// NEW HANDLERS FOR CLASS TEACHER
+// ============================================================
+
+// GetEnrollmentsByClassTeacher handles fetching all enrollments for a class teacher
+// @Summary Get enrollments by class teacher
+// @Description Get all enrollments for grades taught by a specific class teacher
+// @Tags Student Enrollments
+// @Accept json
+// @Produce json
+// @Param teacher_id path string true "Teacher ID"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Security BearerAuth
+// @Router /api/student-enrollments/teacher/{teacher_id} [get]
+func (h *StudentEnrollmentHandler) GetEnrollmentsByClassTeacher(c *gin.Context) {
+	teacherID := c.Param("teacher_id")
+	if teacherID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Teacher ID is required",
+		})
+		return
+	}
+
+	enrollments, err := h.enrollmentService.GetEnrollmentsByClassTeacher(teacherID)
+	if err != nil {
+		if strings.Contains(err.Error(), "invalid teacher ID") {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":     "Enrollments retrieved successfully",
+		"enrollments": enrollments,
+		"total":       len(enrollments),
+	})
+}
+
+// GetEnrollmentsByClassTeacherPaginated handles fetching paginated enrollments for a class teacher
+// @Summary Get paginated enrollments by class teacher
+// @Description Get paginated enrollments for grades taught by a specific class teacher with filters
+// @Tags Student Enrollments
+// @Accept json
+// @Produce json
+// @Param teacher_id path string true "Teacher ID"
+// @Param student_id query string false "Filter by student ID"
+// @Param status query string false "Filter by status"
+// @Param page query int false "Page number" default(1)
+// @Param limit query int false "Items per page" default(20)
+// @Param sort_by query string false "Sort field" default(created_at)
+// @Param sort_order query string false "Sort order" default(desc)
+// @Success 200 {object} dto.StudentEnrollmentListResponse
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Security BearerAuth
+// @Router /api/student-enrollments/teacher/{teacher_id}/paginated [get]
+func (h *StudentEnrollmentHandler) GetEnrollmentsByClassTeacherPaginated(c *gin.Context) {
+	teacherID := c.Param("teacher_id")
+	if teacherID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Teacher ID is required",
+		})
+		return
+	}
+
+	var params dto.StudentEnrollmentQueryParams
+	if err := c.ShouldBindQuery(&params); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Invalid query parameters",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	response, err := h.enrollmentService.GetEnrollmentsByClassTeacherWithPagination(teacherID, &params)
+	if err != nil {
+		if strings.Contains(err.Error(), "invalid teacher ID") {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Enrollments retrieved successfully",
+		"data":    response,
+	})
+}
+
+// GetGradesByClassTeacher handles fetching all grades assigned to a class teacher
+// @Summary Get grades by class teacher
+// @Description Get all grades assigned to a specific class teacher
+// @Tags Student Enrollments
+// @Accept json
+// @Produce json
+// @Param teacher_id path string true "Teacher ID"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Security BearerAuth
+// @Router /api/student-enrollments/teacher/{teacher_id}/grades [get]
+func (h *StudentEnrollmentHandler) GetGradesByClassTeacher(c *gin.Context) {
+	teacherID := c.Param("teacher_id")
+	if teacherID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Teacher ID is required",
+		})
+		return
+	}
+
+	grades, err := h.enrollmentService.GetGradesByClassTeacher(teacherID)
+	if err != nil {
+		if strings.Contains(err.Error(), "invalid teacher ID") {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Grades retrieved successfully",
+		"grades":  grades,
+		"total":   len(grades),
+	})
+}
+
+// GetClassTeacherDashboardStats handles fetching dashboard statistics for a class teacher
+// @Summary Get class teacher dashboard stats
+// @Description Get dashboard statistics for a class teacher including grade-wise student distribution
+// @Tags Student Enrollments
+// @Accept json
+// @Produce json
+// @Param teacher_id path string true "Teacher ID"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Security BearerAuth
+// @Router /api/student-enrollments/teacher/{teacher_id}/dashboard [get]
+func (h *StudentEnrollmentHandler) GetClassTeacherDashboardStats(c *gin.Context) {
+	teacherID := c.Param("teacher_id")
+	if teacherID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Teacher ID is required",
+		})
+		return
+	}
+
+	stats, err := h.enrollmentService.GetClassTeacherDashboardStats(teacherID)
+	if err != nil {
+		if strings.Contains(err.Error(), "invalid teacher ID") {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Dashboard stats retrieved successfully",
+		"data":    stats,
 	})
 }
 

@@ -63,6 +63,7 @@ type UserResponse struct {
 	Email      string    `json:"email"`
 	Phone      string    `json:"phone"`
 	Role       string    `json:"role"`
+	Position   string    `json:"position"`
 	Picture    string    `json:"picture"`
 	IsVerified bool      `json:"is_verified"`
 	IsActive   bool      `json:"is_active"`

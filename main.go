@@ -8,17 +8,17 @@ import (
 	"crm-go/routes"
 	"flag"
 	"github.com/gin-contrib/cors"
-	"time"
-	"os"
 	"log"
+	"os"
+	"time"
 
 	_ "crm-go/docs"
 
 	"github.com/gin-gonic/gin"
 
+	"crm-go/scheduler"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"crm-go/scheduler"
 )
 
 // @title GO CRM API
@@ -48,11 +48,11 @@ func main() {
 	config.ConnectDB()
 	db := config.DB
 
-		// ✅ Initialize and start the academic session scheduler
+	// ✅ Initialize and start the academic session scheduler
 
 	sched := scheduler.NewAcademicSessionScheduler(db)
 	sched.Start()
-	
+
 	// Init Google OAuth
 	config.InitGoogleOauthConfig()
 
@@ -64,31 +64,30 @@ func main() {
 	r.Use(middleware.SessionMiddleware())
 
 	// Define allowed origins
-    allowedOrigins := map[string]bool{
-        "tauri://localhost":          true,
-        "http://localhost:1420":      true,
-        "http://localhost:3000":      true,
-        "https://hr-app-ecru-nine.vercel.app": true,
-    }
-r.Use(cors.New(cors.Config{
-        AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-        AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Accept", "email", "user_id"},
-        ExposeHeaders:    []string{"Content-Length"},
-        AllowCredentials: true,
-        MaxAge:           12 * time.Hour,
-        AllowOriginFunc: func(origin string) bool {
-            if allowedOrigins[origin] {
-                log.Printf("✅ Allowed: %s", origin)
-                return true
-            }else{
-            log.Printf("❌ Denied: %s", origin)
+	allowedOrigins := map[string]bool{
+		"tauri://localhost":                   true,
+		"http://localhost:1420":               true,
+		"http://localhost:3000":               true,
+		"https://hr-app-ecru-nine.vercel.app": true,
+	}
+	r.Use(cors.New(cors.Config{
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Accept", "email", "user_id"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+		AllowOriginFunc: func(origin string) bool {
+			if allowedOrigins[origin] {
+				log.Printf("✅ Allowed: %s", origin)
+				return true
+			} else {
+				log.Printf("❌ Denied: %s", origin)
 
 				return false
 			}
-            
-        },
-    }))
 
+		},
+	}))
 
 	// ✅ Swagger documentation route
 	//r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -106,6 +105,7 @@ r.Use(cors.New(cors.Config{
 		})
 	})
 
+	
 	// Register all routes
 	routes.RegisterAuthRoutes(r)
 	routes.CourseRoutes(r)
@@ -116,7 +116,6 @@ r.Use(cors.New(cors.Config{
 	routes.ProductRoutes(r)
 	routes.EnrollmentRoutes(r)
 	routes.AnnouncementRoutes(r)
-	routes.AssignmentRoutes(r)
 	routes.AssignmentSubmissionRoutes(r, config.DB)
 	routes.LessonRoutes(r, config.DB)
 	routes.GradeRoutes(r, config.DB)
@@ -137,6 +136,7 @@ r.Use(cors.New(cors.Config{
 	routes.StudentEnrollmentRoutes(&r.RouterGroup, config.DB)
 	routes.NotificationRoutes(&r.RouterGroup, config.DB)
 	routes.PushRoutes(&r.RouterGroup, config.DB)
+	routes.TeacherSubjectAssignmentRoutes(&r.RouterGroup, config.DB)
 
 	// Example curl command to clear DB (replace with your server address):
 	// curl -X DELETE "http://localhost:8080/admin/clear-db" \
@@ -168,19 +168,7 @@ r.Use(cors.New(cors.Config{
 		})
 	})
 
-	// Role-based access
-	// @Summary Tutor endpoint
-	// @Description Endpoint accessible only to tutors
-	// @Tags User
-	// @Security BearerAuth
-	// @Produce json
-	// @Success 200 {object} map[string]interface{}
-	// @Failure 401 {object} map[string]interface{}
-	// @Failure 403 {object} map[string]interface{}
-	// @Router /api/tutor [get]
-	protected.GET("/tutor", middleware.RoleMiddleware("tutor"), func(c *gin.Context) {
-		c.JSON(200, gin.H{"message": "Welcome Tutor!"})
-	})
+
 
 	// @Summary Student endpoint
 	// @Description Endpoint accessible only to students

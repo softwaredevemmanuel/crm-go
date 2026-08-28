@@ -558,6 +558,7 @@ func (s *NotificationService) toNotificationResponse(notification *models.Notifi
 			Email:     notification.User.Email,
 			Phone:     notification.User.Phone,
 			Role:      notification.User.Role,
+			Position:  notification.User.Position,
 		}
 	}
 

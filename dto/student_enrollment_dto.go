@@ -84,3 +84,24 @@ type BulkEnrollmentError struct {
 	StudentID string `json:"student_id"`
 	Error     string `json:"error"`
 }
+
+
+// dto/student_enrollment_dto.go
+
+type ClassTeacherDashboardStats struct {
+	TotalGrades      int          `json:"total_grades"`
+	TotalStudents    int          `json:"total_students"`
+	ActiveStudents   int          `json:"active_students"`
+	InactiveStudents int          `json:"inactive_students"`
+	Grades           []GradeStats `json:"grades"`
+}
+
+type GradeStats struct {
+	GradeID        string `json:"grade_id"`
+	GradeName      string `json:"grade_name"`
+	GradeCode      string `json:"grade_code"`
+	Level          int    `json:"level"`
+	TotalStudents  int    `json:"total_students"`
+	ActiveStudents int    `json:"active_students"`
+	Capacity       int    `json:"capacity"`
+}

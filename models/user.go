@@ -21,6 +21,7 @@ type User struct {
 	Picture    string         `gorm:"type:text" json:"picture,omitempty"`
 	Provider   string         `gorm:"type:varchar(50);default:'local'" json:"provider"`
 	Role       string         `gorm:"type:varchar(20);default:'user'" json:"role"`
+	Position   string         `gorm:"type:varchar(20);default:'user'" json:"position"`
 	Phone      string         `gorm:"type:varchar(20)" json:"phone"`
 	DOB 		*time.Time `gorm:"type:date" json:"dob,omitempty"`
 	IsVerified bool        `gorm:"default:false" json:"is_verified"`
@@ -48,7 +49,8 @@ type UserResponse struct {
 	LastName  string    `json:"last_name"`
 	Email     string    `json:"email"`
 	Role      string      `json:"role"`
-	DOB        string `json:"dob"` // Format: YYYY-MM-DD
+	Position  string      `json:"position"`
+	DOB       string `json:"dob"` // Format: YYYY-MM-DD
 
 }
 

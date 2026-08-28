@@ -380,6 +380,7 @@ func (s *AddressService) toAddressResponse(address *models.Address) *dto.Address
 			Email:     address.User.Email,
 			Phone:     address.User.Phone,
 			Role:      address.User.Role,
+			Position:  address.User.Position,
 		}
 	}
 

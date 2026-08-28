@@ -145,6 +145,24 @@ func (s *UserService) GetUsersByRole(role string) ([]dto.UserResponse, error) {
 	return responses, nil
 }
 
+
+// GetUsersByPosition retrieves all users with a specific position
+func (s *UserService) GetUsersByPosition(position string) ([]dto.UserResponse, error) {
+	var users []models.User
+	if err := s.db.Where("position = ? AND deleted_at IS NULL", position).
+		Order("first_name ASC").
+		Find(&users).Error; err != nil {
+		return nil, fmt.Errorf("failed to fetch users by position: %w", err)
+	}
+
+	responses := make([]dto.UserResponse, len(users))
+	for i, user := range users {
+		responses[i] = s.toUserResponse(&user)
+	}
+
+	return responses, nil
+}
+
 // ✅ UpdateUser updates an existing user
 func (s *UserService) UpdateUser(id string, req *dto.UpdateUserRequest) (*dto.UserResponse, error) {
 	// Parse UUID
@@ -253,6 +271,7 @@ func (s *UserService) toUserResponse(user *models.User) dto.UserResponse {
 		Email:       user.Email,
 		Phone:       user.Phone,
 		Role:        user.Role,
+		Position:        user.Position,
 		Picture:     user.Picture,
 		IsVerified:  user.IsVerified,
 		IsActive:    user.IsActive,

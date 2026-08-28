@@ -143,6 +143,41 @@ func (h *UserHandler) GetUsersByRole(c *gin.Context) {
 	})
 }
 
+// GetUsersByPosition handles fetching all users with a specific position
+// @Summary Get users by position
+// @Description Get all users with a specific position
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param position path string true "Position (teacher, admin, staff, student, parent, user)"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Security BearerAuth
+// @Router /api/users/position/{position} [get]
+func (h *UserHandler) GetUsersByPosition(c *gin.Context) {
+	position := c.Param("position")
+	if position == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Position is required",
+		})
+		return
+	}
+
+	users, err := h.userService.GetUsersByPosition(position)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Users retrieved successfully",
+		"users":   users,
+	})
+}
+
 // UpdateUser handles updating an existing user
 // @Summary Update a user
 // @Description Update an existing user by ID

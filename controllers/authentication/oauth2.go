@@ -49,6 +49,7 @@ func GoogleCallbackHandler(c *gin.Context) {
 	// Get code from query
 	code := c.Query("code")
 	role := c.Query("state") // state carries "student" or "tutor"
+	position := c.Query("state") // state carries "student" or "tutor"
 
 	log.Printf("✅ Value of role: %v", role)
 
@@ -120,6 +121,7 @@ func GoogleCallbackHandler(c *gin.Context) {
 				FirstName: first_name,
 				LastName:  last_name,
 				Role:      role,
+				Position:   position,
 				Email:     email,
 				Picture:   picture,
 				Provider:  "google",
@@ -153,6 +155,7 @@ func GoogleCallbackHandler(c *gin.Context) {
 			"first_name": first_name,
 			"last_name":  last_name,
 			"role":       role, // default role
+			"position":   position, // default role
 			"email":      email,
 			"picture":    picture,
 		},
