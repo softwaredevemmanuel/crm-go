@@ -28,14 +28,18 @@ type UpdateArmRequest struct {
 type ArmResponse struct {
 	ID          string    `json:"id"`
 	Name        string    `json:"name"`
-	Description string    `json:"description"`
 	Code        string    `json:"code"`
+	Description string    `json:"description"`
 	GradeID     string    `json:"grade_id"`
-	Grade       *ClassGradeResponse `json:"grade,omitempty"`
-	Status      string    `json:"status"`
 	Capacity    int       `json:"capacity"`
+	Status      string    `json:"status"`
+	CreatedBy   string    `json:"created_by"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+	
+	// Nested relationships
+	Grade       *ClassGradeResponse `json:"grade,omitempty"`
+	ClassTeacher *UserResponse      `json:"class_teacher,omitempty"`
 }
 
 // ArmListResponse represents paginated arm list response

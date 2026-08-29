@@ -38,9 +38,12 @@ type StudentEnrollmentResponse struct {
 	UpdatedAt      time.Time  `json:"updated_at"`
 
 	// Nested relationships
-	Student *UserResponse `json:"student,omitempty"`
-	Arm     *ArmResponse  `json:"arm,omitempty"`
+	Student     *UserResponse     `json:"student,omitempty"`
+	Arm         *ArmResponse      `json:"arm,omitempty"`
+	ClassTeacher *UserResponse    `json:"class_teacher,omitempty"`
 }
+
+
 
 // StudentEnrollmentListResponse represents a paginated list of student enrollments
 type StudentEnrollmentListResponse struct {

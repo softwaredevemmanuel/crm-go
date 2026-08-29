@@ -10,8 +10,8 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
-	"crm-go/models"
 	"crm-go/dto"
+	"crm-go/models"
 )
 
 type StudentEnrollmentService struct {
@@ -78,6 +78,23 @@ func (s *StudentEnrollmentService) CreateStudentEnrollment(req *dto.CreateStuden
 		return nil, errors.New("arm is not active. Cannot enroll student in an inactive arm")
 	}
 
+	// ✅ VALIDATION: Check if grade exists and is active (through arm)
+	if arm.GradeID == uuid.Nil {
+		return nil, errors.New("arm has no grade assigned")
+	}
+
+	var grade models.ClassGrade
+	if err := s.db.Where("id = ? AND deleted_at IS NULL", arm.GradeID).First(&grade).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("grade not found for this arm")
+		}
+		return nil, errors.New("failed to verify grade: " + err.Error())
+	}
+
+	if grade.Status != "active" {
+		return nil, errors.New("grade is not active. Cannot enroll student in an inactive grade")
+	}
+
 	// Check if student is already enrolled in this arm
 	var existing models.StudentEnrollment
 	if err := s.db.Where("student_id = ? AND arm_id = ? AND deleted_at IS NULL",
@@ -119,13 +136,20 @@ func (s *StudentEnrollmentService) CreateStudentEnrollment(req *dto.CreateStuden
 		return nil, errors.New("failed to create enrollment: " + err.Error())
 	}
 
-	// Preload relationships for response
-	if err := s.db.Preload("Student").Preload("Arm").First(enrollment, enrollment.ID).Error; err != nil {
+	// ✅ Preload relationships for response - with proper preloads
+	if err := s.db.
+		Preload("Student").
+		Preload("Arm").
+		Preload("Arm.Grade").
+		Preload("Arm.ClassTeacher").
+		Preload("Arm.ClassTeacher.Teacher").
+		First(enrollment, enrollment.ID).Error; err != nil {
 		return nil, errors.New("failed to load enrollment details: " + err.Error())
 	}
 
-	return s.toEnrollmentResponse(enrollment), nil
+	return s.toEnrollmentResponseWithGrade(enrollment), nil
 }
+
 
 // BulkCreateStudentEnrollments creates multiple student enrollments
 func (s *StudentEnrollmentService) BulkCreateStudentEnrollments(req *dto.BulkCreateStudentEnrollmentsRequest, userID uuid.UUID) (*dto.BulkEnrollmentResult, error) {
@@ -147,6 +171,23 @@ func (s *StudentEnrollmentService) BulkCreateStudentEnrollments(req *dto.BulkCre
 	// ✅ VALIDATION: Check if arm is active
 	if arm.Status != "active" {
 		return nil, errors.New("arm is not active. Cannot enroll students in an inactive arm")
+	}
+
+	// ✅ VALIDATION: Check if grade exists and is active (through arm)
+	if arm.GradeID == uuid.Nil {
+		return nil, errors.New("arm has no grade assigned")
+	}
+
+	var grade models.ClassGrade
+	if err := s.db.Where("id = ? AND deleted_at IS NULL", arm.GradeID).First(&grade).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("grade not found for this arm")
+		}
+		return nil, errors.New("failed to verify grade: " + err.Error())
+	}
+
+	if grade.Status != "active" {
+		return nil, errors.New("grade is not active. Cannot enroll students in an inactive grade")
 	}
 
 	// Set default status
@@ -258,7 +299,13 @@ func (s *StudentEnrollmentService) BulkCreateStudentEnrollments(req *dto.BulkCre
 		}
 
 		// Preload relationships
-		if err := s.db.Preload("Student").Preload("Arm").First(enrollment, enrollment.ID).Error; err != nil {
+		if err := s.db.
+			Preload("Student").
+			Preload("Arm").
+			Preload("Arm.Grade").
+			Preload("Arm.ClassTeacher").
+			Preload("Arm.ClassTeacher.Teacher").
+			First(enrollment, enrollment.ID).Error; err != nil {
 			result.FailedCount++
 			result.Errors = append(result.Errors, dto.BulkEnrollmentError{
 				StudentID: studentIDStr,
@@ -268,10 +315,127 @@ func (s *StudentEnrollmentService) BulkCreateStudentEnrollments(req *dto.BulkCre
 		}
 
 		result.SuccessCount++
-		result.Created = append(result.Created, *s.toEnrollmentResponse(enrollment))
+		result.Created = append(result.Created, *s.toEnrollmentResponseWithGrade(enrollment))
 	}
 
 	return result, nil
+}
+
+// validateEnrollmentRequest validates the enrollment request
+func (s *StudentEnrollmentService) validateEnrollmentRequest(req *dto.CreateStudentEnrollmentRequest) error {
+	if req.StudentID == "" {
+		return errors.New("student ID is required")
+	}
+	if req.ArmID == "" {
+		return errors.New("arm ID is required")
+	}
+
+	if req.Status != "" && req.Status != "active" && req.Status != "inactive" &&
+		req.Status != "transferred" && req.Status != "graduated" && req.Status != "withdrawn" {
+		return errors.New("status must be 'active', 'inactive', 'transferred', 'graduated', or 'withdrawn'")
+	}
+	return nil
+}
+
+// services/student_enrollment/student_enrollment_service.go
+
+// toEnrollmentResponseWithGrade converts model to response DTO with grade info
+func (s *StudentEnrollmentService) toEnrollmentResponseWithGrade(enrollment *models.StudentEnrollment) *dto.StudentEnrollmentResponse {
+	response := &dto.StudentEnrollmentResponse{
+		ID:             enrollment.ID.String(),
+		StudentID:      enrollment.StudentID.String(),
+		ArmID:          enrollment.ArmID.String(),
+		Status:         enrollment.Status,
+		GraduationDate: enrollment.GraduationDate,
+		Notes:          enrollment.Notes,
+		IsVerified:     enrollment.IsVerified,
+		CreatedBy:      enrollment.CreatedBy.String(),
+		CreatedAt:      enrollment.CreatedAt,
+		UpdatedAt:      enrollment.UpdatedAt,
+	}
+
+	// Add student details if preloaded
+	if enrollment.Student.ID != uuid.Nil {
+		response.Student = &dto.UserResponse{
+			ID:          enrollment.Student.ID.String(),
+			FirstName:   enrollment.Student.FirstName,
+			LastName:    enrollment.Student.LastName,
+			MiddleName:  enrollment.Student.MiddleName,
+			Email:       enrollment.Student.Email,
+			Phone:       enrollment.Student.Phone,
+			Role:        enrollment.Student.Role,
+			Position:    enrollment.Student.Position,
+			Picture:     enrollment.Student.Picture,
+			IsVerified:  enrollment.Student.IsVerified,
+			IsActive:    enrollment.Student.IsActive,
+			Location:    enrollment.Student.Location,
+			LastLoginAt: enrollment.Student.LastLoginAt,
+			CreatedAt:   enrollment.Student.CreatedAt,
+			UpdatedAt:   enrollment.Student.UpdatedAt,
+		}
+	}
+
+	// Add arm details with grade if preloaded
+	if enrollment.Arm.ID != uuid.Nil {
+		armResponse := &dto.ArmResponse{
+			ID:          enrollment.Arm.ID.String(),
+			Name:        enrollment.Arm.Name,
+			Code:        enrollment.Arm.Code,
+			Description: enrollment.Arm.Description,
+			GradeID:     enrollment.Arm.GradeID.String(),
+			Capacity:    enrollment.Arm.Capacity,
+			Status:      enrollment.Arm.Status,
+			CreatedBy:   enrollment.Arm.CreatedBy.String(),
+			CreatedAt:   enrollment.Arm.CreatedAt,
+			UpdatedAt:   enrollment.Arm.UpdatedAt,
+		}
+
+		// ✅ Check if Grade exists before accessing
+		if enrollment.Arm.Grade.ID != uuid.Nil {
+			armResponse.Grade = &dto.ClassGradeResponse{
+				ID:          enrollment.Arm.Grade.ID.String(),
+				Name:        enrollment.Arm.Grade.Name,
+				Code:        enrollment.Arm.Grade.Code,
+				Level:       enrollment.Arm.Grade.Level,
+				Description: enrollment.Arm.Grade.Description,
+				Status:      enrollment.Arm.Grade.Status,
+				CreatedAt:   enrollment.Arm.Grade.CreatedAt,
+				UpdatedAt:   enrollment.Arm.Grade.UpdatedAt,
+			}
+		}
+
+		// ✅ Check if ClassTeacher exists before accessing
+		if enrollment.Arm.ClassTeacher.ID != uuid.Nil {
+			if enrollment.Arm.ClassTeacher.Teacher.ID != uuid.Nil {
+				armResponse.ClassTeacher = &dto.UserResponse{
+					ID:          enrollment.Arm.ClassTeacher.Teacher.ID.String(),
+					FirstName:   enrollment.Arm.ClassTeacher.Teacher.FirstName,
+					LastName:    enrollment.Arm.ClassTeacher.Teacher.LastName,
+					MiddleName:  enrollment.Arm.ClassTeacher.Teacher.MiddleName,
+					Email:       enrollment.Arm.ClassTeacher.Teacher.Email,
+					Phone:       enrollment.Arm.ClassTeacher.Teacher.Phone,
+					Role:        enrollment.Arm.ClassTeacher.Teacher.Role,
+					Position:    enrollment.Arm.ClassTeacher.Teacher.Position,
+					Picture:     enrollment.Arm.ClassTeacher.Teacher.Picture,
+					IsVerified:  enrollment.Arm.ClassTeacher.Teacher.IsVerified,
+					IsActive:    enrollment.Arm.ClassTeacher.Teacher.IsActive,
+					Location:    enrollment.Arm.ClassTeacher.Teacher.Location,
+					LastLoginAt: enrollment.Arm.ClassTeacher.Teacher.LastLoginAt,
+					CreatedAt:   enrollment.Arm.ClassTeacher.Teacher.CreatedAt,
+					UpdatedAt:   enrollment.Arm.ClassTeacher.Teacher.UpdatedAt,
+				}
+			} else {
+				// ClassTeacher exists but Teacher relationship is not loaded
+				armResponse.ClassTeacher = &dto.UserResponse{
+					ID: enrollment.Arm.ClassTeacher.TeacherID.String(),
+				}
+			}
+		}
+
+		response.Arm = armResponse
+	}
+
+	return response
 }
 
 // GetAllStudentEnrollments retrieves all student enrollments with pagination and filters
@@ -333,16 +497,22 @@ func (s *StudentEnrollmentService) GetAllStudentEnrollments(params *dto.StudentE
 	offset := (params.Page - 1) * params.Limit
 	query = query.Offset(offset).Limit(params.Limit)
 
-	// Execute with preloads
+	// Execute with preloads - Preload Arm and its Grade
 	var enrollments []models.StudentEnrollment
-	if err := query.Preload("Student").Preload("Arm").Find(&enrollments).Error; err != nil {
+	if err := query.
+		Preload("Student").
+		Preload("Arm").
+		Preload("Arm.Grade").
+		Preload("Arm.ClassTeacher").
+		Preload("Arm.ClassTeacher.Teacher").
+		Find(&enrollments).Error; err != nil {
 		return nil, fmt.Errorf("failed to fetch enrollments: %w", err)
 	}
 
 	// Convert to response
 	responses := make([]dto.StudentEnrollmentResponse, len(enrollments))
 	for i, enrollment := range enrollments {
-		responses[i] = *s.toEnrollmentResponse(&enrollment)
+		responses[i] = *s.toEnrollmentResponseWithGrade(&enrollment)
 	}
 
 	totalPages := int((total + int64(params.Limit) - 1) / int64(params.Limit))
@@ -356,28 +526,7 @@ func (s *StudentEnrollmentService) GetAllStudentEnrollments(params *dto.StudentE
 	}, nil
 }
 
-// GetStudentEnrollmentByID retrieves a single student enrollment by ID
-func (s *StudentEnrollmentService) GetStudentEnrollmentByID(id string) (*dto.StudentEnrollmentResponse, error) {
-	enrollmentID, err := uuid.Parse(id)
-	if err != nil {
-		return nil, errors.New("invalid enrollment ID")
-	}
-
-	var enrollment models.StudentEnrollment
-	if err := s.db.Where("id = ? AND deleted_at IS NULL", enrollmentID).
-		Preload("Student").
-		Preload("Arm").
-		First(&enrollment).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("enrollment not found")
-		}
-		return nil, errors.New("failed to fetch enrollment: " + err.Error())
-	}
-
-	return s.toEnrollmentResponse(&enrollment), nil
-}
-
-// GetEnrollmentsByStudent retrieves all verified enrollments for a specific student
+// GetEnrollmentsByStudent retrieves all verified enrollments for a specific student with grade info
 func (s *StudentEnrollmentService) GetEnrollmentsByStudent(studentID string) ([]dto.StudentEnrollmentResponse, error) {
 	sID, err := uuid.Parse(studentID)
 	if err != nil {
@@ -394,6 +543,9 @@ func (s *StudentEnrollmentService) GetEnrollmentsByStudent(studentID string) ([]
 		).
 		Preload("Student").
 		Preload("Arm").
+		Preload("Arm.Grade").
+		Preload("Arm.ClassTeacher").
+		Preload("Arm.ClassTeacher.Teacher").
 		Order("created_at DESC").
 		Find(&enrollments).Error; err != nil {
 		return nil, fmt.Errorf("failed to fetch enrollments for student: %w", err)
@@ -402,13 +554,13 @@ func (s *StudentEnrollmentService) GetEnrollmentsByStudent(studentID string) ([]
 	responses := make([]dto.StudentEnrollmentResponse, len(enrollments))
 
 	for i, enrollment := range enrollments {
-		responses[i] = *s.toEnrollmentResponse(&enrollment)
+		responses[i] = *s.toEnrollmentResponseWithGrade(&enrollment)
 	}
 
 	return responses, nil
 }
 
-// GetEnrollmentsByArm retrieves all enrollments for a specific arm
+// GetEnrollmentsByArm retrieves all enrollments for a specific arm with grade info
 func (s *StudentEnrollmentService) GetEnrollmentsByArm(armID string) ([]dto.StudentEnrollmentResponse, error) {
 	aID, err := uuid.Parse(armID)
 	if err != nil {
@@ -419,16 +571,153 @@ func (s *StudentEnrollmentService) GetEnrollmentsByArm(armID string) ([]dto.Stud
 	if err := s.db.Where("arm_id = ? AND deleted_at IS NULL", aID).
 		Preload("Student").
 		Preload("Arm").
+		Preload("Arm.Grade").
+		Preload("Arm.ClassTeacher").
+		Preload("Arm.ClassTeacher.Teacher").
 		Find(&enrollments).Error; err != nil {
 		return nil, fmt.Errorf("failed to fetch enrollments for arm: %w", err)
 	}
 
 	responses := make([]dto.StudentEnrollmentResponse, len(enrollments))
 	for i, enrollment := range enrollments {
-		responses[i] = *s.toEnrollmentResponse(&enrollment)
+		responses[i] = *s.toEnrollmentResponseWithGrade(&enrollment)
 	}
 
 	return responses, nil
+}
+
+// GetStudentEnrollmentByID retrieves a single student enrollment by ID with grade info
+func (s *StudentEnrollmentService) GetStudentEnrollmentByID(id string) (*dto.StudentEnrollmentResponse, error) {
+	enrollmentID, err := uuid.Parse(id)
+	if err != nil {
+		return nil, errors.New("invalid enrollment ID")
+	}
+
+	var enrollment models.StudentEnrollment
+	if err := s.db.Where("id = ? AND deleted_at IS NULL", enrollmentID).
+		Preload("Student").
+		Preload("Arm").
+		Preload("Arm.Grade").
+		Preload("Arm.ClassTeacher").
+		Preload("Arm.ClassTeacher.Teacher").
+		First(&enrollment).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("enrollment not found")
+		}
+		return nil, errors.New("failed to fetch enrollment: " + err.Error())
+	}
+
+	return s.toEnrollmentResponseWithGrade(&enrollment), nil
+}
+
+// GetCurrentEnrollmentByStudent retrieves the current active enrollment for a student with grade info
+func (s *StudentEnrollmentService) GetCurrentEnrollmentByStudent(studentID string) (*dto.StudentEnrollmentResponse, error) {
+	sID, err := uuid.Parse(studentID)
+	if err != nil {
+		return nil, errors.New("invalid student ID")
+	}
+
+	var enrollment models.StudentEnrollment
+	if err := s.db.Where("student_id = ? AND status = ? AND deleted_at IS NULL", sID, "active").
+		Preload("Student").
+		Preload("Arm").
+		Preload("Arm.Grade").
+		Preload("Arm.ClassTeacher").
+		Preload("Arm.ClassTeacher.Teacher").
+		Order("created_at DESC").
+		First(&enrollment).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("no active enrollment found for this student")
+		}
+		return nil, errors.New("failed to fetch current enrollment: " + err.Error())
+	}
+
+	return s.toEnrollmentResponseWithGrade(&enrollment), nil
+}
+
+// toEnrollmentResponse converts model to response DTO
+func (s *StudentEnrollmentService) toEnrollmentResponse(enrollment *models.StudentEnrollment) *dto.StudentEnrollmentResponse {
+	response := &dto.StudentEnrollmentResponse{
+		ID:             enrollment.ID.String(),
+		StudentID:      enrollment.StudentID.String(),
+		ArmID:          enrollment.ArmID.String(),
+		Status:         enrollment.Status,
+		GraduationDate: enrollment.GraduationDate,
+		Notes:          enrollment.Notes,
+		IsVerified:     enrollment.IsVerified,
+		CreatedBy:      enrollment.CreatedBy.String(),
+		CreatedAt:      enrollment.CreatedAt,
+		UpdatedAt:      enrollment.UpdatedAt,
+	}
+
+	// Add student details if preloaded
+	if enrollment.Student.ID != uuid.Nil {
+		response.Student = &dto.UserResponse{
+			ID:          enrollment.Student.ID.String(),
+			FirstName:   enrollment.Student.FirstName,
+			LastName:    enrollment.Student.LastName,
+			Email:       enrollment.Student.Email,
+			Phone:       enrollment.Student.Phone,
+			Role:        enrollment.Student.Role,
+			IsVerified:  enrollment.Student.IsVerified,
+			IsActive:    enrollment.Student.IsActive,
+			Picture:     enrollment.Student.Picture,
+			Location:    enrollment.Student.Location,
+			MiddleName:  enrollment.Student.MiddleName,
+			LastLoginAt: enrollment.Student.LastLoginAt,
+			CreatedAt:   enrollment.Student.CreatedAt,
+			UpdatedAt:   enrollment.Student.UpdatedAt,
+		}
+	}
+
+	// Add arm details with grade if preloaded
+	if enrollment.Arm.ID != uuid.Nil {
+		armResponse := &dto.ArmResponse{
+			ID:          enrollment.Arm.ID.String(),
+			Name:        enrollment.Arm.Name,
+			Code:        enrollment.Arm.Code,
+			Description: enrollment.Arm.Description,
+			GradeID:     enrollment.Arm.GradeID.String(),
+			Capacity:    enrollment.Arm.Capacity,
+			Status:      enrollment.Arm.Status,
+			CreatedBy:   enrollment.Arm.CreatedBy.String(),
+			CreatedAt:   enrollment.Arm.CreatedAt,
+			UpdatedAt:   enrollment.Arm.UpdatedAt,
+		}
+
+		// Add grade details if preloaded
+		if enrollment.Arm.Grade.ID != uuid.Nil {
+			armResponse.Grade = &dto.ClassGradeResponse{
+				ID:          enrollment.Arm.Grade.ID.String(),
+				Name:        enrollment.Arm.Grade.Name,
+				Code:        enrollment.Arm.Grade.Code,
+				Level:       enrollment.Arm.Grade.Level,
+				Description: enrollment.Arm.Grade.Description,
+				Status:      enrollment.Arm.Grade.Status,
+				CreatedAt:   enrollment.Arm.Grade.CreatedAt,
+				UpdatedAt:   enrollment.Arm.Grade.UpdatedAt,
+			}
+		}
+
+		// Add class teacher details if preloaded
+		if enrollment.Arm.ClassTeacher.ID != uuid.Nil && enrollment.Arm.ClassTeacher.Teacher.ID != uuid.Nil {
+			armResponse.ClassTeacher = &dto.UserResponse{
+				ID:         enrollment.Arm.ClassTeacher.Teacher.ID.String(),
+				FirstName:  enrollment.Arm.ClassTeacher.Teacher.FirstName,
+				LastName:   enrollment.Arm.ClassTeacher.Teacher.LastName,
+				Email:      enrollment.Arm.ClassTeacher.Teacher.Email,
+				Phone:      enrollment.Arm.ClassTeacher.Teacher.Phone,
+				Role:       enrollment.Arm.ClassTeacher.Teacher.Role,
+				IsVerified: enrollment.Arm.ClassTeacher.Teacher.IsVerified,
+				IsActive:   enrollment.Arm.ClassTeacher.Teacher.IsActive,
+				Picture:    enrollment.Arm.ClassTeacher.Teacher.Picture,
+			}
+		}
+
+		response.Arm = armResponse
+	}
+
+	return response
 }
 
 // GetEnrollmentsByArmAndStatus retrieves enrollments for an arm filtered by status
@@ -452,28 +741,6 @@ func (s *StudentEnrollmentService) GetEnrollmentsByArmAndStatus(armID, status st
 	}
 
 	return responses, nil
-}
-
-// GetCurrentEnrollmentByStudent retrieves the current active enrollment for a student
-func (s *StudentEnrollmentService) GetCurrentEnrollmentByStudent(studentID string) (*dto.StudentEnrollmentResponse, error) {
-	sID, err := uuid.Parse(studentID)
-	if err != nil {
-		return nil, errors.New("invalid student ID")
-	}
-
-	var enrollment models.StudentEnrollment
-	if err := s.db.Where("student_id = ? AND status = ? AND deleted_at IS NULL", sID, "active").
-		Preload("Student").
-		Preload("Arm").
-		Order("created_at DESC").
-		First(&enrollment).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("no active enrollment found for this student")
-		}
-		return nil, errors.New("failed to fetch current enrollment: " + err.Error())
-	}
-
-	return s.toEnrollmentResponse(&enrollment), nil
 }
 
 // GetEnrollmentStats retrieves statistics for student enrollments
@@ -526,6 +793,8 @@ func (s *StudentEnrollmentService) GetEnrollmentStats(filter map[string]interfac
 
 	return &stats, nil
 }
+
+// services/student_enrollment/student_enrollment_service.go
 
 // UpdateStudentEnrollment updates an existing student enrollment
 func (s *StudentEnrollmentService) UpdateStudentEnrollment(id string, req *dto.UpdateStudentEnrollmentRequest, userID uuid.UUID) (*dto.StudentEnrollmentResponse, error) {
@@ -586,12 +855,19 @@ func (s *StudentEnrollmentService) UpdateStudentEnrollment(id string, req *dto.U
 		return nil, errors.New("failed to update enrollment: " + err.Error())
 	}
 
-	// Preload relationships
-	if err := s.db.Preload("Student").Preload("Arm").First(&enrollment, enrollment.ID).Error; err != nil {
+	// ✅ FIX: Preload all relationships including Arm.Grade and ClassTeacher
+	if err := s.db.
+		Preload("Student").
+		Preload("Arm").
+		Preload("Arm.Grade").
+		Preload("Arm.ClassTeacher").
+		Preload("Arm.ClassTeacher.Teacher").
+		First(&enrollment, enrollment.ID).Error; err != nil {
 		return nil, errors.New("failed to load enrollment details: " + err.Error())
 	}
 
-	return s.toEnrollmentResponse(&enrollment), nil
+	// ✅ Use the safe function that handles nil Grade and ClassTeacher
+	return s.toEnrollmentResponseWithGrade(&enrollment), nil
 }
 
 // DeleteStudentEnrollment soft deletes a student enrollment
@@ -614,73 +890,4 @@ func (s *StudentEnrollmentService) DeleteStudentEnrollment(id string) error {
 	}
 
 	return nil
-}
-
-// validateEnrollmentRequest validates the enrollment request
-func (s *StudentEnrollmentService) validateEnrollmentRequest(req *dto.CreateStudentEnrollmentRequest) error {
-	if req.StudentID == "" {
-		return errors.New("student ID is required")
-	}
-	if req.ArmID == "" {
-		return errors.New("arm ID is required")
-	}
-
-	if req.Status != "" && req.Status != "active" && req.Status != "inactive" &&
-		req.Status != "transferred" && req.Status != "graduated" && req.Status != "withdrawn" {
-		return errors.New("status must be 'active', 'inactive', 'transferred', 'graduated', or 'withdrawn'")
-	}
-	return nil
-}
-
-// toEnrollmentResponse converts model to response DTO
-func (s *StudentEnrollmentService) toEnrollmentResponse(enrollment *models.StudentEnrollment) *dto.StudentEnrollmentResponse {
-	response := &dto.StudentEnrollmentResponse{
-		ID:             enrollment.ID.String(),
-		StudentID:      enrollment.StudentID.String(),
-		ArmID:          enrollment.ArmID.String(),
-		Status:         enrollment.Status,
-		GraduationDate: enrollment.GraduationDate,
-		Notes:          enrollment.Notes,
-		IsVerified:     enrollment.IsVerified,
-		CreatedBy:      enrollment.CreatedBy.String(),
-		CreatedAt:      enrollment.CreatedAt,
-		UpdatedAt:      enrollment.UpdatedAt,
-	}
-
-	// Add student details if preloaded
-	if enrollment.Student.ID != uuid.Nil {
-		response.Student = &dto.UserResponse{
-			ID:          enrollment.Student.ID.String(),
-			FirstName:   enrollment.Student.FirstName,
-			LastName:    enrollment.Student.LastName,
-			Email:       enrollment.Student.Email,
-			Phone:       enrollment.Student.Phone,
-			Role:        enrollment.Student.Role,
-			IsVerified:  enrollment.Student.IsVerified,
-			IsActive:    enrollment.Student.IsActive,
-			Picture:     enrollment.Student.Picture,
-			Location:    enrollment.Student.Location,
-			MiddleName:  enrollment.Student.MiddleName,
-			LastLoginAt: enrollment.Student.LastLoginAt,
-			CreatedAt:   enrollment.Student.CreatedAt,
-			UpdatedAt:   enrollment.Student.UpdatedAt,
-		}
-	}
-
-	// Add arm details if preloaded
-	if enrollment.Arm.ID != uuid.Nil {
-		response.Arm = &dto.ArmResponse{
-			ID:          enrollment.Arm.ID.String(),
-			Name:        enrollment.Arm.Name,
-			Code:        enrollment.Arm.Code,
-			GradeID:     enrollment.Arm.GradeID.String(),
-			Capacity:    enrollment.Arm.Capacity,
-			Description: enrollment.Arm.Description,
-			Status:      enrollment.Arm.Status,
-			CreatedAt:   enrollment.Arm.CreatedAt,
-			UpdatedAt:   enrollment.Arm.UpdatedAt,
-		}
-	}
-
-	return response
 }
