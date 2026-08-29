@@ -73,7 +73,6 @@ func (h *ClassGradeController) CreateClassGrade(c *gin.Context) {
 	req.Name = strings.TrimSpace(req.Name)
 	req.Code = strings.TrimSpace(req.Code)
 	req.Description = strings.TrimSpace(req.Description)
-	req.AcademicSessionID = strings.TrimSpace(req.AcademicSessionID)
 
 	// Create class grade using service
 	classGrade, err := h.classGradeService.CreateClassGrade(&req, userID)
@@ -107,11 +106,10 @@ func (h *ClassGradeController) CreateClassGrade(c *gin.Context) {
 // @Produce json
 // @Param search query string false "Search by name, code, or description"
 // @Param level query int false "Filter by level (1-12)"
-// @Param academic_year query string false "Filter by academic year"
 // @Param status query string false "Filter by status (active, inactive, archived)"
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Items per page" default(20)
-// @Param sort_by query string false "Sort by field (name, code, level, academic_year, capacity, status, created_at)" default(created_at)
+// @Param sort_by query string false "Sort by field (name, code, level, status, created_at)" default(created_at)
 // @Param sort_order query string false "Sort order (asc, desc)" default(desc)
 // @Success 200 {object} dto.ClassGradeListResponse
 // @Failure 400 {object} map[string]interface{}
@@ -272,7 +270,7 @@ func (h *ClassGradeController) UpdateClassGrade(c *gin.Context) {
 
 	// Check if at least one field is being updated
 	if req.Name == "" && req.Code == "" && req.Level == 0 && 
-		req.Description == "" && req.AcademicSessionID == "" && req.Capacity == 0 && req.Status == "" {
+		req.Description == "" && req.Status == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "At least one field must be provided for update",
 		})

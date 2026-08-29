@@ -1149,6 +1149,566 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/arm-class-teachers": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get a paginated list of all arm class teacher assignments",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Arm Class Teacher"
+                ],
+                "summary": "Get all arm class teacher assignments",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filter by arm ID",
+                        "name": "arm_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by teacher ID",
+                        "name": "teacher_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ArmClassTeacherListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Assign a class teacher to an arm",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Arm Class Teacher"
+                ],
+                "summary": "Create an arm class teacher assignment",
+                "parameters": [
+                    {
+                        "description": "Assignment request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateArmClassTeacherRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/arm-class-teachers/arm/{arm_id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all class teacher assignments for a specific arm",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Arm Class Teacher"
+                ],
+                "summary": "Get assignments by arm",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Arm ID",
+                        "name": "arm_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/arm-class-teachers/arms-with-teachers": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all arms with their assigned class teachers",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Arm Class Teacher"
+                ],
+                "summary": "Get arms with class teachers",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/arm-class-teachers/bulk": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Assign multiple class teachers to arms",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Arm Class Teacher"
+                ],
+                "summary": "Bulk assign class teachers",
+                "parameters": [
+                    {
+                        "description": "Bulk assignment request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.BulkAssignClassTeachersRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/arm-class-teachers/teacher/{teacher_id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all arm class teacher assignments for a specific teacher",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Arm Class Teacher"
+                ],
+                "summary": "Get assignments by teacher",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Teacher ID",
+                        "name": "teacher_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/arm-class-teachers/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get a single arm class teacher assignment by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Arm Class Teacher"
+                ],
+                "summary": "Get assignment by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Assignment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update an existing arm class teacher assignment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Arm Class Teacher"
+                ],
+                "summary": "Update an assignment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Assignment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateArmClassTeacherRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Soft delete an arm class teacher assignment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Arm Class Teacher"
+                ],
+                "summary": "Delete an assignment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Assignment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/arms": {
             "get": {
                 "security": [
@@ -2067,12 +2627,6 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Filter by academic year",
-                        "name": "academic_year",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
                         "description": "Filter by status (active, inactive, archived)",
                         "name": "status",
                         "in": "query"
@@ -2094,7 +2648,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "default": "created_at",
-                        "description": "Sort by field (name, code, level, academic_year, capacity, status, created_at)",
+                        "description": "Sort by field (name, code, level, status, created_at)",
                         "name": "sort_by",
                         "in": "query"
                     },
@@ -3384,7 +3938,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/fetch/student-enrollments": {
+        "/api/fetch-student-enrollments": {
             "get": {
                 "security": [
                     {
@@ -3411,14 +3965,20 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Filter by grade ID",
-                        "name": "grade_id",
+                        "description": "Filter by arm ID",
+                        "name": "arm_id",
                         "in": "query"
                     },
                     {
                         "type": "string",
                         "description": "Filter by status",
                         "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter by verification status",
+                        "name": "is_verified",
                         "in": "query"
                     },
                     {
@@ -6031,6 +6591,795 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/schemes": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get a paginated list of schemes of work with optional filtering",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Scheme of Work"
+                ],
+                "summary": "Get all schemes of work",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filter by subject ID",
+                        "name": "subject_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by grade",
+                        "name": "grade",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by term",
+                        "name": "term",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filter by week",
+                        "name": "week",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search by topic or objectives",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SchemeOfWorkListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new scheme of work for a subject and grade",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Scheme of Work"
+                ],
+                "summary": "Create a scheme of work",
+                "parameters": [
+                    {
+                        "description": "Scheme request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateSchemeOfWorkRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/schemes/bulk": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create multiple schemes of work for a subject and grade",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Scheme of Work"
+                ],
+                "summary": "Bulk create schemes of work",
+                "parameters": [
+                    {
+                        "description": "Bulk scheme request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.BulkCreateSchemeOfWorkRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/schemes/grade/{grade}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all schemes of work for a specific grade",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Scheme of Work"
+                ],
+                "summary": "Get schemes by grade",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Grade (e.g., JSS1, SS2, JSS2)",
+                        "name": "grade",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/schemes/grade/{grade}/term/{term}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all schemes of work for a specific grade and term",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Scheme of Work"
+                ],
+                "summary": "Get schemes by grade and term",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Grade (e.g., JSS1, SS2)",
+                        "name": "grade",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Term (first, second, third)",
+                        "name": "term",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/schemes/overview/{subject_id}/{grade}/{term}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get an overview of schemes for a subject, grade, and term",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Scheme of Work"
+                ],
+                "summary": "Get scheme overview",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Subject ID",
+                        "name": "subject_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Grade",
+                        "name": "grade",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Term",
+                        "name": "term",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/schemes/stats": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get statistics for schemes of work",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Scheme of Work"
+                ],
+                "summary": "Get scheme statistics",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filter by subject ID",
+                        "name": "subject_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by grade",
+                        "name": "grade",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by term",
+                        "name": "term",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/schemes/subject/{subject_id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all schemes of work for a specific subject",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Scheme of Work"
+                ],
+                "summary": "Get schemes by subject",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Subject ID",
+                        "name": "subject_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/schemes/teacher/{teacher_id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all schemes of work for subjects taught by a specific teacher",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Scheme of Work"
+                ],
+                "summary": "Get schemes by teacher",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Teacher ID",
+                        "name": "teacher_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/schemes/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get a single scheme of work by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Scheme of Work"
+                ],
+                "summary": "Get scheme by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Scheme ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update an existing scheme of work",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Scheme of Work"
+                ],
+                "summary": "Update a scheme",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Scheme ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateSchemeOfWorkRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Soft delete a scheme of work",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Scheme of Work"
+                ],
+                "summary": "Delete a scheme",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Scheme ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/student-enrollments": {
             "post": {
                 "security": [
@@ -6038,7 +7387,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Enroll a student in a grade",
+                "description": "Enroll a student in an arm",
                 "consumes": [
                     "application/json"
                 ],
@@ -6106,6 +7455,117 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/student-enrollments/arm/{arm_id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all enrollments for a specific arm",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Student Enrollments"
+                ],
+                "summary": "Get enrollments by arm",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Arm ID",
+                        "name": "arm_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/student-enrollments/arm/{arm_id}/status/{status}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get enrollments for a specific arm filtered by status",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Student Enrollments"
+                ],
+                "summary": "Get enrollments by arm and status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Arm ID",
+                        "name": "arm_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Status (active, inactive, transferred, graduated, withdrawn)",
+                        "name": "status",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/student-enrollments/bulk": {
             "post": {
                 "security": [
@@ -6113,7 +7573,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Enroll multiple students in a grade",
+                "description": "Enroll multiple students in an arm",
                 "consumes": [
                     "application/json"
                 ],
@@ -6131,7 +7591,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.BulkCreateStudentEnrollmentRequest"
+                            "$ref": "#/definitions/dto.BulkCreateStudentEnrollmentsRequest"
                         }
                     }
                 ],
@@ -6174,14 +7634,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/student-enrollments/grade/{grade_id}": {
+        "/api/student-enrollments/stats": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get all enrollments for a specific grade",
+                "description": "Get statistics for student enrollments",
                 "consumes": [
                     "application/json"
                 ],
@@ -6191,14 +7651,19 @@ const docTemplate = `{
                 "tags": [
                     "Student Enrollments"
                 ],
-                "summary": "Get enrollments by grade",
+                "summary": "Get enrollment statistics",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Grade ID",
-                        "name": "grade_id",
-                        "in": "path",
-                        "required": true
+                        "description": "Filter by arm ID",
+                        "name": "arm_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by student ID",
+                        "name": "student_id",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -6322,253 +7787,6 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/student-enrollments/teacher/{teacher_id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all enrollments for grades taught by a specific class teacher",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Student Enrollments"
-                ],
-                "summary": "Get enrollments by class teacher",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Teacher ID",
-                        "name": "teacher_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/student-enrollments/teacher/{teacher_id}/dashboard": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get dashboard statistics for a class teacher including grade-wise student distribution",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Student Enrollments"
-                ],
-                "summary": "Get class teacher dashboard stats",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Teacher ID",
-                        "name": "teacher_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/student-enrollments/teacher/{teacher_id}/grades": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all grades assigned to a specific class teacher",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Student Enrollments"
-                ],
-                "summary": "Get grades by class teacher",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Teacher ID",
-                        "name": "teacher_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/student-enrollments/teacher/{teacher_id}/paginated": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get paginated enrollments for grades taught by a specific class teacher with filters",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Student Enrollments"
-                ],
-                "summary": "Get paginated enrollments by class teacher",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Teacher ID",
-                        "name": "teacher_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by student ID",
-                        "name": "student_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by status",
-                        "name": "status",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 20,
-                        "description": "Items per page",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "default": "created_at",
-                        "description": "Sort field",
-                        "name": "sort_by",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "default": "desc",
-                        "description": "Sort order",
-                        "name": "sort_order",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.StudentEnrollmentListResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -7081,12 +8299,6 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Filter by grade ID",
-                        "name": "grade_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
                         "description": "Filter by subject ID",
                         "name": "subject_id",
                         "in": "query"
@@ -7154,7 +8366,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Assign a subject to a teacher for a specific grade",
+                "description": "Assign a subject to a teacher",
                 "consumes": [
                     "application/json"
                 ],
@@ -7229,7 +8441,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Assign multiple subjects to a teacher for a specific grade",
+                "description": "Assign multiple subjects to a teacher",
                 "consumes": [
                     "application/json"
                 ],
@@ -7275,58 +8487,6 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/teacher-subject-assignments/grade/{grade_id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all subject-teacher assignments for a specific grade",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Teacher Subject Assignments"
-                ],
-                "summary": "Get assignments by grade",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Grade ID",
-                        "name": "grade_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -7790,6 +8950,12 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Filter by role (admin, staff, student, parent, user)",
                         "name": "role",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by position (admin, staff, student, parent, user, teacher)",
+                        "name": "position",
                         "in": "query"
                     },
                     {
@@ -10193,6 +11359,66 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.ArmClassTeacherListResponse": {
+            "type": "object",
+            "properties": {
+                "assignments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ArmClassTeacherResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ArmClassTeacherResponse": {
+            "type": "object",
+            "properties": {
+                "arm": {
+                    "description": "Nested relationships",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/dto.ArmResponse"
+                        }
+                    ]
+                },
+                "arm_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "creator": {
+                    "$ref": "#/definitions/dto.UserResponse"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "teacher": {
+                    "$ref": "#/definitions/dto.UserResponse"
+                },
+                "teacher_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.ArmListResponse": {
             "type": "object",
             "properties": {
@@ -10228,9 +11454,6 @@ const docTemplate = `{
                 "created_at": {
                     "type": "string"
                 },
-                "created_by": {
-                    "type": "string"
-                },
                 "description": {
                     "type": "string"
                 },
@@ -10254,17 +11477,43 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.BulkAssignClassTeachersRequest": {
+            "type": "object",
+            "required": [
+                "assignments"
+            ],
+            "properties": {
+                "assignments": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "arm_id",
+                            "teacher_id"
+                        ],
+                        "properties": {
+                            "arm_id": {
+                                "type": "string"
+                            },
+                            "teacher_id": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.BulkAssignSubjectsRequest": {
             "type": "object",
             "required": [
-                "grade_id",
                 "subject_ids",
                 "teacher_id"
             ],
             "properties": {
-                "grade_id": {
-                    "type": "string"
-                },
                 "status": {
                     "type": "string"
                 },
@@ -10366,14 +11615,81 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.BulkCreateStudentEnrollmentRequest": {
+        "dto.BulkCreateSchemeOfWorkRequest": {
             "type": "object",
             "required": [
-                "grade_id",
+                "grade",
+                "schemes",
+                "subject_id",
+                "term"
+            ],
+            "properties": {
+                "grade": {
+                    "type": "string"
+                },
+                "schemes": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "objectives",
+                            "topic",
+                            "week"
+                        ],
+                        "properties": {
+                            "activities": {
+                                "type": "string"
+                            },
+                            "assessment": {
+                                "type": "string"
+                            },
+                            "objectives": {
+                                "type": "string"
+                            },
+                            "subtopics": {
+                                "type": "string"
+                            },
+                            "teaching_resources": {
+                                "type": "string"
+                            },
+                            "topic": {
+                                "type": "string"
+                            },
+                            "week": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                },
+                "status": {
+                    "description": "draft, published, archived",
+                    "type": "string"
+                },
+                "subject_id": {
+                    "type": "string"
+                },
+                "term": {
+                    "type": "string",
+                    "enum": [
+                        "first",
+                        "second",
+                        "third"
+                    ]
+                }
+            }
+        },
+        "dto.BulkCreateStudentEnrollmentsRequest": {
+            "type": "object",
+            "required": [
+                "arm_id",
                 "student_ids"
             ],
             "properties": {
-                "grade_id": {
+                "arm_id": {
+                    "type": "string"
+                },
+                "graduation_date": {
                     "type": "string"
                 },
                 "is_verified": {
@@ -10383,14 +11699,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "type": "string",
-                    "enum": [
-                        "active",
-                        "inactive",
-                        "transferred",
-                        "graduated",
-                        "withdrawn"
-                    ]
+                    "type": "string"
                 },
                 "student_ids": {
                     "type": "array",
@@ -10429,15 +11738,6 @@ const docTemplate = `{
             "properties": {
                 "academic_session": {
                     "$ref": "#/definitions/dto.AcademicSessionResponse"
-                },
-                "academic_session_id": {
-                    "type": "string"
-                },
-                "capacity": {
-                    "type": "integer"
-                },
-                "class_teacher_id": {
-                    "type": "string"
                 },
                 "code": {
                     "type": "string"
@@ -10560,6 +11860,25 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.CreateArmClassTeacherRequest": {
+            "type": "object",
+            "required": [
+                "arm_id",
+                "teacher_id"
+            ],
+            "properties": {
+                "arm_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "description": "active, inactive (default: active)",
+                    "type": "string"
+                },
+                "teacher_id": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.CreateArmRequest": {
             "type": "object",
             "required": [
@@ -10574,7 +11893,7 @@ const docTemplate = `{
                 },
                 "code": {
                     "type": "string",
-                    "maxLength": 3,
+                    "maxLength": 5,
                     "minLength": 1
                 },
                 "description": {
@@ -10601,24 +11920,11 @@ const docTemplate = `{
         "dto.CreateClassGradeRequest": {
             "type": "object",
             "required": [
-                "academic_session_id",
-                "class_teacher_id",
                 "code",
                 "level",
                 "name"
             ],
             "properties": {
-                "academic_session_id": {
-                    "type": "string"
-                },
-                "capacity": {
-                    "type": "integer",
-                    "maximum": 100,
-                    "minimum": 1
-                },
-                "class_teacher_id": {
-                    "type": "string"
-                },
                 "code": {
                     "type": "string",
                     "maxLength": 50,
@@ -10822,18 +12128,71 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.CreateSchemeOfWorkRequest": {
+            "type": "object",
+            "required": [
+                "grade",
+                "objectives",
+                "subject_id",
+                "term",
+                "topic",
+                "week"
+            ],
+            "properties": {
+                "activities": {
+                    "type": "string"
+                },
+                "assessment": {
+                    "type": "string"
+                },
+                "grade": {
+                    "type": "string"
+                },
+                "objectives": {
+                    "type": "string"
+                },
+                "status": {
+                    "description": "draft, published, archived",
+                    "type": "string"
+                },
+                "subject_id": {
+                    "type": "string"
+                },
+                "subtopics": {
+                    "type": "string"
+                },
+                "teaching_resources": {
+                    "type": "string"
+                },
+                "term": {
+                    "type": "string",
+                    "enum": [
+                        "first",
+                        "second",
+                        "third"
+                    ]
+                },
+                "topic": {
+                    "type": "string"
+                },
+                "week": {
+                    "type": "integer",
+                    "maximum": 52,
+                    "minimum": 1
+                }
+            }
+        },
         "dto.CreateStudentEnrollmentRequest": {
             "type": "object",
             "required": [
-                "grade_id",
+                "arm_id",
                 "student_id"
             ],
             "properties": {
-                "grade_id": {
+                "arm_id": {
                     "type": "string"
                 },
                 "graduation_date": {
-                    "description": "Format: \"2006-01-02\"",
                     "type": "string"
                 },
                 "is_verified": {
@@ -10843,14 +12202,8 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "type": "string",
-                    "enum": [
-                        "active",
-                        "inactive",
-                        "transferred",
-                        "graduated",
-                        "withdrawn"
-                    ]
+                    "description": "active, inactive, transferred, graduated, withdrawn",
+                    "type": "string"
                 },
                 "student_id": {
                     "type": "string"
@@ -10894,14 +12247,10 @@ const docTemplate = `{
         "dto.CreateTeacherSubjectAssignmentRequest": {
             "type": "object",
             "required": [
-                "grade_id",
                 "subject_id",
                 "teacher_id"
             ],
             "properties": {
-                "grade_id": {
-                    "type": "string"
-                },
                 "status": {
                     "description": "active, inactive (default: active)",
                     "type": "string"
@@ -11185,6 +12534,90 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.SchemeOfWorkListResponse": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "schemes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.SchemeOfWorkResponse"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.SchemeOfWorkResponse": {
+            "type": "object",
+            "properties": {
+                "activities": {
+                    "type": "string"
+                },
+                "assessment": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "string"
+                },
+                "creator": {
+                    "$ref": "#/definitions/dto.UserResponse"
+                },
+                "grade": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "objectives": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "subject": {
+                    "description": "Nested relationships",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/dto.SubjectResponse"
+                        }
+                    ]
+                },
+                "subject_id": {
+                    "type": "string"
+                },
+                "subtopics": {
+                    "type": "string"
+                },
+                "teaching_resources": {
+                    "type": "string"
+                },
+                "term": {
+                    "type": "string"
+                },
+                "topic": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "week": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.StudentEnrollmentListResponse": {
             "type": "object",
             "properties": {
@@ -11211,16 +12644,16 @@ const docTemplate = `{
         "dto.StudentEnrollmentResponse": {
             "type": "object",
             "properties": {
+                "arm": {
+                    "$ref": "#/definitions/dto.ArmResponse"
+                },
+                "arm_id": {
+                    "type": "string"
+                },
                 "created_at": {
                     "type": "string"
                 },
                 "created_by": {
-                    "type": "string"
-                },
-                "grade": {
-                    "$ref": "#/definitions/dto.ClassGradeResponse"
-                },
-                "grade_id": {
                     "type": "string"
                 },
                 "graduation_date": {
@@ -11321,17 +12754,6 @@ const docTemplate = `{
                 "created_at": {
                     "type": "string"
                 },
-                "grade": {
-                    "description": "Nested relationships",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/dto.ClassGradeResponse"
-                        }
-                    ]
-                },
-                "grade_id": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "string"
                 },
@@ -11339,7 +12761,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "subject": {
-                    "$ref": "#/definitions/dto.SubjectResponse"
+                    "description": "Nested relationships",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/dto.SubjectResponse"
+                        }
+                    ]
                 },
                 "subject_id": {
                     "type": "string"
@@ -11439,6 +12866,20 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.UpdateArmClassTeacherRequest": {
+            "type": "object",
+            "properties": {
+                "arm_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "teacher_id": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.UpdateArmRequest": {
             "type": "object",
             "properties": {
@@ -11449,7 +12890,7 @@ const docTemplate = `{
                 },
                 "code": {
                     "type": "string",
-                    "maxLength": 3,
+                    "maxLength": 5,
                     "minLength": 1
                 },
                 "description": {
@@ -11476,17 +12917,6 @@ const docTemplate = `{
         "dto.UpdateClassGradeRequest": {
             "type": "object",
             "properties": {
-                "academic_session_id": {
-                    "type": "string"
-                },
-                "capacity": {
-                    "type": "integer",
-                    "maximum": 100,
-                    "minimum": 1
-                },
-                "class_teacher_id": {
-                    "type": "string"
-                },
                 "code": {
                     "type": "string",
                     "maxLength": 50,
@@ -11612,14 +13042,57 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.UpdateSchemeOfWorkRequest": {
+            "type": "object",
+            "properties": {
+                "activities": {
+                    "type": "string"
+                },
+                "assessment": {
+                    "type": "string"
+                },
+                "grade": {
+                    "type": "string"
+                },
+                "objectives": {
+                    "type": "string"
+                },
+                "status": {
+                    "description": "draft, published, archived",
+                    "type": "string"
+                },
+                "subject_id": {
+                    "type": "string"
+                },
+                "subtopics": {
+                    "type": "string"
+                },
+                "teaching_resources": {
+                    "type": "string"
+                },
+                "term": {
+                    "type": "string",
+                    "enum": [
+                        "first",
+                        "second",
+                        "third"
+                    ]
+                },
+                "topic": {
+                    "type": "string"
+                },
+                "week": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.UpdateStudentEnrollmentRequest": {
             "type": "object",
             "properties": {
-                "grade_id": {
+                "arm_id": {
                     "type": "string"
                 },
                 "graduation_date": {
-                    "description": "Format: \"2006-01-02\"",
                     "type": "string"
                 },
                 "is_verified": {
@@ -11629,14 +13102,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "type": "string",
-                    "enum": [
-                        "active",
-                        "inactive",
-                        "transferred",
-                        "graduated",
-                        "withdrawn"
-                    ]
+                    "type": "string"
                 }
             }
         },
@@ -11666,9 +13132,6 @@ const docTemplate = `{
         "dto.UpdateTeacherSubjectAssignmentRequest": {
             "type": "object",
             "properties": {
-                "grade_id": {
-                    "type": "string"
-                },
                 "status": {
                     "type": "string"
                 },

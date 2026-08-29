@@ -323,6 +323,44 @@ definitions:
       user_id:
         type: string
     type: object
+  dto.ArmClassTeacherListResponse:
+    properties:
+      assignments:
+        items:
+          $ref: '#/definitions/dto.ArmClassTeacherResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.ArmClassTeacherResponse:
+    properties:
+      arm:
+        allOf:
+        - $ref: '#/definitions/dto.ArmResponse'
+        description: Nested relationships
+      arm_id:
+        type: string
+      created_at:
+        type: string
+      creator:
+        $ref: '#/definitions/dto.UserResponse'
+      id:
+        type: string
+      status:
+        type: string
+      teacher:
+        $ref: '#/definitions/dto.UserResponse'
+      teacher_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
   dto.ArmListResponse:
     properties:
       arms:
@@ -346,8 +384,6 @@ definitions:
         type: string
       created_at:
         type: string
-      created_by:
-        type: string
       description:
         type: string
       grade:
@@ -363,10 +399,28 @@ definitions:
       updated_at:
         type: string
     type: object
+  dto.BulkAssignClassTeachersRequest:
+    properties:
+      assignments:
+        items:
+          properties:
+            arm_id:
+              type: string
+            teacher_id:
+              type: string
+          required:
+          - arm_id
+          - teacher_id
+          type: object
+        minItems: 1
+        type: array
+      status:
+        type: string
+    required:
+    - assignments
+    type: object
   dto.BulkAssignSubjectsRequest:
     properties:
-      grade_id:
-        type: string
       status:
         type: string
       subject_ids:
@@ -377,7 +431,6 @@ definitions:
       teacher_id:
         type: string
     required:
-    - grade_id
     - subject_ids
     - teacher_id
     type: object
@@ -444,21 +497,62 @@ definitions:
     - type
     - user_ids
     type: object
-  dto.BulkCreateStudentEnrollmentRequest:
+  dto.BulkCreateSchemeOfWorkRequest:
     properties:
-      grade_id:
+      grade:
+        type: string
+      schemes:
+        items:
+          properties:
+            activities:
+              type: string
+            assessment:
+              type: string
+            objectives:
+              type: string
+            subtopics:
+              type: string
+            teaching_resources:
+              type: string
+            topic:
+              type: string
+            week:
+              type: integer
+          required:
+          - objectives
+          - topic
+          - week
+          type: object
+        minItems: 1
+        type: array
+      status:
+        description: draft, published, archived
+        type: string
+      subject_id:
+        type: string
+      term:
+        enum:
+        - first
+        - second
+        - third
+        type: string
+    required:
+    - grade
+    - schemes
+    - subject_id
+    - term
+    type: object
+  dto.BulkCreateStudentEnrollmentsRequest:
+    properties:
+      arm_id:
+        type: string
+      graduation_date:
         type: string
       is_verified:
         type: boolean
       notes:
         type: string
       status:
-        enum:
-        - active
-        - inactive
-        - transferred
-        - graduated
-        - withdrawn
         type: string
       student_ids:
         items:
@@ -466,7 +560,7 @@ definitions:
         minItems: 1
         type: array
     required:
-    - grade_id
+    - arm_id
     - student_ids
     type: object
   dto.ClassGradeListResponse:
@@ -488,12 +582,6 @@ definitions:
     properties:
       academic_session:
         $ref: '#/definitions/dto.AcademicSessionResponse'
-      academic_session_id:
-        type: string
-      capacity:
-        type: integer
-      class_teacher_id:
-        type: string
       code:
         type: string
       created_at:
@@ -580,6 +668,19 @@ definitions:
     - address
     - user_id
     type: object
+  dto.CreateArmClassTeacherRequest:
+    properties:
+      arm_id:
+        type: string
+      status:
+        description: 'active, inactive (default: active)'
+        type: string
+      teacher_id:
+        type: string
+    required:
+    - arm_id
+    - teacher_id
+    type: object
   dto.CreateArmRequest:
     properties:
       capacity:
@@ -587,7 +688,7 @@ definitions:
         minimum: 1
         type: integer
       code:
-        maxLength: 3
+        maxLength: 5
         minLength: 1
         type: string
       description:
@@ -610,14 +711,6 @@ definitions:
     type: object
   dto.CreateClassGradeRequest:
     properties:
-      academic_session_id:
-        type: string
-      capacity:
-        maximum: 100
-        minimum: 1
-        type: integer
-      class_teacher_id:
-        type: string
       code:
         maxLength: 50
         minLength: 2
@@ -639,8 +732,6 @@ definitions:
         - archived
         type: string
     required:
-    - academic_session_id
-    - class_teacher_id
     - code
     - level
     - name
@@ -774,29 +865,62 @@ definitions:
     - type
     - user_id
     type: object
+  dto.CreateSchemeOfWorkRequest:
+    properties:
+      activities:
+        type: string
+      assessment:
+        type: string
+      grade:
+        type: string
+      objectives:
+        type: string
+      status:
+        description: draft, published, archived
+        type: string
+      subject_id:
+        type: string
+      subtopics:
+        type: string
+      teaching_resources:
+        type: string
+      term:
+        enum:
+        - first
+        - second
+        - third
+        type: string
+      topic:
+        type: string
+      week:
+        maximum: 52
+        minimum: 1
+        type: integer
+    required:
+    - grade
+    - objectives
+    - subject_id
+    - term
+    - topic
+    - week
+    type: object
   dto.CreateStudentEnrollmentRequest:
     properties:
-      grade_id:
+      arm_id:
         type: string
       graduation_date:
-        description: 'Format: "2006-01-02"'
         type: string
       is_verified:
         type: boolean
       notes:
         type: string
       status:
-        enum:
-        - active
-        - inactive
-        - transferred
-        - graduated
-        - withdrawn
+        description: active, inactive, transferred, graduated, withdrawn
         type: string
       student_id:
         type: string
     required:
-    - grade_id
+    - arm_id
     - student_id
     type: object
   dto.CreateSubjectRequest:
@@ -826,8 +950,6 @@ definitions:
     type: object
   dto.CreateTeacherSubjectAssignmentRequest:
     properties:
-      grade_id:
-        type: string
       status:
         description: 'active, inactive (default: active)'
         type: string
@@ -836,7 +958,6 @@ definitions:
       teacher_id:
         type: string
     required:
-    - grade_id
     - subject_id
     - teacher_id
     type: object
@@ -1016,6 +1137,60 @@ definitions:
       unread:
         type: integer
     type: object
+  dto.SchemeOfWorkListResponse:
+    properties:
+      limit:
+        type: integer
+      page:
+        type: integer
+      schemes:
+        items:
+          $ref: '#/definitions/dto.SchemeOfWorkResponse'
+        type: array
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.SchemeOfWorkResponse:
+    properties:
+      activities:
+        type: string
+      assessment:
+        type: string
+      created_at:
+        type: string
+      created_by:
+        type: string
+      creator:
+        $ref: '#/definitions/dto.UserResponse'
+      grade:
+        type: string
+      id:
+        type: string
+      objectives:
+        type: string
+      status:
+        type: string
+      subject:
+        allOf:
+        - $ref: '#/definitions/dto.SubjectResponse'
+        description: Nested relationships
+      subject_id:
+        type: string
+      subtopics:
+        type: string
+      teaching_resources:
+        type: string
+      term:
+        type: string
+      topic:
+        type: string
+      updated_at:
+        type: string
+      week:
+        type: integer
+    type: object
   dto.StudentEnrollmentListResponse:
     properties:
       enrollments:
@@ -1033,13 +1208,13 @@ definitions:
     type: object
   dto.StudentEnrollmentResponse:
     properties:
+      arm:
+        $ref: '#/definitions/dto.ArmResponse'
+      arm_id:
+        type: string
       created_at:
         type: string
       created_by:
-        type: string
-      grade:
-        $ref: '#/definitions/dto.ClassGradeResponse'
-      grade_id:
         type: string
       graduation_date:
         type: string
@@ -1104,18 +1279,14 @@ definitions:
     properties:
       created_at:
         type: string
-      grade:
-        allOf:
-        - $ref: '#/definitions/dto.ClassGradeResponse'
-        description: Nested relationships
-      grade_id:
-        type: string
       id:
         type: string
       status:
         type: string
       subject:
-        $ref: '#/definitions/dto.SubjectResponse'
+        allOf:
+        - $ref: '#/definitions/dto.SubjectResponse'
+        description: Nested relationships
       subject_id:
         type: string
       teacher:
@@ -1185,6 +1356,15 @@ definitions:
         - inactive
         type: string
     type: object
+  dto.UpdateArmClassTeacherRequest:
+    properties:
+      arm_id:
+        type: string
+      status:
+        type: string
+      teacher_id:
+        type: string
+    type: object
   dto.UpdateArmRequest:
     properties:
       capacity:
@@ -1192,7 +1372,7 @@ definitions:
         minimum: 1
         type: integer
       code:
-        maxLength: 3
+        maxLength: 5
         minLength: 1
         type: string
       description:
@@ -1212,14 +1392,6 @@ definitions:
     type: object
   dto.UpdateClassGradeRequest:
     properties:
-      academic_session_id:
-        type: string
-      capacity:
-        maximum: 100
-        minimum: 1
-        type: integer
-      class_teacher_id:
-        type: string
       code:
         maxLength: 50
         minLength: 2
@@ -1309,24 +1481,47 @@ definitions:
         - urgent
         type: string
     type: object
+  dto.UpdateSchemeOfWorkRequest:
+    properties:
+      activities:
+        type: string
+      assessment:
+        type: string
+      grade:
+        type: string
+      objectives:
+        type: string
+      status:
+        description: draft, published, archived
+        type: string
+      subject_id:
+        type: string
+      subtopics:
+        type: string
+      teaching_resources:
+        type: string
+      term:
+        enum:
+        - first
+        - second
+        - third
+        type: string
+      topic:
+        type: string
+      week:
+        type: integer
+    type: object
   dto.UpdateStudentEnrollmentRequest:
     properties:
-      grade_id:
+      arm_id:
         type: string
       graduation_date:
-        description: 'Format: "2006-01-02"'
         type: string
       is_verified:
         type: boolean
       notes:
         type: string
       status:
-        enum:
-        - active
-        - inactive
-        - transferred
-        - graduated
-        - withdrawn
         type: string
     type: object
   dto.UpdateSubjectRequest:
@@ -1346,8 +1541,6 @@ definitions:
     type: object
   dto.UpdateTeacherSubjectAssignmentRequest:
     properties:
-      grade_id:
-        type: string
       status:
         type: string
       subject_id:
@@ -3367,6 +3560,377 @@ paths:
       summary: Update an announcement by ID
       tags:
       - Announcements
+  /api/arm-class-teachers:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of all arm class teacher assignments
+      parameters:
+      - description: Filter by arm ID
+        in: query
+        name: arm_id
+        type: string
+      - description: Filter by teacher ID
+        in: query
+        name: teacher_id
+        type: string
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ArmClassTeacherListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all arm class teacher assignments
+      tags:
+      - Arm Class Teacher
+    post:
+      consumes:
+      - application/json
+      description: Assign a class teacher to an arm
+      parameters:
+      - description: Assignment request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateArmClassTeacherRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create an arm class teacher assignment
+      tags:
+      - Arm Class Teacher
+  /api/arm-class-teachers/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete an arm class teacher assignment
+      parameters:
+      - description: Assignment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete an assignment
+      tags:
+      - Arm Class Teacher
+    get:
+      consumes:
+      - application/json
+      description: Get a single arm class teacher assignment by its ID
+      parameters:
+      - description: Assignment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get assignment by ID
+      tags:
+      - Arm Class Teacher
+    put:
+      consumes:
+      - application/json
+      description: Update an existing arm class teacher assignment
+      parameters:
+      - description: Assignment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateArmClassTeacherRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update an assignment
+      tags:
+      - Arm Class Teacher
+  /api/arm-class-teachers/arm/{arm_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all class teacher assignments for a specific arm
+      parameters:
+      - description: Arm ID
+        in: path
+        name: arm_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get assignments by arm
+      tags:
+      - Arm Class Teacher
+  /api/arm-class-teachers/arms-with-teachers:
+    get:
+      consumes:
+      - application/json
+      description: Get all arms with their assigned class teachers
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get arms with class teachers
+      tags:
+      - Arm Class Teacher
+  /api/arm-class-teachers/bulk:
+    post:
+      consumes:
+      - application/json
+      description: Assign multiple class teachers to arms
+      parameters:
+      - description: Bulk assignment request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BulkAssignClassTeachersRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Bulk assign class teachers
+      tags:
+      - Arm Class Teacher
+  /api/arm-class-teachers/teacher/{teacher_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all arm class teacher assignments for a specific teacher
+      parameters:
+      - description: Teacher ID
+        in: path
+        name: teacher_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get assignments by teacher
+      tags:
+      - Arm Class Teacher
   /api/arms:
     get:
       consumes:
@@ -3964,10 +4528,6 @@ paths:
         in: query
         name: level
         type: integer
-      - description: Filter by academic year
-        in: query
-        name: academic_year
-        type: string
       - description: Filter by status (active, inactive, archived)
         in: query
         name: status
@@ -3983,8 +4543,7 @@ paths:
         name: limit
         type: integer
       - default: created_at
-        description: Sort by field (name, code, level, academic_year, capacity, status,
-          created_at)
+        description: Sort by field (name, code, level, status, created_at)
         in: query
         name: sort_by
         type: string
@@ -4829,7 +5388,7 @@ paths:
       summary: Export all data to Excel
       tags:
       - Export
-  /api/fetch/student-enrollments:
+  /api/fetch-student-enrollments:
     get:
       consumes:
       - application/json
@@ -4839,14 +5398,18 @@ paths:
         in: query
         name: student_id
         type: string
-      - description: Filter by grade ID
+      - description: Filter by arm ID
         in: query
-        name: grade_id
+        name: arm_id
         type: string
       - description: Filter by status
         in: query
         name: status
         type: string
+      - description: Filter by verification status
+        in: query
+        name: is_verified
+        type: boolean
       - default: 1
         description: Page number
         in: query
@@ -6564,11 +7127,534 @@ paths:
       summary: Create multiple questions
       tags:
       - questions
+  /api/schemes:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of schemes of work with optional filtering
+      parameters:
+      - description: Filter by subject ID
+        in: query
+        name: subject_id
+        type: string
+      - description: Filter by grade
+        in: query
+        name: grade
+        type: string
+      - description: Filter by term
+        in: query
+        name: term
+        type: string
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - description: Filter by week
+        in: query
+        name: week
+        type: integer
+      - description: Search by topic or objectives
+        in: query
+        name: search
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SchemeOfWorkListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all schemes of work
+      tags:
+      - Scheme of Work
+    post:
+      consumes:
+      - application/json
+      description: Create a new scheme of work for a subject and grade
+      parameters:
+      - description: Scheme request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateSchemeOfWorkRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a scheme of work
+      tags:
+      - Scheme of Work
+  /api/schemes/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete a scheme of work
+      parameters:
+      - description: Scheme ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a scheme
+      tags:
+      - Scheme of Work
+    get:
+      consumes:
+      - application/json
+      description: Get a single scheme of work by its ID
+      parameters:
+      - description: Scheme ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get scheme by ID
+      tags:
+      - Scheme of Work
+    put:
+      consumes:
+      - application/json
+      description: Update an existing scheme of work
+      parameters:
+      - description: Scheme ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateSchemeOfWorkRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update a scheme
+      tags:
+      - Scheme of Work
+  /api/schemes/bulk:
+    post:
+      consumes:
+      - application/json
+      description: Create multiple schemes of work for a subject and grade
+      parameters:
+      - description: Bulk scheme request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BulkCreateSchemeOfWorkRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Bulk create schemes of work
+      tags:
+      - Scheme of Work
+  /api/schemes/grade/{grade}:
+    get:
+      consumes:
+      - application/json
+      description: Get all schemes of work for a specific grade
+      parameters:
+      - description: Grade (e.g., JSS1, SS2, JSS2)
+        in: path
+        name: grade
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get schemes by grade
+      tags:
+      - Scheme of Work
+  /api/schemes/grade/{grade}/term/{term}:
+    get:
+      consumes:
+      - application/json
+      description: Get all schemes of work for a specific grade and term
+      parameters:
+      - description: Grade (e.g., JSS1, SS2)
+        in: path
+        name: grade
+        required: true
+        type: string
+      - description: Term (first, second, third)
+        in: path
+        name: term
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get schemes by grade and term
+      tags:
+      - Scheme of Work
+  /api/schemes/overview/{subject_id}/{grade}/{term}:
+    get:
+      consumes:
+      - application/json
+      description: Get an overview of schemes for a subject, grade, and term
+      parameters:
+      - description: Subject ID
+        in: path
+        name: subject_id
+        required: true
+        type: string
+      - description: Grade
+        in: path
+        name: grade
+        required: true
+        type: string
+      - description: Term
+        in: path
+        name: term
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get scheme overview
+      tags:
+      - Scheme of Work
+  /api/schemes/stats:
+    get:
+      consumes:
+      - application/json
+      description: Get statistics for schemes of work
+      parameters:
+      - description: Filter by subject ID
+        in: query
+        name: subject_id
+        type: string
+      - description: Filter by grade
+        in: query
+        name: grade
+        type: string
+      - description: Filter by term
+        in: query
+        name: term
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get scheme statistics
+      tags:
+      - Scheme of Work
+  /api/schemes/subject/{subject_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all schemes of work for a specific subject
+      parameters:
+      - description: Subject ID
+        in: path
+        name: subject_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get schemes by subject
+      tags:
+      - Scheme of Work
+  /api/schemes/teacher/{teacher_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all schemes of work for subjects taught by a specific teacher
+      parameters:
+      - description: Teacher ID
+        in: path
+        name: teacher_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get schemes by teacher
+      tags:
+      - Scheme of Work
   /api/student-enrollments:
     post:
       consumes:
       - application/json
-      description: Enroll a student in a grade
+      description: Enroll a student in an arm
       parameters:
       - description: Enrollment request
         in: body
@@ -6745,18 +7831,91 @@ paths:
       summary: Update an enrollment
       tags:
       - Student Enrollments
+  /api/student-enrollments/arm/{arm_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all enrollments for a specific arm
+      parameters:
+      - description: Arm ID
+        in: path
+        name: arm_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get enrollments by arm
+      tags:
+      - Student Enrollments
+  /api/student-enrollments/arm/{arm_id}/status/{status}:
+    get:
+      consumes:
+      - application/json
+      description: Get enrollments for a specific arm filtered by status
+      parameters:
+      - description: Arm ID
+        in: path
+        name: arm_id
+        required: true
+        type: string
+      - description: Status (active, inactive, transferred, graduated, withdrawn)
+        in: path
+        name: status
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get enrollments by arm and status
+      tags:
+      - Student Enrollments
   /api/student-enrollments/bulk:
     post:
       consumes:
       - application/json
-      description: Enroll multiple students in a grade
+      description: Enroll multiple students in an arm
       parameters:
       - description: Bulk enrollment request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.BulkCreateStudentEnrollmentRequest'
+          $ref: '#/definitions/dto.BulkCreateStudentEnrollmentsRequest'
       produces:
       - application/json
       responses:
@@ -6790,16 +7949,19 @@ paths:
       summary: Bulk create student enrollments
       tags:
       - Student Enrollments
-  /api/student-enrollments/grade/{grade_id}:
+  /api/student-enrollments/stats:
     get:
       consumes:
       - application/json
-      description: Get all enrollments for a specific grade
+      description: Get statistics for student enrollments
       parameters:
-      - description: Grade ID
-        in: path
-        name: grade_id
-        required: true
+      - description: Filter by arm ID
+        in: query
+        name: arm_id
+        type: string
+      - description: Filter by student ID
+        in: query
+        name: student_id
         type: string
       produces:
       - application/json
@@ -6821,7 +7983,7 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Get enrollments by grade
+      summary: Get enrollment statistics
       tags:
       - Student Enrollments
   /api/student-enrollments/student/{student_id}:
@@ -6895,171 +8057,6 @@ paths:
       security:
       - BearerAuth: []
       summary: Get current enrollment by student
-      tags:
-      - Student Enrollments
-  /api/student-enrollments/teacher/{teacher_id}:
-    get:
-      consumes:
-      - application/json
-      description: Get all enrollments for grades taught by a specific class teacher
-      parameters:
-      - description: Teacher ID
-        in: path
-        name: teacher_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get enrollments by class teacher
-      tags:
-      - Student Enrollments
-  /api/student-enrollments/teacher/{teacher_id}/dashboard:
-    get:
-      consumes:
-      - application/json
-      description: Get dashboard statistics for a class teacher including grade-wise
-        student distribution
-      parameters:
-      - description: Teacher ID
-        in: path
-        name: teacher_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get class teacher dashboard stats
-      tags:
-      - Student Enrollments
-  /api/student-enrollments/teacher/{teacher_id}/grades:
-    get:
-      consumes:
-      - application/json
-      description: Get all grades assigned to a specific class teacher
-      parameters:
-      - description: Teacher ID
-        in: path
-        name: teacher_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get grades by class teacher
-      tags:
-      - Student Enrollments
-  /api/student-enrollments/teacher/{teacher_id}/paginated:
-    get:
-      consumes:
-      - application/json
-      description: Get paginated enrollments for grades taught by a specific class
-        teacher with filters
-      parameters:
-      - description: Teacher ID
-        in: path
-        name: teacher_id
-        required: true
-        type: string
-      - description: Filter by student ID
-        in: query
-        name: student_id
-        type: string
-      - description: Filter by status
-        in: query
-        name: status
-        type: string
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        type: integer
-      - default: 20
-        description: Items per page
-        in: query
-        name: limit
-        type: integer
-      - default: created_at
-        description: Sort field
-        in: query
-        name: sort_by
-        type: string
-      - default: desc
-        description: Sort order
-        in: query
-        name: sort_order
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.StudentEnrollmentListResponse'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get paginated enrollments by class teacher
       tags:
       - Student Enrollments
   /api/subjects:
@@ -7250,10 +8247,6 @@ paths:
       - application/json
       description: Get a paginated list of all subject-teacher assignments
       parameters:
-      - description: Filter by grade ID
-        in: query
-        name: grade_id
-        type: string
       - description: Filter by subject ID
         in: query
         name: subject_id
@@ -7306,7 +8299,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Assign a subject to a teacher for a specific grade
+      description: Assign a subject to a teacher
       parameters:
       - description: Assignment request
         in: body
@@ -7487,7 +8480,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Assign multiple subjects to a teacher for a specific grade
+      description: Assign multiple subjects to a teacher
       parameters:
       - description: Bulk assignment request
         in: body
@@ -7526,40 +8519,6 @@ paths:
       security:
       - BearerAuth: []
       summary: Bulk assign subjects
-      tags:
-      - Teacher Subject Assignments
-  /api/teacher-subject-assignments/grade/{grade_id}:
-    get:
-      consumes:
-      - application/json
-      description: Get all subject-teacher assignments for a specific grade
-      parameters:
-      - description: Grade ID
-        in: path
-        name: grade_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get assignments by grade
       tags:
       - Teacher Subject Assignments
   /api/teacher-subject-assignments/teacher/{teacher_id}:
@@ -7718,6 +8677,10 @@ paths:
       - description: Filter by role (admin, staff, student, parent, user)
         in: query
         name: role
+        type: string
+      - description: Filter by position (admin, staff, student, parent, user, teacher)
+        in: query
+        name: position
         type: string
       - description: Filter by status (active, inactive)
         in: query

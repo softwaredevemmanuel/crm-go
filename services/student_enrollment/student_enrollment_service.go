@@ -12,7 +12,6 @@ import (
 
 	"crm-go/models"
 	"crm-go/dto"
-	"log"
 )
 
 type StudentEnrollmentService struct {
@@ -35,11 +34,10 @@ func (s *StudentEnrollmentService) CreateStudentEnrollment(req *dto.CreateStuden
 	if err != nil {
 		return nil, errors.New("invalid student ID format")
 	}
-	log.Println("✅ Database migrated successfully")
 
-	gradeID, err := uuid.Parse(req.GradeID)
+	armID, err := uuid.Parse(req.ArmID)
 	if err != nil {
-		return nil, errors.New("invalid grade ID format")
+		return nil, errors.New("invalid arm ID format")
 	}
 
 	// Check if student exists
@@ -66,25 +64,25 @@ func (s *StudentEnrollmentService) CreateStudentEnrollment(req *dto.CreateStuden
 		return nil, errors.New("student account is inactive. Please activate the student's account before enrollment")
 	}
 
-	// Check if grade exists
-	var grade models.ClassGrade
-	if err := s.db.Where("id = ? AND deleted_at IS NULL", gradeID).First(&grade).Error; err != nil {
+	// Check if arm exists
+	var arm models.Arm
+	if err := s.db.Where("id = ? AND deleted_at IS NULL", armID).First(&arm).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("grade not found")
+			return nil, errors.New("arm not found")
 		}
-		return nil, errors.New("failed to verify grade: " + err.Error())
+		return nil, errors.New("failed to verify arm: " + err.Error())
 	}
 
-	// ✅ VALIDATION: Check if grade is active
-	if grade.Status != "active" {
-		return nil, errors.New("grade is not active. Cannot enroll student in an inactive grade")
+	// ✅ VALIDATION: Check if arm is active
+	if arm.Status != "active" {
+		return nil, errors.New("arm is not active. Cannot enroll student in an inactive arm")
 	}
 
-	// Check if student is already enrolled in this grade
+	// Check if student is already enrolled in this arm
 	var existing models.StudentEnrollment
-	if err := s.db.Where("student_id = ? AND grade_id = ? AND deleted_at IS NULL",
-		studentID, gradeID).First(&existing).Error; err == nil {
-		return nil, errors.New("student is already enrolled in this grade")
+	if err := s.db.Where("student_id = ? AND arm_id = ? AND deleted_at IS NULL",
+		studentID, armID).First(&existing).Error; err == nil {
+		return nil, errors.New("student is already enrolled in this arm")
 	}
 
 	// Parse graduation date if provided
@@ -107,11 +105,11 @@ func (s *StudentEnrollmentService) CreateStudentEnrollment(req *dto.CreateStuden
 	enrollment := &models.StudentEnrollment{
 		ID:             uuid.New(),
 		StudentID:      studentID,
-		GradeID:        gradeID,
+		ArmID:          armID,
 		Status:         status,
 		GraduationDate: graduationDate,
 		Notes:          strings.TrimSpace(req.Notes),
-		IsVerified:     bool(req.IsVerified),
+		IsVerified:     req.IsVerified,
 		CreatedBy:      userID,
 		CreatedAt:      time.Now(),
 		UpdatedAt:      time.Now(),
@@ -122,7 +120,7 @@ func (s *StudentEnrollmentService) CreateStudentEnrollment(req *dto.CreateStuden
 	}
 
 	// Preload relationships for response
-	if err := s.db.Preload("Student").Preload("Grade").First(enrollment, enrollment.ID).Error; err != nil {
+	if err := s.db.Preload("Student").Preload("Arm").First(enrollment, enrollment.ID).Error; err != nil {
 		return nil, errors.New("failed to load enrollment details: " + err.Error())
 	}
 
@@ -130,31 +128,41 @@ func (s *StudentEnrollmentService) CreateStudentEnrollment(req *dto.CreateStuden
 }
 
 // BulkCreateStudentEnrollments creates multiple student enrollments
-func (s *StudentEnrollmentService) BulkCreateStudentEnrollments(req *dto.BulkCreateStudentEnrollmentRequest, userID uuid.UUID) (*dto.BulkEnrollmentResult, error) {
-	// Parse Grade ID
-	gradeID, err := uuid.Parse(req.GradeID)
+func (s *StudentEnrollmentService) BulkCreateStudentEnrollments(req *dto.BulkCreateStudentEnrollmentsRequest, userID uuid.UUID) (*dto.BulkEnrollmentResult, error) {
+	// Parse Arm ID
+	armID, err := uuid.Parse(req.ArmID)
 	if err != nil {
-		return nil, errors.New("invalid grade ID format")
+		return nil, errors.New("invalid arm ID format")
 	}
 
-	// Check if grade exists
-	var grade models.ClassGrade
-	if err := s.db.Where("id = ? AND deleted_at IS NULL", gradeID).First(&grade).Error; err != nil {
+	// Check if arm exists
+	var arm models.Arm
+	if err := s.db.Where("id = ? AND deleted_at IS NULL", armID).First(&arm).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("grade not found")
+			return nil, errors.New("arm not found")
 		}
-		return nil, errors.New("failed to verify grade: " + err.Error())
+		return nil, errors.New("failed to verify arm: " + err.Error())
 	}
 
-	// ✅ VALIDATION: Check if grade is active
-	if grade.Status != "active" {
-		return nil, errors.New("grade is not active. Cannot enroll students in an inactive grade")
+	// ✅ VALIDATION: Check if arm is active
+	if arm.Status != "active" {
+		return nil, errors.New("arm is not active. Cannot enroll students in an inactive arm")
 	}
 
 	// Set default status
 	status := req.Status
 	if status == "" {
 		status = "active"
+	}
+
+	// Parse graduation date if provided
+	var graduationDate *time.Time
+	if req.GraduationDate != "" {
+		gradDate, err := time.Parse("2006-01-02", req.GraduationDate)
+		if err != nil {
+			return nil, errors.New("invalid graduation date format. Use YYYY-MM-DD")
+		}
+		graduationDate = &gradDate
 	}
 
 	result := &dto.BulkEnrollmentResult{
@@ -216,12 +224,12 @@ func (s *StudentEnrollmentService) BulkCreateStudentEnrollments(req *dto.BulkCre
 
 		// Check if student is already enrolled
 		var existing models.StudentEnrollment
-		if err := s.db.Where("student_id = ? AND grade_id = ? AND deleted_at IS NULL",
-			studentID, gradeID).First(&existing).Error; err == nil {
+		if err := s.db.Where("student_id = ? AND arm_id = ? AND deleted_at IS NULL",
+			studentID, armID).First(&existing).Error; err == nil {
 			result.FailedCount++
 			result.Errors = append(result.Errors, dto.BulkEnrollmentError{
 				StudentID: studentIDStr,
-				Error:     "student already enrolled in this grade",
+				Error:     "student already enrolled in this arm",
 			})
 			continue
 		}
@@ -230,10 +238,11 @@ func (s *StudentEnrollmentService) BulkCreateStudentEnrollments(req *dto.BulkCre
 		enrollment := &models.StudentEnrollment{
 			ID:             uuid.New(),
 			StudentID:      studentID,
-			GradeID:        gradeID,
+			ArmID:          armID,
 			Status:         status,
+			GraduationDate: graduationDate,
 			Notes:          strings.TrimSpace(req.Notes),
-			IsVerified:     bool(req.IsVerified),
+			IsVerified:     req.IsVerified,
 			CreatedBy:      userID,
 			CreatedAt:      time.Now(),
 			UpdatedAt:      time.Now(),
@@ -249,7 +258,7 @@ func (s *StudentEnrollmentService) BulkCreateStudentEnrollments(req *dto.BulkCre
 		}
 
 		// Preload relationships
-		if err := s.db.Preload("Student").Preload("Grade").First(enrollment, enrollment.ID).Error; err != nil {
+		if err := s.db.Preload("Student").Preload("Arm").First(enrollment, enrollment.ID).Error; err != nil {
 			result.FailedCount++
 			result.Errors = append(result.Errors, dto.BulkEnrollmentError{
 				StudentID: studentIDStr,
@@ -292,15 +301,19 @@ func (s *StudentEnrollmentService) GetAllStudentEnrollments(params *dto.StudentE
 		}
 	}
 
-	if params.GradeID != "" {
-		gradeID, err := uuid.Parse(params.GradeID)
+	if params.ArmID != "" {
+		armID, err := uuid.Parse(params.ArmID)
 		if err == nil {
-			query = query.Where("student_enrollments.grade_id = ?", gradeID)
+			query = query.Where("student_enrollments.arm_id = ?", armID)
 		}
 	}
 
 	if params.Status != "" {
 		query = query.Where("student_enrollments.status = ?", params.Status)
+	}
+
+	if params.IsVerified != nil {
+		query = query.Where("student_enrollments.is_verified = ?", *params.IsVerified)
 	}
 
 	// Get total count
@@ -322,7 +335,7 @@ func (s *StudentEnrollmentService) GetAllStudentEnrollments(params *dto.StudentE
 
 	// Execute with preloads
 	var enrollments []models.StudentEnrollment
-	if err := query.Preload("Student").Preload("Grade").Find(&enrollments).Error; err != nil {
+	if err := query.Preload("Student").Preload("Arm").Find(&enrollments).Error; err != nil {
 		return nil, fmt.Errorf("failed to fetch enrollments: %w", err)
 	}
 
@@ -353,7 +366,7 @@ func (s *StudentEnrollmentService) GetStudentEnrollmentByID(id string) (*dto.Stu
 	var enrollment models.StudentEnrollment
 	if err := s.db.Where("id = ? AND deleted_at IS NULL", enrollmentID).
 		Preload("Student").
-		Preload("Grade").
+		Preload("Arm").
 		First(&enrollment).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("enrollment not found")
@@ -380,7 +393,7 @@ func (s *StudentEnrollmentService) GetEnrollmentsByStudent(studentID string) ([]
 			true,
 		).
 		Preload("Student").
-		Preload("Grade").
+		Preload("Arm").
 		Order("created_at DESC").
 		Find(&enrollments).Error; err != nil {
 		return nil, fmt.Errorf("failed to fetch enrollments for student: %w", err)
@@ -395,19 +408,19 @@ func (s *StudentEnrollmentService) GetEnrollmentsByStudent(studentID string) ([]
 	return responses, nil
 }
 
-// GetEnrollmentsByGrade retrieves all enrollments for a specific grade
-func (s *StudentEnrollmentService) GetEnrollmentsByGrade(gradeID string) ([]dto.StudentEnrollmentResponse, error) {
-	gID, err := uuid.Parse(gradeID)
+// GetEnrollmentsByArm retrieves all enrollments for a specific arm
+func (s *StudentEnrollmentService) GetEnrollmentsByArm(armID string) ([]dto.StudentEnrollmentResponse, error) {
+	aID, err := uuid.Parse(armID)
 	if err != nil {
-		return nil, errors.New("invalid grade ID")
+		return nil, errors.New("invalid arm ID")
 	}
 
 	var enrollments []models.StudentEnrollment
-	if err := s.db.Where("grade_id = ? AND deleted_at IS NULL", gID).
+	if err := s.db.Where("arm_id = ? AND deleted_at IS NULL", aID).
 		Preload("Student").
-		Preload("Grade").
+		Preload("Arm").
 		Find(&enrollments).Error; err != nil {
-		return nil, fmt.Errorf("failed to fetch enrollments for grade: %w", err)
+		return nil, fmt.Errorf("failed to fetch enrollments for arm: %w", err)
 	}
 
 	responses := make([]dto.StudentEnrollmentResponse, len(enrollments))
@@ -418,42 +431,19 @@ func (s *StudentEnrollmentService) GetEnrollmentsByGrade(gradeID string) ([]dto.
 	return responses, nil
 }
 
-// ============================================================
-// NEW METHODS FOR CLASS TEACHER
-// ============================================================
-
-// GetEnrollmentsByClassTeacher retrieves all enrollments for grades taught by a specific class teacher
-func (s *StudentEnrollmentService) GetEnrollmentsByClassTeacher(teacherID string) ([]dto.StudentEnrollmentResponse, error) {
-	tID, err := uuid.Parse(teacherID)
+// GetEnrollmentsByArmAndStatus retrieves enrollments for an arm filtered by status
+func (s *StudentEnrollmentService) GetEnrollmentsByArmAndStatus(armID, status string) ([]dto.StudentEnrollmentResponse, error) {
+	aID, err := uuid.Parse(armID)
 	if err != nil {
-		return nil, errors.New("invalid teacher ID")
+		return nil, errors.New("invalid arm ID")
 	}
 
-	// First, find all grades where this teacher is the class teacher
-	var grades []models.ClassGrade
-	if err := s.db.Where("class_teacher_id = ? AND deleted_at IS NULL", tID).
-		Find(&grades).Error; err != nil {
-		return nil, fmt.Errorf("failed to fetch grades for teacher: %w", err)
-	}
-
-	if len(grades) == 0 {
-		return []dto.StudentEnrollmentResponse{}, nil
-	}
-
-	// Get all grade IDs
-	gradeIDs := make([]uuid.UUID, len(grades))
-	for i, grade := range grades {
-		gradeIDs[i] = grade.ID
-	}
-
-	// Fetch all enrollments for these grades
 	var enrollments []models.StudentEnrollment
-	if err := s.db.Where("grade_id IN ? AND deleted_at IS NULL", gradeIDs).
+	if err := s.db.Where("arm_id = ? AND status = ? AND deleted_at IS NULL", aID, status).
 		Preload("Student").
-		Preload("Grade").
-		Order("created_at DESC").
+		Preload("Arm").
 		Find(&enrollments).Error; err != nil {
-		return nil, fmt.Errorf("failed to fetch enrollments for teacher's grades: %w", err)
+		return nil, fmt.Errorf("failed to fetch enrollments for arm: %w", err)
 	}
 
 	responses := make([]dto.StudentEnrollmentResponse, len(enrollments))
@@ -462,225 +452,6 @@ func (s *StudentEnrollmentService) GetEnrollmentsByClassTeacher(teacherID string
 	}
 
 	return responses, nil
-}
-
-// GetEnrollmentsByClassTeacherWithPagination retrieves paginated enrollments for a class teacher
-func (s *StudentEnrollmentService) GetEnrollmentsByClassTeacherWithPagination(teacherID string, params *dto.StudentEnrollmentQueryParams) (*dto.StudentEnrollmentListResponse, error) {
-	tID, err := uuid.Parse(teacherID)
-	if err != nil {
-		return nil, errors.New("invalid teacher ID")
-	}
-
-	// Set defaults
-	if params.Page < 1 {
-		params.Page = 1
-	}
-	if params.Limit < 1 || params.Limit > 100 {
-		params.Limit = 20
-	}
-	if params.SortBy == "" {
-		params.SortBy = "created_at"
-	}
-	if params.SortOrder == "" {
-		params.SortOrder = "desc"
-	}
-
-	// First, find all grades where this teacher is the class teacher
-	var grades []models.ClassGrade
-	if err := s.db.Where("class_teacher_id = ? AND deleted_at IS NULL", tID).
-		Find(&grades).Error; err != nil {
-		return nil, fmt.Errorf("failed to fetch grades for teacher: %w", err)
-	}
-
-	if len(grades) == 0 {
-		return &dto.StudentEnrollmentListResponse{
-			Enrollments: []dto.StudentEnrollmentResponse{},
-			Total:       0,
-			Page:        params.Page,
-			Limit:       params.Limit,
-			TotalPages:  0,
-		}, nil
-	}
-
-	// Get all grade IDs
-	gradeIDs := make([]uuid.UUID, len(grades))
-	for i, grade := range grades {
-		gradeIDs[i] = grade.ID
-	}
-
-	// Build query
-	query := s.db.Model(&models.StudentEnrollment{}).
-		Where("grade_id IN ? AND deleted_at IS NULL", gradeIDs)
-
-	// Apply additional filters
-	if params.StudentID != "" {
-		studentID, err := uuid.Parse(params.StudentID)
-		if err == nil {
-			query = query.Where("student_id = ?", studentID)
-		}
-	}
-
-	if params.Status != "" {
-		query = query.Where("status = ?", params.Status)
-	}
-
-	// Get total count
-	var total int64
-	if err := query.Count(&total).Error; err != nil {
-		return nil, fmt.Errorf("failed to count enrollments: %w", err)
-	}
-
-	// Apply sorting
-	sortDirection := "DESC"
-	if strings.ToLower(params.SortOrder) == "asc" {
-		sortDirection = "ASC"
-	}
-	query = query.Order("student_enrollments." + params.SortBy + " " + sortDirection)
-
-	// Apply pagination
-	offset := (params.Page - 1) * params.Limit
-	query = query.Offset(offset).Limit(params.Limit)
-
-	// Execute with preloads
-	var enrollments []models.StudentEnrollment
-	if err := query.Preload("Student").Preload("Grade").Find(&enrollments).Error; err != nil {
-		return nil, fmt.Errorf("failed to fetch enrollments: %w", err)
-	}
-
-	// Convert to response
-	responses := make([]dto.StudentEnrollmentResponse, len(enrollments))
-	for i, enrollment := range enrollments {
-		responses[i] = *s.toEnrollmentResponse(&enrollment)
-	}
-
-	totalPages := int((total + int64(params.Limit) - 1) / int64(params.Limit))
-
-	return &dto.StudentEnrollmentListResponse{
-		Enrollments: responses,
-		Total:       total,
-		Page:        params.Page,
-		Limit:       params.Limit,
-		TotalPages:  totalPages,
-	}, nil
-}
-
-// GetGradesByClassTeacher retrieves all grades assigned to a specific class teacher
-func (s *StudentEnrollmentService) GetGradesByClassTeacher(teacherID string) ([]dto.ClassGradeResponse, error) {
-	tID, err := uuid.Parse(teacherID)
-	if err != nil {
-		return nil, errors.New("invalid teacher ID")
-	}
-
-	var grades []models.ClassGrade
-	if err := s.db.Where("class_teacher_id = ? AND deleted_at IS NULL", tID).
-		Find(&grades).Error; err != nil {
-		return nil, fmt.Errorf("failed to fetch grades for teacher: %w", err)
-	}
-
-	responses := make([]dto.ClassGradeResponse, len(grades))
-	for i, grade := range grades {
-		responses[i] = dto.ClassGradeResponse{
-			ID:                grade.ID.String(),
-			Name:              grade.Name,
-			Code:              grade.Code,
-			Level:             grade.Level,
-			Description:       grade.Description,
-			AcademicSessionID: grade.AcademicSessionID.String(),
-			ClassTeacherID:    grade.ClassTeacherID.String(),
-			Capacity:          grade.Capacity,
-			Status:            grade.Status,
-			CreatedAt:         grade.CreatedAt,
-			UpdatedAt:         grade.UpdatedAt,
-		}
-	}
-
-	return responses, nil
-}
-
-// GetClassTeacherDashboardStats retrieves statistics for a class teacher's dashboard
-func (s *StudentEnrollmentService) GetClassTeacherDashboardStats(teacherID string) (*dto.ClassTeacherDashboardStats, error) {
-	tID, err := uuid.Parse(teacherID)
-	if err != nil {
-		return nil, errors.New("invalid teacher ID")
-	}
-
-	// Get all grades for this teacher
-	var grades []models.ClassGrade
-	if err := s.db.Where("class_teacher_id = ? AND deleted_at IS NULL", tID).
-		Find(&grades).Error; err != nil {
-		return nil, fmt.Errorf("failed to fetch grades: %w", err)
-	}
-
-	if len(grades) == 0 {
-		return &dto.ClassTeacherDashboardStats{
-			TotalGrades:      0,
-			TotalStudents:    0,
-			ActiveStudents:   0,
-			InactiveStudents: 0,
-			Grades:           []dto.GradeStats{},
-		}, nil
-	}
-
-	gradeIDs := make([]uuid.UUID, len(grades))
-	for i, grade := range grades {
-		gradeIDs[i] = grade.ID
-	}
-
-	// Get all enrollments for these grades
-	var enrollments []models.StudentEnrollment
-	if err := s.db.Where("grade_id IN ? AND deleted_at IS NULL", gradeIDs).
-		Preload("Grade").
-		Find(&enrollments).Error; err != nil {
-		return nil, fmt.Errorf("failed to fetch enrollments: %w", err)
-	}
-
-	// Calculate stats
-	gradeStats := make([]dto.GradeStats, 0)
-	gradeMap := make(map[uuid.UUID]*dto.GradeStats)
-
-	for _, grade := range grades {
-		gradeMap[grade.ID] = &dto.GradeStats{
-			GradeID:        grade.ID.String(),
-			GradeName:      grade.Name,
-			GradeCode:      grade.Code,
-			Level:          grade.Level,
-			TotalStudents:  0,
-			ActiveStudents: 0,
-			Capacity:       grade.Capacity,
-		}
-	}
-
-	for _, enrollment := range enrollments {
-		if stats, exists := gradeMap[enrollment.GradeID]; exists {
-			stats.TotalStudents++
-			if enrollment.Status == "active" {
-				stats.ActiveStudents++
-			}
-		}
-	}
-
-	for _, stats := range gradeMap {
-		gradeStats = append(gradeStats, *stats)
-	}
-
-	// Calculate totals
-	totalStudents := 0
-	activeStudents := 0
-	inactiveStudents := 0
-
-	for _, stats := range gradeStats {
-		totalStudents += stats.TotalStudents
-		activeStudents += stats.ActiveStudents
-	}
-	inactiveStudents = totalStudents - activeStudents
-
-	return &dto.ClassTeacherDashboardStats{
-		TotalGrades:      len(grades),
-		TotalStudents:    totalStudents,
-		ActiveStudents:   activeStudents,
-		InactiveStudents: inactiveStudents,
-		Grades:           gradeStats,
-	}, nil
 }
 
 // GetCurrentEnrollmentByStudent retrieves the current active enrollment for a student
@@ -693,7 +464,7 @@ func (s *StudentEnrollmentService) GetCurrentEnrollmentByStudent(studentID strin
 	var enrollment models.StudentEnrollment
 	if err := s.db.Where("student_id = ? AND status = ? AND deleted_at IS NULL", sID, "active").
 		Preload("Student").
-		Preload("Grade").
+		Preload("Arm").
 		Order("created_at DESC").
 		First(&enrollment).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -703,6 +474,57 @@ func (s *StudentEnrollmentService) GetCurrentEnrollmentByStudent(studentID strin
 	}
 
 	return s.toEnrollmentResponse(&enrollment), nil
+}
+
+// GetEnrollmentStats retrieves statistics for student enrollments
+func (s *StudentEnrollmentService) GetEnrollmentStats(filter map[string]interface{}) (*dto.StudentEnrollmentStats, error) {
+	query := s.db.Model(&models.StudentEnrollment{}).Where("deleted_at IS NULL")
+
+	// Apply filters
+	if armID, ok := filter["arm_id"].(string); ok && armID != "" {
+		if id, err := uuid.Parse(armID); err == nil {
+			query = query.Where("arm_id = ?", id)
+		}
+	}
+	if studentID, ok := filter["student_id"].(string); ok && studentID != "" {
+		if id, err := uuid.Parse(studentID); err == nil {
+			query = query.Where("student_id = ?", id)
+		}
+	}
+
+	var stats dto.StudentEnrollmentStats
+
+	// Count total
+	if err := query.Count(&stats.TotalEnrollments).Error; err != nil {
+		return nil, fmt.Errorf("failed to count total enrollments: %w", err)
+	}
+
+	// Count by status
+	if err := query.Where("status = ?", "active").Count(&stats.ActiveEnrollments).Error; err != nil {
+		return nil, fmt.Errorf("failed to count active enrollments: %w", err)
+	}
+	if err := query.Where("status = ?", "inactive").Count(&stats.InactiveEnrollments).Error; err != nil {
+		return nil, fmt.Errorf("failed to count inactive enrollments: %w", err)
+	}
+	if err := query.Where("status = ?", "graduated").Count(&stats.GraduatedEnrollments).Error; err != nil {
+		return nil, fmt.Errorf("failed to count graduated enrollments: %w", err)
+	}
+	if err := query.Where("status = ?", "transferred").Count(&stats.TransferredEnrollments).Error; err != nil {
+		return nil, fmt.Errorf("failed to count transferred enrollments: %w", err)
+	}
+	if err := query.Where("status = ?", "withdrawn").Count(&stats.WithdrawnEnrollments).Error; err != nil {
+		return nil, fmt.Errorf("failed to count withdrawn enrollments: %w", err)
+	}
+
+	// Count verified/unverified
+	if err := query.Where("is_verified = ?", true).Count(&stats.VerifiedEnrollments).Error; err != nil {
+		return nil, fmt.Errorf("failed to count verified enrollments: %w", err)
+	}
+	if err := query.Where("is_verified = ?", false).Count(&stats.UnverifiedEnrollments).Error; err != nil {
+		return nil, fmt.Errorf("failed to count unverified enrollments: %w", err)
+	}
+
+	return &stats, nil
 }
 
 // UpdateStudentEnrollment updates an existing student enrollment
@@ -722,20 +544,20 @@ func (s *StudentEnrollmentService) UpdateStudentEnrollment(id string, req *dto.U
 	}
 
 	// Update fields
-	if req.GradeID != "" {
-		gradeID, err := uuid.Parse(req.GradeID)
+	if req.ArmID != "" {
+		armID, err := uuid.Parse(req.ArmID)
 		if err != nil {
-			return nil, errors.New("invalid grade ID format")
+			return nil, errors.New("invalid arm ID format")
 		}
-		// Verify grade exists
-		var grade models.ClassGrade
-		if err := s.db.Where("id = ? AND deleted_at IS NULL", gradeID).First(&grade).Error; err != nil {
+		// Verify arm exists
+		var arm models.Arm
+		if err := s.db.Where("id = ? AND deleted_at IS NULL", armID).First(&arm).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return nil, errors.New("grade not found")
+				return nil, errors.New("arm not found")
 			}
-			return nil, errors.New("failed to verify grade: " + err.Error())
+			return nil, errors.New("failed to verify arm: " + err.Error())
 		}
-		enrollment.GradeID = gradeID
+		enrollment.ArmID = armID
 	}
 
 	if req.Status != "" {
@@ -754,6 +576,10 @@ func (s *StudentEnrollmentService) UpdateStudentEnrollment(id string, req *dto.U
 		enrollment.Notes = strings.TrimSpace(req.Notes)
 	}
 
+	if req.IsVerified != nil {
+		enrollment.IsVerified = *req.IsVerified
+	}
+
 	enrollment.UpdatedAt = time.Now()
 
 	if err := s.db.Save(&enrollment).Error; err != nil {
@@ -761,7 +587,7 @@ func (s *StudentEnrollmentService) UpdateStudentEnrollment(id string, req *dto.U
 	}
 
 	// Preload relationships
-	if err := s.db.Preload("Student").Preload("Grade").First(&enrollment, enrollment.ID).Error; err != nil {
+	if err := s.db.Preload("Student").Preload("Arm").First(&enrollment, enrollment.ID).Error; err != nil {
 		return nil, errors.New("failed to load enrollment details: " + err.Error())
 	}
 
@@ -795,8 +621,8 @@ func (s *StudentEnrollmentService) validateEnrollmentRequest(req *dto.CreateStud
 	if req.StudentID == "" {
 		return errors.New("student ID is required")
 	}
-	if req.GradeID == "" {
-		return errors.New("grade ID is required")
+	if req.ArmID == "" {
+		return errors.New("arm ID is required")
 	}
 
 	if req.Status != "" && req.Status != "active" && req.Status != "inactive" &&
@@ -811,7 +637,7 @@ func (s *StudentEnrollmentService) toEnrollmentResponse(enrollment *models.Stude
 	response := &dto.StudentEnrollmentResponse{
 		ID:             enrollment.ID.String(),
 		StudentID:      enrollment.StudentID.String(),
-		GradeID:        enrollment.GradeID.String(),
+		ArmID:          enrollment.ArmID.String(),
 		Status:         enrollment.Status,
 		GraduationDate: enrollment.GraduationDate,
 		Notes:          enrollment.Notes,
@@ -830,7 +656,6 @@ func (s *StudentEnrollmentService) toEnrollmentResponse(enrollment *models.Stude
 			Email:       enrollment.Student.Email,
 			Phone:       enrollment.Student.Phone,
 			Role:        enrollment.Student.Role,
-			Position:    enrollment.Student.Position,
 			IsVerified:  enrollment.Student.IsVerified,
 			IsActive:    enrollment.Student.IsActive,
 			Picture:     enrollment.Student.Picture,
@@ -842,20 +667,18 @@ func (s *StudentEnrollmentService) toEnrollmentResponse(enrollment *models.Stude
 		}
 	}
 
-	// Add grade details if preloaded
-	if enrollment.Grade.ID != uuid.Nil {
-		response.Grade = &dto.ClassGradeResponse{
-			ID:                enrollment.Grade.ID.String(),
-			Name:              enrollment.Grade.Name,
-			Code:              enrollment.Grade.Code,
-			Level:             enrollment.Grade.Level,
-			Description:       enrollment.Grade.Description,
-			AcademicSessionID: enrollment.Grade.AcademicSessionID.String(),
-			ClassTeacherID:    enrollment.Grade.ClassTeacherID.String(),
-			Capacity:          enrollment.Grade.Capacity,
-			Status:            enrollment.Grade.Status,
-			CreatedAt:         enrollment.Grade.CreatedAt,
-			UpdatedAt:         enrollment.Grade.UpdatedAt,
+	// Add arm details if preloaded
+	if enrollment.Arm.ID != uuid.Nil {
+		response.Arm = &dto.ArmResponse{
+			ID:          enrollment.Arm.ID.String(),
+			Name:        enrollment.Arm.Name,
+			Code:        enrollment.Arm.Code,
+			GradeID:     enrollment.Arm.GradeID.String(),
+			Capacity:    enrollment.Arm.Capacity,
+			Description: enrollment.Arm.Description,
+			Status:      enrollment.Arm.Status,
+			CreatedAt:   enrollment.Arm.CreatedAt,
+			UpdatedAt:   enrollment.Arm.UpdatedAt,
 		}
 	}
 

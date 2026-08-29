@@ -24,7 +24,7 @@ func NewStudentEnrollmentHandler(enrollmentService *services.StudentEnrollmentSe
 
 // CreateStudentEnrollment handles the creation of a new student enrollment
 // @Summary Create a student enrollment
-// @Description Enroll a student in a grade
+// @Description Enroll a student in an arm
 // @Tags Student Enrollments
 // @Accept json
 // @Produce json
@@ -91,11 +91,11 @@ func (h *StudentEnrollmentHandler) CreateStudentEnrollment(c *gin.Context) {
 
 // BulkCreateStudentEnrollments handles bulk creation of student enrollments
 // @Summary Bulk create student enrollments
-// @Description Enroll multiple students in a grade
+// @Description Enroll multiple students in an arm
 // @Tags Student Enrollments
 // @Accept json
 // @Produce json
-// @Param request body dto.BulkCreateStudentEnrollmentRequest true "Bulk enrollment request"
+// @Param request body dto.BulkCreateStudentEnrollmentsRequest true "Bulk enrollment request"
 // @Success 201 {object} map[string]interface{}
 // @Failure 400 {object} map[string]interface{}
 // @Failure 401 {object} map[string]interface{}
@@ -120,7 +120,7 @@ func (h *StudentEnrollmentHandler) BulkCreateStudentEnrollments(c *gin.Context) 
 		return
 	}
 
-	var req dto.BulkCreateStudentEnrollmentRequest
+	var req dto.BulkCreateStudentEnrollmentsRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   "Invalid request body",
@@ -156,8 +156,9 @@ func (h *StudentEnrollmentHandler) BulkCreateStudentEnrollments(c *gin.Context) 
 // @Accept json
 // @Produce json
 // @Param student_id query string false "Filter by student ID"
-// @Param grade_id query string false "Filter by grade ID"
+// @Param arm_id query string false "Filter by arm ID"
 // @Param status query string false "Filter by status"
+// @Param is_verified query bool false "Filter by verification status"
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Items per page" default(20)
 // @Success 200 {object} dto.StudentEnrollmentListResponse
@@ -165,7 +166,7 @@ func (h *StudentEnrollmentHandler) BulkCreateStudentEnrollments(c *gin.Context) 
 // @Failure 401 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Security BearerAuth
-// @Router /api/fetch/student-enrollments [get]
+// @Router /api/fetch-student-enrollments [get]
 func (h *StudentEnrollmentHandler) GetAllStudentEnrollments(c *gin.Context) {
 	var params dto.StudentEnrollmentQueryParams
 	if err := c.ShouldBindQuery(&params); err != nil {
@@ -267,28 +268,28 @@ func (h *StudentEnrollmentHandler) GetEnrollmentsByStudent(c *gin.Context) {
 	})
 }
 
-// GetEnrollmentsByGrade handles fetching all enrollments for a grade
-// @Summary Get enrollments by grade
-// @Description Get all enrollments for a specific grade
+// GetEnrollmentsByArm handles fetching all enrollments for an arm
+// @Summary Get enrollments by arm
+// @Description Get all enrollments for a specific arm
 // @Tags Student Enrollments
 // @Accept json
 // @Produce json
-// @Param grade_id path string true "Grade ID"
+// @Param arm_id path string true "Arm ID"
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Security BearerAuth
-// @Router /api/student-enrollments/grade/{grade_id} [get]
-func (h *StudentEnrollmentHandler) GetEnrollmentsByGrade(c *gin.Context) {
-	gradeID := c.Param("grade_id")
-	if gradeID == "" {
+// @Router /api/student-enrollments/arm/{arm_id} [get]
+func (h *StudentEnrollmentHandler) GetEnrollmentsByArm(c *gin.Context) {
+	armID := c.Param("arm_id")
+	if armID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Grade ID is required",
+			"error": "Arm ID is required",
 		})
 		return
 	}
 
-	enrollments, err := h.enrollmentService.GetEnrollmentsByGrade(gradeID)
+	enrollments, err := h.enrollmentService.GetEnrollmentsByArm(armID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -302,39 +303,38 @@ func (h *StudentEnrollmentHandler) GetEnrollmentsByGrade(c *gin.Context) {
 	})
 }
 
-// ============================================================
-// NEW HANDLERS FOR CLASS TEACHER
-// ============================================================
-
-// GetEnrollmentsByClassTeacher handles fetching all enrollments for a class teacher
-// @Summary Get enrollments by class teacher
-// @Description Get all enrollments for grades taught by a specific class teacher
+// GetEnrollmentsByArmAndStatus handles fetching enrollments by arm and status
+// @Summary Get enrollments by arm and status
+// @Description Get enrollments for a specific arm filtered by status
 // @Tags Student Enrollments
 // @Accept json
 // @Produce json
-// @Param teacher_id path string true "Teacher ID"
+// @Param arm_id path string true "Arm ID"
+// @Param status path string true "Status (active, inactive, transferred, graduated, withdrawn)"
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Security BearerAuth
-// @Router /api/student-enrollments/teacher/{teacher_id} [get]
-func (h *StudentEnrollmentHandler) GetEnrollmentsByClassTeacher(c *gin.Context) {
-	teacherID := c.Param("teacher_id")
-	if teacherID == "" {
+// @Router /api/student-enrollments/arm/{arm_id}/status/{status} [get]
+func (h *StudentEnrollmentHandler) GetEnrollmentsByArmAndStatus(c *gin.Context) {
+	armID := c.Param("arm_id")
+	status := c.Param("status")
+
+	if armID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Teacher ID is required",
+			"error": "Arm ID is required",
+		})
+		return
+	}
+	if status == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Status is required",
 		})
 		return
 	}
 
-	enrollments, err := h.enrollmentService.GetEnrollmentsByClassTeacher(teacherID)
+	enrollments, err := h.enrollmentService.GetEnrollmentsByArmAndStatus(armID, status)
 	if err != nil {
-		if strings.Contains(err.Error(), "invalid teacher ID") {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -344,146 +344,6 @@ func (h *StudentEnrollmentHandler) GetEnrollmentsByClassTeacher(c *gin.Context) 
 	c.JSON(http.StatusOK, gin.H{
 		"message":     "Enrollments retrieved successfully",
 		"enrollments": enrollments,
-		"total":       len(enrollments),
-	})
-}
-
-// GetEnrollmentsByClassTeacherPaginated handles fetching paginated enrollments for a class teacher
-// @Summary Get paginated enrollments by class teacher
-// @Description Get paginated enrollments for grades taught by a specific class teacher with filters
-// @Tags Student Enrollments
-// @Accept json
-// @Produce json
-// @Param teacher_id path string true "Teacher ID"
-// @Param student_id query string false "Filter by student ID"
-// @Param status query string false "Filter by status"
-// @Param page query int false "Page number" default(1)
-// @Param limit query int false "Items per page" default(20)
-// @Param sort_by query string false "Sort field" default(created_at)
-// @Param sort_order query string false "Sort order" default(desc)
-// @Success 200 {object} dto.StudentEnrollmentListResponse
-// @Failure 400 {object} map[string]interface{}
-// @Failure 500 {object} map[string]interface{}
-// @Security BearerAuth
-// @Router /api/student-enrollments/teacher/{teacher_id}/paginated [get]
-func (h *StudentEnrollmentHandler) GetEnrollmentsByClassTeacherPaginated(c *gin.Context) {
-	teacherID := c.Param("teacher_id")
-	if teacherID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Teacher ID is required",
-		})
-		return
-	}
-
-	var params dto.StudentEnrollmentQueryParams
-	if err := c.ShouldBindQuery(&params); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   "Invalid query parameters",
-			"details": err.Error(),
-		})
-		return
-	}
-
-	response, err := h.enrollmentService.GetEnrollmentsByClassTeacherWithPagination(teacherID, &params)
-	if err != nil {
-		if strings.Contains(err.Error(), "invalid teacher ID") {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Enrollments retrieved successfully",
-		"data":    response,
-	})
-}
-
-// GetGradesByClassTeacher handles fetching all grades assigned to a class teacher
-// @Summary Get grades by class teacher
-// @Description Get all grades assigned to a specific class teacher
-// @Tags Student Enrollments
-// @Accept json
-// @Produce json
-// @Param teacher_id path string true "Teacher ID"
-// @Success 200 {object} map[string]interface{}
-// @Failure 400 {object} map[string]interface{}
-// @Failure 500 {object} map[string]interface{}
-// @Security BearerAuth
-// @Router /api/student-enrollments/teacher/{teacher_id}/grades [get]
-func (h *StudentEnrollmentHandler) GetGradesByClassTeacher(c *gin.Context) {
-	teacherID := c.Param("teacher_id")
-	if teacherID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Teacher ID is required",
-		})
-		return
-	}
-
-	grades, err := h.enrollmentService.GetGradesByClassTeacher(teacherID)
-	if err != nil {
-		if strings.Contains(err.Error(), "invalid teacher ID") {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Grades retrieved successfully",
-		"grades":  grades,
-		"total":   len(grades),
-	})
-}
-
-// GetClassTeacherDashboardStats handles fetching dashboard statistics for a class teacher
-// @Summary Get class teacher dashboard stats
-// @Description Get dashboard statistics for a class teacher including grade-wise student distribution
-// @Tags Student Enrollments
-// @Accept json
-// @Produce json
-// @Param teacher_id path string true "Teacher ID"
-// @Success 200 {object} map[string]interface{}
-// @Failure 400 {object} map[string]interface{}
-// @Failure 500 {object} map[string]interface{}
-// @Security BearerAuth
-// @Router /api/student-enrollments/teacher/{teacher_id}/dashboard [get]
-func (h *StudentEnrollmentHandler) GetClassTeacherDashboardStats(c *gin.Context) {
-	teacherID := c.Param("teacher_id")
-	if teacherID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Teacher ID is required",
-		})
-		return
-	}
-
-	stats, err := h.enrollmentService.GetClassTeacherDashboardStats(teacherID)
-	if err != nil {
-		if strings.Contains(err.Error(), "invalid teacher ID") {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Dashboard stats retrieved successfully",
-		"data":    stats,
 	})
 }
 
@@ -526,6 +386,43 @@ func (h *StudentEnrollmentHandler) GetCurrentEnrollmentByStudent(c *gin.Context)
 	c.JSON(http.StatusOK, gin.H{
 		"message":    "Current enrollment retrieved successfully",
 		"enrollment": enrollment,
+	})
+}
+
+// GetEnrollmentStats handles fetching enrollment statistics
+// @Summary Get enrollment statistics
+// @Description Get statistics for student enrollments
+// @Tags Student Enrollments
+// @Accept json
+// @Produce json
+// @Param arm_id query string false "Filter by arm ID"
+// @Param student_id query string false "Filter by student ID"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Security BearerAuth
+// @Router /api/student-enrollments/stats [get]
+func (h *StudentEnrollmentHandler) GetEnrollmentStats(c *gin.Context) {
+	filter := make(map[string]interface{})
+	
+	if armID := c.Query("arm_id"); armID != "" {
+		filter["arm_id"] = armID
+	}
+	if studentID := c.Query("student_id"); studentID != "" {
+		filter["student_id"] = studentID
+	}
+
+	stats, err := h.enrollmentService.GetEnrollmentStats(filter)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Statistics retrieved successfully",
+		"data":    stats,
 	})
 }
 

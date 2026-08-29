@@ -40,8 +40,6 @@ func TeacherSubjectAssignmentRoutes(router *gin.RouterGroup, db *gorm.DB) {
 		// Get assignments by teacher
 		assignmentGroup.GET("/teacher-subject-assignments/teacher/:teacher_id", assignmentHandler.GetAssignmentsByTeacher)
 		
-		// Get assignments by grade
-		assignmentGroup.GET("/teacher-subject-assignments/grade/:grade_id", assignmentHandler.GetAssignmentsByGrade)
 
 		// ============================================================
 		// UPDATE - Assignment update endpoints

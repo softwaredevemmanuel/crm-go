@@ -29,11 +29,6 @@ func (s *TeacherSubjectAssignmentService) CreateAssignment(req *dto.CreateTeache
 		return nil, err
 	}
 
-	// Parse UUIDs
-	gradeID, err := uuid.Parse(req.GradeID)
-	if err != nil {
-		return nil, errors.New("invalid grade ID format")
-	}
 
 	subjectID, err := uuid.Parse(req.SubjectID)
 	if err != nil {
@@ -45,14 +40,6 @@ func (s *TeacherSubjectAssignmentService) CreateAssignment(req *dto.CreateTeache
 		return nil, errors.New("invalid teacher ID format")
 	}
 
-	// Check if grade exists
-	var grade models.ClassGrade
-	if err := s.db.Where("id = ? AND deleted_at IS NULL", gradeID).First(&grade).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("grade not found")
-		}
-		return nil, errors.New("failed to verify grade: " + err.Error())
-	}
 
 	// Check if subject exists
 	var subject models.Subject
@@ -78,9 +65,9 @@ func (s *TeacherSubjectAssignmentService) CreateAssignment(req *dto.CreateTeache
 
 	// Check if assignment already exists
 	var existing models.TeacherSubjectAssignment
-	if err := s.db.Where("grade_id = ? AND subject_id = ? AND teacher_id = ? AND deleted_at IS NULL",
-		gradeID, subjectID, teacherID).First(&existing).Error; err == nil {
-		return nil, errors.New("this subject is already assigned to this teacher for this grade")
+	if err := s.db.Where("subject_id = ? AND teacher_id = ? AND deleted_at IS NULL",
+		subjectID, teacherID).First(&existing).Error; err == nil {
+		return nil, errors.New("this subject is already assigned to this teacher")
 	}
 
 	// Set default status
@@ -92,7 +79,6 @@ func (s *TeacherSubjectAssignmentService) CreateAssignment(req *dto.CreateTeache
 	// Create assignment
 	assignment := &models.TeacherSubjectAssignment{
 		ID:        uuid.New(),
-		GradeID:   gradeID,
 		SubjectID: subjectID,
 		TeacherID: teacherID,
 		Status:    status,
@@ -105,14 +91,14 @@ func (s *TeacherSubjectAssignmentService) CreateAssignment(req *dto.CreateTeache
 	}
 
 	// Preload relationships for response
-	if err := s.db.Preload("Grade").Preload("Subject").Preload("Teacher").First(assignment, assignment.ID).Error; err != nil {
+	if err := s.db.Preload("Subject").Preload("Teacher").First(assignment, assignment.ID).Error; err != nil {
 		return nil, errors.New("failed to load assignment details: " + err.Error())
 	}
 
 	return s.toAssignmentResponse(assignment), nil
 }
 
-// BulkAssignSubjects assigns multiple subjects to a teacher for a grade
+// BulkAssignSubjects assigns multiple subjects to a teacher
 func (s *TeacherSubjectAssignmentService) BulkAssignSubjects(req *dto.BulkAssignSubjectsRequest) (*dto.BulkAssignmentResult, error) {
 	// Parse UUIDs
 	teacherID, err := uuid.Parse(req.TeacherID)
@@ -120,10 +106,6 @@ func (s *TeacherSubjectAssignmentService) BulkAssignSubjects(req *dto.BulkAssign
 		return nil, errors.New("invalid teacher ID format")
 	}
 
-	gradeID, err := uuid.Parse(req.GradeID)
-	if err != nil {
-		return nil, errors.New("invalid grade ID format")
-	}
 
 	// Check if teacher exists
 	var teacher models.User
@@ -138,14 +120,6 @@ func (s *TeacherSubjectAssignmentService) BulkAssignSubjects(req *dto.BulkAssign
 		return nil, errors.New("user is not a teacher or admin")
 	}
 
-	// Check if grade exists
-	var grade models.ClassGrade
-	if err := s.db.Where("id = ? AND deleted_at IS NULL", gradeID).First(&grade).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("grade not found")
-		}
-		return nil, errors.New("failed to verify grade: " + err.Error())
-	}
 
 	// Set default status
 	status := req.Status
@@ -182,12 +156,12 @@ func (s *TeacherSubjectAssignmentService) BulkAssignSubjects(req *dto.BulkAssign
 
 		// Check if assignment already exists
 		var existing models.TeacherSubjectAssignment
-		if err := s.db.Where("grade_id = ? AND subject_id = ? AND teacher_id = ? AND deleted_at IS NULL",
-			gradeID, subjectID, teacherID).First(&existing).Error; err == nil {
+		if err := s.db.Where("subject_id = ? AND teacher_id = ? AND deleted_at IS NULL",
+			 subjectID, teacherID).First(&existing).Error; err == nil {
 			result.FailedCount++
 			result.Errors = append(result.Errors, dto.BulkAssignmentError{
 				SubjectID: subjectIDStr,
-				Error:     "subject already assigned to this teacher for this grade",
+				Error:     "subject already assigned to this teacher",
 			})
 			continue
 		}
@@ -195,7 +169,6 @@ func (s *TeacherSubjectAssignmentService) BulkAssignSubjects(req *dto.BulkAssign
 		// Create assignment
 		assignment := &models.TeacherSubjectAssignment{
 			ID:        uuid.New(),
-			GradeID:   gradeID,
 			SubjectID: subjectID,
 			TeacherID: teacherID,
 			Status:    status,
@@ -213,7 +186,7 @@ func (s *TeacherSubjectAssignmentService) BulkAssignSubjects(req *dto.BulkAssign
 		}
 
 		// Preload relationships
-		if err := s.db.Preload("Grade").Preload("Subject").Preload("Teacher").First(assignment, assignment.ID).Error; err != nil {
+		if err := s.db.Preload("Subject").Preload("Teacher").First(assignment, assignment.ID).Error; err != nil {
 			result.FailedCount++
 			result.Errors = append(result.Errors, dto.BulkAssignmentError{
 				SubjectID: subjectIDStr,
@@ -248,13 +221,6 @@ func (s *TeacherSubjectAssignmentService) GetAllAssignments(params *dto.TeacherS
 	// Build query
 	query := s.db.Model(&models.TeacherSubjectAssignment{}).Where("deleted_at IS NULL")
 
-	// Apply filters
-	if params.GradeID != "" {
-		gradeID, err := uuid.Parse(params.GradeID)
-		if err == nil {
-			query = query.Where("grade_id = ?", gradeID)
-		}
-	}
 
 	if params.SubjectID != "" {
 		subjectID, err := uuid.Parse(params.SubjectID)
@@ -293,7 +259,7 @@ func (s *TeacherSubjectAssignmentService) GetAllAssignments(params *dto.TeacherS
 
 	// Execute with preloads
 	var assignments []models.TeacherSubjectAssignment
-	if err := query.Preload("Grade").Preload("Subject").Preload("Teacher").Find(&assignments).Error; err != nil {
+	if err := query.Preload("Subject").Preload("Teacher").Find(&assignments).Error; err != nil {
 		return nil, fmt.Errorf("failed to fetch assignments: %w", err)
 	}
 
@@ -323,7 +289,6 @@ func (s *TeacherSubjectAssignmentService) GetAssignmentByID(id string) (*dto.Tea
 
 	var assignment models.TeacherSubjectAssignment
 	if err := s.db.Where("id = ? AND deleted_at IS NULL", assignmentID).
-		Preload("Grade").
 		Preload("Subject").
 		Preload("Teacher").
 		First(&assignment).Error; err != nil {
@@ -345,7 +310,6 @@ func (s *TeacherSubjectAssignmentService) GetAssignmentsByTeacher(teacherID stri
 
 	var assignments []models.TeacherSubjectAssignment
 	if err := s.db.Where("teacher_id = ? AND deleted_at IS NULL AND status = ?", tID, "active").
-		Preload("Grade").
 		Preload("Subject").
 		Preload("Teacher").
 		Order("created_at DESC").
@@ -361,30 +325,6 @@ func (s *TeacherSubjectAssignmentService) GetAssignmentsByTeacher(teacherID stri
 	return responses, nil
 }
 
-// GetAssignmentsByGrade retrieves all assignments for a specific grade
-func (s *TeacherSubjectAssignmentService) GetAssignmentsByGrade(gradeID string) ([]dto.TeacherSubjectAssignmentResponse, error) {
-	gID, err := uuid.Parse(gradeID)
-	if err != nil {
-		return nil, errors.New("invalid grade ID")
-	}
-
-	var assignments []models.TeacherSubjectAssignment
-	if err := s.db.Where("grade_id = ? AND deleted_at IS NULL", gID).
-		Preload("Grade").
-		Preload("Subject").
-		Preload("Teacher").
-		Order("created_at DESC").
-		Find(&assignments).Error; err != nil {
-		return nil, fmt.Errorf("failed to fetch assignments for grade: %w", err)
-	}
-
-	responses := make([]dto.TeacherSubjectAssignmentResponse, len(assignments))
-	for i, assignment := range assignments {
-		responses[i] = *s.toAssignmentResponse(&assignment)
-	}
-
-	return responses, nil
-}
 
 // UpdateAssignment updates an existing assignment
 func (s *TeacherSubjectAssignmentService) UpdateAssignment(id string, req *dto.UpdateTeacherSubjectAssignmentRequest) (*dto.TeacherSubjectAssignmentResponse, error) {
@@ -403,21 +343,6 @@ func (s *TeacherSubjectAssignmentService) UpdateAssignment(id string, req *dto.U
 	}
 
 	// Update fields
-	if req.GradeID != "" {
-		gradeID, err := uuid.Parse(req.GradeID)
-		if err != nil {
-			return nil, errors.New("invalid grade ID format")
-		}
-		// Verify grade exists
-		var grade models.ClassGrade
-		if err := s.db.Where("id = ? AND deleted_at IS NULL", gradeID).First(&grade).Error; err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return nil, errors.New("grade not found")
-			}
-			return nil, errors.New("failed to verify grade: " + err.Error())
-		}
-		assignment.GradeID = gradeID
-	}
 
 	if req.SubjectID != "" {
 		subjectID, err := uuid.Parse(req.SubjectID)
@@ -468,7 +393,7 @@ func (s *TeacherSubjectAssignmentService) UpdateAssignment(id string, req *dto.U
 	}
 
 	// Preload relationships
-	if err := s.db.Preload("Grade").Preload("Subject").Preload("Teacher").First(&assignment, assignment.ID).Error; err != nil {
+	if err := s.db.Preload("Subject").Preload("Teacher").First(&assignment, assignment.ID).Error; err != nil {
 		return nil, errors.New("failed to load assignment details: " + err.Error())
 	}
 
@@ -499,9 +424,7 @@ func (s *TeacherSubjectAssignmentService) DeleteAssignment(id string) error {
 
 // validateAssignmentRequest validates the assignment request
 func (s *TeacherSubjectAssignmentService) validateAssignmentRequest(req *dto.CreateTeacherSubjectAssignmentRequest) error {
-	if req.GradeID == "" {
-		return errors.New("grade ID is required")
-	}
+	
 	if req.SubjectID == "" {
 		return errors.New("subject ID is required")
 	}
@@ -518,7 +441,6 @@ func (s *TeacherSubjectAssignmentService) validateAssignmentRequest(req *dto.Cre
 func (s *TeacherSubjectAssignmentService) toAssignmentResponse(assignment *models.TeacherSubjectAssignment) *dto.TeacherSubjectAssignmentResponse {
 	response := &dto.TeacherSubjectAssignmentResponse{
 		ID:        assignment.ID.String(),
-		GradeID:   assignment.GradeID.String(),
 		SubjectID: assignment.SubjectID.String(),
 		TeacherID: assignment.TeacherID.String(),
 		Status:    assignment.Status,
@@ -526,20 +448,6 @@ func (s *TeacherSubjectAssignmentService) toAssignmentResponse(assignment *model
 		UpdatedAt: assignment.UpdatedAt,
 	}
 
-	// Add grade details if preloaded
-	if assignment.Grade.ID != uuid.Nil {
-		response.Grade = &dto.ClassGradeResponse{
-			ID:          assignment.Grade.ID.String(),
-			Name:        assignment.Grade.Name,
-			Code:        assignment.Grade.Code,
-			Level:       assignment.Grade.Level,
-			Description: assignment.Grade.Description,
-			Capacity:    assignment.Grade.Capacity,
-			Status:      assignment.Grade.Status,
-			CreatedAt:   assignment.Grade.CreatedAt,
-			UpdatedAt:   assignment.Grade.UpdatedAt,
-		}
-	}
 
 	// Add subject details if preloaded
 	if assignment.Subject.ID != uuid.Nil {

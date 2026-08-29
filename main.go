@@ -137,6 +137,8 @@ func main() {
 	routes.NotificationRoutes(&r.RouterGroup, config.DB)
 	routes.PushRoutes(&r.RouterGroup, config.DB)
 	routes.TeacherSubjectAssignmentRoutes(&r.RouterGroup, config.DB)
+	routes.SchemeOfWorkRoutes(&r.RouterGroup, config.DB)
+	routes.ArmClassTeacherRoutes(&r.RouterGroup, config.DB)
 
 	// Example curl command to clear DB (replace with your server address):
 	// curl -X DELETE "http://localhost:8080/admin/clear-db" \

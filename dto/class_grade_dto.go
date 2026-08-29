@@ -11,9 +11,6 @@ type CreateClassGradeRequest struct {
 	Code              string `json:"code" binding:"required,min=2,max=50"`
 	Level             int    `json:"level" binding:"required,min=1,max=12"`
 	Description       string `json:"description"`
-	AcademicSessionID string `json:"academic_session_id" binding:"required"`
-	ClassTeacherID 	  string `json:"class_teacher_id" binding:"required"`
-	Capacity          int    `json:"capacity" binding:"min=1,max=100"`
 	Status            string `json:"status" binding:"omitempty,oneof=active inactive archived"`
 }
 
@@ -23,9 +20,6 @@ type UpdateClassGradeRequest struct {
 	Code              string `json:"code" binding:"omitempty,min=2,max=50"`
 	Level             int    `json:"level" binding:"omitempty,min=1,max=12"`
 	Description       string `json:"description"`
-	AcademicSessionID string `json:"academic_session_id"`
-	ClassTeacherID    string `json:"class_teacher_id"`
-	Capacity          int    `json:"capacity" binding:"omitempty,min=1,max=100"`
 	Status            string `json:"status" binding:"omitempty,oneof=active inactive archived"`
 }
 
@@ -36,9 +30,6 @@ type ClassGradeResponse struct {
 	Code              string                  `json:"code"`
 	Level             int                     `json:"level"`
 	Description       string                  `json:"description"`
-	AcademicSessionID string                  `json:"academic_session_id"`
-	ClassTeacherID    string 				  `json:"class_teacher_id"`
-	Capacity          int                     `json:"capacity"`
 	Status            string                  `json:"status"`
 	CreatedAt         time.Time               `json:"created_at"`
 	UpdatedAt         time.Time               `json:"updated_at"`
@@ -58,8 +49,6 @@ type ClassGradeListResponse struct {
 type ClassGradeQueryParams struct {
 	Search            string `form:"search"`
 	Level             int    `form:"level"`
-	AcademicSessionID string `form:"academic_session_id"`
-	ClassTeacherID    string `json:"class_teacher_id"`
 	Status            string `form:"status"`
 	Page              int    `form:"page" binding:"min=1"`
 	Limit             int    `form:"limit" binding:"min=1,max=100"`

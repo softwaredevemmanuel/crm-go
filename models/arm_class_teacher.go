@@ -1,4 +1,4 @@
-// models/teacher_subject_assignment.go
+// models/arm_class_teacher.go
 package models
 
 import (
@@ -8,9 +8,9 @@ import (
 	"gorm.io/gorm"
 )
 
-type TeacherSubjectAssignment struct {
+type ArmClassTeacher struct {
 	ID        uuid.UUID      `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
-	SubjectID uuid.UUID      `gorm:"type:uuid;not null;index" json:"subject_id"`
+	ArmID     uuid.UUID      `gorm:"type:uuid;not null;index" json:"arm_id"`
 	TeacherID uuid.UUID      `gorm:"type:uuid;not null;index" json:"teacher_id"`
 	Status    string         `gorm:"type:varchar(20);default:'active'" json:"status"` // active, inactive
 	CreatedAt time.Time      `gorm:"autoCreateTime" json:"created_at"`
@@ -18,10 +18,10 @@ type TeacherSubjectAssignment struct {
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 
 	// Relationships
-	Subject Subject    `gorm:"foreignKey:SubjectID" json:"subject,omitempty"`
-	Teacher User       `gorm:"foreignKey:TeacherID" json:"teacher,omitempty"`
+	Arm     Arm       `gorm:"foreignKey:ArmID" json:"arm,omitempty"`
+	Teacher User      `gorm:"foreignKey:TeacherID" json:"teacher,omitempty"`
 }
 
-func (TeacherSubjectAssignment) TableName() string {
-	return "teacher_subject_assignments"
+func (ArmClassTeacher) TableName() string {
+	return "arm_class_teachers"
 }

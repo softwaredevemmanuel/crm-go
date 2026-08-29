@@ -449,8 +449,6 @@ func (s *GradeSubjectService) toGradeSubjectResponse(gs *models.GradeSubject) *d
 			Code:        gs.Grade.Code,
 			Level:       gs.Grade.Level,
 			Description: gs.Grade.Description,
-			AcademicSessionID: gs.Grade.AcademicSessionID.String(),
-			Capacity:    gs.Grade.Capacity,
 			Status:      gs.Grade.Status,
 			CreatedAt:   gs.Grade.CreatedAt,
 			UpdatedAt:   gs.Grade.UpdatedAt,

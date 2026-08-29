@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 	"strings"
 
@@ -54,7 +55,10 @@ func (h *ArmHandler) CreateArm(c *gin.Context) {
 	}
 
 	var req dto.CreateArmRequest
+	log.Printf("failed to bind JSON: %v", err)
+
 	if err := c.ShouldBindJSON(&req); err != nil {
+
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   "Invalid request body",
 			"details": err.Error(),

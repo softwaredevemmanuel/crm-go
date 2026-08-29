@@ -7,7 +7,6 @@ import (
 
 // CreateTeacherSubjectAssignmentRequest represents the request to assign a subject to a teacher
 type CreateTeacherSubjectAssignmentRequest struct {
-	GradeID   string `json:"grade_id" binding:"required"`
 	SubjectID string `json:"subject_id" binding:"required"`
 	TeacherID string `json:"teacher_id" binding:"required"`
 	Status    string `json:"status"` // active, inactive (default: active)
@@ -15,7 +14,6 @@ type CreateTeacherSubjectAssignmentRequest struct {
 
 // UpdateTeacherSubjectAssignmentRequest represents the request to update a subject assignment
 type UpdateTeacherSubjectAssignmentRequest struct {
-	GradeID   string `json:"grade_id"`
 	SubjectID string `json:"subject_id"`
 	TeacherID string `json:"teacher_id"`
 	Status    string `json:"status"`
@@ -24,7 +22,6 @@ type UpdateTeacherSubjectAssignmentRequest struct {
 // BulkAssignSubjectsRequest represents the request to assign multiple subjects to a teacher
 type BulkAssignSubjectsRequest struct {
 	TeacherID string   `json:"teacher_id" binding:"required"`
-	GradeID   string   `json:"grade_id" binding:"required"`
 	SubjectIDs []string `json:"subject_ids" binding:"required,min=1"`
 	Status    string   `json:"status"`
 }
@@ -32,7 +29,6 @@ type BulkAssignSubjectsRequest struct {
 // TeacherSubjectAssignmentResponse represents the response for a subject assignment
 type TeacherSubjectAssignmentResponse struct {
 	ID        string    `json:"id"`
-	GradeID   string    `json:"grade_id"`
 	SubjectID string    `json:"subject_id"`
 	TeacherID string    `json:"teacher_id"`
 	Status    string    `json:"status"`
@@ -40,7 +36,6 @@ type TeacherSubjectAssignmentResponse struct {
 	UpdatedAt time.Time `json:"updated_at"`
 
 	// Nested relationships
-	Grade   *ClassGradeResponse `json:"grade,omitempty"`
 	Subject *SubjectResponse    `json:"subject,omitempty"`
 	Teacher *UserResponse       `json:"teacher,omitempty"`
 }
@@ -57,7 +52,6 @@ type TeacherSubjectAssignmentListResponse struct {
 
 // TeacherSubjectAssignmentQueryParams represents query parameters for filtering assignments
 type TeacherSubjectAssignmentQueryParams struct {
-	GradeID   string `form:"grade_id"`
 	SubjectID string `form:"subject_id"`
 	TeacherID string `form:"teacher_id"`
 	Status    string `form:"status"`

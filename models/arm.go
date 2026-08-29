@@ -15,7 +15,6 @@ type Arm struct {
 	GradeID     uuid.UUID      `gorm:"type:uuid;not null;index" json:"grade_id"`
 	Status      string         `gorm:"type:varchar(20);default:'active';check:status IN ('active', 'inactive', 'archived')" json:"status"`
 	Capacity    int            `gorm:"default:30" json:"capacity"`
-	CreatedBy   uuid.UUID      `gorm:"type:uuid;not null" json:"created_by"`
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`

@@ -96,7 +96,6 @@ func (s *ArmService) CreateArm(req *dto.CreateArmRequest, userID uuid.UUID) (*dt
 		GradeID:     gradeID,
 		Status:      status,
 		Capacity:    capacity,
-		CreatedBy:   userID,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}
@@ -431,7 +430,6 @@ func (s *ArmService) toArmResponse(arm *models.Arm) *dto.ArmResponse {
 		GradeID:     arm.GradeID.String(),
 		Status:      arm.Status,
 		Capacity:    arm.Capacity,
-		CreatedBy:   arm.CreatedBy.String(),
 		CreatedAt:   arm.CreatedAt,
 		UpdatedAt:   arm.UpdatedAt,
 	}
@@ -444,8 +442,6 @@ func (s *ArmService) toArmResponse(arm *models.Arm) *dto.ArmResponse {
 			Code:         arm.Grade.Code,
 			Level:        arm.Grade.Level,
 			Description:  arm.Grade.Description,
-			AcademicSessionID: string(arm.Grade.AcademicSessionID.String()),
-			Capacity:     arm.Grade.Capacity,
 			Status:       arm.Grade.Status,
 			CreatedAt:    arm.Grade.CreatedAt,
 			UpdatedAt:    arm.Grade.UpdatedAt,

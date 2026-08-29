@@ -29,6 +29,7 @@ func NewUserHandler(userService *services.UserService) *UserHandler {
 // @Produce json
 // @Param search query string false "Search by name, email, or phone"
 // @Param role query string false "Filter by role (admin, staff, student, parent, user)"
+// @Param position query string false "Filter by position (admin, staff, student, parent, user, teacher)"
 // @Param status query string false "Filter by status (active, inactive)"
 // @Param is_active query bool false "Filter by active status"
 // @Param is_verified query bool false "Filter by verification status"

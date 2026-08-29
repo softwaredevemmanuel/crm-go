@@ -8,7 +8,7 @@ import (
 type CreateArmRequest struct {
 	Name        string `json:"name" binding:"required,min=2,max=255"`
 	Description string `json:"description"`
-	Code        string `json:"code" binding:"omitempty,min=1,max=3"`
+	Code        string `json:"code" binding:"omitempty,min=1,max=5"`
 	GradeID     string `json:"grade_id" binding:"required"`
 	Status      string `json:"status" binding:"omitempty,oneof=active inactive archived"`
 	Capacity    int    `json:"capacity" binding:"min=1,max=100"`
@@ -18,7 +18,7 @@ type CreateArmRequest struct {
 type UpdateArmRequest struct {
 	Name        string `json:"name" binding:"omitempty,min=2,max=255"`
 	Description string `json:"description"`
-	Code        string `json:"code" binding:"omitempty,min=1,max=3"`
+	Code        string `json:"code" binding:"omitempty,min=1,max=5"`
 	GradeID     string `json:"grade_id"`
 	Status      string `json:"status" binding:"omitempty,oneof=active inactive archived"`
 	Capacity    int    `json:"capacity" binding:"min=1,max=100"`
@@ -34,7 +34,6 @@ type ArmResponse struct {
 	Grade       *ClassGradeResponse `json:"grade,omitempty"`
 	Status      string    `json:"status"`
 	Capacity    int       `json:"capacity"`
-	CreatedBy   string    `json:"created_by"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
