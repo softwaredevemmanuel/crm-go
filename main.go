@@ -11,7 +11,6 @@ import (
 	"log"
 	"os"
 	"time"
-
 	_ "crm-go/docs"
 
 	"github.com/gin-gonic/gin"
@@ -114,16 +113,8 @@ func main() {
 	routes.CourseProductRoutes(r)
 	routes.CourseCategoryRoutes(r)
 	routes.ProductRoutes(r)
-	routes.EnrollmentRoutes(r)
 	routes.AnnouncementRoutes(r)
-	routes.AssignmentSubmissionRoutes(r, config.DB)
-	routes.LessonRoutes(r, config.DB)
-	routes.GradeRoutes(r, config.DB)
-	routes.ModuleRoutes(r)
-	routes.TopicRoutes(r)
 	routes.CourseMaterialRoutes(r)
-	routes.LiveClassRoutes(r, config.DB)
-	routes.ObjectiveQuestionRoutes(r, config.DB)
 	routes.SubjectRoutes(&r.RouterGroup, config.DB)
 	routes.ClassGradeRoutes(r, config.DB)
 	routes.DepartmentRoutes(&r.RouterGroup, config.DB)
@@ -137,8 +128,8 @@ func main() {
 	routes.NotificationRoutes(&r.RouterGroup, config.DB)
 	routes.PushRoutes(&r.RouterGroup, config.DB)
 	routes.TeacherSubjectAssignmentRoutes(&r.RouterGroup, config.DB)
-	routes.SchemeOfWorkRoutes(&r.RouterGroup, config.DB)
 	routes.ArmClassTeacherRoutes(&r.RouterGroup, config.DB)
+	routes.TermRoutes(&r.RouterGroup, config.DB)
 
 	// Example curl command to clear DB (replace with your server address):
 	// curl -X DELETE "http://localhost:8080/admin/clear-db" \
@@ -197,15 +188,13 @@ func main() {
 		seeds.SeedCourseProductsTable()
 		seeds.SeedProducts()
 		seeds.SeedAnnouncements()
-		seeds.SeedModules()
-		seeds.SeedLessons()
-		seeds.SeedTopics()
 		seeds.SeedCourseMaterials()
 		seeds.SeedObjectiveQuestions()
 		seeds.SeedAcademicSessions()
 		seeds.SeedClassGrades()
 		seeds.SeedDepartments()
 		seeds.SeedSubjects()
+		seeds.SeedTerm()
 		return
 	}
 

@@ -39,18 +39,15 @@ func MigrateDatabase() {
 	db.AutoMigrate(&models.CourseProductTable{})
 	db.AutoMigrate(&models.CourseCategoryTable{})
 	db.AutoMigrate(&models.UserSession{})
-	db.AutoMigrate(&models.Enrollment{})
 	db.AutoMigrate(&models.ActivityLog{})
 	db.AutoMigrate(&models.Announcement{})
 	db.AutoMigrate(&models.Assignment{})
 	db.AutoMigrate(&models.AssignmentSubmission{})
 	db.AutoMigrate(&models.Module{})
-	db.AutoMigrate(&models.Topics{})
 	db.AutoMigrate(&models.CourseMaterial{})
 	db.AutoMigrate(&models.DeletedRecord{})
 	db.AutoMigrate(&models.Lesson{})
 	db.AutoMigrate(&models.Grade{})
-	db.AutoMigrate(&models.LiveClass{})
 	db.AutoMigrate(&models.ObjectiveQuestion{})
 	db.AutoMigrate(&models.QuestionOption{})
 	db.AutoMigrate(&models.Subject{})
@@ -67,6 +64,7 @@ func MigrateDatabase() {
 	db.AutoMigrate(&models.TeacherSubjectAssignment{})
 	db.AutoMigrate(&models.SchemeOfWork{})
 	db.AutoMigrate(&models.ArmClassTeacher{})
+	db.AutoMigrate(&models.Term{})
 	
 
 

@@ -108,7 +108,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get a paginated list of academic sessions with optional filtering",
+                "description": "Get a paginated list of all academic sessions",
                 "consumes": [
                     "application/json"
                 ],
@@ -122,12 +122,6 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Search by year, code, or description",
-                        "name": "search",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
                         "description": "Filter by status",
                         "name": "status",
                         "in": "query"
@@ -136,6 +130,12 @@
                         "type": "boolean",
                         "description": "Filter by current status",
                         "name": "is_current",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search by academic year, code, or description",
+                        "name": "search",
                         "in": "query"
                     },
                     {
@@ -189,7 +189,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Create a new academic session with the provided details",
+                "description": "Create a new academic session",
                 "consumes": [
                     "application/json"
                 ],
@@ -199,10 +199,10 @@
                 "tags": [
                     "Academic Sessions"
                 ],
-                "summary": "Create a new academic session",
+                "summary": "Create an academic session",
                 "parameters": [
                     {
-                        "description": "Academic session creation request",
+                        "description": "Session request",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -250,6 +250,42 @@
                 }
             }
         },
+        "/api/academic-sessions/active": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all active academic sessions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Academic Sessions"
+                ],
+                "summary": "Get active academic sessions",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/academic-sessions/current": {
             "get": {
                 "security": [
@@ -257,7 +293,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get the currently active academic session",
+                "description": "Get the current academic session",
                 "consumes": [
                     "application/json"
                 ],
@@ -276,15 +312,44 @@
                             "additionalProperties": true
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
-                    "404": {
-                        "description": "Not Found",
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/academic-sessions/stats": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get statistics for academic sessions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Academic Sessions"
+                ],
+                "summary": "Get academic session statistics",
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -321,7 +386,7 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Academic Session ID",
+                        "description": "Session ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -364,7 +429,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Update an existing academic session by ID",
+                "description": "Update an existing academic session",
                 "consumes": [
                     "application/json"
                 ],
@@ -378,13 +443,13 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Academic Session ID",
+                        "description": "Session ID",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Academic session update request",
+                        "description": "Update request",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -444,7 +509,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Soft delete an academic session by ID",
+                "description": "Soft delete an academic session",
                 "consumes": [
                     "application/json"
                 ],
@@ -458,7 +523,7 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Academic Session ID",
+                        "description": "Session ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -488,13 +553,6 @@
                     },
                     "404": {
                         "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "409": {
-                        "description": "Conflict",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -2206,63 +2264,6 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/assignment_submissions": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Create a new assignment submission",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Assignment Submissions"
-                ],
-                "summary": "Create a new assignment submission",
-                "parameters": [
-                    {
-                        "description": "Create Assignment Submission Request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/assignmentsubmission.CreateAssignmentSubmissionRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     }
                 }
@@ -4554,115 +4555,6 @@
                 }
             }
         },
-        "/api/grades": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Create a grade for a student",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "grades"
-                ],
-                "summary": "Create a new grade",
-                "parameters": [
-                    {
-                        "description": "Grade data",
-                        "name": "grade",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.GradeInput"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/models.GradeResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/grades/{id}": {
-            "put": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Update an existing grade",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "grades"
-                ],
-                "summary": "Update a grade",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Grade ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Grade update data",
-                        "name": "grade",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.GradeUpdateInput"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.GradeResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/api/guardians": {
             "get": {
                 "security": [
@@ -5087,419 +4979,6 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/lessons": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Create a new lesson",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "lessons"
-                ],
-                "summary": "Create a new lesson",
-                "parameters": [
-                    {
-                        "description": "Lesson",
-                        "name": "lesson",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.LessonInput"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Lesson created successfully",
-                        "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/lessons/{id}": {
-            "put": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Update a lesson by ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "lessons"
-                ],
-                "summary": "Update a lesson",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Lesson ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Lesson",
-                        "name": "lesson",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.LessonInput"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Lesson updated successfully",
-                        "schema": {
-                            "$ref": "#/definitions/models.LessonResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/live-classes": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Create a scheduled live class with meeting setup",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "live-classes"
-                ],
-                "summary": "Create a new live class",
-                "parameters": [
-                    {
-                        "description": "Live class data",
-                        "name": "live_class",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.LiveClassInput"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/models.LiveClassResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/live-classes/{id}": {
-            "put": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Update live class details. Some fields can only be updated before class starts.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "live-classes"
-                ],
-                "summary": "Update a live class",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Live Class ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Update data",
-                        "name": "update",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.LiveClassUpdateInput"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.LiveClassResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/live-classes/{id}/cancel": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Cancel a live class that hasn't started yet",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "live-classes"
-                ],
-                "summary": "Cancel a live class",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Live Class ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "Include course details",
-                        "name": "with_details",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.LiveClassResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/modules": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Create a new module",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Modules"
-                ],
-                "summary": "Create a new modules",
-                "parameters": [
-                    {
-                        "description": "Module",
-                        "name": "module",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.ModuleInput"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "409": {
-                        "description": "Conflict",
-                        "schema": {
-                            "$ref": "#/definitions/models.ConflictResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.FailureResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/modules/{id}": {
-            "put": {
-                "description": "Update an existing module",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Modules"
-                ],
-                "summary": "Update an existing module",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Module ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Module",
-                        "name": "module",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.ModuleInput"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/models.NotFoundResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.FailureResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete an existing module",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Modules"
-                ],
-                "summary": "Delete an existing module",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Module ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.DeleteSuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/models.NotFoundResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.FailureResponse"
                         }
                     }
                 }
@@ -6477,891 +5956,6 @@
                     },
                     "400": {
                         "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/questions/objective": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Create objective question with options",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "questions"
-                ],
-                "summary": "Create a new objective question",
-                "parameters": [
-                    {
-                        "description": "Question data",
-                        "name": "question",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.ObjectiveQuestionInput"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/models.ObjectiveQuestionResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/questions/objective/bulk": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Create multiple questions in bulk",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "questions"
-                ],
-                "summary": "Create multiple questions",
-                "parameters": [
-                    {
-                        "description": "Array of question data",
-                        "name": "questions",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.ObjectiveQuestionInput"
-                            }
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.ObjectiveQuestionResponse"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/schemes": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get a paginated list of schemes of work with optional filtering",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Scheme of Work"
-                ],
-                "summary": "Get all schemes of work",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Filter by subject ID",
-                        "name": "subject_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by grade",
-                        "name": "grade",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by term",
-                        "name": "term",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by status",
-                        "name": "status",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Filter by week",
-                        "name": "week",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Search by topic or objectives",
-                        "name": "search",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 20,
-                        "description": "Items per page",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.SchemeOfWorkListResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Create a new scheme of work for a subject and grade",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Scheme of Work"
-                ],
-                "summary": "Create a scheme of work",
-                "parameters": [
-                    {
-                        "description": "Scheme request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.CreateSchemeOfWorkRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "409": {
-                        "description": "Conflict",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/schemes/bulk": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Create multiple schemes of work for a subject and grade",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Scheme of Work"
-                ],
-                "summary": "Bulk create schemes of work",
-                "parameters": [
-                    {
-                        "description": "Bulk scheme request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.BulkCreateSchemeOfWorkRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/schemes/grade/{grade}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all schemes of work for a specific grade",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Scheme of Work"
-                ],
-                "summary": "Get schemes by grade",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Grade (e.g., JSS1, SS2, JSS2)",
-                        "name": "grade",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/schemes/grade/{grade}/term/{term}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all schemes of work for a specific grade and term",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Scheme of Work"
-                ],
-                "summary": "Get schemes by grade and term",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Grade (e.g., JSS1, SS2)",
-                        "name": "grade",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Term (first, second, third)",
-                        "name": "term",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/schemes/overview/{subject_id}/{grade}/{term}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get an overview of schemes for a subject, grade, and term",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Scheme of Work"
-                ],
-                "summary": "Get scheme overview",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Subject ID",
-                        "name": "subject_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Grade",
-                        "name": "grade",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Term",
-                        "name": "term",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/schemes/stats": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get statistics for schemes of work",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Scheme of Work"
-                ],
-                "summary": "Get scheme statistics",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Filter by subject ID",
-                        "name": "subject_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by grade",
-                        "name": "grade",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by term",
-                        "name": "term",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/schemes/subject/{subject_id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all schemes of work for a specific subject",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Scheme of Work"
-                ],
-                "summary": "Get schemes by subject",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Subject ID",
-                        "name": "subject_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/schemes/teacher/{teacher_id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all schemes of work for subjects taught by a specific teacher",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Scheme of Work"
-                ],
-                "summary": "Get schemes by teacher",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Teacher ID",
-                        "name": "teacher_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/schemes/{id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get a single scheme of work by its ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Scheme of Work"
-                ],
-                "summary": "Get scheme by ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Scheme ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Update an existing scheme of work",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Scheme of Work"
-                ],
-                "summary": "Update a scheme",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Scheme ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Update request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.UpdateSchemeOfWorkRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Soft delete a scheme of work",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Scheme of Work"
-                ],
-                "summary": "Delete a scheme",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Scheme ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -8747,14 +7341,14 @@
                 }
             }
         },
-        "/api/topics": {
-            "post": {
+        "/api/terms": {
+            "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Create a new topic under a module",
+                "description": "Get a paginated list of all terms",
                 "consumes": [
                     "application/json"
                 ],
@@ -8762,17 +7356,110 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Topics"
+                    "Terms"
                 ],
-                "summary": "Create a topic",
+                "summary": "Get all terms",
                 "parameters": [
                     {
-                        "description": "Topic payload",
-                        "name": "topic",
+                        "type": "string",
+                        "description": "Filter by academic session ID",
+                        "name": "academic_session_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter by current status",
+                        "name": "is_current",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filter by term number",
+                        "name": "term_number",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search by name, code, or description",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.TermListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new term for an academic session",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Terms"
+                ],
+                "summary": "Create a term",
+                "parameters": [
+                    {
+                        "description": "Term request",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.TopicInput"
+                            "$ref": "#/definitions/dto.CreateTermRequest"
                         }
                     }
                 ],
@@ -8780,38 +7467,56 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/models.ConflictResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.FailureResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
             }
         },
-        "/api/topics/{id}": {
-            "put": {
+        "/api/terms/bulk": {
+            "post": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Update topic details",
+                "description": "Create multiple terms for an academic session",
                 "consumes": [
                     "application/json"
                 ],
@@ -8819,24 +7524,311 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Topics"
+                    "Terms"
                 ],
-                "summary": "Update topic",
+                "summary": "Bulk create terms",
+                "parameters": [
+                    {
+                        "description": "Bulk term request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.BulkCreateTermsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/terms/session/{session_id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all terms for a specific academic session",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Terms"
+                ],
+                "summary": "Get terms by academic session",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Topic ID",
+                        "description": "Academic Session ID",
+                        "name": "session_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/terms/session/{session_id}/current": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get the current term for an academic session",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Terms"
+                ],
+                "summary": "Get current term",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Academic Session ID",
+                        "name": "session_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/terms/stats": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get statistics for terms",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Terms"
+                ],
+                "summary": "Get term statistics",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filter by academic session ID",
+                        "name": "academic_session_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/terms/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get a single term by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Terms"
+                ],
+                "summary": "Get term by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Term ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update an existing term",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Terms"
+                ],
+                "summary": "Update a term",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Term ID",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Topic payload",
-                        "name": "topic",
+                        "description": "Update request",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.TopicInput"
+                            "$ref": "#/definitions/dto.UpdateTermRequest"
                         }
                     }
                 ],
@@ -8844,25 +7836,36 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.TopicResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/models.NotFoundResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.FailureResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -8873,18 +7876,21 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Delete topic by ID",
+                "description": "Soft delete a term",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Topics"
+                    "Terms"
                 ],
-                "summary": "Delete topic",
+                "summary": "Delete a term",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Topic ID",
+                        "description": "Term ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -8894,25 +7900,36 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/models.NotFoundResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.FailureResponse"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -10091,579 +9108,6 @@
                 }
             }
         },
-        "/enrollments": {
-            "get": {
-                "description": "Get all enrollments",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Enrollments"
-                ],
-                "summary": "List enrollments",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/enrollments.EnrollmentResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Create a new enrollment with the provided details",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Enrollments"
-                ],
-                "summary": "Create a new enrollment",
-                "parameters": [
-                    {
-                        "description": "Course details",
-                        "name": "enrollment",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/enrollments.CreateEnrollmentInput"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/enrollments.EnrollmentResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/enrollments/{id}": {
-            "get": {
-                "description": "Get an enrollment by its ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Enrollments"
-                ],
-                "summary": "Get enrollment by ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Enrollment ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/enrollments.EnrollmentResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/grades": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get grades with filtering, sorting, and pagination",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "grades"
-                ],
-                "summary": "Get all grades",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Filter by student ID",
-                        "name": "student_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by course ID",
-                        "name": "course_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by assignment ID",
-                        "name": "assignment_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by tutor ID",
-                        "name": "tutor_id",
-                        "in": "query"
-                    },
-                    {
-                        "maximum": 100,
-                        "minimum": 0,
-                        "type": "number",
-                        "description": "Minimum score",
-                        "name": "min_score",
-                        "in": "query"
-                    },
-                    {
-                        "maximum": 100,
-                        "minimum": 0,
-                        "type": "number",
-                        "description": "Maximum score",
-                        "name": "max_score",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by grade letter (A, B, C, D, F)",
-                        "name": "grade",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Start date (YYYY-MM-DD)",
-                        "name": "start_date",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "End date (YYYY-MM-DD)",
-                        "name": "end_date",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Search in remarks",
-                        "name": "search",
-                        "in": "query"
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "Include student/course details",
-                        "name": "with_details",
-                        "in": "query"
-                    },
-                    {
-                        "minimum": 1,
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "maximum": 100,
-                        "minimum": 1,
-                        "type": "integer",
-                        "default": 20,
-                        "description": "Items per page",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "enum": [
-                            "created_at",
-                            "updated_at",
-                            "score",
-                            "student",
-                            "course"
-                        ],
-                        "type": "string",
-                        "description": "Sort field",
-                        "name": "sort_by",
-                        "in": "query"
-                    },
-                    {
-                        "enum": [
-                            "asc",
-                            "desc",
-                            "ASC",
-                            "DESC"
-                        ],
-                        "type": "string",
-                        "description": "Sort order",
-                        "name": "sort_order",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.PaginatedGradesResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/grades/courses/{course_id}/grades": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all grades for a course",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "grades"
-                ],
-                "summary": "Get grades for a specific course",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Course ID",
-                        "name": "course_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "Include student details",
-                        "name": "with_details",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.GradeResponse"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/grades/stats": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get statistics for filtered grades",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "grades"
-                ],
-                "summary": "Get grade statistics",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Filter by student ID",
-                        "name": "student_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by course ID",
-                        "name": "course_id",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.GradeStats"
-                        }
-                    }
-                }
-            }
-        },
-        "/grades/student/{student_id}/grades": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all grades for a student",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "grades"
-                ],
-                "summary": "Get grades for a specific student",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Student ID",
-                        "name": "student_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "Include course details",
-                        "name": "with_details",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.GradeResponse"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/lessons": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all lessons with optional filtering",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "lessons"
-                ],
-                "summary": "Get all lessons",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Course ID",
-                        "name": "course_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Module ID",
-                        "name": "module_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Search term",
-                        "name": "search",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Sort field (title, order, created_at, updated_at)",
-                        "name": "sort_by",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Sort order (asc, desc)",
-                        "name": "sort_order",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 10,
-                        "description": "Items per page",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.PaginatedLessonsResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/modules": {
-            "get": {
-                "description": "Get all modules",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Modules"
-                ],
-                "summary": "Get all modules",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.FailureResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/modules/{id}": {
-            "get": {
-                "description": "Get a single module by ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Modules"
-                ],
-                "summary": "Get a single module by ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Module ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/models.NotFoundResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.FailureResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/products": {
             "get": {
                 "description": "Retrieve a list of all products",
@@ -10792,90 +9236,6 @@
                     }
                 }
             }
-        },
-        "/topics": {
-            "get": {
-                "description": "Get all topics, optionally filtered by course or module",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Topics"
-                ],
-                "summary": "Get topics",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Course ID",
-                        "name": "course_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Module ID",
-                        "name": "module_id",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.TopicResponse"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/topics/{id}": {
-            "get": {
-                "description": "Get topic with module and course details",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Topics"
-                ],
-                "summary": "Get topic details",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Topic ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.TopicResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/models.NotFoundResponse"
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
@@ -10951,60 +9311,6 @@
                 "error": {
                     "type": "string",
                     "example": "Announcement not found"
-                }
-            }
-        },
-        "assignmentsubmission.CreateAssignmentSubmissionRequest": {
-            "type": "object",
-            "required": [
-                "assignment_id",
-                "student_id",
-                "submission_type"
-            ],
-            "properties": {
-                "assignment_id": {
-                    "type": "string"
-                },
-                "code_repo_url": {
-                    "type": "string"
-                },
-                "external_url": {
-                    "type": "string"
-                },
-                "file_url": {
-                    "type": "string"
-                },
-                "metadata": {
-                    "description": "Raw JSON",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "status": {
-                    "description": "Defaults to \"submitted\"",
-                    "type": "string"
-                },
-                "student_id": {
-                    "type": "string"
-                },
-                "submission_type": {
-                    "type": "string",
-                    "enum": [
-                        "text",
-                        "file",
-                        "url",
-                        "code",
-                        "video",
-                        "audio",
-                        "image",
-                        "document",
-                        "presentation",
-                        "multiple"
-                    ]
-                },
-                "text_content": {
-                    "type": "string"
                 }
             }
         },
@@ -11249,8 +9555,13 @@
                 "created_by": {
                     "type": "string"
                 },
-                "days_remaining": {
-                    "type": "integer"
+                "creator": {
+                    "description": "Nested relationships",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/dto.UserResponse"
+                        }
+                    ]
                 },
                 "description": {
                     "type": "string"
@@ -11261,9 +9572,6 @@
                 "id": {
                     "type": "string"
                 },
-                "is_active": {
-                    "type": "boolean"
-                },
                 "is_current": {
                     "type": "boolean"
                 },
@@ -11273,8 +9581,11 @@
                 "status": {
                     "type": "string"
                 },
-                "term": {
-                    "type": "string"
+                "terms": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.TermResponse"
+                    }
                 },
                 "updated_at": {
                     "type": "string"
@@ -11445,17 +9756,28 @@
                 "capacity": {
                     "type": "integer"
                 },
+                "class_teacher": {
+                    "$ref": "#/definitions/dto.UserResponse"
+                },
                 "code": {
                     "type": "string"
                 },
                 "created_at": {
                     "type": "string"
                 },
+                "created_by": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
                 "grade": {
-                    "$ref": "#/definitions/dto.ClassGradeResponse"
+                    "description": "Nested relationships",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/dto.ClassGradeResponse"
+                        }
+                    ]
                 },
                 "grade_id": {
                     "type": "string"
@@ -11612,70 +9934,6 @@
                 }
             }
         },
-        "dto.BulkCreateSchemeOfWorkRequest": {
-            "type": "object",
-            "required": [
-                "grade",
-                "schemes",
-                "subject_id",
-                "term"
-            ],
-            "properties": {
-                "grade": {
-                    "type": "string"
-                },
-                "schemes": {
-                    "type": "array",
-                    "minItems": 1,
-                    "items": {
-                        "type": "object",
-                        "required": [
-                            "objectives",
-                            "topic",
-                            "week"
-                        ],
-                        "properties": {
-                            "activities": {
-                                "type": "string"
-                            },
-                            "assessment": {
-                                "type": "string"
-                            },
-                            "objectives": {
-                                "type": "string"
-                            },
-                            "subtopics": {
-                                "type": "string"
-                            },
-                            "teaching_resources": {
-                                "type": "string"
-                            },
-                            "topic": {
-                                "type": "string"
-                            },
-                            "week": {
-                                "type": "integer"
-                            }
-                        }
-                    }
-                },
-                "status": {
-                    "description": "draft, published, archived",
-                    "type": "string"
-                },
-                "subject_id": {
-                    "type": "string"
-                },
-                "term": {
-                    "type": "string",
-                    "enum": [
-                        "first",
-                        "second",
-                        "third"
-                    ]
-                }
-            }
-        },
         "dto.BulkCreateStudentEnrollmentsRequest": {
             "type": "object",
             "required": [
@@ -11703,6 +9961,57 @@
                     "minItems": 1,
                     "items": {
                         "type": "string"
+                    }
+                }
+            }
+        },
+        "dto.BulkCreateTermsRequest": {
+            "type": "object",
+            "required": [
+                "academic_session_id",
+                "terms"
+            ],
+            "properties": {
+                "academic_session_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "terms": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "name",
+                            "term_number"
+                        ],
+                        "properties": {
+                            "code": {
+                                "type": "string"
+                            },
+                            "description": {
+                                "type": "string"
+                            },
+                            "end_date": {
+                                "type": "string"
+                            },
+                            "is_current": {
+                                "type": "boolean"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "start_date": {
+                                "type": "string"
+                            },
+                            "term_number": {
+                                "type": "integer",
+                                "maximum": 3,
+                                "minimum": 1
+                            }
+                        }
                     }
                 }
             }
@@ -11768,46 +10077,30 @@
                 "academic_year",
                 "code",
                 "end_date",
-                "start_date",
-                "term"
+                "start_date"
             ],
             "properties": {
                 "academic_year": {
-                    "type": "string",
-                    "maxLength": 20,
-                    "minLength": 2
+                    "type": "string"
                 },
                 "code": {
-                    "type": "string",
-                    "maxLength": 20,
-                    "minLength": 2
+                    "type": "string"
                 },
                 "description": {
                     "type": "string"
                 },
                 "end_date": {
-                    "description": "Format: \"2006-01-02\"",
                     "type": "string"
                 },
                 "is_current": {
                     "type": "boolean"
                 },
                 "start_date": {
-                    "description": "Format: \"2006-01-02\"",
                     "type": "string"
                 },
                 "status": {
-                    "type": "string",
-                    "enum": [
-                        "active",
-                        "inactive",
-                        "completed"
-                    ]
-                },
-                "term": {
-                    "type": "string",
-                    "maxLength": 20,
-                    "minLength": 2
+                    "description": "active, inactive, completed",
+                    "type": "string"
                 }
             }
         },
@@ -12125,60 +10418,6 @@
                 }
             }
         },
-        "dto.CreateSchemeOfWorkRequest": {
-            "type": "object",
-            "required": [
-                "grade",
-                "objectives",
-                "subject_id",
-                "term",
-                "topic",
-                "week"
-            ],
-            "properties": {
-                "activities": {
-                    "type": "string"
-                },
-                "assessment": {
-                    "type": "string"
-                },
-                "grade": {
-                    "type": "string"
-                },
-                "objectives": {
-                    "type": "string"
-                },
-                "status": {
-                    "description": "draft, published, archived",
-                    "type": "string"
-                },
-                "subject_id": {
-                    "type": "string"
-                },
-                "subtopics": {
-                    "type": "string"
-                },
-                "teaching_resources": {
-                    "type": "string"
-                },
-                "term": {
-                    "type": "string",
-                    "enum": [
-                        "first",
-                        "second",
-                        "third"
-                    ]
-                },
-                "topic": {
-                    "type": "string"
-                },
-                "week": {
-                    "type": "integer",
-                    "maximum": 52,
-                    "minimum": 1
-                }
-            }
-        },
         "dto.CreateStudentEnrollmentRequest": {
             "type": "object",
             "required": [
@@ -12257,6 +10496,46 @@
                 },
                 "teacher_id": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.CreateTermRequest": {
+            "type": "object",
+            "required": [
+                "academic_session_id",
+                "name",
+                "term_number"
+            ],
+            "properties": {
+                "academic_session_id": {
+                    "type": "string"
+                },
+                "code": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "end_date": {
+                    "type": "string"
+                },
+                "is_current": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "status": {
+                    "description": "active, inactive, completed",
+                    "type": "string"
+                },
+                "term_number": {
+                    "type": "integer",
+                    "maximum": 3,
+                    "minimum": 1
                 }
             }
         },
@@ -12531,90 +10810,6 @@
                 }
             }
         },
-        "dto.SchemeOfWorkListResponse": {
-            "type": "object",
-            "properties": {
-                "limit": {
-                    "type": "integer"
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "schemes": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.SchemeOfWorkResponse"
-                    }
-                },
-                "total": {
-                    "type": "integer"
-                },
-                "total_pages": {
-                    "type": "integer"
-                }
-            }
-        },
-        "dto.SchemeOfWorkResponse": {
-            "type": "object",
-            "properties": {
-                "activities": {
-                    "type": "string"
-                },
-                "assessment": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "created_by": {
-                    "type": "string"
-                },
-                "creator": {
-                    "$ref": "#/definitions/dto.UserResponse"
-                },
-                "grade": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "objectives": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "subject": {
-                    "description": "Nested relationships",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/dto.SubjectResponse"
-                        }
-                    ]
-                },
-                "subject_id": {
-                    "type": "string"
-                },
-                "subtopics": {
-                    "type": "string"
-                },
-                "teaching_resources": {
-                    "type": "string"
-                },
-                "term": {
-                    "type": "string"
-                },
-                "topic": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "week": {
-                    "type": "integer"
-                }
-            }
-        },
         "dto.StudentEnrollmentListResponse": {
             "type": "object",
             "properties": {
@@ -12646,6 +10841,9 @@
                 },
                 "arm_id": {
                     "type": "string"
+                },
+                "class_teacher": {
+                    "$ref": "#/definitions/dto.UserResponse"
                 },
                 "created_at": {
                     "type": "string"
@@ -12779,48 +10977,107 @@
                 }
             }
         },
-        "dto.UpdateAcademicSessionRequest": {
+        "dto.TermListResponse": {
             "type": "object",
-            "required": [
-                "term"
-            ],
             "properties": {
-                "academic_year": {
-                    "type": "string",
-                    "maxLength": 20,
-                    "minLength": 2
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "terms": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.TermResponse"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.TermResponse": {
+            "type": "object",
+            "properties": {
+                "academic_session": {
+                    "description": "Nested relationships",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/dto.AcademicSessionResponse"
+                        }
+                    ]
+                },
+                "academic_session_id": {
+                    "type": "string"
                 },
                 "code": {
-                    "type": "string",
-                    "maxLength": 20,
-                    "minLength": 2
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "string"
+                },
+                "creator": {
+                    "$ref": "#/definitions/dto.UserResponse"
                 },
                 "description": {
                     "type": "string"
                 },
                 "end_date": {
-                    "description": "Format: \"2006-01-02\"",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_current": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "term_number": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UpdateAcademicSessionRequest": {
+            "type": "object",
+            "properties": {
+                "academic_year": {
+                    "type": "string"
+                },
+                "code": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "end_date": {
                     "type": "string"
                 },
                 "is_current": {
                     "type": "boolean"
                 },
                 "start_date": {
-                    "description": "Format: \"2006-01-02\"",
                     "type": "string"
                 },
                 "status": {
-                    "type": "string",
-                    "enum": [
-                        "active",
-                        "inactive",
-                        "completed"
-                    ]
-                },
-                "term": {
-                    "type": "string",
-                    "maxLength": 20,
-                    "minLength": 2
+                    "type": "string"
                 }
             }
         },
@@ -13039,50 +11296,6 @@
                 }
             }
         },
-        "dto.UpdateSchemeOfWorkRequest": {
-            "type": "object",
-            "properties": {
-                "activities": {
-                    "type": "string"
-                },
-                "assessment": {
-                    "type": "string"
-                },
-                "grade": {
-                    "type": "string"
-                },
-                "objectives": {
-                    "type": "string"
-                },
-                "status": {
-                    "description": "draft, published, archived",
-                    "type": "string"
-                },
-                "subject_id": {
-                    "type": "string"
-                },
-                "subtopics": {
-                    "type": "string"
-                },
-                "teaching_resources": {
-                    "type": "string"
-                },
-                "term": {
-                    "type": "string",
-                    "enum": [
-                        "first",
-                        "second",
-                        "third"
-                    ]
-                },
-                "topic": {
-                    "type": "string"
-                },
-                "week": {
-                    "type": "integer"
-                }
-            }
-        },
         "dto.UpdateStudentEnrollmentRequest": {
             "type": "object",
             "properties": {
@@ -13137,6 +11350,35 @@
                 },
                 "teacher_id": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.UpdateTermRequest": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "end_date": {
+                    "type": "string"
+                },
+                "is_current": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "term_number": {
+                    "type": "integer"
                 }
             }
         },
@@ -13270,35 +11512,6 @@
                     "type": "string"
                 },
                 "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "enrollments.CreateEnrollmentInput": {
-            "type": "object",
-            "required": [
-                "course_id",
-                "student_id"
-            ],
-            "properties": {
-                "course_id": {
-                    "type": "string"
-                },
-                "student_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "enrollments.EnrollmentResponse": {
-            "type": "object",
-            "properties": {
-                "course_id": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "student_id": {
                     "type": "string"
                 }
             }
@@ -13549,14 +11762,6 @@
                 }
             }
         },
-        "models.DeleteSuccessResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
         "models.ErrorResponse": {
             "description": "Error response structure",
             "type": "object",
@@ -13576,664 +11781,6 @@
             "properties": {
                 "error": {
                     "type": "string"
-                }
-            }
-        },
-        "models.GradeFilters": {
-            "type": "object",
-            "properties": {
-                "assignment_id": {
-                    "type": "string"
-                },
-                "course_id": {
-                    "type": "string"
-                },
-                "end_date": {
-                    "type": "string"
-                },
-                "grade": {
-                    "type": "string",
-                    "enum": [
-                        "A",
-                        "B",
-                        "C",
-                        "D",
-                        "F",
-                        "A+",
-                        "A-",
-                        "B+",
-                        "B-",
-                        "C+",
-                        "C-",
-                        "D+",
-                        "D-"
-                    ]
-                },
-                "limit": {
-                    "type": "integer",
-                    "maximum": 100,
-                    "minimum": 1
-                },
-                "max_score": {
-                    "type": "number",
-                    "maximum": 100,
-                    "minimum": 0
-                },
-                "min_score": {
-                    "type": "number",
-                    "maximum": 100,
-                    "minimum": 0
-                },
-                "page": {
-                    "description": "Pagination",
-                    "type": "integer",
-                    "minimum": 1
-                },
-                "search": {
-                    "description": "Search in remarks",
-                    "type": "string"
-                },
-                "sort_by": {
-                    "type": "string",
-                    "enum": [
-                        "created_at",
-                        "updated_at",
-                        "score",
-                        "student",
-                        "course"
-                    ]
-                },
-                "sort_order": {
-                    "type": "string",
-                    "enum": [
-                        "asc",
-                        "desc",
-                        "ASC",
-                        "DESC"
-                    ]
-                },
-                "start_date": {
-                    "type": "string"
-                },
-                "student_id": {
-                    "type": "string"
-                },
-                "tutor_id": {
-                    "description": "Teacher/tutor who can view grades",
-                    "type": "string"
-                },
-                "with_details": {
-                    "description": "Include student/course details",
-                    "type": "boolean"
-                }
-            }
-        },
-        "models.GradeInput": {
-            "type": "object",
-            "required": [
-                "course_id",
-                "score",
-                "student_id",
-                "tutor_id"
-            ],
-            "properties": {
-                "assignment_id": {
-                    "description": "Optional",
-                    "type": "string"
-                },
-                "course_id": {
-                    "type": "string"
-                },
-                "remarks": {
-                    "type": "string",
-                    "maxLength": 500
-                },
-                "score": {
-                    "type": "number",
-                    "maximum": 100,
-                    "minimum": 0
-                },
-                "student_id": {
-                    "type": "string"
-                },
-                "tutor_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.GradeResponse": {
-            "type": "object",
-            "properties": {
-                "assignment_id": {
-                    "type": "string"
-                },
-                "course_id": {
-                    "type": "string"
-                },
-                "course_name": {
-                    "description": "Optional",
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "grade": {
-                    "description": "A, B, C, etc.",
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "percentage": {
-                    "description": "Score as percentage",
-                    "type": "number"
-                },
-                "remarks": {
-                    "type": "string"
-                },
-                "score": {
-                    "type": "number"
-                },
-                "student_id": {
-                    "type": "string"
-                },
-                "student_name": {
-                    "description": "Optional, can be populated",
-                    "type": "string"
-                },
-                "tutor_id": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.GradeStats": {
-            "type": "object",
-            "properties": {
-                "average_score": {
-                    "type": "number"
-                },
-                "grade_distribution": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "integer"
-                    }
-                },
-                "highest_score": {
-                    "type": "number"
-                },
-                "lowest_score": {
-                    "type": "number"
-                },
-                "total_count": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.GradeUpdateInput": {
-            "type": "object",
-            "properties": {
-                "assignment_id": {
-                    "description": "Can change assignment link",
-                    "type": "string"
-                },
-                "remarks": {
-                    "description": "Pointer for optional update",
-                    "type": "string",
-                    "maxLength": 500
-                },
-                "score": {
-                    "description": "Pointer to distinguish between 0 and not provided",
-                    "type": "number",
-                    "maximum": 100,
-                    "minimum": 0
-                },
-                "tutor_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.LessonInput": {
-            "type": "object",
-            "required": [
-                "course_id",
-                "description",
-                "module_id",
-                "order",
-                "title",
-                "tutor_id"
-            ],
-            "properties": {
-                "course_id": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "module_id": {
-                    "type": "string"
-                },
-                "order": {
-                    "type": "integer"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "tutor_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.LessonResponse": {
-            "type": "object",
-            "properties": {
-                "course_id": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "module_id": {
-                    "type": "string"
-                },
-                "order": {
-                    "type": "integer"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "tutor_id": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.LiveClassInput": {
-            "type": "object",
-            "required": [
-                "course_id",
-                "end_time",
-                "start_time",
-                "title",
-                "tutor_id"
-            ],
-            "properties": {
-                "access_level": {
-                    "type": "string",
-                    "enum": [
-                        "enrolled",
-                        "premium",
-                        "invite_only",
-                        "public"
-                    ]
-                },
-                "agenda": {
-                    "description": "Preparation \u0026 Materials",
-                    "type": "string",
-                    "maxLength": 5000
-                },
-                "auto_publish_recordings": {
-                    "type": "boolean"
-                },
-                "course_id": {
-                    "description": "Required fields",
-                    "type": "string"
-                },
-                "description": {
-                    "description": "Optional details",
-                    "type": "string",
-                    "maxLength": 2000
-                },
-                "duration": {
-                    "type": "integer"
-                },
-                "end_time": {
-                    "type": "string"
-                },
-                "host_notes": {
-                    "description": "Host notes",
-                    "type": "string",
-                    "maxLength": 2000
-                },
-                "lesson_id": {
-                    "type": "string"
-                },
-                "max_attendees": {
-                    "description": "Capacity \u0026 Access",
-                    "type": "integer",
-                    "maximum": 1000,
-                    "minimum": 1
-                },
-                "min_attendees": {
-                    "type": "integer",
-                    "maximum": 1000,
-                    "minimum": 1
-                },
-                "module_id": {
-                    "description": "Optional relationships",
-                    "type": "string"
-                },
-                "platform": {
-                    "description": "Meeting Platform",
-                    "type": "string",
-                    "enum": [
-                        "zoom",
-                        "teams",
-                        "google_meet",
-                        "custom",
-                        "bigbluebutton",
-                        "jitsi"
-                    ]
-                },
-                "recommended_setup": {
-                    "type": "string",
-                    "maxLength": 2000
-                },
-                "record_automatically": {
-                    "description": "Recording",
-                    "type": "boolean"
-                },
-                "recording_storage": {
-                    "type": "string",
-                    "enum": [
-                        "platform",
-                        "s3",
-                        "gcs",
-                        "local"
-                    ]
-                },
-                "requires_approval": {
-                    "type": "boolean"
-                },
-                "start_time": {
-                    "type": "string"
-                },
-                "timezone": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string",
-                    "maxLength": 255,
-                    "minLength": 3
-                },
-                "topic_id": {
-                    "type": "string"
-                },
-                "tutor_id": {
-                    "type": "string"
-                },
-                "waitlist_capacity": {
-                    "type": "integer",
-                    "maximum": 100,
-                    "minimum": 0
-                },
-                "waitlist_enabled": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "models.LiveClassResponse": {
-            "type": "object",
-            "properties": {
-                "access_level": {
-                    "type": "string"
-                },
-                "agenda": {
-                    "type": "string"
-                },
-                "auto_publish_recordings": {
-                    "type": "boolean"
-                },
-                "available_seats": {
-                    "description": "Computed fields",
-                    "type": "integer"
-                },
-                "course_id": {
-                    "type": "string"
-                },
-                "course_name": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "duration": {
-                    "type": "integer"
-                },
-                "end_time": {
-                    "type": "string"
-                },
-                "host_notes": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "is_live_now": {
-                    "type": "boolean"
-                },
-                "is_upcoming": {
-                    "type": "boolean"
-                },
-                "learning_objectives": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "lesson_id": {
-                    "type": "string"
-                },
-                "max_attendees": {
-                    "type": "integer"
-                },
-                "meeting_id": {
-                    "type": "string"
-                },
-                "meeting_password": {
-                    "type": "string"
-                },
-                "meeting_url": {
-                    "type": "string"
-                },
-                "min_attendees": {
-                    "type": "integer"
-                },
-                "module_id": {
-                    "type": "string"
-                },
-                "platform": {
-                    "type": "string"
-                },
-                "prerequisites": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "recommended_setup": {
-                    "type": "string"
-                },
-                "record_automatically": {
-                    "type": "boolean"
-                },
-                "recording_storage": {
-                    "type": "string"
-                },
-                "requires_approval": {
-                    "type": "boolean"
-                },
-                "slug": {
-                    "type": "string"
-                },
-                "start_time": {
-                    "type": "string"
-                },
-                "status": {
-                    "description": "scheduled, ongoing, completed, cancelled",
-                    "type": "string"
-                },
-                "tech_requirements": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "test_url": {
-                    "type": "string"
-                },
-                "timezone": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "topic_id": {
-                    "type": "string"
-                },
-                "total_enrolled": {
-                    "type": "integer"
-                },
-                "tutor_id": {
-                    "type": "string"
-                },
-                "tutor_name": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "waitlist_capacity": {
-                    "type": "integer"
-                },
-                "waitlist_enabled": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "models.LiveClassUpdateInput": {
-            "type": "object",
-            "properties": {
-                "access_level": {
-                    "description": "Access control (only before start)",
-                    "type": "string",
-                    "enum": [
-                        "enrolled",
-                        "premium",
-                        "invite_only",
-                        "public"
-                    ]
-                },
-                "agenda": {
-                    "description": "Content (can update anytime)",
-                    "type": "string"
-                },
-                "auto_publish_recordings": {
-                    "type": "boolean"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "duration": {
-                    "type": "integer"
-                },
-                "end_time": {
-                    "description": "String for parsing",
-                    "type": "string"
-                },
-                "host_notes": {
-                    "type": "string"
-                },
-                "is_cancelled": {
-                    "description": "Cancellation (can update anytime)",
-                    "type": "boolean",
-                    "default": false
-                },
-                "lesson_id": {
-                    "type": "string"
-                },
-                "max_attendees": {
-                    "description": "Capacity (only before start)",
-                    "type": "integer",
-                    "maximum": 1000,
-                    "minimum": 1
-                },
-                "min_attendees": {
-                    "type": "integer",
-                    "maximum": 1000,
-                    "minimum": 1
-                },
-                "module_id": {
-                    "description": "Relationships (only before start)",
-                    "type": "string"
-                },
-                "platform": {
-                    "description": "Meeting platform (only before start)",
-                    "type": "string",
-                    "enum": [
-                        "zoom",
-                        "teams",
-                        "google_meet",
-                        "custom",
-                        "bigbluebutton",
-                        "jitsi"
-                    ]
-                },
-                "recommended_setup": {
-                    "type": "string"
-                },
-                "record_automatically": {
-                    "description": "Recording (can update anytime before class ends)",
-                    "type": "boolean"
-                },
-                "recording_storage": {
-                    "type": "string",
-                    "enum": [
-                        "platform",
-                        "s3",
-                        "gcs",
-                        "local"
-                    ]
-                },
-                "start_time": {
-                    "description": "Rescheduling (only before start)",
-                    "type": "string"
-                },
-                "timezone": {
-                    "type": "string"
-                },
-                "title": {
-                    "description": "Basic info (only updatable before start)",
-                    "type": "string",
-                    "maxLength": 255,
-                    "minLength": 3
-                },
-                "topic_id": {
-                    "type": "string"
-                },
-                "tutor_id": {
-                    "type": "string"
-                },
-                "waitlist_capacity": {
-                    "type": "integer",
-                    "maximum": 100,
-                    "minimum": 0
-                },
-                "waitlist_enabled": {
-                    "type": "boolean"
                 }
             }
         },
@@ -14297,267 +11844,11 @@
                 }
             }
         },
-        "models.ModuleInput": {
-            "type": "object",
-            "required": [
-                "course_id",
-                "slug",
-                "title"
-            ],
-            "properties": {
-                "course_id": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "estimated_time": {
-                    "type": "integer"
-                },
-                "is_free": {
-                    "type": "boolean"
-                },
-                "module_number": {
-                    "type": "integer"
-                },
-                "slug": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string",
-                    "default": "draft"
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
         "models.NotFoundResponse": {
             "type": "object",
             "properties": {
                 "error": {
                     "type": "string"
-                }
-            }
-        },
-        "models.ObjectiveQuestionInput": {
-            "type": "object",
-            "required": [
-                "course_id",
-                "question_text",
-                "tutor_id"
-            ],
-            "properties": {
-                "answer_explanation": {
-                    "description": "Answer configuration",
-                    "type": "string",
-                    "maxLength": 2000
-                },
-                "course_id": {
-                    "type": "string"
-                },
-                "difficulty_level": {
-                    "type": "string",
-                    "enum": [
-                        "easy",
-                        "medium",
-                        "hard",
-                        "expert"
-                    ]
-                },
-                "hint": {
-                    "type": "string",
-                    "maxLength": 500
-                },
-                "image_url": {
-                    "description": "Media support",
-                    "type": "string",
-                    "maxLength": 500
-                },
-                "is_approved": {
-                    "description": "Approval",
-                    "type": "boolean"
-                },
-                "lesson_id": {
-                    "type": "string"
-                },
-                "module_id": {
-                    "description": "Content relationships",
-                    "type": "string"
-                },
-                "options": {
-                    "description": "Options for multiple choice questions",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.QuestionOptionInput"
-                    }
-                },
-                "points": {
-                    "type": "integer",
-                    "maximum": 100,
-                    "minimum": 0
-                },
-                "question_text": {
-                    "description": "Required fields",
-                    "type": "string",
-                    "maxLength": 1000,
-                    "minLength": 10
-                },
-                "question_type": {
-                    "description": "Optional fields with defaults",
-                    "type": "string",
-                    "enum": [
-                        "multiple_choice",
-                        "true_false",
-                        "multiple_response",
-                        "matching",
-                        "ordering"
-                    ]
-                },
-                "solution_steps": {
-                    "type": "string",
-                    "maxLength": 2000
-                },
-                "tutor_id": {
-                    "type": "string"
-                },
-                "video_url": {
-                    "type": "string",
-                    "maxLength": 500
-                }
-            }
-        },
-        "models.ObjectiveQuestionResponse": {
-            "type": "object",
-            "properties": {
-                "answer_explanation": {
-                    "type": "string"
-                },
-                "correct_attempts": {
-                    "type": "integer"
-                },
-                "course_id": {
-                    "type": "string"
-                },
-                "course_name": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "creator_name": {
-                    "type": "string"
-                },
-                "difficulty_level": {
-                    "type": "string"
-                },
-                "hint": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "image_url": {
-                    "type": "string"
-                },
-                "is_approved": {
-                    "type": "boolean"
-                },
-                "lesson_id": {
-                    "type": "string"
-                },
-                "lesson_name": {
-                    "type": "string"
-                },
-                "module_id": {
-                    "type": "string"
-                },
-                "module_name": {
-                    "type": "string"
-                },
-                "options": {
-                    "description": "Options (for multiple choice questions)",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.QuestionOptionResponse"
-                    }
-                },
-                "points": {
-                    "type": "integer"
-                },
-                "question_text": {
-                    "type": "string"
-                },
-                "question_type": {
-                    "type": "string"
-                },
-                "solution_steps": {
-                    "type": "string"
-                },
-                "success_rate": {
-                    "type": "number"
-                },
-                "total_attempts": {
-                    "description": "Statistics (optional)",
-                    "type": "integer"
-                },
-                "tutor_id": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "video_url": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.PaginatedGradesResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.GradeResponse"
-                    }
-                },
-                "filters": {
-                    "$ref": "#/definitions/models.GradeFilters"
-                },
-                "limit": {
-                    "type": "integer"
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "total": {
-                    "type": "integer"
-                },
-                "total_pages": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.PaginatedLessonsResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.LessonResponse"
-                    }
-                },
-                "limit": {
-                    "type": "integer"
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "total": {
-                    "type": "integer"
-                },
-                "total_pages": {
-                    "type": "integer"
                 }
             }
         },
@@ -14635,53 +11926,6 @@
                 }
             }
         },
-        "models.QuestionOptionInput": {
-            "type": "object",
-            "required": [
-                "option_text"
-            ],
-            "properties": {
-                "explanation": {
-                    "type": "string",
-                    "maxLength": 500
-                },
-                "is_correct": {
-                    "type": "boolean"
-                },
-                "option_text": {
-                    "type": "string",
-                    "maxLength": 500,
-                    "minLength": 1
-                },
-                "sort_order": {
-                    "type": "integer",
-                    "minimum": 0
-                }
-            }
-        },
-        "models.QuestionOptionResponse": {
-            "type": "object",
-            "properties": {
-                "explanation": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "is_correct": {
-                    "type": "boolean"
-                },
-                "option_text": {
-                    "type": "string"
-                },
-                "question_id": {
-                    "type": "string"
-                },
-                "sort_order": {
-                    "type": "integer"
-                }
-            }
-        },
         "models.SessionInfo": {
             "description": "Session information",
             "type": "object",
@@ -14708,91 +11952,6 @@
             "type": "object",
             "properties": {
                 "message": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.TopicInput": {
-            "type": "object",
-            "required": [
-                "content_text",
-                "content_type",
-                "content_url",
-                "course_id",
-                "lesson_id",
-                "module_id",
-                "order",
-                "title",
-                "tutor_id"
-            ],
-            "properties": {
-                "content_text": {
-                    "type": "string"
-                },
-                "content_type": {
-                    "description": "video, pdf, text, quiz",
-                    "type": "string"
-                },
-                "content_url": {
-                    "type": "string"
-                },
-                "course_id": {
-                    "type": "string"
-                },
-                "lesson_id": {
-                    "type": "string"
-                },
-                "module_id": {
-                    "type": "string"
-                },
-                "order": {
-                    "type": "integer"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "tutor_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.TopicResponse": {
-            "type": "object",
-            "properties": {
-                "content_text": {
-                    "type": "string"
-                },
-                "content_type": {
-                    "type": "string"
-                },
-                "content_url": {
-                    "type": "string"
-                },
-                "course_id": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "lesson_id": {
-                    "type": "string"
-                },
-                "module_id": {
-                    "type": "string"
-                },
-                "order": {
-                    "type": "integer"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "tutor_id": {
-                    "type": "string"
-                },
-                "updated_at": {
                     "type": "string"
                 }
             }

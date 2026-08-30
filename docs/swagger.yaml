@@ -53,46 +53,6 @@ definitions:
         example: Announcement not found
         type: string
     type: object
-  assignmentsubmission.CreateAssignmentSubmissionRequest:
-    properties:
-      assignment_id:
-        type: string
-      code_repo_url:
-        type: string
-      external_url:
-        type: string
-      file_url:
-        type: string
-      metadata:
-        description: Raw JSON
-        items:
-          type: string
-        type: array
-      status:
-        description: Defaults to "submitted"
-        type: string
-      student_id:
-        type: string
-      submission_type:
-        enum:
-        - text
-        - file
-        - url
-        - code
-        - video
-        - audio
-        - image
-        - document
-        - presentation
-        - multiple
-        type: string
-      text_content:
-        type: string
-    required:
-    - assignment_id
-    - student_id
-    - submission_type
-    type: object
   controllers.CourseResponse:
     properties:
       description:
@@ -254,24 +214,26 @@ definitions:
         type: string
       created_by:
         type: string
-      days_remaining:
-        type: integer
+      creator:
+        allOf:
+        - $ref: '#/definitions/dto.UserResponse'
+        description: Nested relationships
       description:
         type: string
       end_date:
         type: string
       id:
         type: string
-      is_active:
-        type: boolean
       is_current:
         type: boolean
       start_date:
         type: string
       status:
         type: string
-      term:
-        type: string
+      terms:
+        items:
+          $ref: '#/definitions/dto.TermResponse'
+        type: array
       updated_at:
         type: string
     type: object
@@ -380,14 +342,20 @@ definitions:
     properties:
       capacity:
         type: integer
+      class_teacher:
+        $ref: '#/definitions/dto.UserResponse'
       code:
         type: string
       created_at:
         type: string
+      created_by:
+        type: string
       description:
         type: string
       grade:
-        $ref: '#/definitions/dto.ClassGradeResponse'
+        allOf:
+        - $ref: '#/definitions/dto.ClassGradeResponse'
+        description: Nested relationships
       grade_id:
         type: string
       id:
@@ -497,51 +465,6 @@ definitions:
     - type
     - user_ids
     type: object
-  dto.BulkCreateSchemeOfWorkRequest:
-    properties:
-      grade:
-        type: string
-      schemes:
-        items:
-          properties:
-            activities:
-              type: string
-            assessment:
-              type: string
-            objectives:
-              type: string
-            subtopics:
-              type: string
-            teaching_resources:
-              type: string
-            topic:
-              type: string
-            week:
-              type: integer
-          required:
-          - objectives
-          - topic
-          - week
-          type: object
-        minItems: 1
-        type: array
-      status:
-        description: draft, published, archived
-        type: string
-      subject_id:
-        type: string
-      term:
-        enum:
-        - first
-        - second
-        - third
-        type: string
-    required:
-    - grade
-    - schemes
-    - subject_id
-    - term
-    type: object
   dto.BulkCreateStudentEnrollmentsRequest:
     properties:
       arm_id:
@@ -562,6 +485,41 @@ definitions:
     required:
     - arm_id
     - student_ids
+    type: object
+  dto.BulkCreateTermsRequest:
+    properties:
+      academic_session_id:
+        type: string
+      status:
+        type: string
+      terms:
+        items:
+          properties:
+            code:
+              type: string
+            description:
+              type: string
+            end_date:
+              type: string
+            is_current:
+              type: boolean
+            name:
+              type: string
+            start_date:
+              type: string
+            term_number:
+              maximum: 3
+              minimum: 1
+              type: integer
+          required:
+          - name
+          - term_number
+          type: object
+        minItems: 1
+        type: array
+    required:
+    - academic_session_id
+    - terms
     type: object
   dto.ClassGradeListResponse:
     properties:
@@ -602,39 +560,25 @@ definitions:
   dto.CreateAcademicSessionRequest:
     properties:
       academic_year:
-        maxLength: 20
-        minLength: 2
         type: string
       code:
-        maxLength: 20
-        minLength: 2
         type: string
       description:
         type: string
       end_date:
-        description: 'Format: "2006-01-02"'
         type: string
       is_current:
         type: boolean
       start_date:
-        description: 'Format: "2006-01-02"'
         type: string
       status:
-        enum:
-        - active
-        - inactive
-        - completed
-        type: string
-      term:
-        maxLength: 20
-        minLength: 2
+        description: active, inactive, completed
         type: string
     required:
     - academic_year
     - code
     - end_date
     - start_date
-    - term
     type: object
   dto.CreateAddressRequest:
     properties:
@@ -865,45 +809,6 @@ definitions:
     - type
     - user_id
     type: object
-  dto.CreateSchemeOfWorkRequest:
-    properties:
-      activities:
-        type: string
-      assessment:
-        type: string
-      grade:
-        type: string
-      objectives:
-        type: string
-      status:
-        description: draft, published, archived
-        type: string
-      subject_id:
-        type: string
-      subtopics:
-        type: string
-      teaching_resources:
-        type: string
-      term:
-        enum:
-        - first
-        - second
-        - third
-        type: string
-      topic:
-        type: string
-      week:
-        maximum: 52
-        minimum: 1
-        type: integer
-    required:
-    - grade
-    - objectives
-    - subject_id
-    - term
-    - topic
-    - week
-    type: object
   dto.CreateStudentEnrollmentRequest:
     properties:
       arm_id:
@@ -960,6 +865,34 @@ definitions:
     required:
     - subject_id
     - teacher_id
+    type: object
+  dto.CreateTermRequest:
+    properties:
+      academic_session_id:
+        type: string
+      code:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      is_current:
+        type: boolean
+      name:
+        type: string
+      start_date:
+        type: string
+      status:
+        description: active, inactive, completed
+        type: string
+      term_number:
+        maximum: 3
+        minimum: 1
+        type: integer
+    required:
+    - academic_session_id
+    - name
+    - term_number
     type: object
   dto.DepartmentBriefResponse:
     properties:
@@ -1137,60 +1070,6 @@ definitions:
       unread:
         type: integer
     type: object
-  dto.SchemeOfWorkListResponse:
-    properties:
-      limit:
-        type: integer
-      page:
-        type: integer
-      schemes:
-        items:
-          $ref: '#/definitions/dto.SchemeOfWorkResponse'
-        type: array
-      total:
-        type: integer
-      total_pages:
-        type: integer
-    type: object
-  dto.SchemeOfWorkResponse:
-    properties:
-      activities:
-        type: string
-      assessment:
-        type: string
-      created_at:
-        type: string
-      created_by:
-        type: string
-      creator:
-        $ref: '#/definitions/dto.UserResponse'
-      grade:
-        type: string
-      id:
-        type: string
-      objectives:
-        type: string
-      status:
-        type: string
-      subject:
-        allOf:
-        - $ref: '#/definitions/dto.SubjectResponse'
-        description: Nested relationships
-      subject_id:
-        type: string
-      subtopics:
-        type: string
-      teaching_resources:
-        type: string
-      term:
-        type: string
-      topic:
-        type: string
-      updated_at:
-        type: string
-      week:
-        type: integer
-    type: object
   dto.StudentEnrollmentListResponse:
     properties:
       enrollments:
@@ -1212,6 +1091,8 @@ definitions:
         $ref: '#/definitions/dto.ArmResponse'
       arm_id:
         type: string
+      class_teacher:
+        $ref: '#/definitions/dto.UserResponse'
       created_at:
         type: string
       created_by:
@@ -1296,38 +1177,72 @@ definitions:
       updated_at:
         type: string
     type: object
+  dto.TermListResponse:
+    properties:
+      limit:
+        type: integer
+      page:
+        type: integer
+      terms:
+        items:
+          $ref: '#/definitions/dto.TermResponse'
+        type: array
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.TermResponse:
+    properties:
+      academic_session:
+        allOf:
+        - $ref: '#/definitions/dto.AcademicSessionResponse'
+        description: Nested relationships
+      academic_session_id:
+        type: string
+      code:
+        type: string
+      created_at:
+        type: string
+      created_by:
+        type: string
+      creator:
+        $ref: '#/definitions/dto.UserResponse'
+      description:
+        type: string
+      end_date:
+        type: string
+      id:
+        type: string
+      is_current:
+        type: boolean
+      name:
+        type: string
+      start_date:
+        type: string
+      status:
+        type: string
+      term_number:
+        type: integer
+      updated_at:
+        type: string
+    type: object
   dto.UpdateAcademicSessionRequest:
     properties:
       academic_year:
-        maxLength: 20
-        minLength: 2
         type: string
       code:
-        maxLength: 20
-        minLength: 2
         type: string
       description:
         type: string
       end_date:
-        description: 'Format: "2006-01-02"'
         type: string
       is_current:
         type: boolean
       start_date:
-        description: 'Format: "2006-01-02"'
         type: string
       status:
-        enum:
-        - active
-        - inactive
-        - completed
         type: string
-      term:
-        maxLength: 20
-        minLength: 2
-        type: string
-    required:
-    - term
     type: object
   dto.UpdateAddressRequest:
     properties:
@@ -1481,36 +1396,6 @@ definitions:
         - urgent
         type: string
     type: object
-  dto.UpdateSchemeOfWorkRequest:
-    properties:
-      activities:
-        type: string
-      assessment:
-        type: string
-      grade:
-        type: string
-      objectives:
-        type: string
-      status:
-        description: draft, published, archived
-        type: string
-      subject_id:
-        type: string
-      subtopics:
-        type: string
-      teaching_resources:
-        type: string
-      term:
-        enum:
-        - first
-        - second
-        - third
-        type: string
-      topic:
-        type: string
-      week:
-        type: integer
-    type: object
   dto.UpdateStudentEnrollmentRequest:
     properties:
       arm_id:
@@ -1547,6 +1432,25 @@ definitions:
         type: string
       teacher_id:
         type: string
+    type: object
+  dto.UpdateTermRequest:
+    properties:
+      code:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      is_current:
+        type: boolean
+      name:
+        type: string
+      start_date:
+        type: string
+      status:
+        type: string
+      term_number:
+        type: integer
     type: object
   dto.UpdateUserRequest:
     properties:
@@ -1639,25 +1543,6 @@ definitions:
       role:
         type: string
       updated_at:
-        type: string
-    type: object
-  enrollments.CreateEnrollmentInput:
-    properties:
-      course_id:
-        type: string
-      student_id:
-        type: string
-    required:
-    - course_id
-    - student_id
-    type: object
-  enrollments.EnrollmentResponse:
-    properties:
-      course_id:
-        type: string
-      id:
-        type: string
-      student_id:
         type: string
     type: object
   models.AlreadyLoggedOutResponse:
@@ -1821,11 +1706,6 @@ definitions:
     - course_id
     - product_id
     type: object
-  models.DeleteSuccessResponse:
-    properties:
-      message:
-        type: string
-    type: object
   models.ErrorResponse:
     description: Error response structure
     properties:
@@ -1840,481 +1720,6 @@ definitions:
     properties:
       error:
         type: string
-    type: object
-  models.GradeFilters:
-    properties:
-      assignment_id:
-        type: string
-      course_id:
-        type: string
-      end_date:
-        type: string
-      grade:
-        enum:
-        - A
-        - B
-        - C
-        - D
-        - F
-        - A+
-        - A-
-        - B+
-        - B-
-        - C+
-        - C-
-        - D+
-        - D-
-        type: string
-      limit:
-        maximum: 100
-        minimum: 1
-        type: integer
-      max_score:
-        maximum: 100
-        minimum: 0
-        type: number
-      min_score:
-        maximum: 100
-        minimum: 0
-        type: number
-      page:
-        description: Pagination
-        minimum: 1
-        type: integer
-      search:
-        description: Search in remarks
-        type: string
-      sort_by:
-        enum:
-        - created_at
-        - updated_at
-        - score
-        - student
-        - course
-        type: string
-      sort_order:
-        enum:
-        - asc
-        - desc
-        - ASC
-        - DESC
-        type: string
-      start_date:
-        type: string
-      student_id:
-        type: string
-      tutor_id:
-        description: Teacher/tutor who can view grades
-        type: string
-      with_details:
-        description: Include student/course details
-        type: boolean
-    type: object
-  models.GradeInput:
-    properties:
-      assignment_id:
-        description: Optional
-        type: string
-      course_id:
-        type: string
-      remarks:
-        maxLength: 500
-        type: string
-      score:
-        maximum: 100
-        minimum: 0
-        type: number
-      student_id:
-        type: string
-      tutor_id:
-        type: string
-    required:
-    - course_id
-    - score
-    - student_id
-    - tutor_id
-    type: object
-  models.GradeResponse:
-    properties:
-      assignment_id:
-        type: string
-      course_id:
-        type: string
-      course_name:
-        description: Optional
-        type: string
-      created_at:
-        type: string
-      grade:
-        description: A, B, C, etc.
-        type: string
-      id:
-        type: string
-      percentage:
-        description: Score as percentage
-        type: number
-      remarks:
-        type: string
-      score:
-        type: number
-      student_id:
-        type: string
-      student_name:
-        description: Optional, can be populated
-        type: string
-      tutor_id:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  models.GradeStats:
-    properties:
-      average_score:
-        type: number
-      grade_distribution:
-        additionalProperties:
-          type: integer
-        type: object
-      highest_score:
-        type: number
-      lowest_score:
-        type: number
-      total_count:
-        type: integer
-    type: object
-  models.GradeUpdateInput:
-    properties:
-      assignment_id:
-        description: Can change assignment link
-        type: string
-      remarks:
-        description: Pointer for optional update
-        maxLength: 500
-        type: string
-      score:
-        description: Pointer to distinguish between 0 and not provided
-        maximum: 100
-        minimum: 0
-        type: number
-      tutor_id:
-        type: string
-    type: object
-  models.LessonInput:
-    properties:
-      course_id:
-        type: string
-      description:
-        type: string
-      module_id:
-        type: string
-      order:
-        type: integer
-      title:
-        type: string
-      tutor_id:
-        type: string
-    required:
-    - course_id
-    - description
-    - module_id
-    - order
-    - title
-    - tutor_id
-    type: object
-  models.LessonResponse:
-    properties:
-      course_id:
-        type: string
-      created_at:
-        type: string
-      description:
-        type: string
-      id:
-        type: string
-      module_id:
-        type: string
-      order:
-        type: integer
-      title:
-        type: string
-      tutor_id:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  models.LiveClassInput:
-    properties:
-      access_level:
-        enum:
-        - enrolled
-        - premium
-        - invite_only
-        - public
-        type: string
-      agenda:
-        description: Preparation & Materials
-        maxLength: 5000
-        type: string
-      auto_publish_recordings:
-        type: boolean
-      course_id:
-        description: Required fields
-        type: string
-      description:
-        description: Optional details
-        maxLength: 2000
-        type: string
-      duration:
-        type: integer
-      end_time:
-        type: string
-      host_notes:
-        description: Host notes
-        maxLength: 2000
-        type: string
-      lesson_id:
-        type: string
-      max_attendees:
-        description: Capacity & Access
-        maximum: 1000
-        minimum: 1
-        type: integer
-      min_attendees:
-        maximum: 1000
-        minimum: 1
-        type: integer
-      module_id:
-        description: Optional relationships
-        type: string
-      platform:
-        description: Meeting Platform
-        enum:
-        - zoom
-        - teams
-        - google_meet
-        - custom
-        - bigbluebutton
-        - jitsi
-        type: string
-      recommended_setup:
-        maxLength: 2000
-        type: string
-      record_automatically:
-        description: Recording
-        type: boolean
-      recording_storage:
-        enum:
-        - platform
-        - s3
-        - gcs
-        - local
-        type: string
-      requires_approval:
-        type: boolean
-      start_time:
-        type: string
-      timezone:
-        type: string
-      title:
-        maxLength: 255
-        minLength: 3
-        type: string
-      topic_id:
-        type: string
-      tutor_id:
-        type: string
-      waitlist_capacity:
-        maximum: 100
-        minimum: 0
-        type: integer
-      waitlist_enabled:
-        type: boolean
-    required:
-    - course_id
-    - end_time
-    - start_time
-    - title
-    - tutor_id
-    type: object
-  models.LiveClassResponse:
-    properties:
-      access_level:
-        type: string
-      agenda:
-        type: string
-      auto_publish_recordings:
-        type: boolean
-      available_seats:
-        description: Computed fields
-        type: integer
-      course_id:
-        type: string
-      course_name:
-        type: string
-      created_at:
-        type: string
-      description:
-        type: string
-      duration:
-        type: integer
-      end_time:
-        type: string
-      host_notes:
-        type: string
-      id:
-        type: string
-      is_live_now:
-        type: boolean
-      is_upcoming:
-        type: boolean
-      learning_objectives:
-        items:
-          type: string
-        type: array
-      lesson_id:
-        type: string
-      max_attendees:
-        type: integer
-      meeting_id:
-        type: string
-      meeting_password:
-        type: string
-      meeting_url:
-        type: string
-      min_attendees:
-        type: integer
-      module_id:
-        type: string
-      platform:
-        type: string
-      prerequisites:
-        items:
-          type: string
-        type: array
-      recommended_setup:
-        type: string
-      record_automatically:
-        type: boolean
-      recording_storage:
-        type: string
-      requires_approval:
-        type: boolean
-      slug:
-        type: string
-      start_time:
-        type: string
-      status:
-        description: scheduled, ongoing, completed, cancelled
-        type: string
-      tech_requirements:
-        items:
-          type: string
-        type: array
-      test_url:
-        type: string
-      timezone:
-        type: string
-      title:
-        type: string
-      topic_id:
-        type: string
-      total_enrolled:
-        type: integer
-      tutor_id:
-        type: string
-      tutor_name:
-        type: string
-      updated_at:
-        type: string
-      waitlist_capacity:
-        type: integer
-      waitlist_enabled:
-        type: boolean
-    type: object
-  models.LiveClassUpdateInput:
-    properties:
-      access_level:
-        description: Access control (only before start)
-        enum:
-        - enrolled
-        - premium
-        - invite_only
-        - public
-        type: string
-      agenda:
-        description: Content (can update anytime)
-        type: string
-      auto_publish_recordings:
-        type: boolean
-      description:
-        type: string
-      duration:
-        type: integer
-      end_time:
-        description: String for parsing
-        type: string
-      host_notes:
-        type: string
-      is_cancelled:
-        default: false
-        description: Cancellation (can update anytime)
-        type: boolean
-      lesson_id:
-        type: string
-      max_attendees:
-        description: Capacity (only before start)
-        maximum: 1000
-        minimum: 1
-        type: integer
-      min_attendees:
-        maximum: 1000
-        minimum: 1
-        type: integer
-      module_id:
-        description: Relationships (only before start)
-        type: string
-      platform:
-        description: Meeting platform (only before start)
-        enum:
-        - zoom
-        - teams
-        - google_meet
-        - custom
-        - bigbluebutton
-        - jitsi
-        type: string
-      recommended_setup:
-        type: string
-      record_automatically:
-        description: Recording (can update anytime before class ends)
-        type: boolean
-      recording_storage:
-        enum:
-        - platform
-        - s3
-        - gcs
-        - local
-        type: string
-      start_time:
-        description: Rescheduling (only before start)
-        type: string
-      timezone:
-        type: string
-      title:
-        description: Basic info (only updatable before start)
-        maxLength: 255
-        minLength: 3
-        type: string
-      topic_id:
-        type: string
-      tutor_id:
-        type: string
-      waitlist_capacity:
-        maximum: 100
-        minimum: 0
-        type: integer
-      waitlist_enabled:
-        type: boolean
     type: object
   models.LoginInput:
     description: Login request payload
@@ -2359,189 +1764,10 @@ definitions:
         example: logged_out
         type: string
     type: object
-  models.ModuleInput:
-    properties:
-      course_id:
-        type: string
-      description:
-        type: string
-      estimated_time:
-        type: integer
-      is_free:
-        type: boolean
-      module_number:
-        type: integer
-      slug:
-        type: string
-      status:
-        default: draft
-        type: string
-      title:
-        type: string
-    required:
-    - course_id
-    - slug
-    - title
-    type: object
   models.NotFoundResponse:
     properties:
       error:
         type: string
-    type: object
-  models.ObjectiveQuestionInput:
-    properties:
-      answer_explanation:
-        description: Answer configuration
-        maxLength: 2000
-        type: string
-      course_id:
-        type: string
-      difficulty_level:
-        enum:
-        - easy
-        - medium
-        - hard
-        - expert
-        type: string
-      hint:
-        maxLength: 500
-        type: string
-      image_url:
-        description: Media support
-        maxLength: 500
-        type: string
-      is_approved:
-        description: Approval
-        type: boolean
-      lesson_id:
-        type: string
-      module_id:
-        description: Content relationships
-        type: string
-      options:
-        description: Options for multiple choice questions
-        items:
-          $ref: '#/definitions/models.QuestionOptionInput'
-        type: array
-      points:
-        maximum: 100
-        minimum: 0
-        type: integer
-      question_text:
-        description: Required fields
-        maxLength: 1000
-        minLength: 10
-        type: string
-      question_type:
-        description: Optional fields with defaults
-        enum:
-        - multiple_choice
-        - true_false
-        - multiple_response
-        - matching
-        - ordering
-        type: string
-      solution_steps:
-        maxLength: 2000
-        type: string
-      tutor_id:
-        type: string
-      video_url:
-        maxLength: 500
-        type: string
-    required:
-    - course_id
-    - question_text
-    - tutor_id
-    type: object
-  models.ObjectiveQuestionResponse:
-    properties:
-      answer_explanation:
-        type: string
-      correct_attempts:
-        type: integer
-      course_id:
-        type: string
-      course_name:
-        type: string
-      created_at:
-        type: string
-      creator_name:
-        type: string
-      difficulty_level:
-        type: string
-      hint:
-        type: string
-      id:
-        type: string
-      image_url:
-        type: string
-      is_approved:
-        type: boolean
-      lesson_id:
-        type: string
-      lesson_name:
-        type: string
-      module_id:
-        type: string
-      module_name:
-        type: string
-      options:
-        description: Options (for multiple choice questions)
-        items:
-          $ref: '#/definitions/models.QuestionOptionResponse'
-        type: array
-      points:
-        type: integer
-      question_text:
-        type: string
-      question_type:
-        type: string
-      solution_steps:
-        type: string
-      success_rate:
-        type: number
-      total_attempts:
-        description: Statistics (optional)
-        type: integer
-      tutor_id:
-        type: string
-      updated_at:
-        type: string
-      video_url:
-        type: string
-    type: object
-  models.PaginatedGradesResponse:
-    properties:
-      data:
-        items:
-          $ref: '#/definitions/models.GradeResponse'
-        type: array
-      filters:
-        $ref: '#/definitions/models.GradeFilters'
-      limit:
-        type: integer
-      page:
-        type: integer
-      total:
-        type: integer
-      total_pages:
-        type: integer
-    type: object
-  models.PaginatedLessonsResponse:
-    properties:
-      data:
-        items:
-          $ref: '#/definitions/models.LessonResponse'
-        type: array
-      limit:
-        type: integer
-      page:
-        type: integer
-      total:
-        type: integer
-      total_pages:
-        type: integer
     type: object
   models.Product:
     properties:
@@ -2594,38 +1820,6 @@ definitions:
     - name
     - price
     type: object
-  models.QuestionOptionInput:
-    properties:
-      explanation:
-        maxLength: 500
-        type: string
-      is_correct:
-        type: boolean
-      option_text:
-        maxLength: 500
-        minLength: 1
-        type: string
-      sort_order:
-        minimum: 0
-        type: integer
-    required:
-    - option_text
-    type: object
-  models.QuestionOptionResponse:
-    properties:
-      explanation:
-        type: string
-      id:
-        type: string
-      is_correct:
-        type: boolean
-      option_text:
-        type: string
-      question_id:
-        type: string
-      sort_order:
-        type: integer
-    type: object
   models.SessionInfo:
     description: Session information
     properties:
@@ -2645,65 +1839,6 @@ definitions:
   models.SuccessResponse:
     properties:
       message:
-        type: string
-    type: object
-  models.TopicInput:
-    properties:
-      content_text:
-        type: string
-      content_type:
-        description: video, pdf, text, quiz
-        type: string
-      content_url:
-        type: string
-      course_id:
-        type: string
-      lesson_id:
-        type: string
-      module_id:
-        type: string
-      order:
-        type: integer
-      title:
-        type: string
-      tutor_id:
-        type: string
-    required:
-    - content_text
-    - content_type
-    - content_url
-    - course_id
-    - lesson_id
-    - module_id
-    - order
-    - title
-    - tutor_id
-    type: object
-  models.TopicResponse:
-    properties:
-      content_text:
-        type: string
-      content_type:
-        type: string
-      content_url:
-        type: string
-      course_id:
-        type: string
-      created_at:
-        type: string
-      id:
-        type: string
-      lesson_id:
-        type: string
-      module_id:
-        type: string
-      order:
-        type: integer
-      title:
-        type: string
-      tutor_id:
-        type: string
-      updated_at:
         type: string
     type: object
   models.UpdateCourseMaterialRequest:
@@ -2873,12 +2008,8 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get a paginated list of academic sessions with optional filtering
+      description: Get a paginated list of all academic sessions
       parameters:
-      - description: Search by year, code, or description
-        in: query
-        name: search
-        type: string
       - description: Filter by status
         in: query
         name: status
@@ -2887,6 +2018,10 @@ paths:
         in: query
         name: is_current
         type: boolean
+      - description: Search by academic year, code, or description
+        in: query
+        name: search
+        type: string
       - default: 1
         description: Page number
         in: query
@@ -2927,9 +2062,9 @@ paths:
     post:
       consumes:
       - application/json
-      description: Create a new academic session with the provided details
+      description: Create a new academic session
       parameters:
-      - description: Academic session creation request
+      - description: Session request
         in: body
         name: request
         required: true
@@ -2965,16 +2100,16 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Create a new academic session
+      summary: Create an academic session
       tags:
       - Academic Sessions
   /api/academic-sessions/{id}:
     delete:
       consumes:
       - application/json
-      description: Soft delete an academic session by ID
+      description: Soft delete an academic session
       parameters:
-      - description: Academic Session ID
+      - description: Session ID
         in: path
         name: id
         required: true
@@ -3002,11 +2137,6 @@ paths:
           schema:
             additionalProperties: true
             type: object
-        "409":
-          description: Conflict
-          schema:
-            additionalProperties: true
-            type: object
         "500":
           description: Internal Server Error
           schema:
@@ -3022,7 +2152,7 @@ paths:
       - application/json
       description: Get a single academic session by its ID
       parameters:
-      - description: Academic Session ID
+      - description: Session ID
         in: path
         name: id
         required: true
@@ -3058,14 +2188,14 @@ paths:
     put:
       consumes:
       - application/json
-      description: Update an existing academic session by ID
+      description: Update an existing academic session
       parameters:
-      - description: Academic Session ID
+      - description: Session ID
         in: path
         name: id
         required: true
         type: string
-      - description: Academic session update request
+      - description: Update request
         in: body
         name: request
         required: true
@@ -3109,11 +2239,11 @@ paths:
       summary: Update an academic session
       tags:
       - Academic Sessions
-  /api/academic-sessions/current:
+  /api/academic-sessions/active:
     get:
       consumes:
       - application/json
-      description: Get the currently active academic session
+      description: Get all active academic sessions
       produces:
       - application/json
       responses:
@@ -3122,8 +2252,26 @@ paths:
           schema:
             additionalProperties: true
             type: object
-        "401":
-          description: Unauthorized
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get active academic sessions
+      tags:
+      - Academic Sessions
+  /api/academic-sessions/current:
+    get:
+      consumes:
+      - application/json
+      description: Get the current academic session
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
           schema:
             additionalProperties: true
             type: object
@@ -3140,6 +2288,29 @@ paths:
       security:
       - BearerAuth: []
       summary: Get current academic session
+      tags:
+      - Academic Sessions
+  /api/academic-sessions/stats:
+    get:
+      consumes:
+      - application/json
+      description: Get statistics for academic sessions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get academic session statistics
       tags:
       - Academic Sessions
   /api/addresses:
@@ -4269,42 +3440,6 @@ paths:
       summary: Delete an arm
       tags:
       - Arms
-  /api/assignment_submissions:
-    post:
-      consumes:
-      - application/json
-      description: Create a new assignment submission
-      parameters:
-      - description: Create Assignment Submission Request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/assignmentsubmission.CreateAssignmentSubmissionRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/models.SuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Create a new assignment submission
-      tags:
-      - Assignment Submissions
   /api/categories:
     post:
       consumes:
@@ -5799,75 +4934,6 @@ paths:
       summary: Get grades by subject
       tags:
       - Grade Subjects
-  /api/grades:
-    post:
-      consumes:
-      - application/json
-      description: Create a grade for a student
-      parameters:
-      - description: Grade data
-        in: body
-        name: grade
-        required: true
-        schema:
-          $ref: '#/definitions/models.GradeInput'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/models.GradeResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Create a new grade
-      tags:
-      - grades
-  /api/grades/{id}:
-    put:
-      consumes:
-      - application/json
-      description: Update an existing grade
-      parameters:
-      - description: Grade ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Grade update data
-        in: body
-        name: grade
-        required: true
-        schema:
-          $ref: '#/definitions/models.GradeUpdateInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.GradeResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Update a grade
-      tags:
-      - grades
   /api/guardians:
     get:
       consumes:
@@ -6154,271 +5220,6 @@ paths:
       summary: Get guardians by student
       tags:
       - Guardians
-  /api/lessons:
-    post:
-      consumes:
-      - application/json
-      description: Create a new lesson
-      parameters:
-      - description: Lesson
-        in: body
-        name: lesson
-        required: true
-        schema:
-          $ref: '#/definitions/models.LessonInput'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Lesson created successfully
-          schema:
-            $ref: '#/definitions/models.SuccessResponse'
-        "400":
-          description: Bad request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Create a new lesson
-      tags:
-      - lessons
-  /api/lessons/{id}:
-    put:
-      consumes:
-      - application/json
-      description: Update a lesson by ID
-      parameters:
-      - description: Lesson ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Lesson
-        in: body
-        name: lesson
-        required: true
-        schema:
-          $ref: '#/definitions/models.LessonInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Lesson updated successfully
-          schema:
-            $ref: '#/definitions/models.LessonResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Update a lesson
-      tags:
-      - lessons
-  /api/live-classes:
-    post:
-      consumes:
-      - application/json
-      description: Create a scheduled live class with meeting setup
-      parameters:
-      - description: Live class data
-        in: body
-        name: live_class
-        required: true
-        schema:
-          $ref: '#/definitions/models.LiveClassInput'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/models.LiveClassResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Create a new live class
-      tags:
-      - live-classes
-  /api/live-classes/{id}:
-    put:
-      consumes:
-      - application/json
-      description: Update live class details. Some fields can only be updated before
-        class starts.
-      parameters:
-      - description: Live Class ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Update data
-        in: body
-        name: update
-        required: true
-        schema:
-          $ref: '#/definitions/models.LiveClassUpdateInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.LiveClassResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Update a live class
-      tags:
-      - live-classes
-  /api/live-classes/{id}/cancel:
-    post:
-      consumes:
-      - application/json
-      description: Cancel a live class that hasn't started yet
-      parameters:
-      - description: Live Class ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Include course details
-        in: query
-        name: with_details
-        type: boolean
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.LiveClassResponse'
-      security:
-      - BearerAuth: []
-      summary: Cancel a live class
-      tags:
-      - live-classes
-  /api/modules:
-    post:
-      consumes:
-      - application/json
-      description: Create a new module
-      parameters:
-      - description: Module
-        in: body
-        name: module
-        required: true
-        schema:
-          $ref: '#/definitions/models.ModuleInput'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/models.SuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "409":
-          description: Conflict
-          schema:
-            $ref: '#/definitions/models.ConflictResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.FailureResponse'
-      security:
-      - BearerAuth: []
-      summary: Create a new modules
-      tags:
-      - Modules
-  /api/modules/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Delete an existing module
-      parameters:
-      - description: Module ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.DeleteSuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.NotFoundResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.FailureResponse'
-      summary: Delete an existing module
-      tags:
-      - Modules
-    put:
-      consumes:
-      - application/json
-      description: Update an existing module
-      parameters:
-      - description: Module ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Module
-        in: body
-        name: module
-        required: true
-        schema:
-          $ref: '#/definitions/models.ModuleInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.SuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.NotFoundResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.FailureResponse'
-      summary: Update an existing module
-      tags:
-      - Modules
   /api/notifications:
     get:
       consumes:
@@ -7067,589 +5868,6 @@ paths:
       summary: Unsubscribe from push notifications
       tags:
       - Push Notifications
-  /api/questions/objective:
-    post:
-      consumes:
-      - application/json
-      description: Create objective question with options
-      parameters:
-      - description: Question data
-        in: body
-        name: question
-        required: true
-        schema:
-          $ref: '#/definitions/models.ObjectiveQuestionInput'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/models.ObjectiveQuestionResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Create a new objective question
-      tags:
-      - questions
-  /api/questions/objective/bulk:
-    post:
-      consumes:
-      - application/json
-      description: Create multiple questions in bulk
-      parameters:
-      - description: Array of question data
-        in: body
-        name: questions
-        required: true
-        schema:
-          items:
-            $ref: '#/definitions/models.ObjectiveQuestionInput'
-          type: array
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            items:
-              $ref: '#/definitions/models.ObjectiveQuestionResponse'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Create multiple questions
-      tags:
-      - questions
-  /api/schemes:
-    get:
-      consumes:
-      - application/json
-      description: Get a paginated list of schemes of work with optional filtering
-      parameters:
-      - description: Filter by subject ID
-        in: query
-        name: subject_id
-        type: string
-      - description: Filter by grade
-        in: query
-        name: grade
-        type: string
-      - description: Filter by term
-        in: query
-        name: term
-        type: string
-      - description: Filter by status
-        in: query
-        name: status
-        type: string
-      - description: Filter by week
-        in: query
-        name: week
-        type: integer
-      - description: Search by topic or objectives
-        in: query
-        name: search
-        type: string
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        type: integer
-      - default: 20
-        description: Items per page
-        in: query
-        name: limit
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.SchemeOfWorkListResponse'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get all schemes of work
-      tags:
-      - Scheme of Work
-    post:
-      consumes:
-      - application/json
-      description: Create a new scheme of work for a subject and grade
-      parameters:
-      - description: Scheme request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.CreateSchemeOfWorkRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "409":
-          description: Conflict
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Create a scheme of work
-      tags:
-      - Scheme of Work
-  /api/schemes/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Soft delete a scheme of work
-      parameters:
-      - description: Scheme ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Delete a scheme
-      tags:
-      - Scheme of Work
-    get:
-      consumes:
-      - application/json
-      description: Get a single scheme of work by its ID
-      parameters:
-      - description: Scheme ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get scheme by ID
-      tags:
-      - Scheme of Work
-    put:
-      consumes:
-      - application/json
-      description: Update an existing scheme of work
-      parameters:
-      - description: Scheme ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Update request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.UpdateSchemeOfWorkRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Update a scheme
-      tags:
-      - Scheme of Work
-  /api/schemes/bulk:
-    post:
-      consumes:
-      - application/json
-      description: Create multiple schemes of work for a subject and grade
-      parameters:
-      - description: Bulk scheme request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.BulkCreateSchemeOfWorkRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Bulk create schemes of work
-      tags:
-      - Scheme of Work
-  /api/schemes/grade/{grade}:
-    get:
-      consumes:
-      - application/json
-      description: Get all schemes of work for a specific grade
-      parameters:
-      - description: Grade (e.g., JSS1, SS2, JSS2)
-        in: path
-        name: grade
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get schemes by grade
-      tags:
-      - Scheme of Work
-  /api/schemes/grade/{grade}/term/{term}:
-    get:
-      consumes:
-      - application/json
-      description: Get all schemes of work for a specific grade and term
-      parameters:
-      - description: Grade (e.g., JSS1, SS2)
-        in: path
-        name: grade
-        required: true
-        type: string
-      - description: Term (first, second, third)
-        in: path
-        name: term
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get schemes by grade and term
-      tags:
-      - Scheme of Work
-  /api/schemes/overview/{subject_id}/{grade}/{term}:
-    get:
-      consumes:
-      - application/json
-      description: Get an overview of schemes for a subject, grade, and term
-      parameters:
-      - description: Subject ID
-        in: path
-        name: subject_id
-        required: true
-        type: string
-      - description: Grade
-        in: path
-        name: grade
-        required: true
-        type: string
-      - description: Term
-        in: path
-        name: term
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get scheme overview
-      tags:
-      - Scheme of Work
-  /api/schemes/stats:
-    get:
-      consumes:
-      - application/json
-      description: Get statistics for schemes of work
-      parameters:
-      - description: Filter by subject ID
-        in: query
-        name: subject_id
-        type: string
-      - description: Filter by grade
-        in: query
-        name: grade
-        type: string
-      - description: Filter by term
-        in: query
-        name: term
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get scheme statistics
-      tags:
-      - Scheme of Work
-  /api/schemes/subject/{subject_id}:
-    get:
-      consumes:
-      - application/json
-      description: Get all schemes of work for a specific subject
-      parameters:
-      - description: Subject ID
-        in: path
-        name: subject_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get schemes by subject
-      tags:
-      - Scheme of Work
-  /api/schemes/teacher/{teacher_id}:
-    get:
-      consumes:
-      - application/json
-      description: Get all schemes of work for subjects taught by a specific teacher
-      parameters:
-      - description: Teacher ID
-        in: path
-        name: teacher_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get schemes by teacher
-      tags:
-      - Scheme of Work
   /api/student-enrollments:
     post:
       consumes:
@@ -8555,47 +6773,125 @@ paths:
       summary: Get assignments by teacher
       tags:
       - Teacher Subject Assignments
-  /api/topics:
+  /api/terms:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of all terms
+      parameters:
+      - description: Filter by academic session ID
+        in: query
+        name: academic_session_id
+        type: string
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - description: Filter by current status
+        in: query
+        name: is_current
+        type: boolean
+      - description: Filter by term number
+        in: query
+        name: term_number
+        type: integer
+      - description: Search by name, code, or description
+        in: query
+        name: search
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.TermListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all terms
+      tags:
+      - Terms
     post:
       consumes:
       - application/json
-      description: Create a new topic under a module
+      description: Create a new term for an academic session
       parameters:
-      - description: Topic payload
+      - description: Term request
         in: body
-        name: topic
+        name: request
         required: true
         schema:
-          $ref: '#/definitions/models.TopicInput'
+          $ref: '#/definitions/dto.CreateTermRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.SuccessResponse'
+            additionalProperties: true
+            type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/models.ConflictResponse'
+            additionalProperties: true
+            type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.FailureResponse'
+            additionalProperties: true
+            type: object
       security:
       - BearerAuth: []
-      summary: Create a topic
+      summary: Create a term
       tags:
-      - Topics
-  /api/topics/{id}:
+      - Terms
+  /api/terms/{id}:
     delete:
-      description: Delete topic by ID
+      consumes:
+      - application/json
+      description: Soft delete a term
       parameters:
-      - description: Topic ID
+      - description: Term ID
         in: path
         name: id
         required: true
@@ -8606,64 +6902,271 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.SuccessResponse'
+            additionalProperties: true
+            type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/models.NotFoundResponse'
+            additionalProperties: true
+            type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.FailureResponse'
+            additionalProperties: true
+            type: object
       security:
       - BearerAuth: []
-      summary: Delete topic
+      summary: Delete a term
       tags:
-      - Topics
+      - Terms
+    get:
+      consumes:
+      - application/json
+      description: Get a single term by its ID
+      parameters:
+      - description: Term ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get term by ID
+      tags:
+      - Terms
     put:
       consumes:
       - application/json
-      description: Update topic details
+      description: Update an existing term
       parameters:
-      - description: Topic ID
+      - description: Term ID
         in: path
         name: id
         required: true
         type: string
-      - description: Topic payload
+      - description: Update request
         in: body
-        name: topic
+        name: request
         required: true
         schema:
-          $ref: '#/definitions/models.TopicInput'
+          $ref: '#/definitions/dto.UpdateTermRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.TopicResponse'
+            additionalProperties: true
+            type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/models.NotFoundResponse'
+            additionalProperties: true
+            type: object
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.FailureResponse'
+            additionalProperties: true
+            type: object
       security:
       - BearerAuth: []
-      summary: Update topic
+      summary: Update a term
       tags:
-      - Topics
+      - Terms
+  /api/terms/bulk:
+    post:
+      consumes:
+      - application/json
+      description: Create multiple terms for an academic session
+      parameters:
+      - description: Bulk term request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BulkCreateTermsRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Bulk create terms
+      tags:
+      - Terms
+  /api/terms/session/{session_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all terms for a specific academic session
+      parameters:
+      - description: Academic Session ID
+        in: path
+        name: session_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get terms by academic session
+      tags:
+      - Terms
+  /api/terms/session/{session_id}/current:
+    get:
+      consumes:
+      - application/json
+      description: Get the current term for an academic session
+      parameters:
+      - description: Academic Session ID
+        in: path
+        name: session_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get current term
+      tags:
+      - Terms
+  /api/terms/stats:
+    get:
+      consumes:
+      - application/json
+      description: Get statistics for terms
+      parameters:
+      - description: Filter by academic session ID
+        in: query
+        name: academic_session_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get term statistics
+      tags:
+      - Terms
   /api/users:
     get:
       consumes:
@@ -9444,383 +7947,6 @@ paths:
       summary: Get Products related to a course ID
       tags:
       - Courses
-  /enrollments:
-    get:
-      consumes:
-      - application/json
-      description: Get all enrollments
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/enrollments.EnrollmentResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: List enrollments
-      tags:
-      - Enrollments
-    post:
-      consumes:
-      - application/json
-      description: Create a new enrollment with the provided details
-      parameters:
-      - description: Course details
-        in: body
-        name: enrollment
-        required: true
-        schema:
-          $ref: '#/definitions/enrollments.CreateEnrollmentInput'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/enrollments.EnrollmentResponse'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Create a new enrollment
-      tags:
-      - Enrollments
-  /enrollments/{id}:
-    get:
-      consumes:
-      - application/json
-      description: Get an enrollment by its ID
-      parameters:
-      - description: Enrollment ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/enrollments.EnrollmentResponse'
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Get enrollment by ID
-      tags:
-      - Enrollments
-  /grades:
-    get:
-      consumes:
-      - application/json
-      description: Get grades with filtering, sorting, and pagination
-      parameters:
-      - description: Filter by student ID
-        in: query
-        name: student_id
-        type: string
-      - description: Filter by course ID
-        in: query
-        name: course_id
-        type: string
-      - description: Filter by assignment ID
-        in: query
-        name: assignment_id
-        type: string
-      - description: Filter by tutor ID
-        in: query
-        name: tutor_id
-        type: string
-      - description: Minimum score
-        in: query
-        maximum: 100
-        minimum: 0
-        name: min_score
-        type: number
-      - description: Maximum score
-        in: query
-        maximum: 100
-        minimum: 0
-        name: max_score
-        type: number
-      - description: Filter by grade letter (A, B, C, D, F)
-        in: query
-        name: grade
-        type: string
-      - description: Start date (YYYY-MM-DD)
-        in: query
-        name: start_date
-        type: string
-      - description: End date (YYYY-MM-DD)
-        in: query
-        name: end_date
-        type: string
-      - description: Search in remarks
-        in: query
-        name: search
-        type: string
-      - description: Include student/course details
-        in: query
-        name: with_details
-        type: boolean
-      - default: 1
-        description: Page number
-        in: query
-        minimum: 1
-        name: page
-        type: integer
-      - default: 20
-        description: Items per page
-        in: query
-        maximum: 100
-        minimum: 1
-        name: limit
-        type: integer
-      - description: Sort field
-        enum:
-        - created_at
-        - updated_at
-        - score
-        - student
-        - course
-        in: query
-        name: sort_by
-        type: string
-      - description: Sort order
-        enum:
-        - asc
-        - desc
-        - ASC
-        - DESC
-        in: query
-        name: sort_order
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.PaginatedGradesResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Get all grades
-      tags:
-      - grades
-  /grades/courses/{course_id}/grades:
-    get:
-      consumes:
-      - application/json
-      description: Get all grades for a course
-      parameters:
-      - description: Course ID
-        in: path
-        name: course_id
-        required: true
-        type: string
-      - description: Include student details
-        in: query
-        name: with_details
-        type: boolean
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.GradeResponse'
-            type: array
-      security:
-      - BearerAuth: []
-      summary: Get grades for a specific course
-      tags:
-      - grades
-  /grades/stats:
-    get:
-      consumes:
-      - application/json
-      description: Get statistics for filtered grades
-      parameters:
-      - description: Filter by student ID
-        in: query
-        name: student_id
-        type: string
-      - description: Filter by course ID
-        in: query
-        name: course_id
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.GradeStats'
-      security:
-      - BearerAuth: []
-      summary: Get grade statistics
-      tags:
-      - grades
-  /grades/student/{student_id}/grades:
-    get:
-      consumes:
-      - application/json
-      description: Get all grades for a student
-      parameters:
-      - description: Student ID
-        in: path
-        name: student_id
-        required: true
-        type: string
-      - description: Include course details
-        in: query
-        name: with_details
-        type: boolean
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.GradeResponse'
-            type: array
-      security:
-      - BearerAuth: []
-      summary: Get grades for a specific student
-      tags:
-      - grades
-  /lessons:
-    get:
-      consumes:
-      - application/json
-      description: Get all lessons with optional filtering
-      parameters:
-      - description: Course ID
-        in: query
-        name: course_id
-        type: string
-      - description: Module ID
-        in: query
-        name: module_id
-        type: string
-      - description: Search term
-        in: query
-        name: search
-        type: string
-      - description: Sort field (title, order, created_at, updated_at)
-        in: query
-        name: sort_by
-        type: string
-      - description: Sort order (asc, desc)
-        in: query
-        name: sort_order
-        type: string
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        type: integer
-      - default: 10
-        description: Items per page
-        in: query
-        name: limit
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.PaginatedLessonsResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Get all lessons
-      tags:
-      - lessons
-  /modules:
-    get:
-      consumes:
-      - application/json
-      description: Get all modules
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.SuccessResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.FailureResponse'
-      summary: Get all modules
-      tags:
-      - Modules
-  /modules/{id}:
-    get:
-      consumes:
-      - application/json
-      description: Get a single module by ID
-      parameters:
-      - description: Module ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.SuccessResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.NotFoundResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.FailureResponse'
-      summary: Get a single module by ID
-      tags:
-      - Modules
   /products:
     get:
       description: Retrieve a list of all products
@@ -9907,61 +8033,6 @@ paths:
       summary: Get related courses with product ID
       tags:
       - Products
-  /topics:
-    get:
-      description: Get all topics, optionally filtered by course or module
-      parameters:
-      - description: Course ID
-        in: query
-        name: course_id
-        type: string
-      - description: Module ID
-        in: query
-        name: module_id
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.TopicResponse'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Get topics
-      tags:
-      - Topics
-  /topics/{id}:
-    get:
-      description: Get topic with module and course details
-      parameters:
-      - description: Topic ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.TopicResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.NotFoundResponse'
-      summary: Get topic details
-      tags:
-      - Topics
 schemes:
 - http
 securityDefinitions:

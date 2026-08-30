@@ -1,4 +1,4 @@
-// handlers/academic_session_handler.go
+// handlers/term_handler.go
 package handlers
 
 import (
@@ -9,34 +9,35 @@ import (
 	"github.com/google/uuid"
 
 	"crm-go/dto"
-	"crm-go/services/academic_session"
+	"crm-go/services/term"
 )
 
-type AcademicSessionHandler struct {
-	sessionService *services.AcademicSessionService
+type TermHandler struct {
+	termService *services.TermService
 }
 
-func NewAcademicSessionHandler(sessionService *services.AcademicSessionService) *AcademicSessionHandler {
-	return &AcademicSessionHandler{
-		sessionService: sessionService,
+func NewTermHandler(termService *services.TermService) *TermHandler {
+	return &TermHandler{
+		termService: termService,
 	}
 }
 
-// CreateAcademicSession handles the creation of a new academic session
-// @Summary Create an academic session
-// @Description Create a new academic session
-// @Tags Academic Sessions
+// CreateTerm handles the creation of a new term
+// @Summary Create a term
+// @Description Create a new term for an academic session
+// @Tags Terms
 // @Accept json
 // @Produce json
-// @Param request body dto.CreateAcademicSessionRequest true "Session request"
+// @Param request body dto.CreateTermRequest true "Term request"
 // @Success 201 {object} map[string]interface{}
 // @Failure 400 {object} map[string]interface{}
 // @Failure 401 {object} map[string]interface{}
+// @Failure 404 {object} map[string]interface{}
 // @Failure 409 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Security BearerAuth
-// @Router /api/academic-sessions [post]
-func (h *AcademicSessionHandler) CreateAcademicSession(c *gin.Context) {
+// @Router /api/terms [post]
+func (h *TermHandler) CreateTerm(c *gin.Context) {
 	userIDStr, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
@@ -53,7 +54,7 @@ func (h *AcademicSessionHandler) CreateAcademicSession(c *gin.Context) {
 		return
 	}
 
-	var req dto.CreateAcademicSessionRequest
+	var req dto.CreateTermRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   "Invalid request body",
@@ -62,8 +63,14 @@ func (h *AcademicSessionHandler) CreateAcademicSession(c *gin.Context) {
 		return
 	}
 
-	session, err := h.sessionService.CreateAcademicSession(&req, userID)
+	term, err := h.termService.CreateTerm(&req, userID)
 	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			c.JSON(http.StatusNotFound, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
 		if strings.Contains(err.Error(), "already exists") {
 			c.JSON(http.StatusConflict, gin.H{
 				"error": err.Error(),
@@ -77,30 +84,33 @@ func (h *AcademicSessionHandler) CreateAcademicSession(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"message": "Academic session created successfully",
-		"session": session,
+		"message": "Term created successfully",
+		"term":    term,
 	})
 }
 
-// GetAllSessions handles fetching all academic sessions
-// @Summary Get all academic sessions
-// @Description Get a paginated list of all academic sessions
-// @Tags Academic Sessions
+
+// GetAllTerms handles fetching all terms
+// @Summary Get all terms
+// @Description Get a paginated list of all terms
+// @Tags Terms
 // @Accept json
 // @Produce json
+// @Param academic_session_id query string false "Filter by academic session ID"
 // @Param status query string false "Filter by status"
 // @Param is_current query bool false "Filter by current status"
-// @Param search query string false "Search by academic year, code, or description"
+// @Param term_number query int false "Filter by term number"
+// @Param search query string false "Search by name, code, or description"
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Items per page" default(20)
-// @Success 200 {object} dto.AcademicSessionListResponse
+// @Success 200 {object} dto.TermListResponse
 // @Failure 400 {object} map[string]interface{}
 // @Failure 401 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Security BearerAuth
-// @Router /api/academic-sessions [get]
-func (h *AcademicSessionHandler) GetAllSessions(c *gin.Context) {
-	var params dto.AcademicSessionQueryParams
+// @Router /api/terms [get]
+func (h *TermHandler) GetAllTerms(c *gin.Context) {
+	var params dto.TermQueryParams
 	if err := c.ShouldBindQuery(&params); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   "Invalid query parameters",
@@ -109,7 +119,7 @@ func (h *AcademicSessionHandler) GetAllSessions(c *gin.Context) {
 		return
 	}
 
-	response, err := h.sessionService.GetAllSessions(&params)
+	response, err := h.termService.GetAllTerms(&params)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -118,34 +128,34 @@ func (h *AcademicSessionHandler) GetAllSessions(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Academic sessions retrieved successfully",
+		"message": "Terms retrieved successfully",
 		"data":    response,
 	})
 }
 
-// GetSessionByID handles fetching a single academic session by ID
-// @Summary Get academic session by ID
-// @Description Get a single academic session by its ID
-// @Tags Academic Sessions
+// GetTermByID handles fetching a single term by ID
+// @Summary Get term by ID
+// @Description Get a single term by its ID
+// @Tags Terms
 // @Accept json
 // @Produce json
-// @Param id path string true "Session ID"
+// @Param id path string true "Term ID"
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]interface{}
 // @Failure 404 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Security BearerAuth
-// @Router /api/academic-sessions/{id} [get]
-func (h *AcademicSessionHandler) GetSessionByID(c *gin.Context) {
+// @Router /api/terms/{id} [get]
+func (h *TermHandler) GetTermByID(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Session ID is required",
+			"error": "Term ID is required",
 		})
 		return
 	}
 
-	session, err := h.sessionService.GetSessionByID(id)
+	term, err := h.termService.GetTermByID(id)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			c.JSON(http.StatusNotFound, gin.H{
@@ -160,26 +170,72 @@ func (h *AcademicSessionHandler) GetSessionByID(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Academic session retrieved successfully",
-		"session": session,
+		"message": "Term retrieved successfully",
+		"term":    term,
 	})
 }
 
-// GetCurrentSession handles fetching the current academic session
-// @Summary Get current academic session
-// @Description Get the current academic session
-// @Tags Academic Sessions
+// GetTermsByAcademicSession handles fetching all terms for an academic session
+// @Summary Get terms by academic session
+// @Description Get all terms for a specific academic session
+// @Tags Terms
 // @Accept json
 // @Produce json
+// @Param session_id path string true "Academic Session ID"
 // @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Security BearerAuth
+// @Router /api/terms/session/{session_id} [get]
+func (h *TermHandler) GetTermsByAcademicSession(c *gin.Context) {
+	sessionID := c.Param("session_id")
+	if sessionID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Academic session ID is required",
+		})
+		return
+	}
+
+	terms, err := h.termService.GetTermsByAcademicSession(sessionID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Terms retrieved successfully",
+		"terms":   terms,
+		"total":   len(terms),
+	})
+}
+
+// GetCurrentTerm handles fetching the current term for an academic session
+// @Summary Get current term
+// @Description Get the current term for an academic session
+// @Tags Terms
+// @Accept json
+// @Produce json
+// @Param session_id path string true "Academic Session ID"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
 // @Failure 404 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Security BearerAuth
-// @Router /api/academic-sessions/current [get]
-func (h *AcademicSessionHandler) GetCurrentSession(c *gin.Context) {
-	session, err := h.sessionService.GetCurrentSession()
+// @Router /api/terms/session/{session_id}/current [get]
+func (h *TermHandler) GetCurrentTerm(c *gin.Context) {
+	sessionID := c.Param("session_id")
+	if sessionID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Academic session ID is required",
+		})
+		return
+	}
+
+	term, err := h.termService.GetCurrentTerm(sessionID)
 	if err != nil {
-		if strings.Contains(err.Error(), "no current") {
+		if strings.Contains(err.Error(), "no current term") {
 			c.JSON(http.StatusNotFound, gin.H{
 				"error": err.Error(),
 			})
@@ -192,49 +248,31 @@ func (h *AcademicSessionHandler) GetCurrentSession(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Current academic session retrieved successfully",
-		"session": session,
+		"message": "Current term retrieved successfully",
+		"term":    term,
 	})
 }
 
-// GetActiveSessions handles fetching all active academic sessions
-// @Summary Get active academic sessions
-// @Description Get all active academic sessions
-// @Tags Academic Sessions
+// GetTermStats handles fetching term statistics
+// @Summary Get term statistics
+// @Description Get statistics for terms
+// @Tags Terms
 // @Accept json
 // @Produce json
+// @Param academic_session_id query string false "Filter by academic session ID"
 // @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Security BearerAuth
-// @Router /api/academic-sessions/active [get]
-func (h *AcademicSessionHandler) GetActiveSessions(c *gin.Context) {
-	sessions, err := h.sessionService.GetActiveSessions()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-		return
+// @Router /api/terms/stats [get]
+func (h *TermHandler) GetTermStats(c *gin.Context) {
+	filter := make(map[string]interface{})
+	
+	if sessionID := c.Query("academic_session_id"); sessionID != "" {
+		filter["academic_session_id"] = sessionID
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message":  "Active academic sessions retrieved successfully",
-		"sessions": sessions,
-		"total":    len(sessions),
-	})
-}
-
-// GetSessionStats handles fetching academic session statistics
-// @Summary Get academic session statistics
-// @Description Get statistics for academic sessions
-// @Tags Academic Sessions
-// @Accept json
-// @Produce json
-// @Success 200 {object} map[string]interface{}
-// @Failure 500 {object} map[string]interface{}
-// @Security BearerAuth
-// @Router /api/academic-sessions/stats [get]
-func (h *AcademicSessionHandler) GetSessionStats(c *gin.Context) {
-	stats, err := h.sessionService.GetSessionStats()
+	stats, err := h.termService.GetTermStats(filter)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -248,32 +286,31 @@ func (h *AcademicSessionHandler) GetSessionStats(c *gin.Context) {
 	})
 }
 
-// UpdateAcademicSession handles updating an academic session
-// @Summary Update an academic session
-// @Description Update an existing academic session
-// @Tags Academic Sessions
+// UpdateTerm handles updating a term
+// @Summary Update a term
+// @Description Update an existing term
+// @Tags Terms
 // @Accept json
 // @Produce json
-// @Param id path string true "Session ID"
-// @Param request body dto.UpdateAcademicSessionRequest true "Update request"
+// @Param id path string true "Term ID"
+// @Param request body dto.UpdateTermRequest true "Update request"
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]interface{}
 // @Failure 401 {object} map[string]interface{}
 // @Failure 404 {object} map[string]interface{}
-// @Failure 409 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Security BearerAuth
-// @Router /api/academic-sessions/{id} [put]
-func (h *AcademicSessionHandler) UpdateAcademicSession(c *gin.Context) {
+// @Router /api/terms/{id} [put]
+func (h *TermHandler) UpdateTerm(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Session ID is required",
+			"error": "Term ID is required",
 		})
 		return
 	}
 
-	var req dto.UpdateAcademicSessionRequest
+	var req dto.UpdateTermRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   "Invalid request body",
@@ -282,7 +319,7 @@ func (h *AcademicSessionHandler) UpdateAcademicSession(c *gin.Context) {
 		return
 	}
 
-	session, err := h.sessionService.UpdateAcademicSession(id, &req)
+	term, err := h.termService.UpdateTerm(id, &req)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			c.JSON(http.StatusNotFound, gin.H{
@@ -303,44 +340,38 @@ func (h *AcademicSessionHandler) UpdateAcademicSession(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Academic session updated successfully",
-		"session": session,
+		"message": "Term updated successfully",
+		"term":    term,
 	})
 }
 
-// DeleteAcademicSession handles deleting an academic session (soft delete)
-// @Summary Delete an academic session
-// @Description Soft delete an academic session
-// @Tags Academic Sessions
+// DeleteTerm handles deleting a term (soft delete)
+// @Summary Delete a term
+// @Description Soft delete a term
+// @Tags Terms
 // @Accept json
 // @Produce json
-// @Param id path string true "Session ID"
+// @Param id path string true "Term ID"
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]interface{}
 // @Failure 401 {object} map[string]interface{}
 // @Failure 404 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Security BearerAuth
-// @Router /api/academic-sessions/{id} [delete]
-func (h *AcademicSessionHandler) DeleteAcademicSession(c *gin.Context) {
+// @Router /api/terms/{id} [delete]
+func (h *TermHandler) DeleteTerm(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Session ID is required",
+			"error": "Term ID is required",
 		})
 		return
 	}
 
-	err := h.sessionService.DeleteAcademicSession(id)
+	err := h.termService.DeleteTerm(id)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			c.JSON(http.StatusNotFound, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-		if strings.Contains(err.Error(), "cannot delete") {
-			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
 			return
@@ -352,6 +383,6 @@ func (h *AcademicSessionHandler) DeleteAcademicSession(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Academic session deleted successfully",
+		"message": "Term deleted successfully",
 	})
 }

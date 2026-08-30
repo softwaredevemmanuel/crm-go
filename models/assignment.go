@@ -1,121 +1,39 @@
+// models/assignment.go
 package models
 
 import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type Assignment struct {
-	ID uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	ID                   uuid.UUID      `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	SchemeOfWorkItemID   uuid.UUID      `gorm:"type:uuid;not null;index" json:"scheme_of_work_item_id"`
+	LessonID             uuid.UUID      `gorm:"type:uuid;index" json:"lesson_id"`
+	TeacherID            uuid.UUID      `gorm:"type:uuid;not null;index" json:"teacher_id"`
+	ClassID              uuid.UUID      `gorm:"type:uuid;not null;index" json:"class_id"`
+	ArmID                uuid.UUID      `gorm:"type:uuid;index" json:"arm_id"`
+	Title                string         `gorm:"type:varchar(255);not null" json:"title"`
+	Description          string         `gorm:"type:text" json:"description"`
+	Type                 string         `gorm:"type:varchar(30);not null;default:'assignment'" json:"type"`
+	AssignedDate         *time.Time     `gorm:"type:date" json:"assigned_date,omitempty"`
+	DueDate              *time.Time     `gorm:"type:date" json:"due_date,omitempty"`
+	TotalMarks           float64        `gorm:"type:decimal(10,2)" json:"total_marks"`
+	Status               string         `gorm:"type:varchar(20);default:'draft'" json:"status"`
+	CreatedAt            time.Time      `json:"created_at"`
+	UpdatedAt            time.Time      `json:"updated_at"`
+	DeletedAt            gorm.DeletedAt `gorm:"index" json:"-"`
 
-	CourseID    uuid.UUID  `gorm:"type:uuid;not null;index"`
-	ModuleID    *uuid.UUID `gorm:"type:uuid;index"`
-	TopicID     *uuid.UUID `gorm:"type:uuid;index"`
-	PublisherID *uuid.UUID `gorm:"type:uuid;index"`
-
-	Title          string `gorm:"type:varchar(255);not null"`
-	Slug           string `gorm:"type:varchar(300);uniqueIndex;not null"`
-	Description    string `gorm:"type:text"`
-	Content        string `gorm:"type:text"` // Text content/description
-	SubmissionType string `gorm:"type:varchar(50);default:'text';check:submission_type IN ('text', 'file', 'url', 'code', 'video', 'audio', 'image', 'document', 'presentation', 'multiple')"`
-	Status         string `gorm:"type:varchar(20);default:'submitted';check:status IN ('draft', 'submitted', 'under_review', 'rejected')"`
-
-	Type    string    `gorm:"type:varchar(50);default:'homework';check:type IN ('homework','project','essay','quiz','exam','lab','presentation','discussion','peer_review','group','research','creative')"`
-	DueDate time.Time `gorm:"not null;index"`
-
-	// Foreign key for Publisher
-	Publisher User   `gorm:"foreignKey:PublisherID"`
-	Course    Course `gorm:"foreignKey:CourseID"`
-	Module    Module `gorm:"foreignKey:ModuleID"`
-	Topic     Topics `gorm:"foreignKey:TopicID"`
-
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	ApprovedAt  *time.Time
-	PublishedAt *time.Time
-	ArchivedAt  *time.Time
+	// Relationships
+	SchemeOfWorkItem SchemeOfWorkItem `gorm:"foreignKey:SchemeOfWorkItemID" json:"scheme_of_work_item,omitempty"`
+	Lesson           Lesson           `gorm:"foreignKey:LessonID" json:"lesson,omitempty"`
+	Teacher          User             `gorm:"foreignKey:TeacherID" json:"teacher,omitempty"`
+	Class            ClassGrade       `gorm:"foreignKey:ClassID" json:"class,omitempty"`
+	Arm              Arm              `gorm:"foreignKey:ArmID" json:"arm,omitempty"`
 }
 
-type AssignmentInput struct {
-	CourseID    uuid.UUID  `json:"course_id" binding:"required"`
-	ModuleID    *uuid.UUID `json:"module_id,omitempty"`
-	TopicID     *uuid.UUID `json:"topic_id,omitempty"`
-	PublisherID *uuid.UUID `json:"publisher_id,omitempty"`
-
-	Title       string `json:"title" binding:"required"`
-	Slug        string `json:"slug" binding:"required"`
-	Description string `json:"description,omitempty"`
-
-	DueDate time.Time `json:"due_date" binding:"required"`
-
-	Content        string `json:"content,omitempty"`
-	Type           string `json:"type,omitempty"`
-	SubmissionType string `json:"submission_type,omitempty"`
-	Status         string `json:"status,omitempty"`
-}
-
-type AssignmentListResponse struct {
-	ID          uuid.UUID  `json:"id"`
-	CourseID    uuid.UUID  `json:"course_id"`
-	ModuleID    *uuid.UUID `json:"module_id,omitempty"`
-	TopicID     *uuid.UUID `json:"topic_id,omitempty"`
-	PublisherID *uuid.UUID `json:"publisher_id,omitempty"`
-
-	Title          string    `json:"title"`
-	Slug           string    `json:"slug"`
-	Description    string    `json:"description"`
-	Content        string    `json:"content,omitempty"`
-	Type           string    `json:"type"`
-	SubmissionType string    `json:"submission_type,omitempty"`
-	Status         string    `json:"status,omitempty"`
-	DueDate        time.Time `json:"due_date"`
-
-	CreatedAt   time.Time  `json:"created_at"`
-	UpdatedAt   time.Time  `json:"updated_at"`
-	ApprovedAt  *time.Time `json:"approved_at,omitempty"`
-	PublishedAt *time.Time `json:"published_at,omitempty"`
-	ArchivedAt  *time.Time `json:"archived_at,omitempty"`
-}
-
-type AssignmentViewResponse struct {
-	ID             uuid.UUID `json:"id"`
-	Title          string    `json:"title"`
-	Slug           string    `json:"slug"`
-	Description    string    `json:"description"`
-	Type           string    `json:"type"`
-	SubmissionType string    `json:"submission_type,omitempty"`
-	Content        string    `json:"content,omitempty"`
-	Status         string    `json:"status,omitempty"`
-	DueDate        time.Time `json:"due_date"`
-
-	Course    CourseResponse  `json:"course"`
-	Module    *ModuleResponse `json:"module,omitempty"`
-	Topic     *TopicResponse  `json:"topic,omitempty"`
-	Publisher UserResponse    `json:"publisher"`
-
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-}
-
-type AssignmentUpdateInput struct {
-	CourseID uuid.UUID  `json:"course_id" binding:"required"`
-	ModuleID *uuid.UUID `json:"module_id,omitempty"`
-	TopicID  *uuid.UUID `json:"topic_id,omitempty"`
-
-	Title       string `json:"title" binding:"required"`
-	Slug        string `json:"slug" binding:"required"`
-	Description string `json:"description,omitempty"`
-
-	DueDate time.Time `json:"due_date" binding:"required"`
-
-	Content        string `json:"content,omitempty"`
-	Type           string `json:"type,omitempty"`
-	SubmissionType string `json:"submission_type,omitempty"`
-	Status         string `json:"status,omitempty"`
-}
-
-// TableName specifies the table name
 func (Assignment) TableName() string {
 	return "assignments"
 }

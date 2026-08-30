@@ -11,7 +11,6 @@ type AcademicSession struct {
 	ID           uuid.UUID      `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
 	AcademicYear string         `gorm:"type:varchar(20);not null;" json:"academic_year"`
 	Code         string         `gorm:"type:varchar(20);not null;" json:"code"`
-	Term         string         `gorm:"type:varchar(20);not null;check:term IN ('first', 'second', 'third')" json:"term"`
 	StartDate    time.Time      `gorm:"type:date;not null" json:"start_date"`
 	EndDate      time.Time      `gorm:"type:date;not null" json:"end_date"`
 	Status       string         `gorm:"type:varchar(20);not null;default:'active';check:status IN ('active', 'inactive', 'completed')" json:"status"`
@@ -21,6 +20,14 @@ type AcademicSession struct {
 	CreatedAt    time.Time      `json:"created_at"`
 	UpdatedAt    time.Time      `json:"updated_at"`
 	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
+
+	// Relationships
+	Terms    []Term    `gorm:"foreignKey:AcademicSessionID" json:"terms,omitempty"`
+	Schemes  []SchemeOfWork `gorm:"foreignKey:AcademicSessionID" json:"schemes,omitempty"`
+	Tests    []Test    `gorm:"foreignKey:AcademicSessionID" json:"tests,omitempty"`
+	Exams    []Exam    `gorm:"foreignKey:AcademicSessionID" json:"exams,omitempty"`
+	Creator  User            `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
+
 }
 
 // TableName specifies the table name
