@@ -29,8 +29,8 @@ type SchemeOfWork struct {
 	Class           ClassGrade            `gorm:"foreignKey:ClassID" json:"class,omitempty"`
 	Creator         User                  `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
 	Items           []SchemeOfWorkItem    `gorm:"foreignKey:SchemeOfWorkID" json:"items,omitempty"`
-	Lessons         []Lesson              `gorm:"foreignKey:SchemeOfWorkItemID" json:"lessons,omitempty"`
-	Assignments     []Assignment          `gorm:"foreignKey:SchemeOfWorkItemID" json:"assignments,omitempty"`
+	// ✅ REMOVED: Lessons []Lesson `gorm:"foreignKey:SchemeOfWorkItemID" json:"lessons,omitempty"`
+	// ✅ REMOVED: Assignments []Assignment `gorm:"foreignKey:SchemeOfWorkItemID" json:"assignments,omitempty"`
 }
 
 func (SchemeOfWork) TableName() string {

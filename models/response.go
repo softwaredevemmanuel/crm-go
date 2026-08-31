@@ -10,7 +10,7 @@ import (
 // @Description Login request payload
 type LoginInput struct {
 	Email    string `json:"email" binding:"required,email" example:"eokereke47@gmail.com"`
-	Password string `json:"password" binding:"required" example:"123456"`
+	Password string `json:"password" binding:"required" example:"mypassword"`
 }
 
 

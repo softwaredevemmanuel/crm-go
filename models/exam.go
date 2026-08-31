@@ -14,7 +14,6 @@ type Exam struct {
 	TermID            uuid.UUID      `gorm:"type:uuid;not null;index" json:"term_id"`
 	SubjectID         uuid.UUID      `gorm:"type:uuid;not null;index" json:"subject_id"`
 	ClassID           uuid.UUID      `gorm:"type:uuid;not null;index" json:"class_id"`
-	ArmID             uuid.UUID      `gorm:"type:uuid;index" json:"arm_id"`
 	Title             string         `gorm:"type:varchar(255);not null" json:"title"`
 	ExamType          string         `gorm:"type:varchar(50)" json:"exam_type"`
 	ExamDate          *time.Time     `gorm:"type:date" json:"exam_date,omitempty"`
@@ -31,7 +30,6 @@ type Exam struct {
 	Term            Term               `gorm:"foreignKey:TermID" json:"term,omitempty"`
 	Subject         Subject            `gorm:"foreignKey:SubjectID" json:"subject,omitempty"`
 	Class           ClassGrade         `gorm:"foreignKey:ClassID" json:"class,omitempty"`
-	Arm             Arm                `gorm:"foreignKey:ArmID" json:"arm,omitempty"`
 	Creator         User               `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
 	ExamSchemeItems []ExamSchemeItem   `gorm:"foreignKey:ExamID" json:"exam_scheme_items,omitempty"`
 }

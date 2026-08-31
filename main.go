@@ -130,6 +130,17 @@ func main() {
 	routes.TeacherSubjectAssignmentRoutes(&r.RouterGroup, config.DB)
 	routes.ArmClassTeacherRoutes(&r.RouterGroup, config.DB)
 	routes.TermRoutes(&r.RouterGroup, config.DB)
+	routes.ModuleRoutes(&r.RouterGroup, config.DB)
+	routes.SchemeOfWorkRoutes(&r.RouterGroup, config.DB)
+	routes.SchemeOfWorkItemRoutes(&r.RouterGroup, config.DB)
+	routes.LearningObjectiveRoutes(&r.RouterGroup, config.DB)
+	routes.LessonRoutes(&r.RouterGroup, config.DB)
+	routes.LessonPlanRoutes(&r.RouterGroup, config.DB)
+	routes.ExerciseRoutes(&r.RouterGroup, config.DB)
+	routes.TestRoutes(&r.RouterGroup, config.DB)
+	routes.TestSchemeItemRoutes(&r.RouterGroup, config.DB)
+	routes.ExamRoutes(&r.RouterGroup, config.DB)
+	routes.ExamSchemeItemRoutes(&r.RouterGroup, config.DB)
 
 	// Example curl command to clear DB (replace with your server address):
 	// curl -X DELETE "http://localhost:8080/admin/clear-db" \
@@ -192,9 +203,23 @@ func main() {
 		seeds.SeedObjectiveQuestions()
 		seeds.SeedAcademicSessions()
 		seeds.SeedClassGrades()
+		seeds.SeedArms()
 		seeds.SeedDepartments()
 		seeds.SeedSubjects()
 		seeds.SeedTerm()
+		seeds.SeedModules()
+		seeds.SeedSchemesOfWork()
+		seeds.SeedSchemeOfWorkItems()
+		seeds.SeedLearningObjectives()
+		seeds.SeedLessons()
+		seeds.SeedLessonPlans()
+		seeds.SeedExercises()
+		seeds.SeedTests()
+		seeds.SeedTestSchemeItem()
+		seeds.SeedExams()
+		seeds.SeedExamSchemeItem()
+		
+
 		return
 	}
 

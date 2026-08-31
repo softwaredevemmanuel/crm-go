@@ -11,7 +11,6 @@ import (
 type Lesson struct {
 	ID                   uuid.UUID      `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
 	SchemeOfWorkItemID   uuid.UUID      `gorm:"type:uuid;not null;index" json:"scheme_of_work_item_id"`
-	TeacherID            uuid.UUID      `gorm:"type:uuid;not null;index" json:"teacher_id"`
 	ClassID              uuid.UUID      `gorm:"type:uuid;not null;index" json:"class_id"`
 	ArmID                uuid.UUID      `gorm:"type:uuid;index" json:"arm_id"`
 	Title                string         `gorm:"type:varchar(255);not null" json:"title"`
@@ -26,7 +25,6 @@ type Lesson struct {
 
 	// Relationships - using foreign keys
 	SchemeOfWorkItem SchemeOfWorkItem `gorm:"foreignKey:SchemeOfWorkItemID" json:"scheme_of_work_item,omitempty"`
-	Teacher          User             `gorm:"foreignKey:TeacherID" json:"teacher,omitempty"`
 	Class            ClassGrade       `gorm:"foreignKey:ClassID" json:"class,omitempty"`
 	Arm              Arm              `gorm:"foreignKey:ArmID" json:"arm,omitempty"`
 	

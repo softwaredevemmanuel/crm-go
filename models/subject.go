@@ -22,6 +22,7 @@ type Subject struct {
 
 	// Relationships
 	Department Department `gorm:"foreignKey:DepartmentID" json:"department,omitempty"`
+	Creator         User            `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
 	// Relationships
 	Modules     []Module     `gorm:"foreignKey:SubjectID" json:"modules,omitempty"`
 	Schemes     []SchemeOfWork `gorm:"foreignKey:SubjectID" json:"schemes,omitempty"`

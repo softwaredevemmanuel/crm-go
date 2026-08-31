@@ -2,34 +2,62 @@
 package routes
 
 import (
-	"crm-go/controllers/subject"
-	"crm-go/middleware"
-	"crm-go/services/subjects"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+
+	"crm-go/controllers/subject"
+	"crm-go/services/subjects"
+	"crm-go/middleware"
 )
 
 func SubjectRoutes(router *gin.RouterGroup, db *gorm.DB) {
-	service := services.NewSubjectService(db)
-	handler := controllers.NewSubjectController(service)
+	subjectService := services.NewSubjectService(db)
+	subjectHandler := handlers.NewSubjectHandler(subjectService)
 
-	subjectGroup := router.Group("/api/subjects")
-	subjectGroup.Use(middleware.AuthMiddleware()) // Your auth middleware
+	subjectGroup := router.Group("/api")
+	subjectGroup.Use(middleware.AuthMiddleware())
 	{
-		// 1. Create subject
-		subjectGroup.POST("", handler.CreateSubject)
+		// ============================================================
+		// CREATE - Subject creation endpoints
+		// ============================================================
+		
+		// Create single subject
+		subjectGroup.POST("/subjects", subjectHandler.CreateSubject)
+		
+		// Bulk create subjects
+		subjectGroup.POST("/subjects/bulk", subjectHandler.BulkCreateSubjects)
 
-		// 2. Get all subjects with pagination
-		subjectGroup.GET("", handler.GetAllSubjects)
+		// ============================================================
+		// READ - Subject retrieval endpoints
+		// ============================================================
+		
+		// Get all subjects with pagination and filters
+		subjectGroup.GET("/subjects", subjectHandler.GetAllSubjects)
+		
+		// Get subject by ID
+		subjectGroup.GET("/subjects/:id", subjectHandler.GetSubjectByID)
+		
+		// Get subjects by department
+		subjectGroup.GET("/subjects/department/:department_id", subjectHandler.GetSubjectsByDepartment)
+		
+		// Get active subjects
+		subjectGroup.GET("/subjects/active", subjectHandler.GetActiveSubjects)
+		
+		// Get subject statistics
+		subjectGroup.GET("/subjects/stats", subjectHandler.GetSubjectStats)
 
-		// 3. Get subject by ID with department and head
-		subjectGroup.GET("/department/head-of-department/:id", handler.GetSubjectWithDepartmentAndHead)
+		// ============================================================
+		// UPDATE - Subject update endpoints
+		// ============================================================
+		
+		// Update subject
+		subjectGroup.PUT("/subjects/:id", subjectHandler.UpdateSubject)
 
-		// 4. Update subject
-		subjectGroup.PUT("/:id", handler.UpdateSubject)
-
-		// 5. Delete subject
-		subjectGroup.DELETE("/:id", handler.DeleteSubject)
+		// ============================================================
+		// DELETE - Subject deletion endpoints
+		// ============================================================
+		
+		// Delete subject (soft delete)
+		subjectGroup.DELETE("/subjects/:id", subjectHandler.DeleteSubject)
 	}
 }
-

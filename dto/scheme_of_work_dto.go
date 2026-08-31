@@ -7,55 +7,46 @@ import (
 
 // CreateSchemeOfWorkRequest represents the request to create a scheme of work
 type CreateSchemeOfWorkRequest struct {
+	AcademicSessionID string `json:"academic_session_id" binding:"required"`
+	TermID            string `json:"term_id" binding:"required"`
 	SubjectID         string `json:"subject_id" binding:"required"`
-	Grade             string `json:"grade" binding:"required"`
-	Term              string `json:"term" binding:"required,oneof=first second third"`
-	Week              int    `json:"week" binding:"required,min=1,max=52"`
-	Topic             string `json:"topic" binding:"required"`
-	Subtopics         string `json:"subtopics"`
-	Objectives        string `json:"objectives" binding:"required"`
-	Activities        string `json:"activities"`
-	TeachingResources string `json:"teaching_resources"`
-	Assessment        string `json:"assessment"`
+	ClassID           string `json:"class_id" binding:"required"`
+	Title             string `json:"title" binding:"required"`
+	Description       string `json:"description"`
 	Status            string `json:"status"` // draft, published, archived
 }
 
 // UpdateSchemeOfWorkRequest represents the request to update a scheme of work
 type UpdateSchemeOfWorkRequest struct {
+	AcademicSessionID string `json:"academic_session_id"`
+	TermID            string `json:"term_id"`
 	SubjectID         string `json:"subject_id"`
-	Grade             string `json:"grade"`
-	Term              string `json:"term" binding:"omitempty,oneof=first second third"`
-	Week              int    `json:"week"`
-	Topic             string `json:"topic"`
-	Subtopics         string `json:"subtopics"`
-	Objectives        string `json:"objectives"`
-	Activities        string `json:"activities"`
-	TeachingResources string `json:"teaching_resources"`
-	Assessment        string `json:"assessment"`
-	Status            string `json:"status"` // draft, published, archived
+	ClassID           string `json:"class_id"`
+	Title             string `json:"title"`
+	Description       string `json:"description"`
+	Status            string `json:"status"`
 }
 
 // SchemeOfWorkResponse represents the response for a scheme of work
 type SchemeOfWorkResponse struct {
-	ID                 string    `json:"id"`
-	SubjectID          string    `json:"subject_id"`
-	Grade              string    `json:"grade"`
-	Term               string    `json:"term"`
-	Week               int       `json:"week"`
-	Topic              string    `json:"topic"`
-	Subtopics          string    `json:"subtopics"`
-	Objectives         string    `json:"objectives"`
-	Activities         string    `json:"activities"`
-	TeachingResources  string    `json:"teaching_resources"`
-	Assessment         string    `json:"assessment"`
-	Status             string    `json:"status"`
-	CreatedBy          string    `json:"created_by"`
-	CreatedAt          time.Time `json:"created_at"`
-	UpdatedAt          time.Time `json:"updated_at"`
+	ID                string    `json:"id"`
+	AcademicSessionID string    `json:"academic_session_id"`
+	TermID            string    `json:"term_id"`
+	SubjectID         string    `json:"subject_id"`
+	ClassID           string    `json:"class_id"`
+	Title             string    `json:"title"`
+	Description       string    `json:"description"`
+	Status            string    `json:"status"`
+	CreatedBy         string    `json:"created_by"`
+	CreatedAt         time.Time `json:"created_at"`
+	UpdatedAt         time.Time `json:"updated_at"`
 
 	// Nested relationships
-	Subject *SubjectResponse `json:"subject,omitempty"`
-	Creator *UserResponse    `json:"creator,omitempty"`
+	AcademicSession *AcademicSessionResponse `json:"academic_session,omitempty"`
+	Term            *TermResponse            `json:"term,omitempty"`
+	Subject         *SubjectResponse         `json:"subject,omitempty"`
+	Class           *ClassGradeResponse      `json:"class,omitempty"`
+	Creator         *UserResponse            `json:"creator,omitempty"`
 }
 
 // SchemeOfWorkListResponse represents a paginated list of schemes of work
@@ -69,67 +60,53 @@ type SchemeOfWorkListResponse struct {
 
 // SchemeOfWorkQueryParams represents query parameters for filtering schemes of work
 type SchemeOfWorkQueryParams struct {
-	SubjectID string `form:"subject_id"`
-	Grade     string `form:"grade"`
-	Term      string `form:"term" binding:"omitempty,oneof=first second third"`
-	Status    string `form:"status" binding:"omitempty,oneof=draft published archived"`
-	Week      int    `form:"week"`
-	Search    string `form:"search"`
-	Page      int    `form:"page" default:"1"`
-	Limit     int    `form:"limit" default:"20"`
-	SortBy    string `form:"sort_by" default:"week"`
-	SortOrder string `form:"sort_order" default:"asc"`
+	AcademicSessionID string `form:"academic_session_id"`
+	TermID            string `form:"term_id"`
+	SubjectID         string `form:"subject_id"`
+	ClassID           string `form:"class_id"`
+	Status            string `form:"status"`
+	Search            string `form:"search"`
+	Page              int    `form:"page" default:"1"`
+	Limit             int    `form:"limit" default:"20"`
+	SortBy            string `form:"sort_by" default:"created_at"`
+	SortOrder         string `form:"sort_order" default:"desc"`
 }
 
-// BulkCreateSchemeOfWorkRequest represents the request to bulk create schemes of work
-type BulkCreateSchemeOfWorkRequest struct {
-	SubjectID string `json:"subject_id" binding:"required"`
-	Grade     string `json:"grade" binding:"required"`
-	Term      string `json:"term" binding:"required,oneof=first second third"`
-	Schemes   []struct {
-		Week              int    `json:"week" binding:"required"`
-		Topic             string `json:"topic" binding:"required"`
-		Subtopics         string `json:"subtopics"`
-		Objectives        string `json:"objectives" binding:"required"`
-		Activities        string `json:"activities"`
-		TeachingResources string `json:"teaching_resources"`
-		Assessment        string `json:"assessment"`
+// BulkCreateSchemesRequest represents the request to bulk create schemes of work
+type BulkCreateSchemesRequest struct {
+	AcademicSessionID string `json:"academic_session_id" binding:"required"`
+	TermID            string `json:"term_id" binding:"required"`
+	SubjectID         string `json:"subject_id" binding:"required"`
+	ClassID           string `json:"class_id" binding:"required"`
+	Schemes           []struct {
+		Title       string `json:"title" binding:"required"`
+		Description string `json:"description"`
 	} `json:"schemes" binding:"required,min=1"`
-	Status string `json:"status"` // draft, published, archived
+	Status string `json:"status"`
 }
 
 // BulkSchemeResult represents the result of a bulk operation
 type BulkSchemeResult struct {
-	SuccessCount int                    `json:"success_count"`
-	FailedCount  int                    `json:"failed_count"`
+	SuccessCount int                 `json:"success_count"`
+	FailedCount  int                 `json:"failed_count"`
 	Created      []SchemeOfWorkResponse `json:"created"`
-	Errors       []BulkSchemeError      `json:"errors"`
+	Errors       []BulkSchemeError   `json:"errors"`
 }
 
 // BulkSchemeError represents an error in bulk scheme creation
 type BulkSchemeError struct {
-	Week  int    `json:"week"`
-	Topic string `json:"topic"`
+	Title string `json:"title"`
 	Error string `json:"error"`
 }
 
 // SchemeOfWorkStats represents statistics for schemes of work
 type SchemeOfWorkStats struct {
-	TotalSchemes     int64 `json:"total_schemes"`
-	DraftSchemes     int64 `json:"draft_schemes"`
-	PublishedSchemes int64 `json:"published_schemes"`
-	ArchivedSchemes  int64 `json:"archived_schemes"`
-	TotalWeeks       int64 `json:"total_weeks"`
-}
-
-// SchemeOverview represents a summary of schemes for a subject/grade
-type SchemeOverview struct {
-	SubjectID   string `json:"subject_id"`
-	SubjectName string `json:"subject_name"`
-	Grade       string `json:"grade"`
-	Term        string `json:"term"`
-	TotalWeeks  int    `json:"total_weeks"`
-	WeeksCovered int   `json:"weeks_covered"`
-	Progress    string `json:"progress"` // percentage
-	Status      string `json:"status"`
+	TotalSchemes      int64 `json:"total_schemes"`
+	DraftSchemes      int64 `json:"draft_schemes"`
+	PublishedSchemes  int64 `json:"published_schemes"`
+	ArchivedSchemes   int64 `json:"archived_schemes"`
+	TotalSubjects     int64 `json:"total_subjects"`
+	TotalClasses      int64 `json:"total_classes"`
+	TotalTerms        int64 `json:"total_terms"`
+	TotalAcademicSessions int64 `json:"total_academic_sessions"`
 }
