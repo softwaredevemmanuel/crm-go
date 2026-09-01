@@ -28,8 +28,7 @@ type Term struct {
 	AcademicSession AcademicSession `gorm:"foreignKey:AcademicSessionID" json:"academic_session,omitempty"`
 	Creator         User            `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
 	Schemes         []SchemeOfWork   `gorm:"foreignKey:TermID" json:"schemes,omitempty"`
-	Tests           []Test           `gorm:"foreignKey:TermID" json:"tests,omitempty"`
-	Exams           []Exam           `gorm:"foreignKey:TermID" json:"exams,omitempty"`
+	
 }
 
 func (Term) TableName() string {

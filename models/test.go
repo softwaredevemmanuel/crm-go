@@ -31,7 +31,6 @@ type Test struct {
 	Subject         Subject            `gorm:"foreignKey:SubjectID" json:"subject,omitempty"`
 	Class           ClassGrade         `gorm:"foreignKey:ClassID" json:"class,omitempty"`
 	Creator         User               `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
-	TestSchemeItems []TestSchemeItem   `gorm:"foreignKey:TestID" json:"test_scheme_items,omitempty"`
 }
 
 func (Test) TableName() string {

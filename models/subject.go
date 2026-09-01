@@ -23,11 +23,6 @@ type Subject struct {
 	// Relationships
 	Department Department `gorm:"foreignKey:DepartmentID" json:"department,omitempty"`
 	Creator         User            `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
-	// Relationships
-	Modules     []Module     `gorm:"foreignKey:SubjectID" json:"modules,omitempty"`
-	Schemes     []SchemeOfWork `gorm:"foreignKey:SubjectID" json:"schemes,omitempty"`
-	Tests       []Test       `gorm:"foreignKey:SubjectID" json:"tests,omitempty"`
-	Exams       []Exam       `gorm:"foreignKey:SubjectID" json:"exams,omitempty"`
 }
 
 func (Subject) TableName() string {

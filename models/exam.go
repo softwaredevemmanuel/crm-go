@@ -31,7 +31,6 @@ type Exam struct {
 	Subject         Subject            `gorm:"foreignKey:SubjectID" json:"subject,omitempty"`
 	Class           ClassGrade         `gorm:"foreignKey:ClassID" json:"class,omitempty"`
 	Creator         User               `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
-	ExamSchemeItems []ExamSchemeItem   `gorm:"foreignKey:ExamID" json:"exam_scheme_items,omitempty"`
 }
 
 func (Exam) TableName() string {

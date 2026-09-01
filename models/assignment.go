@@ -27,7 +27,6 @@ type Assignment struct {
 	DeletedAt            gorm.DeletedAt `gorm:"index" json:"-"`
 
 	// Relationships
-	SchemeOfWorkItem SchemeOfWorkItem `gorm:"foreignKey:SchemeOfWorkItemID" json:"scheme_of_work_item,omitempty"`
 	Lesson           Lesson           `gorm:"foreignKey:LessonID" json:"lesson,omitempty"`
 	Teacher          User             `gorm:"foreignKey:TeacherID" json:"teacher,omitempty"`
 	Class            ClassGrade       `gorm:"foreignKey:ClassID" json:"class,omitempty"`

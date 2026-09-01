@@ -15,6 +15,7 @@ type Lesson struct {
 	ArmID                uuid.UUID      `gorm:"type:uuid;index" json:"arm_id"`
 	Title                string         `gorm:"type:varchar(255);not null" json:"title"`
 	LessonDate           *time.Time     `gorm:"type:date" json:"lesson_date,omitempty"`
+	Sequence             int            `gorm:"type:int;default:1" json:"sequence"`
 	Week                 int            `gorm:"type:int" json:"week"`
 	Period               int            `gorm:"type:int" json:"period"`
 	Duration             int            `gorm:"type:int" json:"duration"`
@@ -24,7 +25,6 @@ type Lesson struct {
 	DeletedAt            gorm.DeletedAt `gorm:"index" json:"-"`
 
 	// Relationships - using foreign keys
-	SchemeOfWorkItem SchemeOfWorkItem `gorm:"foreignKey:SchemeOfWorkItemID" json:"scheme_of_work_item,omitempty"`
 	Class            ClassGrade       `gorm:"foreignKey:ClassID" json:"class,omitempty"`
 	Arm              Arm              `gorm:"foreignKey:ArmID" json:"arm,omitempty"`
 	
