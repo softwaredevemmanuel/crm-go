@@ -23,7 +23,7 @@ func NewTeacherSubjectAssignmentHandler(assignmentService *services.TeacherSubje
 
 // CreateAssignment handles the creation of a new subject assignment
 // @Summary Create a subject assignment
-// @Description Assign a subject to a teacher
+// @Description Assign a subject to a teacher for a specific grade
 // @Tags Teacher Subject Assignments
 // @Accept json
 // @Produce json
@@ -74,7 +74,7 @@ func (h *TeacherSubjectAssignmentHandler) CreateAssignment(c *gin.Context) {
 
 // BulkAssignSubjects handles bulk assignment of subjects
 // @Summary Bulk assign subjects
-// @Description Assign multiple subjects to a teacher
+// @Description Assign multiple subjects to a teacher for a specific grade
 // @Tags Teacher Subject Assignments
 // @Accept json
 // @Produce json
@@ -118,12 +118,13 @@ func (h *TeacherSubjectAssignmentHandler) BulkAssignSubjects(c *gin.Context) {
 
 // GetAllAssignments handles fetching all assignments
 // @Summary Get all assignments
-// @Description Get a paginated list of all subject-teacher assignments
+// @Description Get a paginated list of all subject-teacher-grade assignments
 // @Tags Teacher Subject Assignments
 // @Accept json
 // @Produce json
 // @Param subject_id query string false "Filter by subject ID"
 // @Param teacher_id query string false "Filter by teacher ID"
+// @Param grade_id query string false "Filter by grade ID"
 // @Param status query string false "Filter by status"
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Items per page" default(20)
@@ -159,7 +160,7 @@ func (h *TeacherSubjectAssignmentHandler) GetAllAssignments(c *gin.Context) {
 
 // GetAssignmentByID handles fetching a single assignment by ID
 // @Summary Get assignment by ID
-// @Description Get a single subject-teacher assignment by its ID
+// @Description Get a single subject-teacher-grade assignment by its ID
 // @Tags Teacher Subject Assignments
 // @Accept json
 // @Produce json
@@ -201,7 +202,7 @@ func (h *TeacherSubjectAssignmentHandler) GetAssignmentByID(c *gin.Context) {
 
 // GetAssignmentsByTeacher handles fetching all assignments for a teacher
 // @Summary Get assignments by teacher
-// @Description Get all subject assignments for a specific teacher
+// @Description Get all subject-grade assignments for a specific teacher
 // @Tags Teacher Subject Assignments
 // @Accept json
 // @Produce json
@@ -235,10 +236,90 @@ func (h *TeacherSubjectAssignmentHandler) GetAssignmentsByTeacher(c *gin.Context
 	})
 }
 
+// GetAssignmentsByGrade handles fetching all assignments for a grade
+// @Summary Get assignments by grade
+// @Description Get all subject-teacher assignments for a specific grade
+// @Tags Teacher Subject Assignments
+// @Accept json
+// @Produce json
+// @Param grade_id path string true "Grade ID"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Security BearerAuth
+// @Router /api/teacher-subject-assignments/grade/{grade_id} [get]
+func (h *TeacherSubjectAssignmentHandler) GetAssignmentsByGrade(c *gin.Context) {
+	gradeID := c.Param("grade_id")
+	if gradeID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Grade ID is required",
+		})
+		return
+	}
+
+	assignments, err := h.assignmentService.GetAssignmentsByGrade(gradeID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":     "Assignments retrieved successfully",
+		"assignments": assignments,
+		"total":       len(assignments),
+	})
+}
+
+// GetAssignmentsByTeacherAndGrade handles fetching assignments by teacher and grade
+// @Summary Get assignments by teacher and grade
+// @Description Get all subject assignments for a specific teacher and grade
+// @Tags Teacher Subject Assignments
+// @Accept json
+// @Produce json
+// @Param teacher_id path string true "Teacher ID"
+// @Param grade_id path string true "Grade ID"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Security BearerAuth
+// @Router /api/teacher-subject-assignments/teacher/{teacher_id}/grade/{grade_id} [get]
+func (h *TeacherSubjectAssignmentHandler) GetAssignmentsByTeacherAndGrade(c *gin.Context) {
+	teacherID := c.Param("teacher_id")
+	gradeID := c.Param("grade_id")
+	
+	if teacherID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Teacher ID is required",
+		})
+		return
+	}
+	if gradeID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Grade ID is required",
+		})
+		return
+	}
+
+	assignments, err := h.assignmentService.GetAssignmentsByTeacherAndGrade(teacherID, gradeID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":     "Assignments retrieved successfully",
+		"assignments": assignments,
+		"total":       len(assignments),
+	})
+}
 
 // UpdateAssignment handles updating an assignment
 // @Summary Update an assignment
-// @Description Update an existing subject-teacher assignment
+// @Description Update an existing subject-teacher-grade assignment
 // @Tags Teacher Subject Assignments
 // @Accept json
 // @Produce json
@@ -291,7 +372,7 @@ func (h *TeacherSubjectAssignmentHandler) UpdateAssignment(c *gin.Context) {
 
 // DeleteAssignment handles deleting an assignment (soft delete)
 // @Summary Delete an assignment
-// @Description Soft delete a subject-teacher assignment
+// @Description Soft delete a subject-teacher-grade assignment
 // @Tags Teacher Subject Assignments
 // @Accept json
 // @Produce json

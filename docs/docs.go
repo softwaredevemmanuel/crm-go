@@ -8941,7 +8941,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get a paginated list of all subject-teacher assignments",
+                "description": "Get a paginated list of all subject-teacher-grade assignments",
                 "consumes": [
                     "application/json"
                 ],
@@ -8963,6 +8963,12 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Filter by teacher ID",
                         "name": "teacher_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by grade ID",
+                        "name": "grade_id",
                         "in": "query"
                     },
                     {
@@ -9022,7 +9028,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Assign a subject to a teacher",
+                "description": "Assign a subject to a teacher for a specific grade",
                 "consumes": [
                     "application/json"
                 ],
@@ -9097,7 +9103,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Assign multiple subjects to a teacher",
+                "description": "Assign multiple subjects to a teacher for a specific grade",
                 "consumes": [
                     "application/json"
                 ],
@@ -9158,6 +9164,58 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/teacher-subject-assignments/grade/{grade_id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all subject-teacher assignments for a specific grade",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Teacher Subject Assignments"
+                ],
+                "summary": "Get assignments by grade",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Grade ID",
+                        "name": "grade_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/teacher-subject-assignments/teacher/{teacher_id}": {
             "get": {
                 "security": [
@@ -9165,7 +9223,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get all subject assignments for a specific teacher",
+                "description": "Get all subject-grade assignments for a specific teacher",
                 "consumes": [
                     "application/json"
                 ],
@@ -9210,6 +9268,65 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/teacher-subject-assignments/teacher/{teacher_id}/grade/{grade_id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all subject assignments for a specific teacher and grade",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Teacher Subject Assignments"
+                ],
+                "summary": "Get assignments by teacher and grade",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Teacher ID",
+                        "name": "teacher_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Grade ID",
+                        "name": "grade_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/teacher-subject-assignments/{id}": {
             "get": {
                 "security": [
@@ -9217,7 +9334,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get a single subject-teacher assignment by its ID",
+                "description": "Get a single subject-teacher-grade assignment by its ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -9274,7 +9391,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Update an existing subject-teacher assignment",
+                "description": "Update an existing subject-teacher-grade assignment",
                 "consumes": [
                     "application/json"
                 ],
@@ -9347,7 +9464,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Soft delete a subject-teacher assignment",
+                "description": "Soft delete a subject-teacher-grade assignment",
                 "consumes": [
                     "application/json"
                 ],
@@ -12367,10 +12484,15 @@ const docTemplate = `{
         "dto.BulkAssignSubjectsRequest": {
             "type": "object",
             "required": [
+                "grade_id",
                 "subject_ids",
                 "teacher_id"
             ],
             "properties": {
+                "grade_id": {
+                    "description": "Added",
+                    "type": "string"
+                },
                 "status": {
                     "type": "string"
                 },
@@ -13300,10 +13422,15 @@ const docTemplate = `{
         "dto.CreateTeacherSubjectAssignmentRequest": {
             "type": "object",
             "required": [
+                "grade_id",
                 "subject_id",
                 "teacher_id"
             ],
             "properties": {
+                "grade_id": {
+                    "description": "Added",
+                    "type": "string"
+                },
                 "status": {
                     "description": "active, inactive (default: active)",
                     "type": "string"
@@ -13402,6 +13529,29 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.GradeResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 },
                 "updated_at": {
@@ -14158,6 +14308,18 @@ const docTemplate = `{
                 "created_at": {
                     "type": "string"
                 },
+                "grade": {
+                    "description": "Added",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/dto.GradeResponse"
+                        }
+                    ]
+                },
+                "grade_id": {
+                    "description": "Added",
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
@@ -14707,6 +14869,10 @@ const docTemplate = `{
         "dto.UpdateTeacherSubjectAssignmentRequest": {
             "type": "object",
             "properties": {
+                "grade_id": {
+                    "description": "Added",
+                    "type": "string"
+                },
                 "status": {
                     "type": "string"
                 },

@@ -15,7 +15,7 @@ type SchemeOfWork struct {
 	Term               string         `gorm:"type:varchar(20);not null;check:term IN ('first','second','third')" json:"term"`
 	Title             string         `gorm:"type:varchar(255);not null" json:"title"`
 	Description       string         `gorm:"type:text" json:"description"`
-	Status             string         `gorm:"type:varchar(20);default:'draft'" json:"status"`
+	Status 				string `gorm:"type:varchar(20);default:'draft';check:status IN ('draft','published','archived')" json:"status"`
 	CreatedBy          uuid.UUID      `gorm:"type:uuid;not null" json:"created_by"`
 	CreatedAt          time.Time      `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt          time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
