@@ -3905,1459 +3905,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/exam-scheme-items": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get a paginated list of all exam scheme items",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Exam Scheme Items"
-                ],
-                "summary": "Get all exam scheme items",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Filter by exam ID",
-                        "name": "exam_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by scheme of work item ID",
-                        "name": "scheme_of_work_item_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 20,
-                        "description": "Items per page",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.ExamSchemeItemListResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Associate a scheme of work item with an exam",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Exam Scheme Items"
-                ],
-                "summary": "Create an exam scheme item",
-                "parameters": [
-                    {
-                        "description": "Exam scheme item request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.CreateExamSchemeItemRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "409": {
-                        "description": "Conflict",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/exam-scheme-items/bulk": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Associate multiple scheme of work items with an exam",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Exam Scheme Items"
-                ],
-                "summary": "Bulk create exam scheme items",
-                "parameters": [
-                    {
-                        "description": "Bulk exam scheme item request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.BulkCreateExamSchemeItemsRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "409": {
-                        "description": "Conflict",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/exam-scheme-items/exam/{exam_id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all scheme of work items associated with a specific exam",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Exam Scheme Items"
-                ],
-                "summary": "Get exam scheme items by exam",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Exam ID",
-                        "name": "exam_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Remove all associations between an exam and scheme of work items",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Exam Scheme Items"
-                ],
-                "summary": "Delete all exam scheme items for an exam",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Exam ID",
-                        "name": "exam_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/exam-scheme-items/scheme-item/{scheme_of_work_item_id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all exams associated with a specific scheme of work item",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Exam Scheme Items"
-                ],
-                "summary": "Get exam scheme items by scheme of work item",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Scheme of Work Item ID",
-                        "name": "scheme_of_work_item_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/exam-scheme-items/{exam_id}/{scheme_of_work_item_id}": {
-            "delete": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Remove an association between an exam and a scheme of work item",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Exam Scheme Items"
-                ],
-                "summary": "Delete an exam scheme item",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Exam ID",
-                        "name": "exam_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Scheme of Work Item ID",
-                        "name": "scheme_of_work_item_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/exams": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get a paginated list of all exams",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Exams"
-                ],
-                "summary": "Get all exams",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Filter by academic session ID",
-                        "name": "academic_session_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by term ID",
-                        "name": "term_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by subject ID",
-                        "name": "subject_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by class ID",
-                        "name": "class_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by status",
-                        "name": "status",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Search by title or exam type",
-                        "name": "search",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 20,
-                        "description": "Items per page",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.ExamListResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Create a new exam",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Exams"
-                ],
-                "summary": "Create an exam",
-                "parameters": [
-                    {
-                        "description": "Exam request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.CreateExamRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/exams/bulk": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Create multiple exams",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Exams"
-                ],
-                "summary": "Bulk create exams",
-                "parameters": [
-                    {
-                        "description": "Bulk exam request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.BulkCreateExamsRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/exams/class/{class_id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all exams for a specific class",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Exams"
-                ],
-                "summary": "Get exams by class",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Class ID",
-                        "name": "class_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/exams/subject/{subject_id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all exams for a specific subject",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Exams"
-                ],
-                "summary": "Get exams by subject",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Subject ID",
-                        "name": "subject_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/exams/{id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get a single exam by its ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Exams"
-                ],
-                "summary": "Get exam by ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Exam ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Update an existing exam",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Exams"
-                ],
-                "summary": "Update an exam",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Exam ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Update request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.UpdateExamRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Soft delete an exam",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Exams"
-                ],
-                "summary": "Delete an exam",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Exam ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/exercises": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get a paginated list of all exercises",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Exercises"
-                ],
-                "summary": "Get all exercises",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Filter by lesson ID",
-                        "name": "lesson_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Search by title or content",
-                        "name": "search",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 20,
-                        "description": "Items per page",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.ExerciseListResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Create a new exercise for a lesson",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Exercises"
-                ],
-                "summary": "Create an exercise",
-                "parameters": [
-                    {
-                        "description": "Exercise request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.CreateExerciseRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/exercises/bulk": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Create multiple exercises for a lesson",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Exercises"
-                ],
-                "summary": "Bulk create exercises",
-                "parameters": [
-                    {
-                        "description": "Bulk exercise request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.BulkCreateExercisesRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/exercises/lesson/{lesson_id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all exercises for a specific lesson",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Exercises"
-                ],
-                "summary": "Get exercises by lesson",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Lesson ID",
-                        "name": "lesson_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/exercises/{id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get a single exercise by its ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Exercises"
-                ],
-                "summary": "Get exercise by ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Exercise ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Update an existing exercise",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Exercises"
-                ],
-                "summary": "Update an exercise",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Exercise ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Update request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.UpdateExerciseRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Soft delete an exercise",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Exercises"
-                ],
-                "summary": "Delete an exercise",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Exercise ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
         "/api/export/excel": {
             "get": {
                 "security": [
@@ -6440,870 +4987,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/learning-objectives": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get a paginated list of all learning objectives",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Learning Objectives"
-                ],
-                "summary": "Get all learning objectives",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Filter by scheme of work item ID",
-                        "name": "scheme_of_work_item_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Search by objective text",
-                        "name": "search",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 20,
-                        "description": "Items per page",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.LearningObjectiveListResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Create a new learning objective for a scheme of work item",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Learning Objectives"
-                ],
-                "summary": "Create a learning objective",
-                "parameters": [
-                    {
-                        "description": "Objective request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.CreateLearningObjectiveRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/learning-objectives/bulk": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Create multiple learning objectives for a scheme of work item",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Learning Objectives"
-                ],
-                "summary": "Bulk create learning objectives",
-                "parameters": [
-                    {
-                        "description": "Bulk objective request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.BulkCreateLearningObjectivesRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/learning-objectives/scheme-item/{scheme_of_work_item_id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all learning objectives for a specific scheme of work item",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Learning Objectives"
-                ],
-                "summary": "Get objectives by scheme of work item",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Scheme of Work Item ID",
-                        "name": "scheme_of_work_item_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/learning-objectives/{id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get a single learning objective by its ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Learning Objectives"
-                ],
-                "summary": "Get objective by ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Objective ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Update an existing learning objective",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Learning Objectives"
-                ],
-                "summary": "Update a learning objective",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Objective ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Update request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.UpdateLearningObjectiveRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Soft delete a learning objective",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Learning Objectives"
-                ],
-                "summary": "Delete a learning objective",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Objective ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/lesson-plans": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get a paginated list of all lesson plans",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Lesson Plans"
-                ],
-                "summary": "Get all lesson plans",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Filter by lesson ID",
-                        "name": "lesson_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Search in lesson plan content",
-                        "name": "search",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 20,
-                        "description": "Items per page",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.LessonPlanListResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Create a new lesson plan for a lesson",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Lesson Plans"
-                ],
-                "summary": "Create a lesson plan",
-                "parameters": [
-                    {
-                        "description": "Lesson plan request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.CreateLessonPlanRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "409": {
-                        "description": "Conflict",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/lesson-plans/lesson/{lesson_id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get a lesson plan by its associated lesson ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Lesson Plans"
-                ],
-                "summary": "Get lesson plan by lesson",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Lesson ID",
-                        "name": "lesson_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/lesson-plans/{id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get a single lesson plan by its ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Lesson Plans"
-                ],
-                "summary": "Get lesson plan by ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Lesson plan ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Update an existing lesson plan",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Lesson Plans"
-                ],
-                "summary": "Update a lesson plan",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Lesson plan ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Update request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.UpdateLessonPlanRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Soft delete a lesson plan",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Lesson Plans"
-                ],
-                "summary": "Delete a lesson plan",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Lesson plan ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
         "/api/lessons": {
             "get": {
                 "security": [
@@ -7325,20 +5008,20 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Filter by scheme of work item ID",
-                        "name": "scheme_of_work_item_id",
+                        "description": "Filter by scheme of work ID",
+                        "name": "scheme_of_work_id",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "Filter by class ID",
-                        "name": "class_id",
+                        "description": "Filter by module ID",
+                        "name": "module_id",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "Filter by arm ID",
-                        "name": "arm_id",
+                        "description": "Filter by topic ID",
+                        "name": "topic_id",
                         "in": "query"
                     },
                     {
@@ -7355,7 +5038,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Search by title",
+                        "description": "Search by title or description",
                         "name": "search",
                         "in": "query"
                     },
@@ -7539,14 +5222,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/lessons/class/{class_id}": {
+        "/api/lessons/module/{module_id}": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get all lessons for a specific class",
+                "description": "Get all lessons for a specific module",
                 "consumes": [
                     "application/json"
                 ],
@@ -7556,12 +5239,177 @@ const docTemplate = `{
                 "tags": [
                     "Lessons"
                 ],
-                "summary": "Get lessons by class",
+                "summary": "Get lessons by module",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Class ID",
-                        "name": "class_id",
+                        "description": "Module ID",
+                        "name": "module_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/lessons/reorder": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Reorder lessons within a topic",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Reorder lessons",
+                "parameters": [
+                    {
+                        "description": "Reorder request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ReorderLessonsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/lessons/scheme/{scheme_of_work_id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all lessons for a specific scheme of work",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Get lessons by scheme of work",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Scheme of Work ID",
+                        "name": "scheme_of_work_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/lessons/topic/{topic_id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all lessons for a specific topic",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Get lessons by topic",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Topic ID",
+                        "name": "topic_id",
                         "in": "path",
                         "required": true
                     }
@@ -7808,13 +5656,13 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Filter by subject ID",
-                        "name": "subject_id",
+                        "description": "Filter by scheme of work ID",
+                        "name": "scheme_of_work_id",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "Search by name, code, or description",
+                        "description": "Search by title or description",
                         "name": "search",
                         "in": "query"
                     },
@@ -7869,7 +5717,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Create a new module for a subject",
+                "description": "Create a new module for a scheme of work",
                 "consumes": [
                     "application/json"
                 ],
@@ -7944,7 +5792,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Create multiple modules for a subject",
+                "description": "Create multiple modules for a scheme of work",
                 "consumes": [
                     "application/json"
                 ],
@@ -8012,14 +5860,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/modules/subject/{subject_id}": {
-            "get": {
+        "/api/modules/reorder": {
+            "put": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get all modules for a specific subject",
+                "description": "Reorder modules within a scheme of work",
                 "consumes": [
                     "application/json"
                 ],
@@ -8029,12 +5877,73 @@ const docTemplate = `{
                 "tags": [
                     "Modules"
                 ],
-                "summary": "Get modules by subject",
+                "summary": "Reorder modules",
+                "parameters": [
+                    {
+                        "description": "Reorder request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ReorderModulesRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/modules/scheme/{scheme_of_work_id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all modules for a specific scheme of work",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Modules"
+                ],
+                "summary": "Get modules by scheme of work",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Subject ID",
-                        "name": "subject_id",
+                        "description": "Scheme of Work ID",
+                        "name": "scheme_of_work_id",
                         "in": "path",
                         "required": true
                     }
@@ -9254,523 +7163,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/scheme-items": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get a paginated list of all scheme of work items",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Scheme of Work Items"
-                ],
-                "summary": "Get all scheme of work items",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Filter by scheme of work ID",
-                        "name": "scheme_of_work_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by module ID",
-                        "name": "module_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Search by topic, subtopic, or content",
-                        "name": "search",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 20,
-                        "description": "Items per page",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.SchemeOfWorkItemListResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Create a new scheme of work item",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Scheme of Work Items"
-                ],
-                "summary": "Create a scheme of work item",
-                "parameters": [
-                    {
-                        "description": "Item request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.CreateSchemeOfWorkItemRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/scheme-items/bulk": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Create multiple scheme of work items",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Scheme of Work Items"
-                ],
-                "summary": "Bulk create scheme of work items",
-                "parameters": [
-                    {
-                        "description": "Bulk item request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.BulkCreateSchemeItemsRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/scheme-items/module/{module_id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all items for a specific module",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Scheme of Work Items"
-                ],
-                "summary": "Get items by module",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Module ID",
-                        "name": "module_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/scheme-items/scheme/{scheme_of_work_id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all items for a specific scheme of work",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Scheme of Work Items"
-                ],
-                "summary": "Get items by scheme of work",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Scheme of Work ID",
-                        "name": "scheme_of_work_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/scheme-items/{id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get a single scheme of work item by its ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Scheme of Work Items"
-                ],
-                "summary": "Get item by ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Item ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Update an existing scheme of work item",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Scheme of Work Items"
-                ],
-                "summary": "Update an item",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Item ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Update request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.UpdateSchemeOfWorkItemRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Soft delete a scheme of work item",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Scheme of Work Items"
-                ],
-                "summary": "Delete an item",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Item ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
         "/api/schemes": {
             "get": {
                 "security": [
@@ -9792,26 +7184,20 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Filter by academic session ID",
-                        "name": "academic_session_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by term ID",
-                        "name": "term_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
                         "description": "Filter by subject ID",
                         "name": "subject_id",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "Filter by class ID",
-                        "name": "class_id",
+                        "description": "Filter by grade ID",
+                        "name": "grade_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by term",
+                        "name": "term",
                         "in": "query"
                     },
                     {
@@ -10020,14 +7406,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/schemes/class/{class_id}": {
+        "/api/schemes/grade/{grade_id}": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get all schemes of work for a specific class",
+                "description": "Get all schemes of work for a specific grade",
                 "consumes": [
                     "application/json"
                 ],
@@ -10037,12 +7423,71 @@ const docTemplate = `{
                 "tags": [
                     "Scheme of Work"
                 ],
-                "summary": "Get schemes by class",
+                "summary": "Get schemes by grade",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Class ID",
-                        "name": "class_id",
+                        "description": "Grade ID",
+                        "name": "grade_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/schemes/grade/{grade_id}/term/{term}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all schemes of work for a specific grade and term",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Scheme of Work"
+                ],
+                "summary": "Get schemes by grade and term",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Grade ID",
+                        "name": "grade_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Term (first, second, third)",
+                        "name": "term",
                         "in": "path",
                         "required": true
                     }
@@ -12487,14 +9932,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/test-scheme-items": {
+        "/api/topics": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get a paginated list of all test scheme items",
+                "description": "Get a paginated list of all topics",
                 "consumes": [
                     "application/json"
                 ],
@@ -12502,502 +9947,19 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Test Scheme Items"
+                    "Topics"
                 ],
-                "summary": "Get all test scheme items",
+                "summary": "Get all topics",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Filter by test ID",
-                        "name": "test_id",
+                        "description": "Filter by module ID",
+                        "name": "module_id",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "Filter by scheme of work item ID",
-                        "name": "scheme_of_work_item_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 20,
-                        "description": "Items per page",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.TestSchemeItemListResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Associate a scheme of work item with a test",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Test Scheme Items"
-                ],
-                "summary": "Create a test scheme item",
-                "parameters": [
-                    {
-                        "description": "Test scheme item request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.CreateTestSchemeItemRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "409": {
-                        "description": "Conflict",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/test-scheme-items/bulk": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Associate multiple scheme of work items with a test",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Test Scheme Items"
-                ],
-                "summary": "Bulk create test scheme items",
-                "parameters": [
-                    {
-                        "description": "Bulk test scheme item request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.BulkCreateTestSchemeItemsRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "409": {
-                        "description": "Conflict",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/test-scheme-items/scheme-item/{scheme_of_work_item_id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all tests associated with a specific scheme of work item",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Test Scheme Items"
-                ],
-                "summary": "Get test scheme items by scheme of work item",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Scheme of Work Item ID",
-                        "name": "scheme_of_work_item_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/test-scheme-items/test/{test_id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all scheme of work items associated with a specific test",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Test Scheme Items"
-                ],
-                "summary": "Get test scheme items by test",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Test ID",
-                        "name": "test_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Remove all associations between a test and scheme of work items",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Test Scheme Items"
-                ],
-                "summary": "Delete all test scheme items for a test",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Test ID",
-                        "name": "test_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/test-scheme-items/{test_id}/{scheme_of_work_item_id}": {
-            "delete": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Remove an association between a test and a scheme of work item",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Test Scheme Items"
-                ],
-                "summary": "Delete a test scheme item",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Test ID",
-                        "name": "test_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Scheme of Work Item ID",
-                        "name": "scheme_of_work_item_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/tests": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get a paginated list of all tests",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Tests"
-                ],
-                "summary": "Get all tests",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Filter by academic session ID",
-                        "name": "academic_session_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by term ID",
-                        "name": "term_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by subject ID",
-                        "name": "subject_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by class ID",
-                        "name": "class_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by status",
-                        "name": "status",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Search by title or test type",
+                        "description": "Search by title or description",
                         "name": "search",
                         "in": "query"
                     },
@@ -13020,7 +9982,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.TestListResponse"
+                            "$ref": "#/definitions/dto.TopicListResponse"
                         }
                     },
                     "400": {
@@ -13052,7 +10014,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Create a new test",
+                "description": "Create a new topic for a module",
                 "consumes": [
                     "application/json"
                 ],
@@ -13060,17 +10022,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tests"
+                    "Topics"
                 ],
-                "summary": "Create a test",
+                "summary": "Create a topic",
                 "parameters": [
                     {
-                        "description": "Test request",
+                        "description": "Topic request",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.CreateTestRequest"
+                            "$ref": "#/definitions/dto.CreateTopicRequest"
                         }
                     }
                 ],
@@ -13103,6 +10065,13 @@ const docTemplate = `{
                             "additionalProperties": true
                         }
                     },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -13113,14 +10082,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/tests/bulk": {
+        "/api/topics/bulk": {
             "post": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Create multiple tests",
+                "description": "Create multiple topics for a module",
                 "consumes": [
                     "application/json"
                 ],
@@ -13128,17 +10097,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tests"
+                    "Topics"
                 ],
-                "summary": "Bulk create tests",
+                "summary": "Bulk create topics",
                 "parameters": [
                     {
-                        "description": "Bulk test request",
+                        "description": "Bulk topic request",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.BulkCreateTestsRequest"
+                            "$ref": "#/definitions/dto.BulkCreateTopicsRequest"
                         }
                     }
                 ],
@@ -13171,6 +10140,13 @@ const docTemplate = `{
                             "additionalProperties": true
                         }
                     },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -13181,14 +10157,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/tests/class/{class_id}": {
+        "/api/topics/module/{module_id}": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get all tests for a specific class",
+                "description": "Get all topics for a specific module",
                 "consumes": [
                     "application/json"
                 ],
@@ -13196,14 +10172,14 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tests"
+                    "Topics"
                 ],
-                "summary": "Get tests by class",
+                "summary": "Get topics by module",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Class ID",
-                        "name": "class_id",
+                        "description": "Module ID",
+                        "name": "module_id",
                         "in": "path",
                         "required": true
                     }
@@ -13233,14 +10209,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/tests/subject/{subject_id}": {
-            "get": {
+        "/api/topics/reorder": {
+            "put": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get all tests for a specific subject",
+                "description": "Reorder topics within a module",
                 "consumes": [
                     "application/json"
                 ],
@@ -13248,16 +10224,18 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tests"
+                    "Topics"
                 ],
-                "summary": "Get tests by subject",
+                "summary": "Reorder topics",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Subject ID",
-                        "name": "subject_id",
-                        "in": "path",
-                        "required": true
+                        "description": "Reorder request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ReorderTopicsRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -13275,6 +10253,13 @@ const docTemplate = `{
                             "additionalProperties": true
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -13285,14 +10270,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/tests/{id}": {
+        "/api/topics/{id}": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get a single test by its ID",
+                "description": "Get a single topic by its ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -13300,13 +10285,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tests"
+                    "Topics"
                 ],
-                "summary": "Get test by ID",
+                "summary": "Get topic by ID",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Test ID",
+                        "description": "Topic ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -13349,7 +10334,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Update an existing test",
+                "description": "Update an existing topic",
                 "consumes": [
                     "application/json"
                 ],
@@ -13357,13 +10342,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tests"
+                    "Topics"
                 ],
-                "summary": "Update a test",
+                "summary": "Update a topic",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Test ID",
+                        "description": "Topic ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -13374,7 +10359,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.UpdateTestRequest"
+                            "$ref": "#/definitions/dto.UpdateTopicRequest"
                         }
                     }
                 ],
@@ -13407,6 +10392,13 @@ const docTemplate = `{
                             "additionalProperties": true
                         }
                     },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -13422,7 +10414,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Soft delete a test",
+                "description": "Soft delete a topic",
                 "consumes": [
                     "application/json"
                 ],
@@ -13430,13 +10422,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tests"
+                    "Topics"
                 ],
-                "summary": "Delete a test",
+                "summary": "Delete a topic",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Test ID",
+                        "description": "Topic ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -15394,115 +12386,6 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.BulkCreateExamSchemeItemsRequest": {
-            "type": "object",
-            "required": [
-                "exam_id",
-                "scheme_of_work_item_ids"
-            ],
-            "properties": {
-                "exam_id": {
-                    "type": "string"
-                },
-                "scheme_of_work_item_ids": {
-                    "type": "array",
-                    "minItems": 1,
-                    "items": {
-                        "type": "string"
-                    }
-                }
-            }
-        },
-        "dto.BulkCreateExamsRequest": {
-            "type": "object",
-            "required": [
-                "exams"
-            ],
-            "properties": {
-                "exams": {
-                    "type": "array",
-                    "minItems": 1,
-                    "items": {
-                        "type": "object",
-                        "required": [
-                            "academic_session_id",
-                            "class_id",
-                            "subject_id",
-                            "term_id",
-                            "title"
-                        ],
-                        "properties": {
-                            "academic_session_id": {
-                                "type": "string"
-                            },
-                            "class_id": {
-                                "type": "string"
-                            },
-                            "duration": {
-                                "type": "integer"
-                            },
-                            "exam_date": {
-                                "type": "string"
-                            },
-                            "exam_type": {
-                                "type": "string"
-                            },
-                            "subject_id": {
-                                "type": "string"
-                            },
-                            "term_id": {
-                                "type": "string"
-                            },
-                            "title": {
-                                "type": "string"
-                            },
-                            "total_marks": {
-                                "type": "number"
-                            }
-                        }
-                    }
-                },
-                "status": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.BulkCreateExercisesRequest": {
-            "type": "object",
-            "required": [
-                "exercises",
-                "lesson_id"
-            ],
-            "properties": {
-                "exercises": {
-                    "type": "array",
-                    "minItems": 1,
-                    "items": {
-                        "type": "object",
-                        "required": [
-                            "title"
-                        ],
-                        "properties": {
-                            "content": {
-                                "type": "string"
-                            },
-                            "instructions": {
-                                "type": "string"
-                            },
-                            "title": {
-                                "type": "string"
-                            },
-                            "total_marks": {
-                                "type": "number"
-                            }
-                        }
-                    }
-                },
-                "lesson_id": {
-                    "type": "string"
-                }
-            }
-        },
         "dto.BulkCreateGradeSubjectRequest": {
             "type": "object",
             "required": [
@@ -15532,69 +12415,50 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.BulkCreateLearningObjectivesRequest": {
-            "type": "object",
-            "required": [
-                "objectives",
-                "scheme_of_work_item_id"
-            ],
-            "properties": {
-                "objectives": {
-                    "type": "array",
-                    "minItems": 1,
-                    "items": {
-                        "type": "object",
-                        "required": [
-                            "objective"
-                        ],
-                        "properties": {
-                            "objective": {
-                                "type": "string"
-                            },
-                            "sequence": {
-                                "type": "integer"
-                            }
-                        }
-                    }
-                },
-                "scheme_of_work_item_id": {
-                    "type": "string"
-                }
-            }
-        },
         "dto.BulkCreateLessonsRequest": {
             "type": "object",
             "required": [
-                "class_id",
-                "lessons"
+                "lessons",
+                "module_id",
+                "scheme_of_work_id",
+                "topic_id"
             ],
             "properties": {
-                "arm_id": {
-                    "type": "string"
-                },
-                "class_id": {
-                    "type": "string"
-                },
                 "lessons": {
                     "type": "array",
                     "minItems": 1,
                     "items": {
                         "type": "object",
                         "required": [
-                            "scheme_of_work_item_id",
                             "title"
                         ],
                         "properties": {
+                            "activities": {
+                                "type": "string"
+                            },
+                            "assessment": {
+                                "type": "string"
+                            },
+                            "content": {
+                                "description": "JSON string",
+                                "type": "string"
+                            },
+                            "description": {
+                                "type": "string"
+                            },
                             "duration": {
                                 "type": "integer"
                             },
                             "lesson_date": {
                                 "type": "string"
                             },
-                            "period": {
+                            "lesson_order": {
                                 "type": "integer"
                             },
-                            "scheme_of_work_item_id": {
+                            "objectives": {
+                                "type": "string"
+                            },
+                            "resources": {
                                 "type": "string"
                             },
                             "title": {
@@ -15606,7 +12470,16 @@ const docTemplate = `{
                         }
                     }
                 },
+                "module_id": {
+                    "type": "string"
+                },
+                "scheme_of_work_id": {
+                    "type": "string"
+                },
                 "status": {
+                    "type": "string"
+                },
+                "topic_id": {
                     "type": "string"
                 }
             }
@@ -15615,7 +12488,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "modules",
-                "subject_id"
+                "scheme_of_work_id"
             ],
             "properties": {
                 "modules": {
@@ -15624,25 +12497,22 @@ const docTemplate = `{
                     "items": {
                         "type": "object",
                         "required": [
-                            "name"
+                            "title"
                         ],
                         "properties": {
-                            "code": {
-                                "type": "string"
-                            },
                             "description": {
                                 "type": "string"
                             },
-                            "name": {
-                                "type": "string"
-                            },
-                            "sequence": {
+                            "module_order": {
                                 "type": "integer"
+                            },
+                            "title": {
+                                "type": "string"
                             }
                         }
                     }
                 },
-                "subject_id": {
+                "scheme_of_work_id": {
                     "type": "string"
                 }
             }
@@ -15704,67 +12574,16 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.BulkCreateSchemeItemsRequest": {
-            "type": "object",
-            "required": [
-                "items",
-                "scheme_of_work_id"
-            ],
-            "properties": {
-                "items": {
-                    "type": "array",
-                    "minItems": 1,
-                    "items": {
-                        "type": "object",
-                        "required": [
-                            "topic",
-                            "week_start"
-                        ],
-                        "properties": {
-                            "content": {
-                                "type": "string"
-                            },
-                            "module_id": {
-                                "type": "string"
-                            },
-                            "sequence": {
-                                "type": "integer"
-                            },
-                            "subtopic": {
-                                "type": "string"
-                            },
-                            "topic": {
-                                "type": "string"
-                            },
-                            "week_end": {
-                                "type": "integer"
-                            },
-                            "week_start": {
-                                "type": "integer",
-                                "minimum": 1
-                            }
-                        }
-                    }
-                },
-                "scheme_of_work_id": {
-                    "type": "string"
-                }
-            }
-        },
         "dto.BulkCreateSchemesRequest": {
             "type": "object",
             "required": [
-                "academic_session_id",
-                "class_id",
+                "grade_id",
                 "schemes",
                 "subject_id",
-                "term_id"
+                "term"
             ],
             "properties": {
-                "academic_session_id": {
-                    "type": "string"
-                },
-                "class_id": {
+                "grade_id": {
                     "type": "string"
                 },
                 "schemes": {
@@ -15791,8 +12610,13 @@ const docTemplate = `{
                 "subject_id": {
                     "type": "string"
                 },
-                "term_id": {
-                    "type": "string"
+                "term": {
+                    "type": "string",
+                    "enum": [
+                        "first",
+                        "second",
+                        "third"
+                    ]
                 }
             }
         },
@@ -15867,73 +12691,33 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.BulkCreateTestSchemeItemsRequest": {
+        "dto.BulkCreateTopicsRequest": {
             "type": "object",
             "required": [
-                "scheme_of_work_item_ids",
-                "test_id"
+                "module_id",
+                "topics"
             ],
             "properties": {
-                "scheme_of_work_item_ids": {
-                    "type": "array",
-                    "minItems": 1,
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "test_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.BulkCreateTestsRequest": {
-            "type": "object",
-            "required": [
-                "tests"
-            ],
-            "properties": {
-                "status": {
+                "module_id": {
                     "type": "string"
                 },
-                "tests": {
+                "topics": {
                     "type": "array",
                     "minItems": 1,
                     "items": {
                         "type": "object",
                         "required": [
-                            "academic_session_id",
-                            "class_id",
-                            "subject_id",
-                            "term_id",
                             "title"
                         ],
                         "properties": {
-                            "academic_session_id": {
-                                "type": "string"
-                            },
-                            "class_id": {
-                                "type": "string"
-                            },
-                            "duration": {
-                                "type": "integer"
-                            },
-                            "subject_id": {
-                                "type": "string"
-                            },
-                            "term_id": {
-                                "type": "string"
-                            },
-                            "test_date": {
-                                "type": "string"
-                            },
-                            "test_type": {
+                            "description": {
                                 "type": "string"
                             },
                             "title": {
                                 "type": "string"
                             },
-                            "total_marks": {
-                                "type": "number"
+                            "topic_order": {
+                                "type": "integer"
                             }
                         }
                     }
@@ -16195,88 +12979,6 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.CreateExamRequest": {
-            "type": "object",
-            "required": [
-                "academic_session_id",
-                "class_id",
-                "subject_id",
-                "term_id",
-                "title"
-            ],
-            "properties": {
-                "academic_session_id": {
-                    "type": "string"
-                },
-                "class_id": {
-                    "type": "string"
-                },
-                "duration": {
-                    "type": "integer"
-                },
-                "exam_date": {
-                    "type": "string"
-                },
-                "exam_type": {
-                    "type": "string"
-                },
-                "status": {
-                    "description": "draft, published, completed",
-                    "type": "string"
-                },
-                "subject_id": {
-                    "type": "string"
-                },
-                "term_id": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "total_marks": {
-                    "type": "number"
-                }
-            }
-        },
-        "dto.CreateExamSchemeItemRequest": {
-            "type": "object",
-            "required": [
-                "exam_id",
-                "scheme_of_work_item_id"
-            ],
-            "properties": {
-                "exam_id": {
-                    "type": "string"
-                },
-                "scheme_of_work_item_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.CreateExerciseRequest": {
-            "type": "object",
-            "required": [
-                "lesson_id",
-                "title"
-            ],
-            "properties": {
-                "content": {
-                    "type": "string"
-                },
-                "instructions": {
-                    "type": "string"
-                },
-                "lesson_id": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "total_marks": {
-                    "type": "number"
-                }
-            }
-        },
         "dto.CreateGradeSubjectRequest": {
             "type": "object",
             "required": [
@@ -16371,74 +13073,26 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.CreateLearningObjectiveRequest": {
-            "type": "object",
-            "required": [
-                "objective",
-                "scheme_of_work_item_id"
-            ],
-            "properties": {
-                "objective": {
-                    "type": "string"
-                },
-                "scheme_of_work_item_id": {
-                    "type": "string"
-                },
-                "sequence": {
-                    "type": "integer"
-                }
-            }
-        },
-        "dto.CreateLessonPlanRequest": {
-            "type": "object",
-            "required": [
-                "lesson_id"
-            ],
-            "properties": {
-                "behavioural_objectives": {
-                    "type": "string"
-                },
-                "conclusion": {
-                    "type": "string"
-                },
-                "evaluation": {
-                    "type": "string"
-                },
-                "introduction": {
-                    "type": "string"
-                },
-                "lesson_content": {
-                    "type": "string"
-                },
-                "lesson_id": {
-                    "type": "string"
-                },
-                "previous_knowledge": {
-                    "type": "string"
-                },
-                "student_activities": {
-                    "type": "string"
-                },
-                "teacher_activities": {
-                    "type": "string"
-                },
-                "teaching_aids": {
-                    "type": "string"
-                }
-            }
-        },
         "dto.CreateLessonRequest": {
             "type": "object",
             "required": [
-                "class_id",
-                "scheme_of_work_item_id",
-                "title"
+                "module_id",
+                "scheme_of_work_id",
+                "title",
+                "topic_id"
             ],
             "properties": {
-                "arm_id": {
+                "activities": {
                     "type": "string"
                 },
-                "class_id": {
+                "assessment": {
+                    "type": "string"
+                },
+                "content": {
+                    "description": "JSON string",
+                    "type": "string"
+                },
+                "description": {
                     "type": "string"
                 },
                 "duration": {
@@ -16447,10 +13101,19 @@ const docTemplate = `{
                 "lesson_date": {
                     "type": "string"
                 },
-                "period": {
+                "lesson_order": {
                     "type": "integer"
                 },
-                "scheme_of_work_item_id": {
+                "module_id": {
+                    "type": "string"
+                },
+                "objectives": {
+                    "type": "string"
+                },
+                "resources": {
+                    "type": "string"
+                },
+                "scheme_of_work_id": {
                     "type": "string"
                 },
                 "status": {
@@ -16458,6 +13121,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "title": {
+                    "type": "string"
+                },
+                "topic_id": {
                     "type": "string"
                 },
                 "week": {
@@ -16468,23 +13134,20 @@ const docTemplate = `{
         "dto.CreateModuleRequest": {
             "type": "object",
             "required": [
-                "name",
-                "subject_id"
+                "scheme_of_work_id",
+                "title"
             ],
             "properties": {
-                "code": {
-                    "type": "string"
-                },
                 "description": {
                     "type": "string"
                 },
-                "name": {
-                    "type": "string"
-                },
-                "sequence": {
+                "module_order": {
                     "type": "integer"
                 },
-                "subject_id": {
+                "scheme_of_work_id": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 }
             }
@@ -16542,58 +13205,19 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.CreateSchemeOfWorkItemRequest": {
-            "type": "object",
-            "required": [
-                "scheme_of_work_id",
-                "topic",
-                "week_start"
-            ],
-            "properties": {
-                "content": {
-                    "type": "string"
-                },
-                "module_id": {
-                    "type": "string"
-                },
-                "scheme_of_work_id": {
-                    "type": "string"
-                },
-                "sequence": {
-                    "type": "integer"
-                },
-                "subtopic": {
-                    "type": "string"
-                },
-                "topic": {
-                    "type": "string"
-                },
-                "week_end": {
-                    "type": "integer"
-                },
-                "week_start": {
-                    "type": "integer",
-                    "minimum": 1
-                }
-            }
-        },
         "dto.CreateSchemeOfWorkRequest": {
             "type": "object",
             "required": [
-                "academic_session_id",
-                "class_id",
+                "grade_id",
                 "subject_id",
-                "term_id",
+                "term",
                 "title"
             ],
             "properties": {
-                "academic_session_id": {
-                    "type": "string"
-                },
-                "class_id": {
-                    "type": "string"
-                },
                 "description": {
+                    "type": "string"
+                },
+                "grade_id": {
                     "type": "string"
                 },
                 "status": {
@@ -16603,8 +13227,13 @@ const docTemplate = `{
                 "subject_id": {
                     "type": "string"
                 },
-                "term_id": {
-                    "type": "string"
+                "term": {
+                    "type": "string",
+                    "enum": [
+                        "first",
+                        "second",
+                        "third"
+                    ]
                 },
                 "title": {
                     "type": "string"
@@ -16727,61 +13356,24 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.CreateTestRequest": {
+        "dto.CreateTopicRequest": {
             "type": "object",
             "required": [
-                "academic_session_id",
-                "class_id",
-                "subject_id",
-                "term_id",
+                "module_id",
                 "title"
             ],
             "properties": {
-                "academic_session_id": {
+                "description": {
                     "type": "string"
                 },
-                "class_id": {
-                    "type": "string"
-                },
-                "duration": {
-                    "type": "integer"
-                },
-                "status": {
-                    "description": "draft, published, completed",
-                    "type": "string"
-                },
-                "subject_id": {
-                    "type": "string"
-                },
-                "term_id": {
-                    "type": "string"
-                },
-                "test_date": {
-                    "type": "string"
-                },
-                "test_type": {
+                "module_id": {
                     "type": "string"
                 },
                 "title": {
                     "type": "string"
                 },
-                "total_marks": {
-                    "type": "number"
-                }
-            }
-        },
-        "dto.CreateTestSchemeItemRequest": {
-            "type": "object",
-            "required": [
-                "scheme_of_work_item_id",
-                "test_id"
-            ],
-            "properties": {
-                "scheme_of_work_item_id": {
-                    "type": "string"
-                },
-                "test_id": {
-                    "type": "string"
+                "topic_order": {
+                    "type": "integer"
                 }
             }
         },
@@ -16811,213 +13403,6 @@ const docTemplate = `{
                 },
                 "status": {
                     "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.ExamListResponse": {
-            "type": "object",
-            "properties": {
-                "exams": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.ExamResponse"
-                    }
-                },
-                "limit": {
-                    "type": "integer"
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "total": {
-                    "type": "integer"
-                },
-                "total_pages": {
-                    "type": "integer"
-                }
-            }
-        },
-        "dto.ExamResponse": {
-            "type": "object",
-            "properties": {
-                "academic_session": {
-                    "description": "Nested relationships",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/dto.AcademicSessionResponse"
-                        }
-                    ]
-                },
-                "academic_session_id": {
-                    "type": "string"
-                },
-                "class": {
-                    "$ref": "#/definitions/dto.ClassGradeResponse"
-                },
-                "class_id": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "created_by": {
-                    "type": "string"
-                },
-                "creator": {
-                    "$ref": "#/definitions/dto.UserResponse"
-                },
-                "duration": {
-                    "type": "integer"
-                },
-                "exam_date": {
-                    "type": "string"
-                },
-                "exam_type": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "subject": {
-                    "$ref": "#/definitions/dto.SubjectResponse"
-                },
-                "subject_id": {
-                    "type": "string"
-                },
-                "term": {
-                    "$ref": "#/definitions/dto.TermResponse"
-                },
-                "term_id": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "total_marks": {
-                    "type": "number"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.ExamSchemeItemListResponse": {
-            "type": "object",
-            "properties": {
-                "items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.ExamSchemeItemResponse"
-                    }
-                },
-                "limit": {
-                    "type": "integer"
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "total": {
-                    "type": "integer"
-                },
-                "total_pages": {
-                    "type": "integer"
-                }
-            }
-        },
-        "dto.ExamSchemeItemResponse": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "exam": {
-                    "description": "Nested relationships",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/dto.ExamResponse"
-                        }
-                    ]
-                },
-                "exam_id": {
-                    "type": "string"
-                },
-                "scheme_of_work_item": {
-                    "$ref": "#/definitions/dto.SchemeOfWorkItemResponse"
-                },
-                "scheme_of_work_item_id": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.ExerciseListResponse": {
-            "type": "object",
-            "properties": {
-                "exercises": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.ExerciseResponse"
-                    }
-                },
-                "limit": {
-                    "type": "integer"
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "total": {
-                    "type": "integer"
-                },
-                "total_pages": {
-                    "type": "integer"
-                }
-            }
-        },
-        "dto.ExerciseResponse": {
-            "type": "object",
-            "properties": {
-                "content": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "created_by": {
-                    "type": "string"
-                },
-                "creator": {
-                    "$ref": "#/definitions/dto.UserResponse"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "instructions": {
-                    "type": "string"
-                },
-                "lesson": {
-                    "description": "Nested relationships",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/dto.LessonResponse"
-                        }
-                    ]
-                },
-                "lesson_id": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "total_marks": {
-                    "type": "number"
                 },
                 "updated_at": {
                     "type": "string"
@@ -17162,60 +13547,6 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.LearningObjectiveListResponse": {
-            "type": "object",
-            "properties": {
-                "limit": {
-                    "type": "integer"
-                },
-                "objectives": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.LearningObjectiveResponse"
-                    }
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "total": {
-                    "type": "integer"
-                },
-                "total_pages": {
-                    "type": "integer"
-                }
-            }
-        },
-        "dto.LearningObjectiveResponse": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "objective": {
-                    "type": "string"
-                },
-                "scheme_of_work_item": {
-                    "description": "Nested relationships",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/dto.SchemeOfWorkItemResponse"
-                        }
-                    ]
-                },
-                "scheme_of_work_item_id": {
-                    "type": "string"
-                },
-                "sequence": {
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
         "dto.LessonListResponse": {
             "type": "object",
             "properties": {
@@ -17239,36 +13570,17 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.LessonPlanListResponse": {
+        "dto.LessonResponse": {
             "type": "object",
             "properties": {
-                "lesson_plans": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.LessonPlanResponse"
-                    }
-                },
-                "limit": {
-                    "type": "integer"
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "total": {
-                    "type": "integer"
-                },
-                "total_pages": {
-                    "type": "integer"
-                }
-            }
-        },
-        "dto.LessonPlanResponse": {
-            "type": "object",
-            "properties": {
-                "behavioural_objectives": {
+                "activities": {
                     "type": "string"
                 },
-                "conclusion": {
+                "assessment": {
+                    "type": "string"
+                },
+                "content": {
+                    "description": "JSON string",
                     "type": "string"
                 },
                 "created_at": {
@@ -17280,62 +13592,7 @@ const docTemplate = `{
                 "creator": {
                     "$ref": "#/definitions/dto.UserResponse"
                 },
-                "evaluation": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "introduction": {
-                    "type": "string"
-                },
-                "lesson": {
-                    "description": "Nested relationships",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/dto.LessonResponse"
-                        }
-                    ]
-                },
-                "lesson_content": {
-                    "type": "string"
-                },
-                "lesson_id": {
-                    "type": "string"
-                },
-                "previous_knowledge": {
-                    "type": "string"
-                },
-                "student_activities": {
-                    "type": "string"
-                },
-                "teacher_activities": {
-                    "type": "string"
-                },
-                "teaching_aids": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.LessonResponse": {
-            "type": "object",
-            "properties": {
-                "arm": {
-                    "$ref": "#/definitions/dto.ArmResponse"
-                },
-                "arm_id": {
-                    "type": "string"
-                },
-                "class": {
-                    "$ref": "#/definitions/dto.ClassGradeResponse"
-                },
-                "class_id": {
-                    "type": "string"
-                },
-                "created_at": {
+                "description": {
                     "type": "string"
                 },
                 "duration": {
@@ -17347,24 +13604,42 @@ const docTemplate = `{
                 "lesson_date": {
                     "type": "string"
                 },
-                "period": {
+                "lesson_order": {
                     "type": "integer"
                 },
-                "scheme_of_work_item": {
+                "module": {
+                    "$ref": "#/definitions/dto.ModuleResponse"
+                },
+                "module_id": {
+                    "type": "string"
+                },
+                "objectives": {
+                    "type": "string"
+                },
+                "resources": {
+                    "type": "string"
+                },
+                "scheme_of_work": {
                     "description": "Nested relationships",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/dto.SchemeOfWorkItemResponse"
+                            "$ref": "#/definitions/dto.SchemeOfWorkResponse"
                         }
                     ]
                 },
-                "scheme_of_work_item_id": {
+                "scheme_of_work_id": {
                     "type": "string"
                 },
                 "status": {
                     "type": "string"
                 },
                 "title": {
+                    "type": "string"
+                },
+                "topic": {
+                    "$ref": "#/definitions/dto.TopicResponse"
+                },
+                "topic_id": {
                     "type": "string"
                 },
                 "updated_at": {
@@ -17401,9 +13676,6 @@ const docTemplate = `{
         "dto.ModuleResponse": {
             "type": "object",
             "properties": {
-                "code": {
-                    "type": "string"
-                },
                 "created_at": {
                     "type": "string"
                 },
@@ -17413,21 +13685,27 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "name": {
-                    "type": "string"
+                "lessons": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.LessonResponse"
+                    }
                 },
-                "sequence": {
+                "module_order": {
                     "type": "integer"
                 },
-                "subject": {
+                "scheme_of_work": {
                     "description": "Nested relationships",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/dto.SubjectResponse"
+                            "$ref": "#/definitions/dto.SchemeOfWorkResponse"
                         }
                     ]
                 },
-                "subject_id": {
+                "scheme_of_work_id": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 },
                 "updated_at": {
@@ -17551,75 +13829,84 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.SchemeOfWorkItemListResponse": {
+        "dto.ReorderLessonsRequest": {
             "type": "object",
+            "required": [
+                "lesson_orders"
+            ],
             "properties": {
-                "items": {
+                "lesson_orders": {
                     "type": "array",
+                    "minItems": 1,
                     "items": {
-                        "$ref": "#/definitions/dto.SchemeOfWorkItemResponse"
+                        "type": "object",
+                        "required": [
+                            "id",
+                            "lesson_order"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "lesson_order": {
+                                "type": "integer"
+                            }
+                        }
                     }
-                },
-                "limit": {
-                    "type": "integer"
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "total": {
-                    "type": "integer"
-                },
-                "total_pages": {
-                    "type": "integer"
                 }
             }
         },
-        "dto.SchemeOfWorkItemResponse": {
+        "dto.ReorderModulesRequest": {
             "type": "object",
+            "required": [
+                "module_orders"
+            ],
             "properties": {
-                "content": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "module": {
-                    "$ref": "#/definitions/dto.ModuleResponse"
-                },
-                "module_id": {
-                    "type": "string"
-                },
-                "scheme_of_work": {
-                    "description": "Nested relationships",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/dto.SchemeOfWorkResponse"
+                "module_orders": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "id",
+                            "module_order"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "module_order": {
+                                "type": "integer"
+                            }
                         }
-                    ]
-                },
-                "scheme_of_work_id": {
-                    "type": "string"
-                },
-                "sequence": {
-                    "type": "integer"
-                },
-                "subtopic": {
-                    "type": "string"
-                },
-                "topic": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "week_end": {
-                    "type": "integer"
-                },
-                "week_start": {
-                    "type": "integer"
+                    }
+                }
+            }
+        },
+        "dto.ReorderTopicsRequest": {
+            "type": "object",
+            "required": [
+                "topic_orders"
+            ],
+            "properties": {
+                "topic_orders": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "id",
+                            "topic_order"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "topic_order": {
+                                "type": "integer"
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -17649,23 +13936,6 @@ const docTemplate = `{
         "dto.SchemeOfWorkResponse": {
             "type": "object",
             "properties": {
-                "academic_session": {
-                    "description": "Nested relationships",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/dto.AcademicSessionResponse"
-                        }
-                    ]
-                },
-                "academic_session_id": {
-                    "type": "string"
-                },
-                "class": {
-                    "$ref": "#/definitions/dto.ClassGradeResponse"
-                },
-                "class_id": {
-                    "type": "string"
-                },
                 "created_at": {
                     "type": "string"
                 },
@@ -17678,22 +13948,36 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
+                "grade": {
+                    "$ref": "#/definitions/dto.ClassGradeResponse"
+                },
+                "grade_id": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
+                },
+                "lessons": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.LessonResponse"
+                    }
                 },
                 "status": {
                     "type": "string"
                 },
                 "subject": {
-                    "$ref": "#/definitions/dto.SubjectResponse"
+                    "description": "Nested relationships",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/dto.SubjectResponse"
+                        }
+                    ]
                 },
                 "subject_id": {
                     "type": "string"
                 },
                 "term": {
-                    "$ref": "#/definitions/dto.TermResponse"
-                },
-                "term_id": {
                     "type": "string"
                 },
                 "title": {
@@ -17980,7 +14264,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.TestListResponse": {
+        "dto.TopicListResponse": {
             "type": "object",
             "properties": {
                 "limit": {
@@ -17989,10 +14273,10 @@ const docTemplate = `{
                 "page": {
                     "type": "integer"
                 },
-                "tests": {
+                "topics": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/dto.TestResponse"
+                        "$ref": "#/definitions/dto.TopicResponse"
                     }
                 },
                 "total": {
@@ -18003,118 +14287,40 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.TestResponse": {
+        "dto.TopicResponse": {
             "type": "object",
             "properties": {
-                "academic_session": {
-                    "description": "Nested relationships",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/dto.AcademicSessionResponse"
-                        }
-                    ]
-                },
-                "academic_session_id": {
-                    "type": "string"
-                },
-                "class": {
-                    "$ref": "#/definitions/dto.ClassGradeResponse"
-                },
-                "class_id": {
-                    "type": "string"
-                },
                 "created_at": {
                     "type": "string"
                 },
-                "created_by": {
+                "description": {
                     "type": "string"
-                },
-                "creator": {
-                    "$ref": "#/definitions/dto.UserResponse"
-                },
-                "duration": {
-                    "type": "integer"
                 },
                 "id": {
                     "type": "string"
                 },
-                "status": {
-                    "type": "string"
+                "lessons": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.LessonResponse"
+                    }
                 },
-                "subject": {
-                    "$ref": "#/definitions/dto.SubjectResponse"
+                "module": {
+                    "description": "Nested relationships",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/dto.ModuleResponse"
+                        }
+                    ]
                 },
-                "subject_id": {
-                    "type": "string"
-                },
-                "term": {
-                    "$ref": "#/definitions/dto.TermResponse"
-                },
-                "term_id": {
-                    "type": "string"
-                },
-                "test_date": {
-                    "type": "string"
-                },
-                "test_type": {
+                "module_id": {
                     "type": "string"
                 },
                 "title": {
                     "type": "string"
                 },
-                "total_marks": {
-                    "type": "number"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.TestSchemeItemListResponse": {
-            "type": "object",
-            "properties": {
-                "items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.TestSchemeItemResponse"
-                    }
-                },
-                "limit": {
+                "topic_order": {
                     "type": "integer"
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "total": {
-                    "type": "integer"
-                },
-                "total_pages": {
-                    "type": "integer"
-                }
-            }
-        },
-        "dto.TestSchemeItemResponse": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "scheme_of_work_item": {
-                    "$ref": "#/definitions/dto.SchemeOfWorkItemResponse"
-                },
-                "scheme_of_work_item_id": {
-                    "type": "string"
-                },
-                "test": {
-                    "description": "Nested relationships",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/dto.TestResponse"
-                        }
-                    ]
-                },
-                "test_id": {
-                    "type": "string"
                 },
                 "updated_at": {
                     "type": "string"
@@ -18285,58 +14491,6 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.UpdateExamRequest": {
-            "type": "object",
-            "properties": {
-                "academic_session_id": {
-                    "type": "string"
-                },
-                "class_id": {
-                    "type": "string"
-                },
-                "duration": {
-                    "type": "integer"
-                },
-                "exam_date": {
-                    "type": "string"
-                },
-                "exam_type": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "subject_id": {
-                    "type": "string"
-                },
-                "term_id": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "total_marks": {
-                    "type": "number"
-                }
-            }
-        },
-        "dto.UpdateExerciseRequest": {
-            "type": "object",
-            "properties": {
-                "content": {
-                    "type": "string"
-                },
-                "instructions": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "total_marks": {
-                    "type": "number"
-                }
-            }
-        },
         "dto.UpdateGradeSubjectRequest": {
             "type": "object",
             "properties": {
@@ -18394,56 +14548,20 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.UpdateLearningObjectiveRequest": {
-            "type": "object",
-            "properties": {
-                "objective": {
-                    "type": "string"
-                },
-                "sequence": {
-                    "type": "integer"
-                }
-            }
-        },
-        "dto.UpdateLessonPlanRequest": {
-            "type": "object",
-            "properties": {
-                "behavioural_objectives": {
-                    "type": "string"
-                },
-                "conclusion": {
-                    "type": "string"
-                },
-                "evaluation": {
-                    "type": "string"
-                },
-                "introduction": {
-                    "type": "string"
-                },
-                "lesson_content": {
-                    "type": "string"
-                },
-                "previous_knowledge": {
-                    "type": "string"
-                },
-                "student_activities": {
-                    "type": "string"
-                },
-                "teacher_activities": {
-                    "type": "string"
-                },
-                "teaching_aids": {
-                    "type": "string"
-                }
-            }
-        },
         "dto.UpdateLessonRequest": {
             "type": "object",
             "properties": {
-                "arm_id": {
+                "activities": {
                     "type": "string"
                 },
-                "class_id": {
+                "assessment": {
+                    "type": "string"
+                },
+                "content": {
+                    "description": "JSON string",
+                    "type": "string"
+                },
+                "description": {
                     "type": "string"
                 },
                 "duration": {
@@ -18452,16 +14570,28 @@ const docTemplate = `{
                 "lesson_date": {
                     "type": "string"
                 },
-                "period": {
+                "lesson_order": {
                     "type": "integer"
                 },
-                "scheme_of_work_item_id": {
+                "module_id": {
+                    "type": "string"
+                },
+                "objectives": {
+                    "type": "string"
+                },
+                "resources": {
+                    "type": "string"
+                },
+                "scheme_of_work_id": {
                     "type": "string"
                 },
                 "status": {
                     "type": "string"
                 },
                 "title": {
+                    "type": "string"
+                },
+                "topic_id": {
                     "type": "string"
                 },
                 "week": {
@@ -18472,17 +14602,14 @@ const docTemplate = `{
         "dto.UpdateModuleRequest": {
             "type": "object",
             "properties": {
-                "code": {
-                    "type": "string"
-                },
                 "description": {
                     "type": "string"
                 },
-                "name": {
-                    "type": "string"
-                },
-                "sequence": {
+                "module_order": {
                     "type": "integer"
+                },
+                "title": {
+                    "type": "string"
                 }
             }
         },
@@ -18506,42 +14633,13 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.UpdateSchemeOfWorkItemRequest": {
-            "type": "object",
-            "properties": {
-                "content": {
-                    "type": "string"
-                },
-                "module_id": {
-                    "type": "string"
-                },
-                "sequence": {
-                    "type": "integer"
-                },
-                "subtopic": {
-                    "type": "string"
-                },
-                "topic": {
-                    "type": "string"
-                },
-                "week_end": {
-                    "type": "integer"
-                },
-                "week_start": {
-                    "type": "integer"
-                }
-            }
-        },
         "dto.UpdateSchemeOfWorkRequest": {
             "type": "object",
             "properties": {
-                "academic_session_id": {
-                    "type": "string"
-                },
-                "class_id": {
-                    "type": "string"
-                },
                 "description": {
+                    "type": "string"
+                },
+                "grade_id": {
                     "type": "string"
                 },
                 "status": {
@@ -18550,8 +14648,13 @@ const docTemplate = `{
                 "subject_id": {
                     "type": "string"
                 },
-                "term_id": {
-                    "type": "string"
+                "term": {
+                    "type": "string",
+                    "enum": [
+                        "first",
+                        "second",
+                        "third"
+                    ]
                 },
                 "title": {
                     "type": "string"
@@ -18644,38 +14747,17 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.UpdateTestRequest": {
+        "dto.UpdateTopicRequest": {
             "type": "object",
             "properties": {
-                "academic_session_id": {
-                    "type": "string"
-                },
-                "class_id": {
-                    "type": "string"
-                },
-                "duration": {
-                    "type": "integer"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "subject_id": {
-                    "type": "string"
-                },
-                "term_id": {
-                    "type": "string"
-                },
-                "test_date": {
-                    "type": "string"
-                },
-                "test_type": {
+                "description": {
                     "type": "string"
                 },
                 "title": {
                     "type": "string"
                 },
-                "total_marks": {
-                    "type": "number"
+                "topic_order": {
+                    "type": "integer"
                 }
             }
         },

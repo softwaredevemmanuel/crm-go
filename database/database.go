@@ -65,10 +65,9 @@ func MigrateDatabase() {
 	db.AutoMigrate(&models.ArmClassTeacher{})
 	db.AutoMigrate(&models.Term{})
 	db.AutoMigrate(&models.SchemeOfWork{})
+	db.AutoMigrate(&models.Module{})
+	db.AutoMigrate(&models.Topic{})
 	db.AutoMigrate(&models.Lesson{})
-	db.AutoMigrate(&models.Exercise{})
-	db.AutoMigrate(&models.Test{})
-	db.AutoMigrate(&models.Exam{})
 	
 
 

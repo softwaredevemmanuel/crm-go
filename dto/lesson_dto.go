@@ -7,49 +7,69 @@ import (
 
 // CreateLessonRequest represents the request to create a lesson
 type CreateLessonRequest struct {
-	SchemeOfWorkItemID string `json:"scheme_of_work_item_id" binding:"required"`
-	ClassID            string `json:"class_id" binding:"required"`
-	ArmID              string `json:"arm_id"`
-	Title              string `json:"title" binding:"required"`
-	LessonDate         string `json:"lesson_date"`
-	Week               int    `json:"week"`
-	Period             int    `json:"period"`
-	Duration           int    `json:"duration"`
-	Status             string `json:"status"` // planned, ongoing, completed, cancelled
+	SchemeOfWorkID string `json:"scheme_of_work_id" binding:"required"`
+	ModuleID       string `json:"module_id" binding:"required"`
+	TopicID        string `json:"topic_id" binding:"required"`
+	LessonOrder    int    `json:"lesson_order"`
+	Title          string `json:"title" binding:"required"`
+	Description    string `json:"description"`
+	LessonDate     string `json:"lesson_date"`
+	Week           int    `json:"week"`
+	Duration       int    `json:"duration"`
+	Content        string `json:"content"` // JSON string
+	Objectives     string `json:"objectives"`
+	Activities     string `json:"activities"`
+	Resources      string `json:"resources"`
+	Assessment     string `json:"assessment"`
+	Status         string `json:"status"` // planned, ongoing, completed, cancelled
 }
 
 // UpdateLessonRequest represents the request to update a lesson
 type UpdateLessonRequest struct {
-	SchemeOfWorkItemID string `json:"scheme_of_work_item_id"`
-	ClassID            string `json:"class_id"`
-	ArmID              string `json:"arm_id"`
-	Title              string `json:"title"`
-	LessonDate         string `json:"lesson_date"`
-	Week               int    `json:"week"`
-	Period             int    `json:"period"`
-	Duration           int    `json:"duration"`
-	Status             string `json:"status"`
+	SchemeOfWorkID string `json:"scheme_of_work_id"`
+	ModuleID       string `json:"module_id"`
+	TopicID        string `json:"topic_id"`
+	LessonOrder    int    `json:"lesson_order"`
+	Title          string `json:"title"`
+	Description    string `json:"description"`
+	LessonDate     string `json:"lesson_date"`
+	Week           int    `json:"week"`
+	Duration       int    `json:"duration"`
+	Content        string `json:"content"` // JSON string
+	Objectives     string `json:"objectives"`
+	Activities     string `json:"activities"`
+	Resources      string `json:"resources"`
+	Assessment     string `json:"assessment"`
+	Status         string `json:"status"`
 }
 
 // LessonResponse represents the response for a lesson
 type LessonResponse struct {
-	ID                 string     `json:"id"`
-	SchemeOfWorkItemID string     `json:"scheme_of_work_item_id"`
-	ClassID            string     `json:"class_id"`
-	ArmID              string     `json:"arm_id"`
-	Title              string     `json:"title"`
-	LessonDate         *time.Time `json:"lesson_date,omitempty"`
-	Week               int        `json:"week"`
-	Period             int        `json:"period"`
-	Duration           int        `json:"duration"`
-	Status             string     `json:"status"`
-	CreatedAt          time.Time  `json:"created_at"`
-	UpdatedAt          time.Time  `json:"updated_at"`
+	ID             string     `json:"id"`
+	SchemeOfWorkID string     `json:"scheme_of_work_id"`
+	ModuleID       string     `json:"module_id"`
+	TopicID        string     `json:"topic_id"`
+	LessonOrder    int        `json:"lesson_order"`
+	Title          string     `json:"title"`
+	Description    string     `json:"description"`
+	LessonDate     *time.Time `json:"lesson_date,omitempty"`
+	Week           int        `json:"week"`
+	Duration       int        `json:"duration"`
+	Content        string     `json:"content"` // JSON string
+	Objectives     string     `json:"objectives"`
+	Activities     string     `json:"activities"`
+	Resources      string     `json:"resources"`
+	Assessment     string     `json:"assessment"`
+	Status         string     `json:"status"`
+	CreatedBy      string     `json:"created_by"`
+	CreatedAt      time.Time  `json:"created_at"`
+	UpdatedAt      time.Time  `json:"updated_at"`
 
 	// Nested relationships
-	SchemeOfWorkItem *SchemeOfWorkItemResponse `json:"scheme_of_work_item,omitempty"`
-	Class            *ClassGradeResponse      `json:"class,omitempty"`
-	Arm              *ArmResponse             `json:"arm,omitempty"`
+	SchemeOfWork *SchemeOfWorkResponse `json:"scheme_of_work,omitempty"`
+	Module       *ModuleResponse       `json:"module,omitempty"`
+	Topic        *TopicResponse        `json:"topic,omitempty"`
+	Creator      *UserResponse         `json:"creator,omitempty"`
 }
 
 // LessonListResponse represents a paginated list of lessons
@@ -63,29 +83,35 @@ type LessonListResponse struct {
 
 // LessonQueryParams represents query parameters for filtering lessons
 type LessonQueryParams struct {
-	SchemeOfWorkItemID string `form:"scheme_of_work_item_id"`
-	ClassID            string `form:"class_id"`
-	ArmID              string `form:"arm_id"`
-	Status             string `form:"status"`
-	Week               int    `form:"week"`
-	Search             string `form:"search"`
-	Page               int    `form:"page" default:"1"`
-	Limit              int    `form:"limit" default:"20"`
-	SortBy             string `form:"sort_by" default:"lesson_date"`
-	SortOrder          string `form:"sort_order" default:"desc"`
+	SchemeOfWorkID string `form:"scheme_of_work_id"`
+	ModuleID       string `form:"module_id"`
+	TopicID        string `form:"topic_id"`
+	Status         string `form:"status"`
+	Week           int    `form:"week"`
+	Search         string `form:"search"`
+	Page           int    `form:"page" default:"1"`
+	Limit          int    `form:"limit" default:"20"`
+	SortBy         string `form:"sort_by" default:"lesson_order"`
+	SortOrder      string `form:"sort_order" default:"asc"`
 }
 
 // BulkCreateLessonsRequest represents the request to bulk create lessons
 type BulkCreateLessonsRequest struct {
-	ClassID   string `json:"class_id" binding:"required"`
-	ArmID     string `json:"arm_id"`
-	Lessons   []struct {
-		SchemeOfWorkItemID string `json:"scheme_of_work_item_id" binding:"required"`
-		Title              string `json:"title" binding:"required"`
-		LessonDate         string `json:"lesson_date"`
-		Week               int    `json:"week"`
-		Period             int    `json:"period"`
-		Duration           int    `json:"duration"`
+	SchemeOfWorkID string `json:"scheme_of_work_id" binding:"required"`
+	ModuleID       string `json:"module_id" binding:"required"`
+	TopicID        string `json:"topic_id" binding:"required"`
+	Lessons        []struct {
+		LessonOrder int    `json:"lesson_order"`
+		Title       string `json:"title" binding:"required"`
+		Description string `json:"description"`
+		LessonDate  string `json:"lesson_date"`
+		Week        int    `json:"week"`
+		Duration    int    `json:"duration"`
+		Content     string `json:"content"` // JSON string
+		Objectives  string `json:"objectives"`
+		Activities  string `json:"activities"`
+		Resources   string `json:"resources"`
+		Assessment  string `json:"assessment"`
 	} `json:"lessons" binding:"required,min=1"`
 	Status string `json:"status"`
 }
@@ -104,6 +130,14 @@ type BulkLessonError struct {
 	Error string `json:"error"`
 }
 
+// ReorderLessonsRequest represents the request to reorder lessons
+type ReorderLessonsRequest struct {
+	LessonOrders []struct {
+		ID          string `json:"id" binding:"required"`
+		LessonOrder int    `json:"lesson_order" binding:"required"`
+	} `json:"lesson_orders" binding:"required,min=1"`
+}
+
 // LessonStats represents statistics for lessons
 type LessonStats struct {
 	TotalLessons    int64 `json:"total_lessons"`
@@ -111,5 +145,7 @@ type LessonStats struct {
 	OngoingLessons  int64 `json:"ongoing_lessons"`
 	CompletedLessons int64 `json:"completed_lessons"`
 	CancelledLessons int64 `json:"cancelled_lessons"`
-	TotalClasses    int64 `json:"total_classes"`
+	TotalSchemes    int64 `json:"total_schemes"`
+	TotalModules    int64 `json:"total_modules"`
+	TotalTopics     int64 `json:"total_topics"`
 }

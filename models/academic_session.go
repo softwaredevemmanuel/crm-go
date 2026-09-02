@@ -23,9 +23,6 @@ type AcademicSession struct {
 
 	// Relationships
 	Terms    []Term    `gorm:"foreignKey:AcademicSessionID" json:"terms,omitempty"`
-	Schemes  []SchemeOfWork `gorm:"foreignKey:AcademicSessionID" json:"schemes,omitempty"`
-	Tests    []Test    `gorm:"foreignKey:AcademicSessionID" json:"tests,omitempty"`
-	Exams    []Exam    `gorm:"foreignKey:AcademicSessionID" json:"exams,omitempty"`
 	Creator  User            `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
 
 }

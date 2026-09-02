@@ -402,80 +402,6 @@ definitions:
     - subject_ids
     - teacher_id
     type: object
-  dto.BulkCreateExamSchemeItemsRequest:
-    properties:
-      exam_id:
-        type: string
-      scheme_of_work_item_ids:
-        items:
-          type: string
-        minItems: 1
-        type: array
-    required:
-    - exam_id
-    - scheme_of_work_item_ids
-    type: object
-  dto.BulkCreateExamsRequest:
-    properties:
-      exams:
-        items:
-          properties:
-            academic_session_id:
-              type: string
-            class_id:
-              type: string
-            duration:
-              type: integer
-            exam_date:
-              type: string
-            exam_type:
-              type: string
-            subject_id:
-              type: string
-            term_id:
-              type: string
-            title:
-              type: string
-            total_marks:
-              type: number
-          required:
-          - academic_session_id
-          - class_id
-          - subject_id
-          - term_id
-          - title
-          type: object
-        minItems: 1
-        type: array
-      status:
-        type: string
-    required:
-    - exams
-    type: object
-  dto.BulkCreateExercisesRequest:
-    properties:
-      exercises:
-        items:
-          properties:
-            content:
-              type: string
-            instructions:
-              type: string
-            title:
-              type: string
-            total_marks:
-              type: number
-          required:
-          - title
-          type: object
-        minItems: 1
-        type: array
-      lesson_id:
-        type: string
-    required:
-    - exercises
-    - lesson_id
-    type: object
   dto.BulkCreateGradeSubjectRequest:
     properties:
       grade_id:
@@ -496,82 +422,74 @@ definitions:
     - grade_id
     - subject_ids
     type: object
-  dto.BulkCreateLearningObjectivesRequest:
-    properties:
-      objectives:
-        items:
-          properties:
-            objective:
-              type: string
-            sequence:
-              type: integer
-          required:
-          - objective
-          type: object
-        minItems: 1
-        type: array
-      scheme_of_work_item_id:
-        type: string
-    required:
-    - objectives
-    - scheme_of_work_item_id
-    type: object
   dto.BulkCreateLessonsRequest:
     properties:
-      arm_id:
-        type: string
-      class_id:
-        type: string
       lessons:
         items:
           properties:
+            activities:
+              type: string
+            assessment:
+              type: string
+            content:
+              description: JSON string
+              type: string
+            description:
+              type: string
             duration:
               type: integer
             lesson_date:
               type: string
-            period:
+            lesson_order:
               type: integer
-            scheme_of_work_item_id:
+            objectives:
+              type: string
+            resources:
               type: string
             title:
               type: string
             week:
               type: integer
           required:
-          - scheme_of_work_item_id
           - title
           type: object
         minItems: 1
         type: array
+      module_id:
+        type: string
+      scheme_of_work_id:
+        type: string
       status:
         type: string
+      topic_id:
+        type: string
     required:
-    - class_id
     - lessons
+    - module_id
+    - scheme_of_work_id
+    - topic_id
     type: object
   dto.BulkCreateModulesRequest:
     properties:
       modules:
         items:
           properties:
-            code:
-              type: string
             description:
               type: string
-            name:
-              type: string
-            sequence:
+            module_order:
               type: integer
+            title:
+              type: string
           required:
-          - name
+          - title
           type: object
         minItems: 1
         type: array
-      subject_id:
+      scheme_of_work_id:
         type: string
     required:
     - modules
-    - subject_id
+    - scheme_of_work_id
     type: object
   dto.BulkCreateNotificationRequest:
     properties:
@@ -616,43 +534,9 @@ definitions:
     - type
     - user_ids
     type: object
-  dto.BulkCreateSchemeItemsRequest:
-    properties:
-      items:
-        items:
-          properties:
-            content:
-              type: string
-            module_id:
-              type: string
-            sequence:
-              type: integer
-            subtopic:
-              type: string
-            topic:
-              type: string
-            week_end:
-              type: integer
-            week_start:
-              minimum: 1
-              type: integer
-          required:
-          - topic
-          - week_start
-          type: object
-        minItems: 1
-        type: array
-      scheme_of_work_id:
-        type: string
-    required:
-    - items
-    - scheme_of_work_id
-    type: object
   dto.BulkCreateSchemesRequest:
     properties:
-      academic_session_id:
-        type: string
-      class_id:
+      grade_id:
         type: string
       schemes:
         items:
@@ -670,14 +554,17 @@ definitions:
         type: string
       subject_id:
         type: string
-      term_id:
+      term:
+        enum:
+        - first
+        - second
+        - third
         type: string
     required:
-    - academic_session_id
-    - class_id
+    - grade_id
     - schemes
     - subject_id
-    - term_id
+    - term
     type: object
   dto.BulkCreateStudentEnrollmentsRequest:
     properties:
@@ -727,55 +614,27 @@ definitions:
     required:
     - subjects
     type: object
-  dto.BulkCreateTestSchemeItemsRequest:
+  dto.BulkCreateTopicsRequest:
     properties:
-      scheme_of_work_item_ids:
-        items:
-          type: string
-        minItems: 1
-        type: array
-      test_id:
+      module_id:
         type: string
-    required:
-    - scheme_of_work_item_ids
-    - test_id
-    type: object
-  dto.BulkCreateTestsRequest:
-    properties:
-      status:
-        type: string
-      tests:
+      topics:
         items:
           properties:
-            academic_session_id:
-              type: string
-            class_id:
-              type: string
-            duration:
-              type: integer
-            subject_id:
-              type: string
-            term_id:
-              type: string
-            test_date:
-              type: string
-            test_type:
+            description:
               type: string
             title:
               type: string
-            total_marks:
-              type: number
+            topic_order:
+              type: integer
           required:
-          - academic_session_id
-          - class_id
-          - subject_id
-          - term_id
           - title
           type: object
         minItems: 1
         type: array
     required:
-    - tests
+    - module_id
+    - topics
     type: object
   dto.ClassGradeListResponse:
     properties:
@@ -956,62 +815,6 @@ definitions:
     - code
     - name
     type: object
-  dto.CreateExamRequest:
-    properties:
-      academic_session_id:
-        type: string
-      class_id:
-        type: string
-      duration:
-        type: integer
-      exam_date:
-        type: string
-      exam_type:
-        type: string
-      status:
-        description: draft, published, completed
-        type: string
-      subject_id:
-        type: string
-      term_id:
-        type: string
-      title:
-        type: string
-      total_marks:
-        type: number
-    required:
-    - academic_session_id
-    - class_id
-    - subject_id
-    - term_id
-    - title
-    type: object
-  dto.CreateExamSchemeItemRequest:
-    properties:
-      exam_id:
-        type: string
-      scheme_of_work_item_id:
-        type: string
-    required:
-    - exam_id
-    - scheme_of_work_item_id
-    type: object
-  dto.CreateExerciseRequest:
-    properties:
-      content:
-        type: string
-      instructions:
-        type: string
-      lesson_id:
-        type: string
-      title:
-        type: string
-      total_marks:
-        type: number
-    required:
-    - lesson_id
-    - title
-    type: object
   dto.CreateGradeSubjectRequest:
     properties:
       grade_id:
@@ -1081,84 +884,59 @@ definitions:
     - relationship
     - student_id
     type: object
-  dto.CreateLearningObjectiveRequest:
-    properties:
-      objective:
-        type: string
-      scheme_of_work_item_id:
-        type: string
-      sequence:
-        type: integer
-    required:
-    - objective
-    - scheme_of_work_item_id
-    type: object
-  dto.CreateLessonPlanRequest:
-    properties:
-      behavioural_objectives:
-        type: string
-      conclusion:
-        type: string
-      evaluation:
-        type: string
-      introduction:
-        type: string
-      lesson_content:
-        type: string
-      lesson_id:
-        type: string
-      previous_knowledge:
-        type: string
-      student_activities:
-        type: string
-      teacher_activities:
-        type: string
-      teaching_aids:
-        type: string
-    required:
-    - lesson_id
-    type: object
   dto.CreateLessonRequest:
     properties:
-      arm_id:
+      activities:
         type: string
-      class_id:
+      assessment:
+        type: string
+      content:
+        description: JSON string
+        type: string
+      description:
         type: string
       duration:
         type: integer
       lesson_date:
         type: string
-      period:
+      lesson_order:
         type: integer
-      scheme_of_work_item_id:
+      module_id:
+        type: string
+      objectives:
+        type: string
+      resources:
+        type: string
+      scheme_of_work_id:
         type: string
       status:
         description: planned, ongoing, completed, cancelled
         type: string
       title:
         type: string
+      topic_id:
+        type: string
       week:
         type: integer
     required:
-    - class_id
-    - scheme_of_work_item_id
+    - module_id
+    - scheme_of_work_id
     - title
+    - topic_id
     type: object
   dto.CreateModuleRequest:
     properties:
-      code:
-        type: string
       description:
         type: string
-      name:
-        type: string
-      sequence:
+      module_order:
         type: integer
-      subject_id:
+      scheme_of_work_id:
+        type: string
+      title:
         type: string
     required:
-    - name
-    - subject_id
+    - scheme_of_work_id
+    - title
     type: object
   dto.CreateNotificationRequest:
     properties:
@@ -1200,52 +978,29 @@ definitions:
     - type
     - user_id
     type: object
-  dto.CreateSchemeOfWorkItemRequest:
-    properties:
-      content:
-        type: string
-      module_id:
-        type: string
-      scheme_of_work_id:
-        type: string
-      sequence:
-        type: integer
-      subtopic:
-        type: string
-      topic:
-        type: string
-      week_end:
-        type: integer
-      week_start:
-        minimum: 1
-        type: integer
-    required:
-    - scheme_of_work_id
-    - topic
-    - week_start
-    type: object
   dto.CreateSchemeOfWorkRequest:
     properties:
-      academic_session_id:
-        type: string
-      class_id:
-        type: string
       description:
+        type: string
+      grade_id:
         type: string
       status:
         description: draft, published, archived
         type: string
       subject_id:
         type: string
-      term_id:
+      term:
+        enum:
+        - first
+        - second
+        - third
         type: string
       title:
         type: string
     required:
-    - academic_session_id
-    - class_id
+    - grade_id
     - subject_id
-    - term_id
+    - term
     - title
     type: object
   dto.CreateStudentEnrollmentRequest:
@@ -1328,45 +1083,19 @@ definitions:
     - name
     - term_number
     type: object
-  dto.CreateTestRequest:
+  dto.CreateTopicRequest:
     properties:
-      academic_session_id:
+      description:
         type: string
-      class_id:
-        type: string
-      duration:
-        type: integer
-      status:
-        description: draft, published, completed
-        type: string
-      subject_id:
-        type: string
-      term_id:
-        type: string
-      test_date:
-        type: string
-      test_type:
+      module_id:
         type: string
       title:
         type: string
-      total_marks:
-        type: number
+      topic_order:
+        type: integer
     required:
-    - academic_session_id
-    - class_id
-    - subject_id
-    - term_id
+    - module_id
     - title
-    type: object
-  dto.CreateTestSchemeItemRequest:
-    properties:
-      scheme_of_work_item_id:
-        type: string
-      test_id:
-        type: string
-    required:
-    - scheme_of_work_item_id
-    - test_id
     type: object
   dto.DepartmentResponse:
     properties:
@@ -1386,138 +1115,6 @@ definitions:
         type: string
       status:
         type: string
-      updated_at:
-        type: string
-    type: object
-  dto.ExamListResponse:
-    properties:
-      exams:
-        items:
-          $ref: '#/definitions/dto.ExamResponse'
-        type: array
-      limit:
-        type: integer
-      page:
-        type: integer
-      total:
-        type: integer
-      total_pages:
-        type: integer
-    type: object
-  dto.ExamResponse:
-    properties:
-      academic_session:
-        allOf:
-        - $ref: '#/definitions/dto.AcademicSessionResponse'
-        description: Nested relationships
-      academic_session_id:
-        type: string
-      class:
-        $ref: '#/definitions/dto.ClassGradeResponse'
-      class_id:
-        type: string
-      created_at:
-        type: string
-      created_by:
-        type: string
-      creator:
-        $ref: '#/definitions/dto.UserResponse'
-      duration:
-        type: integer
-      exam_date:
-        type: string
-      exam_type:
-        type: string
-      id:
-        type: string
-      status:
-        type: string
-      subject:
-        $ref: '#/definitions/dto.SubjectResponse'
-      subject_id:
-        type: string
-      term:
-        $ref: '#/definitions/dto.TermResponse'
-      term_id:
-        type: string
-      title:
-        type: string
-      total_marks:
-        type: number
-      updated_at:
-        type: string
-    type: object
-  dto.ExamSchemeItemListResponse:
-    properties:
-      items:
-        items:
-          $ref: '#/definitions/dto.ExamSchemeItemResponse'
-        type: array
-      limit:
-        type: integer
-      page:
-        type: integer
-      total:
-        type: integer
-      total_pages:
-        type: integer
-    type: object
-  dto.ExamSchemeItemResponse:
-    properties:
-      created_at:
-        type: string
-      exam:
-        allOf:
-        - $ref: '#/definitions/dto.ExamResponse'
-        description: Nested relationships
-      exam_id:
-        type: string
-      scheme_of_work_item:
-        $ref: '#/definitions/dto.SchemeOfWorkItemResponse'
-      scheme_of_work_item_id:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  dto.ExerciseListResponse:
-    properties:
-      exercises:
-        items:
-          $ref: '#/definitions/dto.ExerciseResponse'
-        type: array
-      limit:
-        type: integer
-      page:
-        type: integer
-      total:
-        type: integer
-      total_pages:
-        type: integer
-    type: object
-  dto.ExerciseResponse:
-    properties:
-      content:
-        type: string
-      created_at:
-        type: string
-      created_by:
-        type: string
-      creator:
-        $ref: '#/definitions/dto.UserResponse'
-      id:
-        type: string
-      instructions:
-        type: string
-      lesson:
-        allOf:
-        - $ref: '#/definitions/dto.LessonResponse'
-        description: Nested relationships
-      lesson_id:
-        type: string
-      title:
-        type: string
-      total_marks:
-        type: number
       updated_at:
         type: string
     type: object
@@ -1609,40 +1206,6 @@ definitions:
       user_id:
         type: string
     type: object
-  dto.LearningObjectiveListResponse:
-    properties:
-      limit:
-        type: integer
-      objectives:
-        items:
-          $ref: '#/definitions/dto.LearningObjectiveResponse'
-        type: array
-      page:
-        type: integer
-      total:
-        type: integer
-      total_pages:
-        type: integer
-    type: object
-  dto.LearningObjectiveResponse:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: string
-      objective:
-        type: string
-      scheme_of_work_item:
-        allOf:
-        - $ref: '#/definitions/dto.SchemeOfWorkItemResponse'
-        description: Nested relationships
-      scheme_of_work_item_id:
-        type: string
-      sequence:
-        type: integer
-      updated_at:
-        type: string
-    type: object
   dto.LessonListResponse:
     properties:
       lessons:
@@ -1658,26 +1221,14 @@ definitions:
       total_pages:
         type: integer
     type: object
-  dto.LessonPlanListResponse:
+  dto.LessonResponse:
     properties:
-      lesson_plans:
-        items:
-          $ref: '#/definitions/dto.LessonPlanResponse'
-        type: array
-      limit:
-        type: integer
-      page:
-        type: integer
-      total:
-        type: integer
-      total_pages:
-        type: integer
-    type: object
-  dto.LessonPlanResponse:
-    properties:
-      behavioural_objectives:
+      activities:
         type: string
-      conclusion:
+      assessment:
+        type: string
+      content:
+        description: JSON string
         type: string
       created_at:
         type: string
@@ -1685,42 +1236,7 @@ definitions:
         type: string
       creator:
         $ref: '#/definitions/dto.UserResponse'
-      evaluation:
-        type: string
-      id:
-        type: string
-      introduction:
-        type: string
-      lesson:
-        allOf:
-        - $ref: '#/definitions/dto.LessonResponse'
-        description: Nested relationships
-      lesson_content:
-        type: string
-      lesson_id:
-        type: string
-      previous_knowledge:
-        type: string
-      student_activities:
-        type: string
-      teacher_activities:
-        type: string
-      teaching_aids:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  dto.LessonResponse:
-    properties:
-      arm:
-        $ref: '#/definitions/dto.ArmResponse'
-      arm_id:
-        type: string
-      class:
-        $ref: '#/definitions/dto.ClassGradeResponse'
-      class_id:
-        type: string
-      created_at:
+      description:
         type: string
       duration:
         type: integer
@@ -1728,17 +1244,29 @@ definitions:
         type: string
       lesson_date:
         type: string
-      period:
+      lesson_order:
         type: integer
-      scheme_of_work_item:
+      module:
+        $ref: '#/definitions/dto.ModuleResponse'
+      module_id:
+        type: string
+      objectives:
+        type: string
+      resources:
+        type: string
+      scheme_of_work:
         allOf:
-        - $ref: '#/definitions/dto.SchemeOfWorkItemResponse'
+        - $ref: '#/definitions/dto.SchemeOfWorkResponse'
         description: Nested relationships
-      scheme_of_work_item_id:
+      scheme_of_work_id:
         type: string
       status:
         type: string
       title:
+        type: string
+      topic:
+        $ref: '#/definitions/dto.TopicResponse'
+      topic_id:
         type: string
       updated_at:
         type: string
@@ -1762,23 +1290,25 @@ definitions:
     type: object
   dto.ModuleResponse:
     properties:
-      code:
-        type: string
       created_at:
         type: string
       description:
         type: string
       id:
         type: string
-      name:
-        type: string
-      sequence:
+      lessons:
+        items:
+          $ref: '#/definitions/dto.LessonResponse'
+        type: array
+      module_order:
         type: integer
-      subject:
+      scheme_of_work:
         allOf:
-        - $ref: '#/definitions/dto.SubjectResponse'
+        - $ref: '#/definitions/dto.SchemeOfWorkResponse'
         description: Nested relationships
-      subject_id:
+      scheme_of_work_id:
+        type: string
+      title:
         type: string
       updated_at:
         type: string
@@ -1860,51 +1390,59 @@ definitions:
       unread:
         type: integer
     type: object
-  dto.SchemeOfWorkItemListResponse:
+  dto.ReorderLessonsRequest:
     properties:
-      items:
+      lesson_orders:
         items:
-          $ref: '#/definitions/dto.SchemeOfWorkItemResponse'
+          properties:
+            id:
+              type: string
+            lesson_order:
+              type: integer
+          required:
+          - id
+          - lesson_order
+          type: object
+        minItems: 1
         type: array
-      limit:
-        type: integer
-      page:
-        type: integer
-      total:
-        type: integer
-      total_pages:
-        type: integer
+    required:
+    - lesson_orders
     type: object
-  dto.SchemeOfWorkItemResponse:
+  dto.ReorderModulesRequest:
     properties:
-      content:
-        type: string
-      created_at:
-        type: string
-      id:
-        type: string
-      module:
-        $ref: '#/definitions/dto.ModuleResponse'
-      module_id:
-        type: string
-      scheme_of_work:
-        allOf:
-        - $ref: '#/definitions/dto.SchemeOfWorkResponse'
-        description: Nested relationships
-      scheme_of_work_id:
-        type: string
-      sequence:
-        type: integer
-      subtopic:
-        type: string
-      topic:
-        type: string
-      updated_at:
-        type: string
-      week_end:
-        type: integer
-      week_start:
-        type: integer
+      module_orders:
+        items:
+          properties:
+            id:
+              type: string
+            module_order:
+              type: integer
+          required:
+          - id
+          - module_order
+          type: object
+        minItems: 1
+        type: array
+    required:
+    - module_orders
+    type: object
+  dto.ReorderTopicsRequest:
+    properties:
+      topic_orders:
+        items:
+          properties:
+            id:
+              type: string
+            topic_order:
+              type: integer
+          required:
+          - id
+          - topic_order
+          type: object
+        minItems: 1
+        type: array
+    required:
+    - topic_orders
     type: object
   dto.SchemeOfWorkListResponse:
     properties:
@@ -1923,16 +1461,6 @@ definitions:
     type: object
   dto.SchemeOfWorkResponse:
     properties:
-      academic_session:
-        allOf:
-        - $ref: '#/definitions/dto.AcademicSessionResponse'
-        description: Nested relationships
-      academic_session_id:
-        type: string
-      class:
-        $ref: '#/definitions/dto.ClassGradeResponse'
-      class_id:
-        type: string
       created_at:
         type: string
       created_by:
@@ -1941,17 +1469,25 @@ definitions:
         $ref: '#/definitions/dto.UserResponse'
       description:
         type: string
+      grade:
+        $ref: '#/definitions/dto.ClassGradeResponse'
+      grade_id:
+        type: string
       id:
         type: string
+      lessons:
+        items:
+          $ref: '#/definitions/dto.LessonResponse'
+        type: array
       status:
         type: string
       subject:
-        $ref: '#/definitions/dto.SubjectResponse'
+        allOf:
+        - $ref: '#/definitions/dto.SubjectResponse'
+        description: Nested relationships
       subject_id:
         type: string
       term:
-        $ref: '#/definitions/dto.TermResponse'
-      term_id:
         type: string
       title:
         type: string
@@ -2134,93 +1670,43 @@ definitions:
       updated_at:
         type: string
     type: object
-  dto.TestListResponse:
+  dto.TopicListResponse:
     properties:
       limit:
         type: integer
       page:
         type: integer
-      tests:
+      topics:
         items:
-          $ref: '#/definitions/dto.TestResponse'
+          $ref: '#/definitions/dto.TopicResponse'
         type: array
       total:
         type: integer
       total_pages:
         type: integer
     type: object
-  dto.TestResponse:
+  dto.TopicResponse:
     properties:
-      academic_session:
-        allOf:
-        - $ref: '#/definitions/dto.AcademicSessionResponse'
-        description: Nested relationships
-      academic_session_id:
-        type: string
-      class:
-        $ref: '#/definitions/dto.ClassGradeResponse'
-      class_id:
-        type: string
       created_at:
         type: string
-      created_by:
+      description:
         type: string
-      creator:
-        $ref: '#/definitions/dto.UserResponse'
-      duration:
-        type: integer
       id:
         type: string
-      status:
-        type: string
-      subject:
-        $ref: '#/definitions/dto.SubjectResponse'
-      subject_id:
-        type: string
-      term:
-        $ref: '#/definitions/dto.TermResponse'
-      term_id:
-        type: string
-      test_date:
-        type: string
-      test_type:
+      lessons:
+        items:
+          $ref: '#/definitions/dto.LessonResponse'
+        type: array
+      module:
+        allOf:
+        - $ref: '#/definitions/dto.ModuleResponse'
+        description: Nested relationships
+      module_id:
         type: string
       title:
         type: string
-      total_marks:
-        type: number
-      updated_at:
-        type: string
-    type: object
-  dto.TestSchemeItemListResponse:
-    properties:
-      items:
-        items:
-          $ref: '#/definitions/dto.TestSchemeItemResponse'
-        type: array
-      limit:
+      topic_order:
         type: integer
-      page:
-        type: integer
-      total:
-        type: integer
-      total_pages:
-        type: integer
-    type: object
-  dto.TestSchemeItemResponse:
-    properties:
-      created_at:
-        type: string
-      scheme_of_work_item:
-        $ref: '#/definitions/dto.SchemeOfWorkItemResponse'
-      scheme_of_work_item_id:
-        type: string
-      test:
-        allOf:
-        - $ref: '#/definitions/dto.TestResponse'
-        description: Nested relationships
-      test_id:
-        type: string
       updated_at:
         type: string
     type: object
@@ -2338,40 +1824,6 @@ definitions:
       status:
         type: string
     type: object
-  dto.UpdateExamRequest:
-    properties:
-      academic_session_id:
-        type: string
-      class_id:
-        type: string
-      duration:
-        type: integer
-      exam_date:
-        type: string
-      exam_type:
-        type: string
-      status:
-        type: string
-      subject_id:
-        type: string
-      term_id:
-        type: string
-      title:
-        type: string
-      total_marks:
-        type: number
-    type: object
-  dto.UpdateExerciseRequest:
-    properties:
-      content:
-        type: string
-      instructions:
-        type: string
-      title:
-        type: string
-      total_marks:
-        type: number
-    type: object
   dto.UpdateGradeSubjectRequest:
     properties:
       is_compulsory:
@@ -2413,65 +1865,48 @@ definitions:
       student_id:
         type: string
     type: object
-  dto.UpdateLearningObjectiveRequest:
-    properties:
-      objective:
-        type: string
-      sequence:
-        type: integer
-    type: object
-  dto.UpdateLessonPlanRequest:
-    properties:
-      behavioural_objectives:
-        type: string
-      conclusion:
-        type: string
-      evaluation:
-        type: string
-      introduction:
-        type: string
-      lesson_content:
-        type: string
-      previous_knowledge:
-        type: string
-      student_activities:
-        type: string
-      teacher_activities:
-        type: string
-      teaching_aids:
-        type: string
-    type: object
   dto.UpdateLessonRequest:
     properties:
-      arm_id:
+      activities:
         type: string
-      class_id:
+      assessment:
+        type: string
+      content:
+        description: JSON string
+        type: string
+      description:
         type: string
       duration:
         type: integer
       lesson_date:
         type: string
-      period:
+      lesson_order:
         type: integer
-      scheme_of_work_item_id:
+      module_id:
+        type: string
+      objectives:
+        type: string
+      resources:
+        type: string
+      scheme_of_work_id:
         type: string
       status:
         type: string
       title:
+        type: string
+      topic_id:
         type: string
       week:
         type: integer
     type: object
   dto.UpdateModuleRequest:
     properties:
-      code:
-        type: string
       description:
         type: string
-      name:
-        type: string
-      sequence:
+      module_order:
         type: integer
+      title:
+        type: string
     type: object
   dto.UpdateNotificationRequest:
     properties:
@@ -2487,36 +1922,21 @@ definitions:
         - urgent
         type: string
     type: object
-  dto.UpdateSchemeOfWorkItemRequest:
-    properties:
-      content:
-        type: string
-      module_id:
-        type: string
-      sequence:
-        type: integer
-      subtopic:
-        type: string
-      topic:
-        type: string
-      week_end:
-        type: integer
-      week_start:
-        type: integer
-    type: object
   dto.UpdateSchemeOfWorkRequest:
     properties:
-      academic_session_id:
-        type: string
-      class_id:
-        type: string
       description:
+        type: string
+      grade_id:
         type: string
       status:
         type: string
       subject_id:
         type: string
-      term_id:
+      term:
+        enum:
+        - first
+        - second
+        - third
         type: string
       title:
         type: string
@@ -2577,28 +1997,14 @@ definitions:
       term_number:
         type: integer
     type: object
-  dto.UpdateTestRequest:
+  dto.UpdateTopicRequest:
     properties:
-      academic_session_id:
-        type: string
-      class_id:
-        type: string
-      duration:
-        type: integer
-      status:
-        type: string
-      subject_id:
-        type: string
-      term_id:
-        type: string
-      test_date:
-        type: string
-      test_type:
+      description:
         type: string
       title:
         type: string
-      total_marks:
-        type: number
+      topic_order:
+        type: integer
     type: object
   dto.UpdateUserRequest:
     properties:
@@ -5649,971 +5055,6 @@ paths:
       summary: Get department with its subjects
       tags:
       - Departments
-  /api/exam-scheme-items:
-    get:
-      consumes:
-      - application/json
-      description: Get a paginated list of all exam scheme items
-      parameters:
-      - description: Filter by exam ID
-        in: query
-        name: exam_id
-        type: string
-      - description: Filter by scheme of work item ID
-        in: query
-        name: scheme_of_work_item_id
-        type: string
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        type: integer
-      - default: 20
-        description: Items per page
-        in: query
-        name: limit
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.ExamSchemeItemListResponse'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get all exam scheme items
-      tags:
-      - Exam Scheme Items
-    post:
-      consumes:
-      - application/json
-      description: Associate a scheme of work item with an exam
-      parameters:
-      - description: Exam scheme item request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.CreateExamSchemeItemRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "409":
-          description: Conflict
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Create an exam scheme item
-      tags:
-      - Exam Scheme Items
-  /api/exam-scheme-items/{exam_id}/{scheme_of_work_item_id}:
-    delete:
-      consumes:
-      - application/json
-      description: Remove an association between an exam and a scheme of work item
-      parameters:
-      - description: Exam ID
-        in: path
-        name: exam_id
-        required: true
-        type: string
-      - description: Scheme of Work Item ID
-        in: path
-        name: scheme_of_work_item_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Delete an exam scheme item
-      tags:
-      - Exam Scheme Items
-  /api/exam-scheme-items/bulk:
-    post:
-      consumes:
-      - application/json
-      description: Associate multiple scheme of work items with an exam
-      parameters:
-      - description: Bulk exam scheme item request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.BulkCreateExamSchemeItemsRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "409":
-          description: Conflict
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Bulk create exam scheme items
-      tags:
-      - Exam Scheme Items
-  /api/exam-scheme-items/exam/{exam_id}:
-    delete:
-      consumes:
-      - application/json
-      description: Remove all associations between an exam and scheme of work items
-      parameters:
-      - description: Exam ID
-        in: path
-        name: exam_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Delete all exam scheme items for an exam
-      tags:
-      - Exam Scheme Items
-    get:
-      consumes:
-      - application/json
-      description: Get all scheme of work items associated with a specific exam
-      parameters:
-      - description: Exam ID
-        in: path
-        name: exam_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get exam scheme items by exam
-      tags:
-      - Exam Scheme Items
-  /api/exam-scheme-items/scheme-item/{scheme_of_work_item_id}:
-    get:
-      consumes:
-      - application/json
-      description: Get all exams associated with a specific scheme of work item
-      parameters:
-      - description: Scheme of Work Item ID
-        in: path
-        name: scheme_of_work_item_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get exam scheme items by scheme of work item
-      tags:
-      - Exam Scheme Items
-  /api/exams:
-    get:
-      consumes:
-      - application/json
-      description: Get a paginated list of all exams
-      parameters:
-      - description: Filter by academic session ID
-        in: query
-        name: academic_session_id
-        type: string
-      - description: Filter by term ID
-        in: query
-        name: term_id
-        type: string
-      - description: Filter by subject ID
-        in: query
-        name: subject_id
-        type: string
-      - description: Filter by class ID
-        in: query
-        name: class_id
-        type: string
-      - description: Filter by status
-        in: query
-        name: status
-        type: string
-      - description: Search by title or exam type
-        in: query
-        name: search
-        type: string
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        type: integer
-      - default: 20
-        description: Items per page
-        in: query
-        name: limit
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.ExamListResponse'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get all exams
-      tags:
-      - Exams
-    post:
-      consumes:
-      - application/json
-      description: Create a new exam
-      parameters:
-      - description: Exam request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.CreateExamRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Create an exam
-      tags:
-      - Exams
-  /api/exams/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Soft delete an exam
-      parameters:
-      - description: Exam ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Delete an exam
-      tags:
-      - Exams
-    get:
-      consumes:
-      - application/json
-      description: Get a single exam by its ID
-      parameters:
-      - description: Exam ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get exam by ID
-      tags:
-      - Exams
-    put:
-      consumes:
-      - application/json
-      description: Update an existing exam
-      parameters:
-      - description: Exam ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Update request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.UpdateExamRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Update an exam
-      tags:
-      - Exams
-  /api/exams/bulk:
-    post:
-      consumes:
-      - application/json
-      description: Create multiple exams
-      parameters:
-      - description: Bulk exam request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.BulkCreateExamsRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Bulk create exams
-      tags:
-      - Exams
-  /api/exams/class/{class_id}:
-    get:
-      consumes:
-      - application/json
-      description: Get all exams for a specific class
-      parameters:
-      - description: Class ID
-        in: path
-        name: class_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get exams by class
-      tags:
-      - Exams
-  /api/exams/subject/{subject_id}:
-    get:
-      consumes:
-      - application/json
-      description: Get all exams for a specific subject
-      parameters:
-      - description: Subject ID
-        in: path
-        name: subject_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get exams by subject
-      tags:
-      - Exams
-  /api/exercises:
-    get:
-      consumes:
-      - application/json
-      description: Get a paginated list of all exercises
-      parameters:
-      - description: Filter by lesson ID
-        in: query
-        name: lesson_id
-        type: string
-      - description: Search by title or content
-        in: query
-        name: search
-        type: string
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        type: integer
-      - default: 20
-        description: Items per page
-        in: query
-        name: limit
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.ExerciseListResponse'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get all exercises
-      tags:
-      - Exercises
-    post:
-      consumes:
-      - application/json
-      description: Create a new exercise for a lesson
-      parameters:
-      - description: Exercise request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.CreateExerciseRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Create an exercise
-      tags:
-      - Exercises
-  /api/exercises/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Soft delete an exercise
-      parameters:
-      - description: Exercise ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Delete an exercise
-      tags:
-      - Exercises
-    get:
-      consumes:
-      - application/json
-      description: Get a single exercise by its ID
-      parameters:
-      - description: Exercise ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get exercise by ID
-      tags:
-      - Exercises
-    put:
-      consumes:
-      - application/json
-      description: Update an existing exercise
-      parameters:
-      - description: Exercise ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Update request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.UpdateExerciseRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Update an exercise
-      tags:
-      - Exercises
-  /api/exercises/bulk:
-    post:
-      consumes:
-      - application/json
-      description: Create multiple exercises for a lesson
-      parameters:
-      - description: Bulk exercise request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.BulkCreateExercisesRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Bulk create exercises
-      tags:
-      - Exercises
-  /api/exercises/lesson/{lesson_id}:
-    get:
-      consumes:
-      - application/json
-      description: Get all exercises for a specific lesson
-      parameters:
-      - description: Lesson ID
-        in: path
-        name: lesson_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get exercises by lesson
-      tags:
-      - Exercises
   /api/export/excel:
     get:
       description: Fetches all data from the database and exports it as an Excel (.xlsx)
@@ -7333,598 +5774,23 @@ paths:
       summary: Get guardians by student
       tags:
       - Guardians
-  /api/learning-objectives:
-    get:
-      consumes:
-      - application/json
-      description: Get a paginated list of all learning objectives
-      parameters:
-      - description: Filter by scheme of work item ID
-        in: query
-        name: scheme_of_work_item_id
-        type: string
-      - description: Search by objective text
-        in: query
-        name: search
-        type: string
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        type: integer
-      - default: 20
-        description: Items per page
-        in: query
-        name: limit
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.LearningObjectiveListResponse'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get all learning objectives
-      tags:
-      - Learning Objectives
-    post:
-      consumes:
-      - application/json
-      description: Create a new learning objective for a scheme of work item
-      parameters:
-      - description: Objective request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.CreateLearningObjectiveRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Create a learning objective
-      tags:
-      - Learning Objectives
-  /api/learning-objectives/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Soft delete a learning objective
-      parameters:
-      - description: Objective ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Delete a learning objective
-      tags:
-      - Learning Objectives
-    get:
-      consumes:
-      - application/json
-      description: Get a single learning objective by its ID
-      parameters:
-      - description: Objective ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get objective by ID
-      tags:
-      - Learning Objectives
-    put:
-      consumes:
-      - application/json
-      description: Update an existing learning objective
-      parameters:
-      - description: Objective ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Update request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.UpdateLearningObjectiveRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Update a learning objective
-      tags:
-      - Learning Objectives
-  /api/learning-objectives/bulk:
-    post:
-      consumes:
-      - application/json
-      description: Create multiple learning objectives for a scheme of work item
-      parameters:
-      - description: Bulk objective request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.BulkCreateLearningObjectivesRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Bulk create learning objectives
-      tags:
-      - Learning Objectives
-  /api/learning-objectives/scheme-item/{scheme_of_work_item_id}:
-    get:
-      consumes:
-      - application/json
-      description: Get all learning objectives for a specific scheme of work item
-      parameters:
-      - description: Scheme of Work Item ID
-        in: path
-        name: scheme_of_work_item_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get objectives by scheme of work item
-      tags:
-      - Learning Objectives
-  /api/lesson-plans:
-    get:
-      consumes:
-      - application/json
-      description: Get a paginated list of all lesson plans
-      parameters:
-      - description: Filter by lesson ID
-        in: query
-        name: lesson_id
-        type: string
-      - description: Search in lesson plan content
-        in: query
-        name: search
-        type: string
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        type: integer
-      - default: 20
-        description: Items per page
-        in: query
-        name: limit
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.LessonPlanListResponse'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get all lesson plans
-      tags:
-      - Lesson Plans
-    post:
-      consumes:
-      - application/json
-      description: Create a new lesson plan for a lesson
-      parameters:
-      - description: Lesson plan request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.CreateLessonPlanRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "409":
-          description: Conflict
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Create a lesson plan
-      tags:
-      - Lesson Plans
-  /api/lesson-plans/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Soft delete a lesson plan
-      parameters:
-      - description: Lesson plan ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Delete a lesson plan
-      tags:
-      - Lesson Plans
-    get:
-      consumes:
-      - application/json
-      description: Get a single lesson plan by its ID
-      parameters:
-      - description: Lesson plan ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get lesson plan by ID
-      tags:
-      - Lesson Plans
-    put:
-      consumes:
-      - application/json
-      description: Update an existing lesson plan
-      parameters:
-      - description: Lesson plan ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Update request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.UpdateLessonPlanRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Update a lesson plan
-      tags:
-      - Lesson Plans
-  /api/lesson-plans/lesson/{lesson_id}:
-    get:
-      consumes:
-      - application/json
-      description: Get a lesson plan by its associated lesson ID
-      parameters:
-      - description: Lesson ID
-        in: path
-        name: lesson_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get lesson plan by lesson
-      tags:
-      - Lesson Plans
   /api/lessons:
     get:
       consumes:
       - application/json
       description: Get a paginated list of all lessons
       parameters:
-      - description: Filter by scheme of work item ID
+      - description: Filter by scheme of work ID
         in: query
-        name: scheme_of_work_item_id
+        name: scheme_of_work_id
         type: string
-      - description: Filter by class ID
+      - description: Filter by module ID
         in: query
-        name: class_id
+        name: module_id
         type: string
-      - description: Filter by arm ID
+      - description: Filter by topic ID
         in: query
-        name: arm_id
+        name: topic_id
         type: string
       - description: Filter by status
         in: query
@@ -7934,7 +5800,7 @@ paths:
         in: query
         name: week
         type: integer
-      - description: Search by title
+      - description: Search by title or description
         in: query
         name: search
         type: string
@@ -8195,15 +6061,15 @@ paths:
       summary: Bulk create lessons
       tags:
       - Lessons
-  /api/lessons/class/{class_id}:
+  /api/lessons/module/{module_id}:
     get:
       consumes:
       - application/json
-      description: Get all lessons for a specific class
+      description: Get all lessons for a specific module
       parameters:
-      - description: Class ID
+      - description: Module ID
         in: path
-        name: class_id
+        name: module_id
         required: true
         type: string
       produces:
@@ -8226,7 +6092,115 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Get lessons by class
+      summary: Get lessons by module
+      tags:
+      - Lessons
+  /api/lessons/reorder:
+    put:
+      consumes:
+      - application/json
+      description: Reorder lessons within a topic
+      parameters:
+      - description: Reorder request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ReorderLessonsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Reorder lessons
+      tags:
+      - Lessons
+  /api/lessons/scheme/{scheme_of_work_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all lessons for a specific scheme of work
+      parameters:
+      - description: Scheme of Work ID
+        in: path
+        name: scheme_of_work_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get lessons by scheme of work
+      tags:
+      - Lessons
+  /api/lessons/topic/{topic_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all lessons for a specific topic
+      parameters:
+      - description: Topic ID
+        in: path
+        name: topic_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get lessons by topic
       tags:
       - Lessons
   /api/modules:
@@ -8235,11 +6209,11 @@ paths:
       - application/json
       description: Get a paginated list of all modules
       parameters:
-      - description: Filter by subject ID
+      - description: Filter by scheme of work ID
         in: query
-        name: subject_id
+        name: scheme_of_work_id
         type: string
-      - description: Search by name, code, or description
+      - description: Search by title or description
         in: query
         name: search
         type: string
@@ -8283,7 +6257,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Create a new module for a subject
+      description: Create a new module for a scheme of work
       parameters:
       - description: Module request
         in: body
@@ -8469,7 +6443,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Create multiple modules for a subject
+      description: Create multiple modules for a scheme of work
       parameters:
       - description: Bulk module request
         in: body
@@ -8515,15 +6489,55 @@ paths:
       summary: Bulk create modules
       tags:
       - Modules
-  /api/modules/subject/{subject_id}:
+  /api/modules/reorder:
+    put:
+      consumes:
+      - application/json
+      description: Reorder modules within a scheme of work
+      parameters:
+      - description: Reorder request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ReorderModulesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Reorder modules
+      tags:
+      - Modules
+  /api/modules/scheme/{scheme_of_work_id}:
     get:
       consumes:
       - application/json
-      description: Get all modules for a specific subject
+      description: Get all modules for a specific scheme of work
       parameters:
-      - description: Subject ID
+      - description: Scheme of Work ID
         in: path
-        name: subject_id
+        name: scheme_of_work_id
         required: true
         type: string
       produces:
@@ -8546,7 +6560,7 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Get modules by subject
+      summary: Get modules by scheme of work
       tags:
       - Modules
   /api/notifications:
@@ -9197,370 +7211,23 @@ paths:
       summary: Unsubscribe from push notifications
       tags:
       - Push Notifications
-  /api/scheme-items:
-    get:
-      consumes:
-      - application/json
-      description: Get a paginated list of all scheme of work items
-      parameters:
-      - description: Filter by scheme of work ID
-        in: query
-        name: scheme_of_work_id
-        type: string
-      - description: Filter by module ID
-        in: query
-        name: module_id
-        type: string
-      - description: Search by topic, subtopic, or content
-        in: query
-        name: search
-        type: string
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        type: integer
-      - default: 20
-        description: Items per page
-        in: query
-        name: limit
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.SchemeOfWorkItemListResponse'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get all scheme of work items
-      tags:
-      - Scheme of Work Items
-    post:
-      consumes:
-      - application/json
-      description: Create a new scheme of work item
-      parameters:
-      - description: Item request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.CreateSchemeOfWorkItemRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Create a scheme of work item
-      tags:
-      - Scheme of Work Items
-  /api/scheme-items/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Soft delete a scheme of work item
-      parameters:
-      - description: Item ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Delete an item
-      tags:
-      - Scheme of Work Items
-    get:
-      consumes:
-      - application/json
-      description: Get a single scheme of work item by its ID
-      parameters:
-      - description: Item ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get item by ID
-      tags:
-      - Scheme of Work Items
-    put:
-      consumes:
-      - application/json
-      description: Update an existing scheme of work item
-      parameters:
-      - description: Item ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Update request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.UpdateSchemeOfWorkItemRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Update an item
-      tags:
-      - Scheme of Work Items
-  /api/scheme-items/bulk:
-    post:
-      consumes:
-      - application/json
-      description: Create multiple scheme of work items
-      parameters:
-      - description: Bulk item request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.BulkCreateSchemeItemsRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Bulk create scheme of work items
-      tags:
-      - Scheme of Work Items
-  /api/scheme-items/module/{module_id}:
-    get:
-      consumes:
-      - application/json
-      description: Get all items for a specific module
-      parameters:
-      - description: Module ID
-        in: path
-        name: module_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get items by module
-      tags:
-      - Scheme of Work Items
-  /api/scheme-items/scheme/{scheme_of_work_id}:
-    get:
-      consumes:
-      - application/json
-      description: Get all items for a specific scheme of work
-      parameters:
-      - description: Scheme of Work ID
-        in: path
-        name: scheme_of_work_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get items by scheme of work
-      tags:
-      - Scheme of Work Items
   /api/schemes:
     get:
       consumes:
       - application/json
       description: Get a paginated list of all schemes of work
       parameters:
-      - description: Filter by academic session ID
-        in: query
-        name: academic_session_id
-        type: string
-      - description: Filter by term ID
-        in: query
-        name: term_id
-        type: string
       - description: Filter by subject ID
         in: query
         name: subject_id
         type: string
-      - description: Filter by class ID
+      - description: Filter by grade ID
         in: query
-        name: class_id
+        name: grade_id
+        type: string
+      - description: Filter by term
+        in: query
+        name: term
         type: string
       - description: Filter by status
         in: query
@@ -9842,15 +7509,15 @@ paths:
       summary: Bulk create schemes
       tags:
       - Scheme of Work
-  /api/schemes/class/{class_id}:
+  /api/schemes/grade/{grade_id}:
     get:
       consumes:
       - application/json
-      description: Get all schemes of work for a specific class
+      description: Get all schemes of work for a specific grade
       parameters:
-      - description: Class ID
+      - description: Grade ID
         in: path
-        name: class_id
+        name: grade_id
         required: true
         type: string
       produces:
@@ -9873,7 +7540,46 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Get schemes by class
+      summary: Get schemes by grade
+      tags:
+      - Scheme of Work
+  /api/schemes/grade/{grade_id}/term/{term}:
+    get:
+      consumes:
+      - application/json
+      description: Get all schemes of work for a specific grade and term
+      parameters:
+      - description: Grade ID
+        in: path
+        name: grade_id
+        required: true
+        type: string
+      - description: Term (first, second, third)
+        in: path
+        name: term
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get schemes by grade and term
       tags:
       - Scheme of Work
   /api/schemes/subject/{subject_id}:
@@ -11342,338 +9048,17 @@ paths:
       summary: Get term statistics
       tags:
       - Terms
-  /api/test-scheme-items:
+  /api/topics:
     get:
       consumes:
       - application/json
-      description: Get a paginated list of all test scheme items
+      description: Get a paginated list of all topics
       parameters:
-      - description: Filter by test ID
+      - description: Filter by module ID
         in: query
-        name: test_id
+        name: module_id
         type: string
-      - description: Filter by scheme of work item ID
-        in: query
-        name: scheme_of_work_item_id
-        type: string
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        type: integer
-      - default: 20
-        description: Items per page
-        in: query
-        name: limit
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.TestSchemeItemListResponse'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get all test scheme items
-      tags:
-      - Test Scheme Items
-    post:
-      consumes:
-      - application/json
-      description: Associate a scheme of work item with a test
-      parameters:
-      - description: Test scheme item request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.CreateTestSchemeItemRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "409":
-          description: Conflict
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Create a test scheme item
-      tags:
-      - Test Scheme Items
-  /api/test-scheme-items/{test_id}/{scheme_of_work_item_id}:
-    delete:
-      consumes:
-      - application/json
-      description: Remove an association between a test and a scheme of work item
-      parameters:
-      - description: Test ID
-        in: path
-        name: test_id
-        required: true
-        type: string
-      - description: Scheme of Work Item ID
-        in: path
-        name: scheme_of_work_item_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Delete a test scheme item
-      tags:
-      - Test Scheme Items
-  /api/test-scheme-items/bulk:
-    post:
-      consumes:
-      - application/json
-      description: Associate multiple scheme of work items with a test
-      parameters:
-      - description: Bulk test scheme item request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.BulkCreateTestSchemeItemsRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "409":
-          description: Conflict
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Bulk create test scheme items
-      tags:
-      - Test Scheme Items
-  /api/test-scheme-items/scheme-item/{scheme_of_work_item_id}:
-    get:
-      consumes:
-      - application/json
-      description: Get all tests associated with a specific scheme of work item
-      parameters:
-      - description: Scheme of Work Item ID
-        in: path
-        name: scheme_of_work_item_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get test scheme items by scheme of work item
-      tags:
-      - Test Scheme Items
-  /api/test-scheme-items/test/{test_id}:
-    delete:
-      consumes:
-      - application/json
-      description: Remove all associations between a test and scheme of work items
-      parameters:
-      - description: Test ID
-        in: path
-        name: test_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Delete all test scheme items for a test
-      tags:
-      - Test Scheme Items
-    get:
-      consumes:
-      - application/json
-      description: Get all scheme of work items associated with a specific test
-      parameters:
-      - description: Test ID
-        in: path
-        name: test_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get test scheme items by test
-      tags:
-      - Test Scheme Items
-  /api/tests:
-    get:
-      consumes:
-      - application/json
-      description: Get a paginated list of all tests
-      parameters:
-      - description: Filter by academic session ID
-        in: query
-        name: academic_session_id
-        type: string
-      - description: Filter by term ID
-        in: query
-        name: term_id
-        type: string
-      - description: Filter by subject ID
-        in: query
-        name: subject_id
-        type: string
-      - description: Filter by class ID
-        in: query
-        name: class_id
-        type: string
-      - description: Filter by status
-        in: query
-        name: status
-        type: string
-      - description: Search by title or test type
+      - description: Search by title or description
         in: query
         name: search
         type: string
@@ -11693,7 +9078,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.TestListResponse'
+            $ref: '#/definitions/dto.TopicListResponse'
         "400":
           description: Bad Request
           schema:
@@ -11711,20 +9096,20 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Get all tests
+      summary: Get all topics
       tags:
-      - Tests
+      - Topics
     post:
       consumes:
       - application/json
-      description: Create a new test
+      description: Create a new topic for a module
       parameters:
-      - description: Test request
+      - description: Topic request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.CreateTestRequest'
+          $ref: '#/definitions/dto.CreateTopicRequest'
       produces:
       - application/json
       responses:
@@ -11748,6 +9133,11 @@ paths:
           schema:
             additionalProperties: true
             type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
         "500":
           description: Internal Server Error
           schema:
@@ -11755,16 +9145,16 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Create a test
+      summary: Create a topic
       tags:
-      - Tests
-  /api/tests/{id}:
+      - Topics
+  /api/topics/{id}:
     delete:
       consumes:
       - application/json
-      description: Soft delete a test
+      description: Soft delete a topic
       parameters:
-      - description: Test ID
+      - description: Topic ID
         in: path
         name: id
         required: true
@@ -11799,15 +9189,15 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Delete a test
+      summary: Delete a topic
       tags:
-      - Tests
+      - Topics
     get:
       consumes:
       - application/json
-      description: Get a single test by its ID
+      description: Get a single topic by its ID
       parameters:
-      - description: Test ID
+      - description: Topic ID
         in: path
         name: id
         required: true
@@ -11837,15 +9227,15 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Get test by ID
+      summary: Get topic by ID
       tags:
-      - Tests
+      - Topics
     put:
       consumes:
       - application/json
-      description: Update an existing test
+      description: Update an existing topic
       parameters:
-      - description: Test ID
+      - description: Topic ID
         in: path
         name: id
         required: true
@@ -11855,7 +9245,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.UpdateTestRequest'
+          $ref: '#/definitions/dto.UpdateTopicRequest'
       produces:
       - application/json
       responses:
@@ -11879,6 +9269,11 @@ paths:
           schema:
             additionalProperties: true
             type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
         "500":
           description: Internal Server Error
           schema:
@@ -11886,21 +9281,21 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Update a test
+      summary: Update a topic
       tags:
-      - Tests
-  /api/tests/bulk:
+      - Topics
+  /api/topics/bulk:
     post:
       consumes:
       - application/json
-      description: Create multiple tests
+      description: Create multiple topics for a module
       parameters:
-      - description: Bulk test request
+      - description: Bulk topic request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.BulkCreateTestsRequest'
+          $ref: '#/definitions/dto.BulkCreateTopicsRequest'
       produces:
       - application/json
       responses:
@@ -11924,6 +9319,11 @@ paths:
           schema:
             additionalProperties: true
             type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
         "500":
           description: Internal Server Error
           schema:
@@ -11931,18 +9331,18 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Bulk create tests
+      summary: Bulk create topics
       tags:
-      - Tests
-  /api/tests/class/{class_id}:
+      - Topics
+  /api/topics/module/{module_id}:
     get:
       consumes:
       - application/json
-      description: Get all tests for a specific class
+      description: Get all topics for a specific module
       parameters:
-      - description: Class ID
+      - description: Module ID
         in: path
-        name: class_id
+        name: module_id
         required: true
         type: string
       produces:
@@ -11965,20 +9365,21 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Get tests by class
+      summary: Get topics by module
       tags:
-      - Tests
-  /api/tests/subject/{subject_id}:
-    get:
+      - Topics
+  /api/topics/reorder:
+    put:
       consumes:
       - application/json
-      description: Get all tests for a specific subject
+      description: Reorder topics within a module
       parameters:
-      - description: Subject ID
-        in: path
-        name: subject_id
+      - description: Reorder request
+        in: body
+        name: request
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/dto.ReorderTopicsRequest'
       produces:
       - application/json
       responses:
@@ -11992,6 +9393,11 @@ paths:
           schema:
             additionalProperties: true
             type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
         "500":
           description: Internal Server Error
           schema:
@@ -11999,9 +9405,9 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Get tests by subject
+      summary: Reorder topics
       tags:
-      - Tests
+      - Topics
   /api/users:
     get:
       consumes:

@@ -40,8 +40,11 @@ func SchemeOfWorkRoutes(router *gin.RouterGroup, db *gorm.DB) {
 		// Get schemes by subject
 		schemeGroup.GET("/schemes/subject/:subject_id", schemeHandler.GetSchemesBySubject)
 		
-		// Get schemes by class
-		schemeGroup.GET("/schemes/class/:class_id", schemeHandler.GetSchemesByClass)
+		// Get schemes by grade
+		schemeGroup.GET("/schemes/grade/:grade_id", schemeHandler.GetSchemesByGrade)
+		
+		// Get schemes by grade and term
+		schemeGroup.GET("/schemes/grade/:grade_id/term/:term", schemeHandler.GetSchemesByGradeAndTerm)
 
 		// ============================================================
 		// UPDATE - Scheme update endpoints

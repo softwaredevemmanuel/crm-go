@@ -9,25 +9,24 @@ import (
 )
 
 type SchemeOfWork struct {
-	ID                uuid.UUID      `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
-	AcademicSessionID uuid.UUID      `gorm:"type:uuid;not null;index" json:"academic_session_id"`
-	TermID            uuid.UUID      `gorm:"type:uuid;not null;index" json:"term_id"`
-	SubjectID         uuid.UUID      `gorm:"type:uuid;not null;index" json:"subject_id"`
-	ClassID           uuid.UUID      `gorm:"type:uuid;not null;index" json:"class_id"`
+	ID                 uuid.UUID      `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	SubjectID          uuid.UUID      `gorm:"type:uuid;not null;index" json:"subject_id"`
+	GradeID           uuid.UUID      `gorm:"type:uuid;not null;index" json:"grade_id"`
+	Term               string         `gorm:"type:varchar(20);not null;check:term IN ('first','second','third')" json:"term"`
 	Title             string         `gorm:"type:varchar(255);not null" json:"title"`
 	Description       string         `gorm:"type:text" json:"description"`
-	Status            string         `gorm:"type:varchar(20);default:'draft'" json:"status"`
-	CreatedBy         uuid.UUID      `gorm:"type:uuid;not null" json:"created_by"`
-	CreatedAt         time.Time      `json:"created_at"`
-	UpdatedAt         time.Time      `json:"updated_at"`
-	DeletedAt         gorm.DeletedAt `gorm:"index" json:"-"`
+	Status             string         `gorm:"type:varchar(20);default:'draft'" json:"status"`
+	CreatedBy          uuid.UUID      `gorm:"type:uuid;not null" json:"created_by"`
+	CreatedAt          time.Time      `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt          time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+	DeletedAt          gorm.DeletedAt `gorm:"index" json:"-"`
 
 	// Relationships
-	AcademicSession AcademicSession       `gorm:"foreignKey:AcademicSessionID" json:"academic_session,omitempty"`
-	Term            Term                  `gorm:"foreignKey:TermID" json:"term,omitempty"`
-	Subject         Subject               `gorm:"foreignKey:SubjectID" json:"subject,omitempty"`
-	Class           ClassGrade            `gorm:"foreignKey:ClassID" json:"class,omitempty"`
-	Creator         User                  `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
+	Subject Subject `gorm:"foreignKey:SubjectID" json:"subject,omitempty"`
+	Creator User    `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
+	Lessons           []Lesson        `gorm:"foreignKey:SchemeOfWorkID" json:"lessons,omitempty"`
+	Grade   ClassGrade `gorm:"foreignKey:GradeID" json:"grade,omitempty"`
+
 
 }
 

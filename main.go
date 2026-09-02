@@ -131,8 +131,9 @@ func main() {
 	routes.ArmClassTeacherRoutes(&r.RouterGroup, config.DB)
 	routes.TermRoutes(&r.RouterGroup, config.DB)
 	routes.SchemeOfWorkRoutes(&r.RouterGroup, config.DB)
-	routes.ExerciseRoutes(&r.RouterGroup, config.DB)
-	routes.ExamRoutes(&r.RouterGroup, config.DB)
+	routes.ModuleRoutes(&r.RouterGroup, config.DB)
+	routes.TopicRoutes(&r.RouterGroup, config.DB)
+	routes.LessonRoutes(&r.RouterGroup, config.DB)
 
 	// Example curl command to clear DB (replace with your server address):
 	// curl -X DELETE "http://localhost:8080/admin/clear-db" \
@@ -199,7 +200,10 @@ func main() {
 		seeds.SeedDepartments()
 		seeds.SeedSubjects()
 		seeds.SeedTerm()
-		
+		seeds.SeedSchemesOfWork()
+		seeds.SeedModules()
+		seeds.SeedTopics()
+		seeds.SeedLessons()
 
 		return
 	}
