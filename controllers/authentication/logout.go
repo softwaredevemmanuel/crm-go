@@ -1,13 +1,14 @@
 package controllers
 
 import (
-	"crm-go/config"
-	"crm-go/models"
 	"net/http"
-	"github.com/gin-gonic/gin"
 	"time"
-	
+	"github.com/gin-gonic/gin"
+	"crm-go/models"
+	"crm-go/config"
+
 )
+
 
 // Logout handles user logout
 // @Summary User logout

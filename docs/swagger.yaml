@@ -101,13 +101,6 @@ definitions:
     - title
     - tutor_id
     type: object
-  controllers.ForgotPasswordInput:
-    properties:
-      email:
-        type: string
-    required:
-    - email
-    type: object
   controllers.ListCoursesByProduct:
     properties:
       course_id:
@@ -131,17 +124,6 @@ definitions:
       message:
         example: Login successful
         type: string
-    type: object
-  controllers.ResetPasswordInput:
-    properties:
-      new_password:
-        minLength: 6
-        type: string
-      token:
-        type: string
-    required:
-    - new_password
-    - token
     type: object
   controllers.SignUpInput:
     properties:
@@ -1052,7 +1034,6 @@ definitions:
         description: Added
         type: string
       status:
-        description: 'active, inactive (default: active)'
         type: string
       subject_id:
         type: string
@@ -1136,6 +1117,8 @@ definitions:
         type: string
       id:
         type: string
+      level:
+        type: integer
       name:
         type: string
       updated_at:
@@ -1467,6 +1450,17 @@ definitions:
     required:
     - topic_orders
     type: object
+  dto.ResetPasswordRequest:
+    properties:
+      password:
+        minLength: 8
+        type: string
+      token:
+        type: string
+    required:
+    - password
+    - token
+    type: object
   dto.SchemeOfWorkListResponse:
     properties:
       limit:
@@ -1516,6 +1510,20 @@ definitions:
         type: string
       updated_at:
         type: string
+    type: object
+  dto.SendPasswordResetRequest:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  dto.SendVerificationEmailRequest:
+    properties:
+      email:
+        type: string
+    required:
+    - email
     type: object
   dto.StudentEnrollmentListResponse:
     properties:
@@ -2132,6 +2140,20 @@ definitions:
       updated_at:
         type: string
     type: object
+  dto.VerifyEmailRequest:
+    properties:
+      token:
+        type: string
+    required:
+    - token
+    type: object
+  dto.VerifyResetTokenRequest:
+    properties:
+      token:
+        type: string
+    required:
+    - token
+    type: object
   models.AlreadyLoggedOutResponse:
     description: Already logged out response
     properties:
@@ -2453,6 +2475,8 @@ definitions:
       dob:
         type: string
       email:
+        type: string
+      email_verified_at:
         type: string
       first_name:
         type: string
@@ -4027,6 +4051,224 @@ paths:
       summary: Delete an arm
       tags:
       - Arms
+  /api/auth/resend-verification:
+    post:
+      consumes:
+      - application/json
+      description: Resend email verification link
+      parameters:
+      - description: Email
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SendVerificationEmailRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Resend verification email
+      tags:
+      - Authentication
+  /api/auth/reset-password:
+    post:
+      consumes:
+      - application/json
+      description: Reset user's password using token
+      parameters:
+      - description: Reset password request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ResetPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Reset password
+      tags:
+      - Authentication
+  /api/auth/send-password-reset:
+    post:
+      consumes:
+      - application/json
+      description: Send a password reset link to the user's email
+      parameters:
+      - description: Email
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SendPasswordResetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Send password reset email
+      tags:
+      - Authentication
+  /api/auth/send-verification:
+    post:
+      consumes:
+      - application/json
+      description: Send a verification email to the user
+      parameters:
+      - description: Email
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SendVerificationEmailRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Send email verification
+      tags:
+      - Authentication
+  /api/auth/verify-email:
+    post:
+      consumes:
+      - application/json
+      description: Verify user's email using token
+      parameters:
+      - description: Verification token
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.VerifyEmailRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Verify email
+      tags:
+      - Authentication
+  /api/auth/verify-reset-token:
+    post:
+      consumes:
+      - application/json
+      description: Check if a password reset token is valid
+      parameters:
+      - description: Reset token
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.VerifyResetTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Verify password reset token
+      tags:
+      - Authentication
   /api/categories:
     post:
       consumes:
@@ -9799,46 +10041,6 @@ paths:
       summary: Get users by role
       tags:
       - Users
-  /auth/forgot-password:
-    post:
-      consumes:
-      - application/json
-      description: Initiates a password reset process by sending a reset link to the
-        provided email (if exists)
-      parameters:
-      - description: Email address for password reset
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/controllers.ForgotPasswordInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Success response with reset link (for testing)
-          schema:
-            properties:
-              link:
-                type: string
-              message:
-                type: string
-            type: object
-        "400":
-          description: Invalid input data
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Failed to send email
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Request password reset
-      tags:
-      - Authentication
   /auth/google/callback:
     get:
       description: Processes Google OAuth2 callback, creates/updates user, and returns
@@ -9962,7 +10164,7 @@ paths:
             $ref: '#/definitions/models.ErrorResponse'
       summary: Login with ID
       tags:
-      - auth
+      - Authentication
   /auth/logout:
     post:
       description: Invalidates the user's session and clears authentication cookies
@@ -9984,38 +10186,6 @@ paths:
       security:
       - BearerAuth: []
       summary: User logout
-      tags:
-      - Authentication
-  /auth/reset-password:
-    post:
-      consumes:
-      - application/json
-      description: Confirms password reset using a valid token and sets new password
-      parameters:
-      - description: Password reset data
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/controllers.ResetPasswordInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Password reset successful
-          schema:
-            properties:
-              message:
-                type: string
-            type: object
-        "400":
-          description: Invalid token, token expired, or invalid input
-          schema:
-            properties:
-              error:
-                type: string
-            type: object
-      summary: Reset user password
       tags:
       - Authentication
   /auth/signup:
@@ -10050,39 +10220,6 @@ paths:
             additionalProperties: true
             type: object
       summary: Register a new user
-      tags:
-      - Authentication
-  /auth/test-email:
-    post:
-      consumes:
-      - application/json
-      description: Send a test email to verify SMTP configuration
-      parameters:
-      - description: Email address to send test email to
-        in: body
-        name: email
-        required: true
-        schema:
-          type: object
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Send test email
       tags:
       - Authentication
   /categories:

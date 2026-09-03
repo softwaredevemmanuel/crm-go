@@ -65,7 +65,7 @@ func (s *LessonService) CreateLesson(req *dto.CreateLessonRequest, userID uuid.U
 	// Set default status
 	status := req.Status
 	if status == "" {
-		status = "planned"
+		status = "draft"
 	}
 
 	// Set default lesson order if not provided
@@ -155,7 +155,7 @@ func (s *LessonService) BulkCreateLessons(req *dto.BulkCreateLessonsRequest, use
 	// Set default status
 	status := req.Status
 	if status == "" {
-		status = "planned"
+		status = "draft"
 	}
 
 	result := &dto.BulkLessonResult{
@@ -577,9 +577,9 @@ func (s *LessonService) UpdateLesson(id string, req *dto.UpdateLessonRequest) (*
 	}
 
 	if req.Status != "" {
-		validStatuses := map[string]bool{"planned": true, "ongoing": true, "completed": true, "cancelled": true}
+		validStatuses := map[string]bool{"draft": true, "published": true, "in review": true, "archived": true}
 		if !validStatuses[req.Status] {
-			return nil, errors.New("status must be 'planned', 'ongoing', 'completed', or 'cancelled'")
+			return nil, errors.New("status must be 'draft', 'published', 'in review', or 'archived'")
 		}
 		lesson.Status = req.Status
 	}
@@ -760,9 +760,9 @@ func (s *LessonService) validateLessonRequest(req *dto.CreateLessonRequest) erro
 		return errors.New("title is required")
 	}
 	if req.Status != "" {
-		validStatuses := map[string]bool{"planned": true, "ongoing": true, "completed": true, "cancelled": true}
+		validStatuses := map[string]bool{"draft": true, "published": true, "in review": true, "archived": true}
 		if !validStatuses[req.Status] {
-			return errors.New("status must be 'planned', 'ongoing', 'completed', or 'cancelled'")
+			return errors.New("status must be 'draft', 'published', 'in review', or 'archived'")
 		}
 	}
 	if req.LessonOrder < 0 {

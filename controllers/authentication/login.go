@@ -1,21 +1,17 @@
+// controllers/controllers/login.go
 package controllers
 
 import (
 	"net/http"
 	"time"
-
-	"crm-go/config"
-	"crm-go/models"
 	"crm-go/utils"
-
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"crm-go/models"
+	"crm-go/config"
+
+
 )
-
-var cfg = config.LoadEnv()
-
-
-
 // Login handles user login
 // @Summary User login
 // @Description Authenticate user and return JWT token with session information
@@ -108,6 +104,7 @@ func Login(c *gin.Context) {
 			Email: user.Email,
 			Role:  string(user.Role),
 			Position:  string(user.Position),
+			IsVerified: user.IsVerified,
 		},
 		Session: models.SessionInfo{
 			ExpiresAt: session.ExpiresAt,
@@ -119,6 +116,10 @@ func Login(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response)
 }
+
+
+
+
 
 // func Login(c *gin.Context) {
 // 	var input models.LoginInput
@@ -245,131 +246,3 @@ func Login(c *gin.Context) {
 
 // 	c.JSON(http.StatusOK, response)
 // }
-
-type LoginIdInput struct {
-	Password string `json:"password" binding:"required"`
-}
-
-type LoginIdResponse struct {
-	Message   string     `json:"message" example:"Login successful"`
-}
-// LoginId handles login with email from header and password from body
-// @Summary Login with ID
-// @Description Authenticates user using email from header and password from body
-// @Tags auth
-// @Accept json
-// @Produce json
-// @Param email header string true "User Email"
-// @Param request body LoginIdInput true "Login credentials"
-// @Success 200 {object} LoginIdResponse
-// @Failure 400 {object} models.ErrorResponse
-// @Failure 401 {object} models.ErrorResponse
-// @Router /auth/login/id [post]
-func LoginId(c *gin.Context) {
-	// Get email from header
-	email := c.GetHeader("email")
-	if email == "" {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Error:   "Missing header",
-			Message: "Email header is required",
-		})
-		return
-	}
-
-	// Bind password from JSON body
-	var input LoginIdInput
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Error:   "Invalid input",
-			Message: err.Error(),
-		})
-		return
-	}
-
-	// Validate password is provided
-	if input.Password == "" {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse{
-			Error:   "Invalid input",
-			Message: "Password is required",
-		})
-		return
-	}
-
-	// Find user by email
-	var user models.User
-	if err := config.DB.Where("email = ?", email).First(&user).Error; err != nil {
-		c.JSON(http.StatusUnauthorized, models.ErrorResponse{
-			Error:   "Invalid credentials",
-			Message: "Invalid email or password",
-		})
-		return
-	}
-
-	// Compare login IDs (password)
-	if user.LoginID != input.Password {
-		c.JSON(http.StatusUnauthorized, models.ErrorResponse{
-			Error:   "Invalid credentials",
-			Message: "Invalid email or password",
-		})
-		return
-	}
-
-	// Return structured response
-	response := LoginIdResponse{
-		Message:    "Login successful",
-	}
-
-	c.JSON(http.StatusOK, response)
-}
-
-
-
-// Helper functions to parse user agent
-func getDeviceType(userAgent string) string {
-
-	// Simple device detection - you can use a proper library like github.com/mssola/user_agent
-	if contains(userAgent, "Mobile") || contains(userAgent, "Android") || contains(userAgent, "iPhone") {
-		return "mobile"
-	} else if contains(userAgent, "Tablet") || contains(userAgent, "iPad") {
-		return "tablet"
-	}
-	return "desktop"
-}
-
-func getOS(userAgent string) string {
-	switch {
-	case contains(userAgent, "Windows"):
-		return "Windows"
-	case contains(userAgent, "Macintosh") || contains(userAgent, "Mac OS"):
-		return "macOS"
-	case contains(userAgent, "Linux"):
-		return "Linux"
-	case contains(userAgent, "Android"):
-		return "Android"
-	case contains(userAgent, "iPhone") || contains(userAgent, "iPad"):
-		return "iOS"
-	default:
-		return "Unknown"
-	}
-}
-
-func getBrowser(userAgent string) string {
-	switch {
-	case contains(userAgent, "Chrome"):
-		return "Chrome"
-	case contains(userAgent, "Firefox"):
-		return "Firefox"
-	case contains(userAgent, "Safari"):
-		return "Safari"
-	case contains(userAgent, "Edge"):
-		return "Edge"
-	case contains(userAgent, "Opera"):
-		return "Opera"
-	default:
-		return "Unknown"
-	}
-}
-
-func contains(s, substr string) bool {
-	return len(s) >= len(substr) && s[:len(substr)] == substr
-}

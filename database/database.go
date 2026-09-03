@@ -33,6 +33,7 @@ func MigrateDatabase() {
 	// Run migrations to database
 	db.AutoMigrate(&models.User{})
 	db.AutoMigrate(&models.PasswordReset{})
+	db.AutoMigrate(&models.EmailVerification{})
 	db.AutoMigrate(&models.Course{})
 	db.AutoMigrate(&models.Product{})
 	db.AutoMigrate(&models.Category{})

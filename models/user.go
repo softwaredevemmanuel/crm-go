@@ -28,31 +28,15 @@ type User struct {
 	IsActive   bool        `gorm:"default:false" json:"is_active"`
 	Location   string      `gorm:"type:varchar(255)" json:"location"`
 	LastLoginAt *time.Time `json:"last_login_at"`
-
+	EmailVerifiedAt   *time.Time     `json:"email_verified_at,omitempty"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 
-type PasswordReset struct {
-	ID        string    `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	UserID    string    `gorm:"type:uuid;not null"`
-	Token     string    `gorm:"uniqueIndex;not null"`
-	ExpiresAt time.Time `gorm:"not null"`
-}
 
 
-type UserResponse struct {
-	ID        uuid.UUID `json:"id"`
-	FirstName string    `json:"first_name"`
-	LastName  string    `json:"last_name"`
-	Email     string    `json:"email"`
-	Role      string      `json:"role"`
-	Position  string      `json:"position"`
-	DOB       string `json:"dob"` // Format: YYYY-MM-DD
-
-}
 
 
 func (User) TableName() string {

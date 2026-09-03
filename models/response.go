@@ -34,6 +34,7 @@ type UserInfo struct {
 	Email string    `json:"email" example:"user@example.com"`
 	Role  string    `json:"role" example:"student"`
 	Position  string    `json:"position" example:"student"`
+	IsVerified bool      `json:"is_verified" example:"true"`
 }
 
 // SessionInfo represents session information in login response

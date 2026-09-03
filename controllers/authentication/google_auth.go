@@ -1,19 +1,19 @@
+
 package controllers
 
 import (
-	"context"
-	"encoding/json"
-	"io"
 	"log"
 	"net/http"
-
-	"crm-go/config"
-	"crm-go/models"
 	"crm-go/utils"
-
-	"errors"
 	"github.com/gin-gonic/gin"
+	"crm-go/models"
+	"crm-go/config"
+	"errors"
+	"context"
+	"io"
 	"gorm.io/gorm"
+	"encoding/json"
+
 )
 
 // GoogleLoginHandler initiates Google OAuth2 login

@@ -7,20 +7,20 @@ import (
 
 )
 
-// Reset Password
-// @Summary Reset password
-// @Description Reset user's password using token
+// Verify Email
+// @Summary Verify email
+// @Description Verify user's email using token
 // @Tags Authentication
 // @Accept json
 // @Produce json
-// @Param request body dto.ResetPasswordRequest true "Reset password request"
+// @Param request body dto.VerifyEmailRequest true "Verification token"
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]interface{}
 // @Failure 401 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
-// @Router /api/auth/reset-password [post]
-func (c *AuthController) ResetPassword(ctx *gin.Context) {
-	var req dto.ResetPasswordRequest
+// @Router /api/auth/verify-email [post]
+func (c *AuthController) VerifyEmail(ctx *gin.Context) {
+	var req dto.VerifyEmailRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error":   "Invalid request",
@@ -29,9 +29,10 @@ func (c *AuthController) ResetPassword(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.authService.ResetPassword(&req); err != nil {
-		if err.Error() == "invalid or expired reset token" ||
-			err.Error() == "reset token has expired" {
+	response, err := c.authService.VerifyEmail(&req)
+	if err != nil {
+		if err.Error() == "invalid or expired verification token" ||
+			err.Error() == "verification token has expired" {
 			ctx.JSON(http.StatusUnauthorized, gin.H{
 				"error": err.Error(),
 			})
@@ -44,6 +45,7 @@ func (c *AuthController) ResetPassword(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": "Password reset successfully",
+		"message": "Email verified successfully",
+		"data":    response,
 	})
 }

@@ -106,7 +106,7 @@ func main() {
 
 	
 	// Register all routes
-	routes.RegisterAuthRoutes(r)
+	routes.AuthRoutes(&r.RouterGroup, config.DB)
 	routes.CourseRoutes(r)
 	routes.AdminRoutes(r)
 	routes.CategoryRoutes(r)
