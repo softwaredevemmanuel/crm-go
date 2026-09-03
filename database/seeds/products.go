@@ -6,11 +6,11 @@ import (
 
 	"crm-go/config"
 	"crm-go/models"
-
 	"github.com/google/uuid"
+	"gorm.io/gorm/clause"
 )
 
-func SeedProducts() {
+func SeedProducts() error {
 	db := config.GetDB()
 	productID1, err1 := uuid.Parse("064d8891-7f46-41ff-af13-7f17f27ed11c")
 	productID2, err2 := uuid.Parse("0b9e9362-9f1e-4261-bfc9-5975ba88067a")
@@ -36,73 +36,96 @@ func SeedProducts() {
 
 	products := []models.Product{
 		{
-			ID:          productID1,
-			Name:       "HP Laptop 15s-fq2713TU",
-			Description: "High performance laptop with Intel i5, 8GB RAM, 512GB SSD.",
-			Price: 300000.00,
-			CompareAtPrice: 350000.00,
-			Image:       "https://example.com/images/laptop.png",
-			RequiresShipping:    false,
-			Status:     "active",
-			CreatedAt:   time.Now(),
-			UpdatedAt:   time.Now(),
+			ID:               productID1,
+			Name:             "HP Laptop 15s-fq2713TU",
+			Description:      "High performance laptop with Intel i5, 8GB RAM, 512GB SSD.",
+			Price:            300000.00,
+			CompareAtPrice:   350000.00,
+			Image:            "https://example.com/images/laptop.png",
+			RequiresShipping: false,
+			Status:           "active",
+			CreatedAt:        time.Now(),
+			UpdatedAt:        time.Now(),
 		},
 		{
-			ID:          productID2,
-			Name:       "Apple iPhone 13",
-			Description: "Latest Apple iPhone with A15 Bionic chip, 128GB storage.",
-			Price: 800000.00,
-			CompareAtPrice: 900000.00,
-			Image:       "https://example.com/images/iphone13.png",
-			RequiresShipping:    false,
-			Status:     "active",
-			CreatedAt:   time.Now(),
-			UpdatedAt:   time.Now(),
+			ID:               productID2,
+			Name:             "Apple iPhone 13",
+			Description:      "Latest Apple iPhone with A15 Bionic chip, 128GB storage.",
+			Price:            800000.00,
+			CompareAtPrice:   900000.00,
+			Image:            "https://example.com/images/iphone13.png",
+			RequiresShipping: false,
+			Status:           "active",
+			CreatedAt:        time.Now(),
+			UpdatedAt:        time.Now(),
 		},
 		{
-			ID:          productID3,
-			Name:       "Samsung Galaxy S21",
-			Description: "Flagship Samsung phone with excellent camera and display.",
-			Price: 700000.00,
-			CompareAtPrice: 750000.00,
-			Image:       "https://example.com/images/galaxys21.png",
-			RequiresShipping:    false,
-			Status:     "active",
-			CreatedAt:   time.Now(),
-			UpdatedAt:   time.Now(),
+			ID:               productID3,
+			Name:             "Samsung Galaxy S21",
+			Description:      "Flagship Samsung phone with excellent camera and display.",
+			Price:            700000.00,
+			CompareAtPrice:   750000.00,
+			Image:            "https://example.com/images/galaxys21.png",
+			RequiresShipping: false,
+			Status:           "active",
+			CreatedAt:        time.Now(),
+			UpdatedAt:        time.Now(),
 		},
 		{
-			ID:          productID4,
-			Name:       "Sony WH-1000XM4 Headphones",
-			Description: "Industry leading noise cancelling over-ear headphones.",
-			Price: 250000.00,
-			CompareAtPrice: 300000.00,
-			Image:       "https://example.com/images/sonyheadphones.png",
-			RequiresShipping:    false,
-			Status:     "active",
-			CreatedAt:   time.Now(),
-			UpdatedAt:   time.Now(),
+			ID:               productID4,
+			Name:             "Sony WH-1000XM4 Headphones",
+			Description:      "Industry leading noise cancelling over-ear headphones.",
+			Price:            250000.00,
+			CompareAtPrice:   300000.00,
+			Image:            "https://example.com/images/sonyheadphones.png",
+			RequiresShipping: false,
+			Status:           "active",
+			CreatedAt:        time.Now(),
+			UpdatedAt:        time.Now(),
 		},
 		{
-			ID:          productID5,
-			Name:       "Dell UltraSharp U2723QE Monitor",
-			Description: "27-inch 4K UHD monitor with excellent color accuracy.",
-			Price: 400000.00,
-			CompareAtPrice: 450000.00,
-			Image:       "https://example.com/images/dellmonitor.png",
-			RequiresShipping:    false,
-			Status:     "active",
-			CreatedAt:   time.Now(),
-			UpdatedAt:   time.Now(),	
+			ID:               productID5,
+			Name:             "Dell UltraSharp U2723QE Monitor",
+			Description:      "27-inch 4K UHD monitor with excellent color accuracy.",
+			Price:            400000.00,
+			CompareAtPrice:   450000.00,
+			Image:            "https://example.com/images/dellmonitor.png",
+			RequiresShipping: false,
+			Status:           "active",
+			CreatedAt:        time.Now(),
+			UpdatedAt:        time.Now(),
 		},
 	}
 
 	for _, product := range products {
-		if err := db.Create(&product).Error; err != nil {
-			log.Printf("❌ Failed to seed Product: %v", err)
+		result := db.Clauses(clause.OnConflict{
+			Columns: []clause.Column{
+				{Name: "id"},
+			},
+			DoUpdates: clause.AssignmentColumns([]string{
+				"name",
+				"description",
+				"price",
+				"compare_at_price",
+				"image",
+				"requires_shipping",
+				"status",
+				"created_at",
+				"updated_at",
+			}),
+		}).Create(&product)
+
+		if result.Error != nil {
+			log.Printf(
+				"❌ Failed to seed Product: %v",
+				result.Error,
+			)
 		} else {
-			log.Printf("✅ Seeded product: %v", &product.Name)
+			log.Printf(
+				"✅ Seeded/updated product: %s",
+				product.Name,
+			)
 		}
 	}
+	return nil
 }
-

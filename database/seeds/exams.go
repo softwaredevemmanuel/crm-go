@@ -4,11 +4,12 @@ import (
 	"crm-go/config"
 	"crm-go/models"
 	"github.com/google/uuid"
+	"gorm.io/gorm/clause"
 	"log"
 	"time"
 )
 
-func SeedExams() {
+func SeedExams() error {
 	db := config.GetDB()
 
 	examDate1 := time.Date(2026, time.November, 23, 0, 0, 0, 0, time.UTC)
@@ -63,10 +64,36 @@ func SeedExams() {
 	}
 
 	for _, exam := range exams {
-		if err := db.Create(&exam).Error; err != nil {
-			log.Printf("❌ Failed to seed exam: %v", err)
+		result := db.Clauses(clause.OnConflict{
+			Columns: []clause.Column{
+				{Name: "id"},
+			},
+			DoUpdates: clause.AssignmentColumns([]string{
+				"academic_session_id",
+				"class_id",
+				"duration",
+				"exam_date",
+				"exam_type",
+				"status",
+				"subject_id",
+				"term_id",
+				"title",
+				"total_marks",
+				"created_by",
+			}),
+		}).Create(&exam)
+
+		if result.Error != nil {
+			log.Printf(
+				"❌ Failed to seed exam: %v",
+				result.Error,
+			)
 		} else {
-			log.Printf("✅ Seeded exam: %s", exam.Title)
+			log.Printf(
+				"✅ Seeded/updated exam: %s",
+				exam.Title,
+			)
 		}
 	}
+	return nil
 }

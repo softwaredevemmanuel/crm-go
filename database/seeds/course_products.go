@@ -5,11 +5,11 @@ import (
 
 	"crm-go/config"
 	"crm-go/models"
-
 	"github.com/google/uuid"
+	"gorm.io/gorm/clause"
 )
 
-func SeedCourseProductsTable() {
+func SeedCourseProductsTable() error {
 	db := config.GetDB()
 	productID1, err1 := uuid.Parse("064d8891-7f46-41ff-af13-7f17f27ed11c")
 	productID2, err2 := uuid.Parse("0b9e9362-9f1e-4261-bfc9-5975ba88067a")
@@ -22,7 +22,7 @@ func SeedCourseProductsTable() {
 	courseID3, err8 := uuid.Parse("b8ef3c14-d8ef-46fd-b63e-01b50cc9f227")
 	courseID4, err9 := uuid.Parse("c40c9c00-0779-490a-931b-e8dbd91549bf")
 	courseID5, err10 := uuid.Parse("cdbe9a63-c659-4912-abb0-58dcb9d2f341")
-	
+
 	courseProductID1, err11 := uuid.Parse("19a292e3-8376-4fd4-a1a1-04d6e21532b8")
 	courseProductID2, err12 := uuid.Parse("417b2ded-bb70-4054-87e6-eb8e2abd3915")
 	courseProductID3, err13 := uuid.Parse("4e84dfc2-aaca-4d9a-b96e-9074f294cae3")
@@ -34,7 +34,7 @@ func SeedCourseProductsTable() {
 	courseProductID9, err19 := uuid.Parse("ed9c891b-9bb3-4427-ae0d-d6292e1de5dc")
 	courseProductID10, err20 := uuid.Parse("f7eb164d-9897-41d5-b233-4fb175144691")
 
-if err1 != nil {
+	if err1 != nil {
 		log.Fatalf("❌ Invalid product UUID: %v", err1)
 	}
 	if err2 != nil {
@@ -64,7 +64,7 @@ if err1 != nil {
 	if err10 != nil {
 		log.Fatalf("❌ Invalid course UUID: %v", err10)
 	}
-if err11 != nil {
+	if err11 != nil {
 		log.Fatalf("❌ Invalid course product UUID: %v", err11)
 	}
 	if err12 != nil {
@@ -95,74 +95,80 @@ if err11 != nil {
 		log.Fatalf("❌ Invalid course product UUID: %v", err20)
 	}
 
-
-
 	course_product_tables := []models.CourseProductTable{
 		{
-		ID: 	  courseProductID1,
-		CourseID: courseID1,
-		ProductID: productID3,
+			ID:        courseProductID1,
+			CourseID:  courseID1,
+			ProductID: productID3,
 		},
 		{
-		ID: 	  courseProductID2,
-		CourseID: courseID2,
-		ProductID: productID4,	
+			ID:        courseProductID2,
+			CourseID:  courseID2,
+			ProductID: productID4,
 		},
 		{
-		ID: 	  courseProductID3,
-		CourseID: courseID3,
-		ProductID: productID1,	
+			ID:        courseProductID3,
+			CourseID:  courseID3,
+			ProductID: productID1,
 		},
 		{
-		ID: 	  courseProductID4,
-		CourseID: courseID4,
-		ProductID: productID2,	
+			ID:        courseProductID4,
+			CourseID:  courseID4,
+			ProductID: productID2,
 		},
 		{
-		ID: 	  courseProductID5,
-		CourseID: courseID5,
-		ProductID: productID5,	
-		},	
-		{
-		ID: 	  courseProductID6,
-		CourseID: courseID1,
-		ProductID: productID1,
-		},	
-		{
-		ID: 	  courseProductID7,
-		CourseID: courseID2,
-		ProductID: productID2,
+			ID:        courseProductID5,
+			CourseID:  courseID5,
+			ProductID: productID5,
 		},
 		{
-		ID: 	  courseProductID8,
-		CourseID: courseID3,
-		ProductID: productID3,
-		},	
-		{
-		ID: 	  courseProductID9,
-		CourseID: courseID4,
-		ProductID: productID4,
+			ID:        courseProductID6,
+			CourseID:  courseID1,
+			ProductID: productID1,
 		},
 		{
-		ID: 	  courseProductID10,
-		CourseID: courseID5,
-		ProductID: productID5,
-		},	
-	
-	
-
-		
-		
+			ID:        courseProductID7,
+			CourseID:  courseID2,
+			ProductID: productID2,
+		},
+		{
+			ID:        courseProductID8,
+			CourseID:  courseID3,
+			ProductID: productID3,
+		},
+		{
+			ID:        courseProductID9,
+			CourseID:  courseID4,
+			ProductID: productID4,
+		},
+		{
+			ID:        courseProductID10,
+			CourseID:  courseID5,
+			ProductID: productID5,
+		},
 	}
-
-	
 
 	for _, course_product := range course_product_tables {
-		if err := db.Create(&course_product).Error; err != nil {
-			log.Printf("❌ Failed to seed Course Product Table: %v", err)
+		result := db.Clauses(clause.OnConflict{
+			Columns: []clause.Column{
+				{Name: "id"},
+			},
+			DoUpdates: clause.AssignmentColumns([]string{
+				"course_id",
+				"product_id",
+			}),
+		}).Create(&course_product)
+
+		if result.Error != nil {
+			log.Printf(
+				"❌ Failed to seed Course Product Table: %v",
+				result.Error,
+			)
 		} else {
-			log.Printf("✅ Course Product Seeded Successfully:")
+			log.Printf(
+				"✅ Course Product seeded/updated successfully",
+			)
 		}
 	}
+	return nil
 }
-

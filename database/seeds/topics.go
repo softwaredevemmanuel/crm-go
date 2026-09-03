@@ -4,11 +4,12 @@ import (
 	"log"
 
 	"crm-go/config"
-	"github.com/google/uuid"
 	"crm-go/models"
+	"github.com/google/uuid"
+	"gorm.io/gorm/clause"
 )
 
-func SeedTopics() {
+func SeedTopics() error {
 	db := config.GetDB()
 	moduleID1 := uuid.MustParse("f2c8d631-9a47-45be-a103-764e2b9158cd")
 	moduleID2 := uuid.MustParse("5b7e4a29-83d1-4f60-b925-318c6e7a5042")
@@ -211,10 +212,30 @@ func SeedTopics() {
 	}
 
 	for _, topic := range Topics {
-		if err := db.Create(&topic).Error; err != nil {
-			log.Printf("❌ Failed to seed topic %s: %v", topic.Title, err)
+		result := db.Clauses(clause.OnConflict{
+			Columns: []clause.Column{
+				{Name: "id"},
+			},
+			DoUpdates: clause.AssignmentColumns([]string{
+				"module_id",
+				"title",
+				"description",
+				"topic_order",
+			}),
+		}).Create(&topic)
+
+		if result.Error != nil {
+			log.Printf(
+				"❌ Failed to seed topic %s: %v",
+				topic.Title,
+				result.Error,
+			)
 		} else {
-			log.Printf("✅ Seeded Topic: %s", topic.Title)
+			log.Printf(
+				"✅ Seeded/updated Topic: %s",
+				topic.Title,
+			)
 		}
 	}
+	return nil
 }

@@ -5,11 +5,11 @@ import (
 
 	"crm-go/config"
 	"crm-go/models"
-
 	"github.com/google/uuid"
+	"gorm.io/gorm/clause"
 )
 
-func SeedCourseCategories() {
+func SeedCourseCategories() error {
 	db := config.GetDB()
 	categoryID1, err1 := uuid.Parse("283eaf1d-bf89-40fe-b363-b119e5815107")
 	categoryID2, err2 := uuid.Parse("6109ae19-2a10-43b3-9daf-94c62f133724")
@@ -22,7 +22,7 @@ func SeedCourseCategories() {
 	courseID3, err8 := uuid.Parse("b8ef3c14-d8ef-46fd-b63e-01b50cc9f227")
 	courseID4, err9 := uuid.Parse("c40c9c00-0779-490a-931b-e8dbd91549bf")
 	courseID5, err10 := uuid.Parse("cdbe9a63-c659-4912-abb0-58dcb9d2f341")
-	
+
 	courseCategoryID1, err11 := uuid.Parse("577d2ae4-9f46-411f-9e2c-21bf24bf1415")
 	courseCategoryID2, err12 := uuid.Parse("6276970a-c708-4b3f-a79e-49305ebe5eae")
 	courseCategoryID3, err13 := uuid.Parse("7053ace4-7061-4878-9884-9d895990c050")
@@ -34,7 +34,7 @@ func SeedCourseCategories() {
 	courseCategoryID9, err19 := uuid.Parse("e75e9747-89b0-4125-b473-0f5a532495f4")
 	courseCategoryID10, err20 := uuid.Parse("eb915723-8fea-48c7-aee5-813be2ed0a2f")
 
-if err1 != nil {
+	if err1 != nil {
 		log.Fatalf("❌ Invalid category UUID: %v", err1)
 	}
 	if err2 != nil {
@@ -64,7 +64,7 @@ if err1 != nil {
 	if err10 != nil {
 		log.Fatalf("❌ Invalid course UUID: %v", err10)
 	}
-if err11 != nil {
+	if err11 != nil {
 		log.Fatalf("❌ Invalid course category UUID: %v", err11)
 	}
 	if err12 != nil {
@@ -95,72 +95,80 @@ if err11 != nil {
 		log.Fatalf("❌ Invalid course category UUID: %v", err20)
 	}
 
-
-
 	course_category_tables := []models.CourseCategoryTable{
-			{
-		ID: 	  courseCategoryID1,
-		CourseID: courseID1,
-		CategoryID: categoryID3,
+		{
+			ID:         courseCategoryID1,
+			CourseID:   courseID1,
+			CategoryID: categoryID3,
 		},
 		{
-		ID: 	  courseCategoryID2,
-		CourseID: courseID2,
-		CategoryID: categoryID4,	
+			ID:         courseCategoryID2,
+			CourseID:   courseID2,
+			CategoryID: categoryID4,
 		},
 		{
-		ID: 	  courseCategoryID3,
-		CourseID: courseID3,
-		CategoryID: categoryID1,	
+			ID:         courseCategoryID3,
+			CourseID:   courseID3,
+			CategoryID: categoryID1,
 		},
 		{
-		ID: 	  courseCategoryID4,
-		CourseID: courseID4,
-		CategoryID: categoryID2,	
+			ID:         courseCategoryID4,
+			CourseID:   courseID4,
+			CategoryID: categoryID2,
 		},
 		{
-		ID: 	  courseCategoryID5,
-		CourseID: courseID5,
-		CategoryID: categoryID5,	
-		},	
-		{
-		ID: 	  courseCategoryID6,
-		CourseID: courseID1,
-		CategoryID: categoryID1,
-		},	
-		{
-		ID: 	  courseCategoryID7,
-		CourseID: courseID2,
-		CategoryID: categoryID2,
+			ID:         courseCategoryID5,
+			CourseID:   courseID5,
+			CategoryID: categoryID5,
 		},
 		{
-		ID: 	  courseCategoryID8,
-		CourseID: courseID3,
-		CategoryID: categoryID3,
-		},	
-		{
-		ID: 	  courseCategoryID9,
-		CourseID: courseID4,
-		CategoryID: categoryID4,
+			ID:         courseCategoryID6,
+			CourseID:   courseID1,
+			CategoryID: categoryID1,
 		},
 		{
-		ID: 	  courseCategoryID10,
-		CourseID: courseID5,
-		CategoryID: categoryID5,
-		},	
-
-		
-		
+			ID:         courseCategoryID7,
+			CourseID:   courseID2,
+			CategoryID: categoryID2,
+		},
+		{
+			ID:         courseCategoryID8,
+			CourseID:   courseID3,
+			CategoryID: categoryID3,
+		},
+		{
+			ID:         courseCategoryID9,
+			CourseID:   courseID4,
+			CategoryID: categoryID4,
+		},
+		{
+			ID:         courseCategoryID10,
+			CourseID:   courseID5,
+			CategoryID: categoryID5,
+		},
 	}
-
-	
 
 	for _, course_category := range course_category_tables {
-		if err := db.Create(&course_category).Error; err != nil {
-			log.Printf("❌ Failed to seed Course Category: %v", err)
+		result := db.Clauses(clause.OnConflict{
+			Columns: []clause.Column{
+				{Name: "id"},
+			},
+			DoUpdates: clause.AssignmentColumns([]string{
+				"course_id",
+				"category_id",
+			}),
+		}).Create(&course_category)
+
+		if result.Error != nil {
+			log.Printf(
+				"❌ Failed to seed Course Category: %v",
+				result.Error,
+			)
 		} else {
-			log.Printf("✅ Course Category Seeded Successfully:")
+			log.Printf(
+				"✅ Course Category seeded/updated successfully",
+			)
 		}
 	}
+	return nil
 }
-

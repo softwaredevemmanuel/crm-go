@@ -6,7 +6,7 @@ import (
 
 	"crm-go/config"
 	"crm-go/models"
-
+	"gorm.io/gorm/clause"
 	"github.com/google/uuid"
 )
 
@@ -105,22 +105,36 @@ func SeedArms() error {
 		
 	}
 
-	for _, arm := range arms {
-		if err := db.Create(&arm).Error; err != nil {
-			return fmt.Errorf(
-				"failed to seed arm %s (%s): %w",
-				arm.Name,
-				arm.Code,
-				err,
-			)
-		}
+for _, arm := range arms {
+	result := db.Clauses(clause.OnConflict{
+		Columns: []clause.Column{
+			{Name: "id"},
+		},
+		DoUpdates: clause.AssignmentColumns([]string{
+			"grade_id",
+			"name",
+			"code",
+			"capacity",
+			"status",
+			"description",
+		}),
+	}).Create(&arm)
 
-		log.Printf(
-			"✅ Seeded arm: %s - %s",
+	if result.Error != nil {
+		return fmt.Errorf(
+			"failed to seed arm %s (%s): %w",
+			arm.Name,
 			arm.Code,
-			arm.Description,
+			result.Error,
 		)
 	}
+
+	log.Printf(
+		"✅ Seeded/updated arm: %s - %s",
+		arm.Code,
+		arm.Description,
+	)
+}
 
 	return nil
 }

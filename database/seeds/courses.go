@@ -5,12 +5,12 @@ import (
 
 	"crm-go/config"
 	"crm-go/models"
-
 	"github.com/google/uuid"
 	"gorm.io/datatypes"
+	"gorm.io/gorm/clause"
 )
 
-func SeedCourses() {
+func SeedCourses() error {
 	db := config.GetDB()
 	tutorID, err := uuid.Parse("5a853260-31fc-44ee-9d69-bb2a2957ba48")
 
@@ -71,32 +71,54 @@ func SeedCourses() {
 			Requirements:     datatypes.JSON([]byte(`["Basic programming knowledge", "Familiarity with command line", "Willingness to learn", "No prior Python experience required"]`)),
 		},
 		{
-			ID:          courseID4,
-			Title:       "Building APIs with FastAPI",
-			Description: "Learn how to develop high-performance APIs using Python FastAPI framework.",
-			Image:       "https://example.com/images/fastapi.png",
-			VideoURL:    "https://example.com/videos/fastapi-web-dev.mp4",
-			TutorID:     tutorID,
+			ID:               courseID4,
+			Title:            "Building APIs with FastAPI",
+			Description:      "Learn how to develop high-performance APIs using Python FastAPI framework.",
+			Image:            "https://example.com/images/fastapi.png",
+			VideoURL:         "https://example.com/videos/fastapi-web-dev.mp4",
+			TutorID:          tutorID,
 			LearningOutcomes: datatypes.JSON([]byte(`[ "Set up FastAPI project", "Create API endpoints", "Validate requests with Pydantic", "Handle path and query parameters", "Deploy FastAPI applications"]`)),
-			Requirements: datatypes.JSON([]byte(`[ "Basic Python knowledge", "Familiarity with web development concepts", "Understanding of REST APIs", "No prior FastAPI experience required"]`)),
+			Requirements:     datatypes.JSON([]byte(`[ "Basic Python knowledge", "Familiarity with web development concepts", "Understanding of REST APIs", "No prior FastAPI experience required"]`)),
 		},
 		{
-			ID:          courseID5,
-			Title:       "Data Analysis with Python",
-			Description: "Learn to analyze and visualize data effectively using Python libraries.",
-			Image:       "https://example.com/images/data-analysis.png",
-			VideoURL:    "https://example.com/videos/data-analysis-basics.mp4",
-			TutorID:     tutorID,
+			ID:               courseID5,
+			Title:            "Data Analysis with Python",
+			Description:      "Learn to analyze and visualize data effectively using Python libraries.",
+			Image:            "https://example.com/images/data-analysis.png",
+			VideoURL:         "https://example.com/videos/data-analysis-basics.mp4",
+			TutorID:          tutorID,
 			LearningOutcomes: datatypes.JSON([]byte(`[ "Collect and clean datasets", "Perform exploratory data analysis", "Use Python libraries like Pandas and Matplotlib", "Create insightful data visualizations", "Draw actionable conclusions from data"]`)),
-			Requirements: datatypes.JSON([]byte(`[ "Basic Python knowledge", "Familiarity with spreadsheets or data concepts", "Willingness to learn Python libraries", "No prior data analysis experience required"]`)),
+			Requirements:     datatypes.JSON([]byte(`[ "Basic Python knowledge", "Familiarity with spreadsheets or data concepts", "Willingness to learn Python libraries", "No prior data analysis experience required"]`)),
 		},
 	}
 
 	for _, course := range courses {
-		if err := db.Create(&course).Error; err != nil {
-			log.Printf("❌ Failed to seed course: %v", err)
+		result := db.Clauses(clause.OnConflict{
+			Columns: []clause.Column{
+				{Name: "id"},
+			},
+			DoUpdates: clause.AssignmentColumns([]string{
+				"title",
+				"description",
+				"image",
+				"video_url",
+				"tutor_id",
+				"learning_outcomes",
+				"requirements",
+			}),
+		}).Create(&course)
+
+		if result.Error != nil {
+			log.Printf(
+				"❌ Failed to seed course: %v",
+				result.Error,
+			)
 		} else {
-			log.Printf("✅ Seeded course: %s", course.Title)
+			log.Printf(
+				"✅ Seeded/updated course: %s",
+				course.Title,
+			)
 		}
 	}
+	return nil
 }

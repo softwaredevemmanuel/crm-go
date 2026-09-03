@@ -5,7 +5,7 @@ import (
 
 	"crm-go/config"
 	"crm-go/models"
-
+	"gorm.io/gorm/clause"
 	"github.com/google/uuid"
 )
 
@@ -56,13 +56,36 @@ func SeedAcademicSessions() error {
 
 	}
 
-	for _, academic_session := range academic_sessions {
-		if err := db.Create(&academic_session).Error; err != nil {
-			log.Printf("❌ Failed to seed academic session: %v", err)
-		} else {
-			log.Printf("✅ Seeded academic session: %s", academic_session.AcademicYear)
-		}
+for _, academic_session := range academic_sessions {
+	result := db.Clauses(clause.OnConflict{
+		Columns: []clause.Column{
+			{Name: "id"},
+		},
+		DoUpdates: clause.AssignmentColumns([]string{
+			"academic_year",
+			"code",
+			"start_date",
+			"end_date",
+			"status",
+			"is_current",
+			"description",
+			"created_by",
+		}),
+	}).Create(&academic_session)
+
+	if result.Error != nil {
+		log.Printf(
+			"❌ Failed to seed academic session %s: %v",
+			academic_session.AcademicYear,
+			result.Error,
+		)
+	} else {
+		log.Printf(
+			"✅ Seeded/updated academic session: %s",
+			academic_session.AcademicYear,
+		)
 	}
+}
 
 	return nil
 }

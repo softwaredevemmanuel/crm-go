@@ -5,11 +5,11 @@ import (
 
 	"crm-go/config"
 	"crm-go/models"
-
+	"gorm.io/gorm/clause"
 	"github.com/google/uuid"
 )
 
-func SeedClassGrades() {
+func SeedClassGrades() error{
 	db := config.GetDB()
 
 
@@ -66,20 +66,33 @@ func SeedClassGrades() {
 		
 	}
 
-	for _, classGrade := range classGrades {
-		if err := db.Create(&classGrade).Error; err != nil {
-			log.Printf(
-				"❌ Failed to seed class grade %s: %v",
-				classGrade.Code,
-				err,
-			)
-			continue
-		}
+for _, classGrade := range classGrades {
+	result := db.Clauses(clause.OnConflict{
+		Columns: []clause.Column{
+			{Name: "id"},
+		},
+		DoUpdates: clause.AssignmentColumns([]string{
+			"name",
+			"code",
+			"level",
+			"description",
+			"status",
+		}),
+	}).Create(&classGrade)
 
+	if result.Error != nil {
 		log.Printf(
-			"✅ Seeded class grade: %s (%s)",
+			"❌ Failed to seed class grade %s: %v",
+			classGrade.Code,
+			result.Error,
+		)
+	} else {
+		log.Printf(
+			"✅ Seeded/updated class grade: %s (%s)",
 			classGrade.Name,
 			classGrade.Code,
 		)
 	}
+}
+return nil
 }

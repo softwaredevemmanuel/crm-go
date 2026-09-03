@@ -3,13 +3,14 @@ package seeds
 import (
 	"log"
 
-	"github.com/google/uuid"
 	"crm-go/config"
 	"crm-go/models"
+	"github.com/google/uuid"
+	"gorm.io/gorm/clause"
 )
 
 func SeedSchemesOfWork() {
-		db := config.GetDB()
+	db := config.GetDB()
 
 	// Replace these with IDs from your existing seed data.
 	biologyID := uuid.MustParse("a61583ba-fb14-4bd4-8054-80ea69da954d")
@@ -25,7 +26,7 @@ func SeedSchemesOfWork() {
 			Term:        "first",
 			Title:       "Biology Scheme of Work - SS1 First Term",
 			Description: "First term Biology scheme of work for Senior Secondary School 1.",
-			Status:      "active",
+			Status:      "published",
 			CreatedBy:   adminID,
 		},
 		{
@@ -56,7 +57,7 @@ func SeedSchemesOfWork() {
 			Term:        "first",
 			Title:       "Biology Scheme of Work - SS2 First Term",
 			Description: "First term Biology scheme of work for Senior Secondary School 2.",
-			Status:      "active",
+			Status:      "published",
 			CreatedBy:   adminID,
 		},
 		{
@@ -82,10 +83,25 @@ func SeedSchemesOfWork() {
 	}
 
 	for _, scheme := range schemes {
-		if err := db.Create(&scheme).Error; err != nil {
-			log.Printf("❌ Failed to seed scheme %s: %v", scheme.Title, err)
+		result := db.Clauses(clause.OnConflict{
+			Columns: []clause.Column{
+				{Name: "id"},
+			},
+			DoUpdates: clause.AssignmentColumns([]string{
+				"subject_id",
+				"grade_id",
+				"term",
+				"title",
+				"description",
+				"status",
+				"created_by",
+			}),
+		}).Create(&scheme)
+
+		if result.Error != nil {
+			log.Printf("❌ Failed to seed scheme %s: %v", scheme.Title, result.Error)
 		} else {
-			log.Printf("✅ Seeded Scheme of Work: %s", scheme.Title)
+			log.Printf("✅ Seeded/updated Scheme of Work: %s", scheme.Title)
 		}
 	}
 }

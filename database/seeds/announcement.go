@@ -6,11 +6,11 @@ import (
 
 	"crm-go/config"
 	"crm-go/models"
-
 	"github.com/google/uuid"
+	"gorm.io/gorm/clause"
 )
 
-func SeedAnnouncements() {
+func SeedAnnouncements() error {
 	db := config.GetDB()
 	announcementID1, err1 := uuid.Parse("1e1cbb15-07b6-4f75-9918-7d2e982c8133")
 	announcementID2, err2 := uuid.Parse("22629645-9649-4bb3-b9f3-eed88ba36d60")
@@ -114,10 +114,33 @@ func SeedAnnouncements() {
 	}
 
 	for _, announcement := range announcements {
-		if err := db.Create(&announcement).Error; err != nil {
-			log.Printf("❌ Failed to seed Announcement: %v", err)
+		result := db.Clauses(clause.OnConflict{
+			Columns: []clause.Column{
+				{Name: "id"},
+			},
+			DoUpdates: clause.AssignmentColumns([]string{
+				"audience",
+				"created_by",
+				"end_date",
+				"is_pinned",
+				"message",
+				"start_date",
+				"title",
+				"type",
+			}),
+		}).Create(&announcement)
+
+		if result.Error != nil {
+			log.Printf(
+				"❌ Failed to seed Announcement: %v",
+				result.Error,
+			)
 		} else {
-			log.Printf("✅ Seeded Announcement: %v", &announcement.Message)
+			log.Printf(
+				"✅ Seeded/updated Announcement: %s",
+				announcement.Message,
+			)
 		}
 	}
+	return nil
 }

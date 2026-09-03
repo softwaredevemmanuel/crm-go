@@ -5,11 +5,11 @@ import (
 
 	"crm-go/config"
 	"crm-go/models"
-
 	"github.com/google/uuid"
+	"gorm.io/gorm/clause"
 )
 
-func SeedCategories() {
+func SeedCategories() error {
 	db := config.GetDB()
 	categoryID1, err1 := uuid.Parse("283eaf1d-bf89-40fe-b363-b119e5815107")
 	categoryID2, err2 := uuid.Parse("6109ae19-2a10-43b3-9daf-94c62f133724")
@@ -35,43 +35,54 @@ func SeedCategories() {
 
 	categories := []models.Category{
 		{
-		ID: 	  categoryID1,
-		Name:     "Coding",
-		Description:"Master the art of writing clean, efficient code to build powerful software applications and solve complex problems.",
+			ID:          categoryID1,
+			Name:        "Coding",
+			Description: "Master the art of writing clean, efficient code to build powerful software applications and solve complex problems.",
 		},
 		{
-		ID: 	  categoryID2,
-		Name:     "Design",
-		Description:"Learn the principles of visual communication to create compelling and effective user experiences across digital and physical products",
+			ID:          categoryID2,
+			Name:        "Design",
+			Description: "Learn the principles of visual communication to create compelling and effective user experiences across digital and physical products",
 		},
 		{
-		ID: 	  categoryID3,
-		Name:     "Backend Development",
-		Description:"Master server-side programming, APIs, and databases to build the powerful, unseen logic that drives modern web applications and services.",
-
+			ID:          categoryID3,
+			Name:        "Backend Development",
+			Description: "Master server-side programming, APIs, and databases to build the powerful, unseen logic that drives modern web applications and services.",
 		},
 		{
-		ID: 	  categoryID4,
-		Name:     "Frontend Development",
-		Description:"Craft engaging user interfaces with HTML, CSS, and JavaScript to create fast, accessible, and visually stunning websites and applications.",
+			ID:          categoryID4,
+			Name:        "Frontend Development",
+			Description: "Craft engaging user interfaces with HTML, CSS, and JavaScript to create fast, accessible, and visually stunning websites and applications.",
 		},
 		{
-		ID: 	  categoryID5,
-		Name:     "Programming",
-		Description:"Learn the fundamentals of writing code to create software, solve complex problems, and automate tasks across various technologies.",
-
-		},	
-		
+			ID:          categoryID5,
+			Name:        "Programming",
+			Description: "Learn the fundamentals of writing code to create software, solve complex problems, and automate tasks across various technologies.",
+		},
 	}
-
-	
 
 	for _, category := range categories {
-		if err := db.Create(&category).Error; err != nil {
-			log.Printf("❌ Failed to seed Category: %v", err)
+		result := db.Clauses(clause.OnConflict{
+			Columns: []clause.Column{
+				{Name: "id"},
+			},
+			DoUpdates: clause.AssignmentColumns([]string{
+				"name",
+				"description",
+			}),
+		}).Create(&category)
+
+		if result.Error != nil {
+			log.Printf(
+				"❌ Failed to seed Category: %v",
+				result.Error,
+			)
 		} else {
-			log.Printf("✅ Seeded Category: %v", &category.Name)
+			log.Printf(
+				"✅ Seeded/updated Category: %s",
+				category.Name,
+			)
 		}
 	}
+	return nil
 }
-

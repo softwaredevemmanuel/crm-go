@@ -5,11 +5,11 @@ import (
 
 	"crm-go/config"
 	"crm-go/models"
-
 	"github.com/google/uuid"
+	"gorm.io/gorm/clause"
 )
 
-func SeedCourseMaterials() {
+func SeedCourseMaterials() error {
 	db := config.GetDB()
 
 	// ✅ Validate UUIDs for Course Material
@@ -59,59 +59,78 @@ func SeedCourseMaterials() {
 
 	modules := []models.CourseMaterial{
 		{
-			ID:            courseMaterial1,
-			CourseID:      courseId1,
-			Title:         "Go Lang Basics",
-			Description:   "Introduction to Go programming language, covering syntax, data types, and basic constructs.",
-			Type:          "document",
-			FileURL:       "https://example.com/go-lang-basics.pdf",
-			Status:        "published",
+			ID:          courseMaterial1,
+			CourseID:    courseId1,
+			Title:       "Go Lang Basics",
+			Description: "Introduction to Go programming language, covering syntax, data types, and basic constructs.",
+			Type:        "document",
+			FileURL:     "https://example.com/go-lang-basics.pdf",
+			Status:      "published",
 		},
 		{
-			ID:            courseMaterial2,
-			CourseID:      courseId2,
-			Title:         "React Fundamentals",
-			Description:   "Learn the fundamentals of React, including components, state management, and hooks.",
-			Type:          "video",
-			FileURL:       "https://example.com/react-fundamentals.mp4",
-			Status:        "published",
+			ID:          courseMaterial2,
+			CourseID:    courseId2,
+			Title:       "React Fundamentals",
+			Description: "Learn the fundamentals of React, including components, state management, and hooks.",
+			Type:        "video",
+			FileURL:     "https://example.com/react-fundamentals.mp4",
+			Status:      "published",
 		},
 		{
-			ID:            courseMaterial3,
-			CourseID:      courseId3,
-			Title:         "Python for Data Science",
-			Description:   "Explore Python libraries and tools for data science, including NumPy, pandas, and Matplotlib.",
-			Type:          "document",
-			FileURL:       "https://example.com/python-data-science.pdf",
-			Status:        "published",
+			ID:          courseMaterial3,
+			CourseID:    courseId3,
+			Title:       "Python for Data Science",
+			Description: "Explore Python libraries and tools for data science, including NumPy, pandas, and Matplotlib.",
+			Type:        "document",
+			FileURL:     "https://example.com/python-data-science.pdf",
+			Status:      "published",
 		},
 		{
-			ID:            courseMaterial4,
-			CourseID:      courseId4,
-			Title:         "Django Web Development",
-			Description:   "Build web applications using Django, covering models, views, templates, and REST APIs.",
-			Type:          "video",
-			FileURL:       "https://example.com/django-web-development.mp4",
-			Status:        "published",
+			ID:          courseMaterial4,
+			CourseID:    courseId4,
+			Title:       "Django Web Development",
+			Description: "Build web applications using Django, covering models, views, templates, and REST APIs.",
+			Type:        "video",
+			FileURL:     "https://example.com/django-web-development.mp4",
+			Status:      "published",
 		},
 		{
-			ID:            courseMaterial5,
-			CourseID:      courseId5,
-			Title:         "Machine Learning Algorithms",
-			Description:   "An overview of popular machine learning algorithms, including regression, classification, and clustering.",
-			Type:          "document",
-			FileURL:       "https://example.com/machine-learning-algorithms.pdf",
-			Status:        "published",
+			ID:          courseMaterial5,
+			CourseID:    courseId5,
+			Title:       "Machine Learning Algorithms",
+			Description: "An overview of popular machine learning algorithms, including regression, classification, and clustering.",
+			Type:        "document",
+			FileURL:     "https://example.com/machine-learning-algorithms.pdf",
+			Status:      "published",
 		},
-
-	
 	}
 
 	for _, module := range modules {
-		if err := db.Create(&module).Error; err != nil {
-			log.Printf("❌ Failed to seed Modules: %v", err)
+		result := db.Clauses(clause.OnConflict{
+			Columns: []clause.Column{
+				{Name: "id"},
+			},
+			DoUpdates: clause.AssignmentColumns([]string{
+				"course_id",
+				"title",
+				"description",
+				"type",
+				"file_url",
+				"status",
+			}),
+		}).Create(&module)
+
+		if result.Error != nil {
+			log.Printf(
+				"❌ Failed to seed Module: %v",
+				result.Error,
+			)
 		} else {
-			log.Printf("✅ Seeded Module: %v", &module.Title)
+			log.Printf(
+				"✅ Seeded/updated Module: %s",
+				module.Title,
+			)
 		}
 	}
+	return nil
 }

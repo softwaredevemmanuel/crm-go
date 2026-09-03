@@ -6,9 +6,10 @@ import (
 	"crm-go/config"
 	"crm-go/models"
 	"github.com/google/uuid"
+	"gorm.io/gorm/clause"
 )
 
-func SeedExercises() {
+func SeedExercises() error {
 	db := config.GetDB()
 	adminID := uuid.MustParse("fe4547a7-4c81-4bc2-bc81-5bbbce2fb5bd")
 
@@ -297,19 +298,34 @@ func SeedExercises() {
 		},
 	}
 
-		for _, exercise := range exercises {
-		if err := db.Create(&exercise).Error; err != nil {
+	for _, exercise := range exercises {
+		result := db.Clauses(clause.OnConflict{
+			Columns: []clause.Column{
+				{Name: "id"},
+			},
+			DoUpdates: clause.AssignmentColumns([]string{
+				"lesson_id",
+				"title",
+				"content",
+				"instructions",
+				"total_marks",
+				"created_by",
+			}),
+		}).Create(&exercise)
+
+		if result.Error != nil {
 			log.Printf(
-				"failed to seed exercise %s: %v",
+				"❌ Failed to seed exercise %s: %v",
 				exercise.Title,
-				err,
+				result.Error,
 			)
 			continue
 		}
 
 		log.Printf(
-			"✅ Seeded exercise: %s",
+			"✅ Seeded/updated exercise: %s",
 			exercise.Title,
 		)
 	}
+	return nil
 }

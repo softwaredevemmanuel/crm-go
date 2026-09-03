@@ -6,6 +6,7 @@ import (
 	"crm-go/config"
 	"crm-go/models"
 	"github.com/google/uuid"
+	"gorm.io/gorm/clause"
 )
 
 func SeedTerm() error {
@@ -18,34 +19,34 @@ func SeedTerm() error {
 
 	// prepare pointer dates since Term expects *time.Time for StartDate/EndDate
 	// 2026/2027
-firstStartDate2026 := ParseDate("2026-09-01")
-firstEndDate2026 := ParseDate("2026-12-20")
+	firstStartDate2026 := ParseDate("2026-09-01")
+	firstEndDate2026 := ParseDate("2026-12-20")
 
-secondStartDate2026 := ParseDate("2027-01-05")
-secondEndDate2026 := ParseDate("2027-04-09")
+	secondStartDate2026 := ParseDate("2027-01-05")
+	secondEndDate2026 := ParseDate("2027-04-09")
 
-thirdStartDate2026 := ParseDate("2027-04-26")
-thirdEndDate2026 := ParseDate("2027-07-31")
+	thirdStartDate2026 := ParseDate("2027-04-26")
+	thirdEndDate2026 := ParseDate("2027-07-31")
 
-// 2025/2026
-firstStartDate2025 := ParseDate("2025-09-01")
-firstEndDate2025 := ParseDate("2025-12-20")
+	// 2025/2026
+	firstStartDate2025 := ParseDate("2025-09-01")
+	firstEndDate2025 := ParseDate("2025-12-20")
 
-secondStartDate2025 := ParseDate("2026-01-05")
-secondEndDate2025 := ParseDate("2026-04-10")
+	secondStartDate2025 := ParseDate("2026-01-05")
+	secondEndDate2025 := ParseDate("2026-04-10")
 
-thirdStartDate2025 := ParseDate("2026-04-27")
-thirdEndDate2025 := ParseDate("2026-07-31")
+	thirdStartDate2025 := ParseDate("2026-04-27")
+	thirdEndDate2025 := ParseDate("2026-07-31")
 
-// 2024/2025
-firstStartDate2024 := ParseDate("2024-09-09")
-firstEndDate2024 := ParseDate("2024-12-20")
+	// 2024/2025
+	firstStartDate2024 := ParseDate("2024-09-09")
+	firstEndDate2024 := ParseDate("2024-12-20")
 
-secondStartDate2024 := ParseDate("2025-01-06")
-secondEndDate2024 := ParseDate("2025-04-11")
+	secondStartDate2024 := ParseDate("2025-01-06")
+	secondEndDate2024 := ParseDate("2025-04-11")
 
-thirdStartDate2024 := ParseDate("2025-04-28")
-thirdEndDate2024 := ParseDate("2025-07-31")
+	thirdStartDate2024 := ParseDate("2025-04-28")
+	thirdEndDate2024 := ParseDate("2025-07-31")
 
 	terms := []models.Term{
 		{
@@ -168,10 +169,35 @@ thirdEndDate2024 := ParseDate("2025-07-31")
 	}
 
 	for _, term := range terms {
-		if err := db.Create(&term).Error; err != nil {
-			log.Printf("❌ Failed to seed term: %v", err)
+		result := db.Clauses(clause.OnConflict{
+			Columns: []clause.Column{
+				{Name: "id"},
+			},
+			DoUpdates: clause.AssignmentColumns([]string{
+				"academic_session_id",
+				"name",
+				"code",
+				"term_number",
+				"start_date",
+				"end_date",
+				"is_current",
+				"status",
+				"description",
+				"created_by",
+			}),
+		}).Create(&term)
+
+		if result.Error != nil {
+			log.Printf(
+				"❌ Failed to seed term: %s: %v",
+				term.Name,
+				result.Error,
+			)
 		} else {
-			log.Printf("✅ Seeded academic term: %s", term.Name)
+			log.Printf(
+				"✅ Seeded/updated academic term: %s",
+				term.Name,
+			)
 		}
 	}
 

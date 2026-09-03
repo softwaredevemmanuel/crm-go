@@ -5,11 +5,11 @@ import (
 
 	"crm-go/config"
 	"crm-go/models"
-
 	"github.com/google/uuid"
+	"gorm.io/gorm/clause"
 )
 
-func SeedDepartments() {
+func SeedDepartments() error {
 	db := config.GetDB()
 
 	adminID := uuid.MustParse("fe4547a7-4c81-4bc2-bc81-5bbbce2fb5bd")
@@ -130,19 +130,33 @@ func SeedDepartments() {
 	}
 
 	for _, department := range departments {
-		if err := db.Create(&department).Error; err != nil {
+		result := db.Clauses(clause.OnConflict{
+			Columns: []clause.Column{
+				{Name: "id"},
+			},
+			DoUpdates: clause.AssignmentColumns([]string{
+				"name",
+				"code",
+				"description",
+				"head_of_dept",
+				"status",
+				"created_by",
+			}),
+		}).Create(&department)
+
+		if result.Error != nil {
 			log.Printf(
 				"❌ Failed to seed department %s: %v",
 				department.Name,
-				err,
+				result.Error,
 			)
-			continue
+		} else {
+			log.Printf(
+				"✅ Seeded/updated department: %s (%s)",
+				department.Name,
+				department.Code,
+			)
 		}
-
-		log.Printf(
-			"✅ Seeded department: %s (%s)",
-			department.Name,
-			department.Code,
-		)
 	}
+	return nil
 }

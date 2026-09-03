@@ -6,11 +6,11 @@ import (
 	"gorm.io/datatypes"
 	"crm-go/config"
 	"crm-go/models"
-
+	"gorm.io/gorm/clause"
 	"github.com/google/uuid"
 )
 
-func SeedLessons() {
+func SeedLessons() error{
 	db := config.GetDB()
 
 	// Scheme of work id
@@ -904,15 +904,41 @@ func SeedLessons() {
 		},
 	}
 
-	// ---------------------------------------------------------
-	// Insert lessons
-	// ---------------------------------------------------------
 
-	for _, lesson := range lessons {
-		if err := db.Create(&lesson).Error; err != nil {
-			log.Printf("❌ Failed to seed lesson %s: %v", lesson.Title, err)
-		} else {
-			log.Printf("✅ Seeded Lesson: %s", lesson.Title)
-		}
+for _, lesson := range lessons {
+	result := db.Clauses(clause.OnConflict{
+		Columns: []clause.Column{
+			{Name: "id"},
+		},
+		DoUpdates: clause.AssignmentColumns([]string{
+			"scheme_of_work_id",
+			"module_id",
+			"topic_id",
+			"lesson_order",
+			"week",
+			"title",
+			"description",
+			"objectives",
+			"activities",
+			"resources",
+			"assessment",
+			"created_by",
+			"content",
+		}),
+	}).Create(&lesson)
+
+	if result.Error != nil {
+		log.Printf(
+			"❌ Failed to seed lesson %s: %v",
+			lesson.Title,
+			result.Error,
+		)
+	} else {
+		log.Printf(
+			"✅ Seeded/updated Lesson: %s",
+			lesson.Title,
+		)
 	}
+}
+return nil
 }

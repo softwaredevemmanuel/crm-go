@@ -35,7 +35,7 @@ func parseDOB(date string) *time.Time {
 	return &d
 }
 
-func SeedUsers() {
+func SeedUsers() error {
 	db := config.GetDB()
 
 	userID1, err1 := uuid.Parse("fe4547a7-4c81-4bc2-bc81-5bbbce2fb5bd")
@@ -103,17 +103,38 @@ func SeedUsers() {
 		
 	}
 
-	for _, user := range users {
-    err := db.Clauses(clause.OnConflict{
-        Columns:   []clause.Column{{Name: "email"}}, // avoid duplicates by email
-        DoNothing: true, // don’t insert if exists
-    }).Create(&user).Error
+for _, user := range users {
+	result := db.Clauses(clause.OnConflict{
+		Columns: []clause.Column{
+			{Name: "email"},
+		},
+		DoUpdates: clause.AssignmentColumns([]string{
+			"first_name",
+			"last_name",
+			"password",
+			"login_id",
+			"picture",
+			"role",
+			"position",
+			"dob",
+			"provider",
+			"created_at",
+			"updated_at",
+		}),
+	}).Create(&user)
 
-    if err != nil {
-        log.Printf("❌ Failed to seed user: %v", err)
-    
+	if result.Error != nil {
+		log.Printf(
+			"❌ Failed to seed user %s: %v",
+			user.Email,
+			result.Error,
+		)
 	} else {
-			log.Printf("✅ Seeded course: %s", user.FirstName + " " + user.LastName)
-		}
+		log.Printf(
+			"✅ Seeded/updated user: %s",
+			user.FirstName+" "+user.LastName,
+		)
+	}
 }
+return nil
 }
