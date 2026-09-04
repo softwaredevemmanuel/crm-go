@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -23,7 +22,7 @@ type Lesson struct {
 	LessonDate *time.Time     `gorm:"type:date" json:"lesson_date,omitempty"`
 	Week       int            `gorm:"default:1" json:"week"`
 	Duration   int            `gorm:"default:40" json:"duration"`
-	Content    datatypes.JSON `gorm:"type:jsonb" json:"content"`
+    Content     string 			`json:"content" gorm:"type:text"` // Make sure it's TEXT type
 
 	Objectives string `gorm:"type:text" json:"objectives"`
 	Activities string `gorm:"type:text" json:"activities"`

@@ -55,7 +55,7 @@ type LessonResponse struct {
 	LessonDate     *time.Time `json:"lesson_date,omitempty"`
 	Week           int        `json:"week"`
 	Duration       int        `json:"duration"`
-	Content        string     `json:"content"` // JSON string
+	Content        string     `json:"content"` 
 	Objectives     string     `json:"objectives"`
 	Activities     string     `json:"activities"`
 	Resources      string     `json:"resources"`
@@ -107,7 +107,7 @@ type BulkCreateLessonsRequest struct {
 		LessonDate  string `json:"lesson_date"`
 		Week        int    `json:"week"`
 		Duration    int    `json:"duration"`
-		Content     string `json:"content"` // JSON string
+		Content     string `json:"content"` 
 		Objectives  string `json:"objectives"`
 		Activities  string `json:"activities"`
 		Resources   string `json:"resources"`

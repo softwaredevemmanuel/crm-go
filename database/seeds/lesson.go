@@ -1,9 +1,7 @@
 package seeds
 
 import (
-	"encoding/json"
 	"log"
-	"gorm.io/datatypes"
 	"crm-go/config"
 	"crm-go/models"
 	"gorm.io/gorm/clause"
@@ -27,16 +25,6 @@ func SeedLessons() error{
 
 	adminID := uuid.MustParse("fe4547a7-4c81-4bc2-bc81-5bbbce2fb5bd")
 
-	// Helper function to convert map to datatypes.JSON
-	toJSON := func(data map[string]interface{}) datatypes.JSON {
-		jsonData, err := json.Marshal(data)
-		if err != nil {
-			log.Printf("Error marshalling JSON: %v", err)
-			return datatypes.JSON([]byte("{}"))
-		}
-		return datatypes.JSON(jsonData)
-	}
-
 	lessons := []models.Lesson{
 
 		// =========================================================
@@ -57,25 +45,7 @@ func SeedLessons() error{
 			Resources:   "Biology textbook, charts, pictures of living organisms.",
 			Assessment:  "Define Biology and list five examples of living organisms.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"introduction": "Biology is the scientific study of life and living organisms.",
-				"sections": []interface{}{
-					map[string]interface{}{
-						"title":   "Meaning of Biology",
-						"content": "Biology is the branch of science concerned with the study of living organisms.",
-					},
-					map[string]interface{}{
-						"title":   "Living Organisms",
-						"content": "Living organisms include plants, animals, fungi, bacteria and other forms of life.",
-					},
-				},
-				"key_terms": []interface{}{
-					"Biology",
-					"organism",
-					"life",
-				},
-				"summary": "Biology is the scientific study of living organisms.",
-			}),
+			Content: "<div>Biology is the scientific study of life and living organisms, including their structure, function, growth, evolution, distribution, and taxonomy. It encompasses various fields such as botany, zoology, microbiology, and ecology.</div>",
 		},
 
 		{
@@ -92,28 +62,7 @@ func SeedLessons() error{
 			Resources:   "Biology textbook, branch classification chart.",
 			Assessment:  "List five branches of Biology and state what each studies.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"introduction": "Biology is divided into several specialized branches.",
-				"sections": []interface{}{
-					map[string]interface{}{
-						"title":   "Zoology",
-						"content": "Zoology is the study of animals.",
-					},
-					map[string]interface{}{
-						"title":   "Botany",
-						"content": "Botany is the study of plants.",
-					},
-					map[string]interface{}{
-						"title":   "Microbiology",
-						"content": "Microbiology is the study of microorganisms.",
-					},
-					map[string]interface{}{
-						"title":   "Ecology",
-						"content": "Ecology is the study of relationships between organisms and their environment.",
-					},
-				},
-				"summary": "Different branches of Biology focus on different aspects of life.",
-			}),
+			Content: "<div>The branches of Biology include botany (study of plants), zoology (study of animals), microbiology (study of microorganisms), ecology (study of interactions between organisms and their environment), and genetics (study of heredity and variation).</div>",
 		},
 
 		{
@@ -130,24 +79,7 @@ func SeedLessons() error{
 			Resources:   "Textbook, pictures and charts.",
 			Assessment:  "State five ways Biology is useful to society.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"introduction": "Biology has many applications in human life.",
-				"sections": []interface{}{
-					map[string]interface{}{
-						"title":   "Medicine",
-						"content": "Biology helps in understanding diseases, developing medicines and improving healthcare.",
-					},
-					map[string]interface{}{
-						"title":   "Agriculture",
-						"content": "Biology helps farmers understand crops, pests, diseases and animal production.",
-					},
-					map[string]interface{}{
-						"title":   "Environment",
-						"content": "Biology helps us understand and protect ecosystems and natural resources.",
-					},
-				},
-				"summary": "Biology is important in medicine, agriculture, environmental management and many other fields.",
-			}),
+			Content: "<div> The importance of Biology in everyday life cannot be overstated. It helps us understand the world around us and provides solutions to many of the challenges we face. </div>",
 		},
 
 		// =========================================================
@@ -168,24 +100,7 @@ func SeedLessons() error{
 			Resources:   "Microscope, cell charts, Biology textbook.",
 			Assessment:  "State the three main principles of cell theory.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"introduction": "The cell theory explains the importance of cells in living organisms.",
-				"sections": []interface{}{
-					map[string]interface{}{
-						"title":   "First Principle",
-						"content": "All living organisms are made up of one or more cells.",
-					},
-					map[string]interface{}{
-						"title":   "Second Principle",
-						"content": "The cell is the basic structural and functional unit of life.",
-					},
-					map[string]interface{}{
-						"title":   "Third Principle",
-						"content": "All cells arise from pre-existing cells.",
-					},
-				},
-				"summary": "Cells are the basic units of life.",
-			}),
+			Content: "<p>The cell theory is a fundamental concept in Biology that describes the properties of cells. It states that all living organisms are composed of cells, that the cell is the basic unit of life, and that all cells arise from pre-existing cells.</p>",
 		},
 
 		{
@@ -202,24 +117,7 @@ func SeedLessons() error{
 			Resources:   "Cell diagrams, microscope, prepared slides.",
 			Assessment:  "Draw and label a typical animal cell.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"introduction": "Cells contain different structures that perform specialized functions.",
-				"sections": []interface{}{
-					map[string]interface{}{
-						"title":   "Cell Membrane",
-						"content": "The cell membrane controls the movement of substances into and out of the cell.",
-					},
-					map[string]interface{}{
-						"title":   "Cytoplasm",
-						"content": "The cytoplasm is the region where many cellular activities occur.",
-					},
-					map[string]interface{}{
-						"title":   "Nucleus",
-						"content": "The nucleus contains genetic material and controls many activities of the cell.",
-					},
-				},
-				"summary": "A cell contains specialized structures that work together to keep it alive.",
-			}),
+			Content: "<div>Cells are the basic structural and functional units of life. They contain various organelles that perform specific functions necessary for the cell's survival and operation.</div>",
 		},
 
 		{
@@ -236,28 +134,7 @@ func SeedLessons() error{
 			Resources:   "Cell charts, textbook, microscope.",
 			Assessment:  "State the functions of the nucleus, mitochondria, ribosomes and chloroplasts.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"introduction": "Cell organelles are specialized structures that perform specific functions.",
-				"organelles": []interface{}{
-					map[string]interface{}{
-						"name":     "Nucleus",
-						"function": "Controls cell activities and contains genetic material.",
-					},
-					map[string]interface{}{
-						"name":     "Mitochondrion",
-						"function": "Site of aerobic respiration and energy release.",
-					},
-					map[string]interface{}{
-						"name":     "Ribosome",
-						"function": "Site of protein synthesis.",
-					},
-					map[string]interface{}{
-						"name":     "Chloroplast",
-						"function": "Site of photosynthesis in plant cells.",
-					},
-				},
-				"summary": "Different organelles perform different functions within cells.",
-			}),
+			Content: "<div>Cell organelles are specialized structures within a cell that perform distinct processes. For example, the nucleus controls cell activities, mitochondria produce energy, ribosomes synthesize proteins, and chloroplasts conduct photosynthesis in plant cells.</div>",
 		},
 
 		{
@@ -274,26 +151,7 @@ func SeedLessons() error{
 			Resources:   "Plant and animal cell charts.",
 			Assessment:  "List four differences between plant and animal cells.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"comparison": []interface{}{
-					map[string]interface{}{
-						"feature": "Cell wall",
-						"plant":   "Present",
-						"animal":  "Absent",
-					},
-					map[string]interface{}{
-						"feature": "Chloroplast",
-						"plant":   "Present in photosynthetic cells",
-						"animal":  "Absent",
-					},
-					map[string]interface{}{
-						"feature": "Large permanent vacuole",
-						"plant":   "Usually present",
-						"animal":  "Usually absent or small",
-					},
-				},
-				"summary": "Plant and animal cells share many structures but also have important differences.",
-			}),
+			Content: "<div>Plant and animal cells share many common structures, such as the nucleus, cytoplasm, and cell membrane. However, plant cells have a cell wall, chloroplasts, and large central vacuoles, which are not found in animal cells.</div>",
 		},
 
 		{
@@ -310,20 +168,7 @@ func SeedLessons() error{
 			Resources:   "Cell division charts, textbook.",
 			Assessment:  "Explain two reasons why cell division is important.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"introduction": "Cell division is the process by which cells produce new cells.",
-				"types": []interface{}{
-					"Mitosis",
-					"Meiosis",
-				},
-				"importance": []interface{}{
-					"Growth",
-					"Repair",
-					"Replacement of damaged cells",
-					"Reproduction",
-				},
-				"summary": "Cell division is essential for growth, repair and reproduction.",
-			}),
+			Content: "<div>Cell division is a fundamental process by which a parent cell divides into two or more daughter cells. It is essential for growth, repair, and reproduction in living organisms. The two main types of cell division are mitosis and meiosis.</div>",
 		},
 
 		// =========================================================
@@ -344,16 +189,7 @@ func SeedLessons() error{
 			Resources:   "Charts, cards and textbook.",
 			Assessment:  "List the levels of organization in a multicellular organism.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"levels": []interface{}{
-					"Cell",
-					"Tissue",
-					"Organ",
-					"Organ system",
-					"Organism",
-				},
-				"summary": "Cells combine to form tissues, tissues form organs, and organs work together in organ systems.",
-			}),
+			Content: "<div>The levels of organization in living organisms include cells, tissues, organs, organ systems, and the organism as a whole. Each level represents a higher degree of complexity and specialization.</div>",
 		},
 
 		{
@@ -370,17 +206,7 @@ func SeedLessons() error{
 			Resources:   "Microscope, tissue charts, textbook.",
 			Assessment:  "Define tissue and give three examples.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"definition": "A tissue is a group of similar cells working together to perform a specific function.",
-				"examples": []interface{}{
-					"Muscle tissue",
-					"Nervous tissue",
-					"Epithelial tissue",
-					"Xylem",
-					"Phloem",
-				},
-				"summary": "Tissues are groups of specialized cells performing particular functions.",
-			}),
+			Content: "<div>Tissues are groups of similar cells that work together to perform a specific function. In animals, examples include epithelial tissue, muscle tissue, and nervous tissue. In plants, examples include xylem and phloem.</div>",
 		},
 
 		{
@@ -397,24 +223,7 @@ func SeedLessons() error{
 			Resources:   "Human body charts, textbook.",
 			Assessment:  "Give three examples of organs and state the systems they belong to.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"definition": "An organ is made up of different tissues working together to perform a specific function.",
-				"examples": []interface{}{
-					map[string]interface{}{
-						"organ":  "Heart",
-						"system": "Circulatory system",
-					},
-					map[string]interface{}{
-						"organ":  "Lung",
-						"system": "Respiratory system",
-					},
-					map[string]interface{}{
-						"organ":  "Stomach",
-						"system": "Digestive system",
-					},
-				},
-				"summary": "Organs contain tissues and work together as organ systems.",
-			}),
+			Content: "<div>Organs are structures composed of different tissues that work together to perform specific functions. Organ systems are groups of organs that collaborate to carry out complex bodily functions. For example, the heart and blood vessels form the circulatory system.</div>",
 		},
 
 		// =========================================================
@@ -435,17 +244,7 @@ func SeedLessons() error{
 			Resources:   "Food samples, charts, textbook.",
 			Assessment:  "List the major classes of food and give one example of each.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"classes": []interface{}{
-					"Carbohydrates",
-					"Proteins",
-					"Fats and oils",
-					"Vitamins",
-					"Minerals",
-					"Water",
-				},
-				"summary": "The body requires different classes of food for energy, growth, repair and regulation.",
-			}),
+			Content: "<div>Food can be classified into major classes based on the nutrients they provide. The main classes include carbohydrates, proteins, fats, vitamins, minerals, and water. Each class has specific functions in the body, such as providing energy, building tissues, and regulating body processes.</div>",
 		},
 
 		{
@@ -462,26 +261,7 @@ func SeedLessons() error{
 			Resources:   "Iodine solution, Benedict's solution, Biuret reagent, ethanol and food samples.",
 			Assessment:  "Describe the test for starch and state the expected result.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"tests": []interface{}{
-					map[string]interface{}{
-						"food":   "Starch",
-						"test":   "Add iodine solution",
-						"result": "Blue-black colour indicates starch.",
-					},
-					map[string]interface{}{
-						"food":   "Protein",
-						"test":   "Biuret test",
-						"result": "Purple colour indicates protein.",
-					},
-					map[string]interface{}{
-						"food":   "Reducing sugar",
-						"test":   "Benedict's test",
-						"result": "On heating, a coloured precipitate may form.",
-					},
-				},
-				"summary": "Chemical tests can be used to identify nutrients in food.",
-			}),
+			Content: "<div>Food tests are simple chemical tests used to identify the presence of specific nutrients in food samples. For example, the iodine test is used for starch, Benedict's test for reducing sugars, Biuret test for proteins, and the ethanol emulsion test for fats.</div>",
 		},
 
 		{
@@ -498,16 +278,7 @@ func SeedLessons() error{
 			Resources:   "Food charts, nutrition guides, textbook.",
 			Assessment:  "Define balanced diet and explain why it is important.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"definition": "A balanced diet contains all essential nutrients in the correct proportions.",
-				"factors": []interface{}{
-					"Age",
-					"Sex",
-					"Activity level",
-					"Health condition",
-				},
-				"summary": "A balanced diet provides the nutrients needed for healthy growth and body function.",
-			}),
+			Content: "<div>A balanced diet is one that provides all the essential nutrients in the right proportions to maintain health and well-being. It includes a variety of foods from different food groups, ensuring that the body receives adequate energy, protein, vitamins, and minerals.</div>",
 		},
 
 		{
@@ -524,19 +295,7 @@ func SeedLessons() error{
 			Resources:   "Plant charts, textbook.",
 			Assessment:  "Differentiate between autotrophic and heterotrophic nutrition.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"types": []interface{}{
-					map[string]interface{}{
-						"type":        "Autotrophic nutrition",
-						"description": "Organisms manufacture their own food, usually through photosynthesis.",
-					},
-					map[string]interface{}{
-						"type":        "Heterotrophic nutrition",
-						"description": "Organisms obtain food from other organisms.",
-					},
-				},
-				"summary": "Organisms obtain nutrients either by producing their own food or by consuming other organisms.",
-			}),
+			Content: "<div>Autotrophic nutrition is the process by which organisms produce their own food, typically through photosynthesis, as seen in plants. Heterotrophic nutrition involves obtaining food from other organisms, as seen in animals and humans.</div>",
 		},
 
 		// =========================================================
@@ -557,15 +316,7 @@ func SeedLessons() error{
 			Resources:   "Biology textbook, reproductive system charts.",
 			Assessment:  "Define reproduction and state two reasons why it is important.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"definition": "Reproduction is the biological process by which organisms produce new individuals of the same species.",
-				"importance": []interface{}{
-					"Continuation of species",
-					"Replacement of organisms",
-					"Transfer of genetic information",
-				},
-				"summary": "Reproduction ensures the continuation of living organisms and their species.",
-			}),
+			Content: "<div>Reproduction is the biological process by which new individual organisms are produced. It is essential for the continuation of species and the transfer of genetic information from one generation to the next.</div>",
 		},
 
 		{
@@ -582,16 +333,7 @@ func SeedLessons() error{
 			Resources:   "Charts, textbook, plant specimens.",
 			Assessment:  "List three methods of asexual reproduction.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"definition": "Asexual reproduction involves the production of offspring from a single parent without the fusion of gametes.",
-				"methods": []interface{}{
-					"Binary fission",
-					"Budding",
-					"Spore formation",
-					"Vegetative propagation",
-				},
-				"summary": "Asexual reproduction generally produces offspring that are genetically similar to the parent.",
-			}),
+			Content: "<div>Asexual reproduction is a mode of reproduction that involves a single parent and results in offspring that are genetically identical to the parent. Major forms include binary fission, budding, and vegetative propagation.</div>",
 		},
 
 		{
@@ -608,15 +350,7 @@ func SeedLessons() error{
 			Resources:   "Reproductive system charts, textbook.",
 			Assessment:  "Explain the meaning of fertilization.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"definition": "Sexual reproduction involves the fusion of male and female gametes.",
-				"key_terms": []interface{}{
-					"Gamete",
-					"Fertilization",
-					"Zygote",
-				},
-				"summary": "Sexual reproduction involves the fusion of gametes to form a zygote.",
-			}),
+			Content: "<div>Sexual reproduction involves the fusion of male and female gametes to produce offspring that are genetically different from their parents. Fertilization is the process by which the male gamete (sperm) fuses with the female gamete (egg) to form a zygote.</div>",
 		},
 
 		{
@@ -633,17 +367,7 @@ func SeedLessons() error{
 			Resources:   "Fresh flowers, hand lens, diagrams and textbook.",
 			Assessment:  "Draw and label the reproductive parts of a flower.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"male_part":   "Stamen",
-				"female_part": "Carpel or pistil",
-				"processes": []interface{}{
-					"Pollination",
-					"Fertilization",
-					"Seed formation",
-					"Fruit formation",
-				},
-				"summary": "Flowers contain reproductive structures that enable sexual reproduction in flowering plants.",
-			}),
+			Content: "<div>Flowering plants reproduce sexually through the production of flowers, which contain male and female reproductive organs. The male part is the stamen, which produces pollen, while the female part is the carpel, which contains the ovary, style, and stigma. Pollination and fertilization lead to the formation of seeds and fruits.</div>",
 		},
 
 		// =========================================================
@@ -664,17 +388,7 @@ func SeedLessons() error{
 			Resources:   "School environment, textbook, ecology charts.",
 			Assessment:  "Define ecology.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"definition": "Ecology is the study of relationships between organisms and their environment.",
-				"key_terms": []interface{}{
-					"Organism",
-					"Environment",
-					"Habitat",
-					"Population",
-					"Community",
-				},
-				"summary": "Ecology examines how organisms interact with one another and with their environment.",
-			}),
+			Content: "<div>Ecology is the branch of Biology that studies the interactions between organisms and their environment. It examines how living organisms adapt to their surroundings, how they interact with each other, and how they are affected by environmental factors.</div>",
 		},
 
 		{
@@ -691,24 +405,7 @@ func SeedLessons() error{
 			Resources:   "School environment, charts, textbook.",
 			Assessment:  "List five biotic and five abiotic components of an ecosystem.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"definition": "An ecosystem consists of living organisms interacting with one another and with non-living components of their environment.",
-				"components": map[string]interface{}{
-					"biotic": []interface{}{
-						"Plants",
-						"Animals",
-						"Microorganisms",
-					},
-					"abiotic": []interface{}{
-						"Light",
-						"Temperature",
-						"Water",
-						"Soil",
-						"Air",
-					},
-				},
-				"summary": "An ecosystem contains both living and non-living components.",
-			}),
+			Content: "<div>An ecosystem is a community of living organisms interacting with their physical environment. It includes both biotic components (living things) and abiotic components (non-living things) that influence the survival and growth of organisms.</div>",
 		},
 
 		{
@@ -725,22 +422,7 @@ func SeedLessons() error{
 			Resources:   "Food chain charts, cards and textbook.",
 			Assessment:  "Construct a food chain containing a producer and three consumers.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"food_chain_example": []interface{}{
-					"Grass",
-					"Grasshopper",
-					"Frog",
-					"Snake",
-					"Hawk",
-				},
-				"key_terms": []interface{}{
-					"Producer",
-					"Consumer",
-					"Predator",
-					"Prey",
-				},
-				"summary": "Food chains show the transfer of energy from one organism to another.",
-			}),
+			Content: "<div>A food chain is a linear sequence of organisms through which nutrients and energy pass as one organism eats another. A food web is a complex network of interconnected food chains that shows the feeding relationships in an ecosystem.</div>",
 		},
 
 		{
@@ -757,22 +439,7 @@ func SeedLessons() error{
 			Resources:   "School environment, thermometer, charts and textbook.",
 			Assessment:  "List five abiotic factors that affect organisms.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"biotic_factors": []interface{}{
-					"Competition",
-					"Predation",
-					"Disease",
-					"Availability of food",
-				},
-				"abiotic_factors": []interface{}{
-					"Temperature",
-					"Light",
-					"Water",
-					"Soil",
-					"Humidity",
-				},
-				"summary": "Environmental factors influence the survival, growth and distribution of organisms.",
-			}),
+			Content: "<div>Environmental factors can be classified as biotic (living) or abiotic (non-living). Biotic factors include other organisms, while abiotic factors include temperature, light, water, and soil. Both types of factors influence the survival and distribution of organisms.</div>",
 		},
 
 		// =========================================================
@@ -793,15 +460,7 @@ func SeedLessons() error{
 			Resources:   "Classification charts, textbook.",
 			Assessment:  "Define biological classification.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"definition": "Classification is the systematic arrangement of organisms into groups based on shared characteristics.",
-				"importance": []interface{}{
-					"Easy identification",
-					"Study of relationships",
-					"Organization of biological information",
-				},
-				"summary": "Classification organizes organisms into groups based on their similarities and differences.",
-			}),
+			Content: "<div>Classification is the process of grouping organisms based on shared characteristics. It helps scientists organize and understand the diversity of life, making it easier to study and communicate about different species.</div>",
 		},
 
 		{
@@ -818,15 +477,7 @@ func SeedLessons() error{
 			Resources:   "Biology textbook, classification charts.",
 			Assessment:  "State four importance of biological classification.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"importance": []interface{}{
-					"Helps identify organisms",
-					"Provides a systematic way to study organisms",
-					"Shows relationships among organisms",
-					"Reduces confusion caused by local names",
-				},
-				"summary": "Classification makes the study and identification of organisms easier.",
-			}),
+			Content: "<div>Classification is important because it helps scientists organize and understand the diversity of life, facilitates communication about organisms, aids in identifying and naming species, and provides insights into evolutionary relationships.</div>",
 		},
 
 		{
@@ -843,31 +494,7 @@ func SeedLessons() error{
 			Resources:   "Classification chart, Biology textbook.",
 			Assessment:  "List the major kingdoms and give one example of each.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"kingdoms": []interface{}{
-					map[string]interface{}{
-						"name":    "Monera",
-						"example": "Bacteria",
-					},
-					map[string]interface{}{
-						"name":    "Protista",
-						"example": "Amoeba",
-					},
-					map[string]interface{}{
-						"name":    "Fungi",
-						"example": "Mushroom",
-					},
-					map[string]interface{}{
-						"name":    "Plantae",
-						"example": "Maize",
-					},
-					map[string]interface{}{
-						"name":    "Animalia",
-						"example": "Human",
-					},
-				},
-				"summary": "Living organisms can be grouped into kingdoms based on their characteristics.",
-			}),
+			Content: "<div>The major kingdoms of living organisms include Animalia (animals), Plantae (plants), Fungi (fungi), Protista (protists), and Monera (bacteria). Each kingdom groups organisms based on shared characteristics and evolutionary relationships.</div>",
 		},
 
 		{
@@ -884,23 +511,7 @@ func SeedLessons() error{
 			Resources:   "Classification textbook and charts.",
 			Assessment:  "Explain the two parts of a scientific name.",
 			CreatedBy:   adminID,
-			Content: toJSON(map[string]interface{}{
-				"definition": "Binomial nomenclature is a system of naming organisms using two names.",
-				"parts": []interface{}{
-					"Genus",
-					"Species",
-				},
-				"examples": []interface{}{
-					"Homō sapiens",
-					"Zea mays",
-				},
-				"rules": []interface{}{
-					"Genus begins with a capital letter.",
-					"Species begins with a lowercase letter.",
-					"The scientific name is usually italicized when typed.",
-				},
-				"summary": "Binomial nomenclature gives each organism a standardized two-part scientific name.",
-			}),
+			Content: "<div>Binomial nomenclature is a system of naming organisms using two names: the genus name (capitalized) and the species name (lowercase). For example, the scientific name for humans is Homo sapi",
 		},
 	}
 

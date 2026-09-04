@@ -2,16 +2,12 @@
 package services
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
 	"time"
-
 	"github.com/google/uuid"
-	"gorm.io/datatypes"
 	"gorm.io/gorm"
-
 	"crm-go/models"
 	"crm-go/dto"
 )
@@ -81,18 +77,7 @@ func (s *LessonService) CreateLesson(req *dto.CreateLessonRequest, userID uuid.U
 		lessonOrder = maxOrder + 1
 	}
 
-	// Parse content JSON
-	var content datatypes.JSON
-	if req.Content != "" {
-		var jsonContent interface{}
-		if err := json.Unmarshal([]byte(req.Content), &jsonContent); err != nil {
-			return nil, errors.New("invalid content JSON format")
-		}
-		content, err = json.Marshal(jsonContent)
-		if err != nil {
-			return nil, errors.New("failed to marshal content: " + err.Error())
-		}
-	}
+
 
 	// Create lesson
 	lesson := &models.Lesson{
@@ -106,7 +91,7 @@ func (s *LessonService) CreateLesson(req *dto.CreateLessonRequest, userID uuid.U
 		LessonDate:     lessonDate,
 		Week:           req.Week,
 		Duration:       req.Duration,
-		Content:        content,
+		Content:        req.Content,
 		Objectives:     req.Objectives,
 		Activities:     req.Activities,
 		Resources:      req.Resources,
@@ -206,28 +191,6 @@ func (s *LessonService) BulkCreateLessons(req *dto.BulkCreateLessonsRequest, use
 			lessonOrder = currentOrder
 		}
 
-		// Parse content JSON
-		var content datatypes.JSON
-		if lessonReq.Content != "" {
-			var jsonContent interface{}
-			if err := json.Unmarshal([]byte(lessonReq.Content), &jsonContent); err != nil {
-				result.FailedCount++
-				result.Errors = append(result.Errors, dto.BulkLessonError{
-					Title: lessonReq.Title,
-					Error: "invalid content JSON format",
-				})
-				continue
-			}
-			content, err = json.Marshal(jsonContent)
-			if err != nil {
-				result.FailedCount++
-				result.Errors = append(result.Errors, dto.BulkLessonError{
-					Title: lessonReq.Title,
-					Error: "failed to marshal content",
-				})
-				continue
-			}
-		}
 
 		// Create lesson
 		lesson := &models.Lesson{
@@ -241,7 +204,7 @@ func (s *LessonService) BulkCreateLessons(req *dto.BulkCreateLessonsRequest, use
 			LessonDate:     lessonDate,
 			Week:           lessonReq.Week,
 			Duration:       lessonReq.Duration,
-			Content:        content,
+			Content:        lessonReq.Content,
 			Objectives:     lessonReq.Objectives,
 			Activities:     lessonReq.Activities,
 			Resources:      lessonReq.Resources,
@@ -548,17 +511,6 @@ func (s *LessonService) UpdateLesson(id string, req *dto.UpdateLessonRequest) (*
 		lesson.Duration = req.Duration
 	}
 
-	if req.Content != "" {
-		var jsonContent interface{}
-		if err := json.Unmarshal([]byte(req.Content), &jsonContent); err != nil {
-			return nil, errors.New("invalid content JSON format")
-		}
-		content, err := json.Marshal(jsonContent)
-		if err != nil {
-			return nil, errors.New("failed to marshal content: " + err.Error())
-		}
-		lesson.Content = content
-	}
 
 	if req.Objectives != "" {
 		lesson.Objectives = req.Objectives
