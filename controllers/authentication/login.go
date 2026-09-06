@@ -23,7 +23,7 @@ import (
 // @Failure 400 {object} models.ErrorResponse "Invalid input"
 // @Failure 401 {object} models.ErrorResponse "Invalid credentials"
 // @Failure 500 {object} models.ErrorResponse "Internal server error"
-// @Router /auth/login [post]
+// @Router /api/auth/login [post]
 func Login(c *gin.Context) {
 	var input models.LoginInput
 	

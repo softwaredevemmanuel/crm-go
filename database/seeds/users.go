@@ -37,23 +37,15 @@ func parseDOB(date string) *time.Time {
 
 func SeedUsers() error {
 	db := config.GetDB()
+	userID1 := uuid.MustParse("fe4547a7-4c81-4bc2-bc81-5bbbce2fb5bd")
+	userID2 := uuid.MustParse("5a853260-31fc-44ee-9d69-bb2a2957ba48")
+	userID3 := uuid.MustParse("9c47dbea-5c34-4a35-9084-148c363eddaf")
+	userID4 := uuid.MustParse("0affa19c-9419-4712-ba3e-9b17bc21c71c")
+	userID5 := uuid.MustParse("6182a0b3-dcf1-4f0a-b73e-3c5cdafde0cf")
+	userID6 := uuid.MustParse("8f965d41-2072-41e1-ad76-9bb579a9130d")
+	userID7 := uuid.MustParse("618da138-da85-47c3-a96c-60a248864da1")
+	userID8 := uuid.MustParse("a11962e0-870c-4568-a43c-5f1850b10a95")
 
-	userID1, err1 := uuid.Parse("fe4547a7-4c81-4bc2-bc81-5bbbce2fb5bd")
-	userID2, err2:= uuid.Parse("5a853260-31fc-44ee-9d69-bb2a2957ba48")
-	userID3, err3 := uuid.Parse("9c47dbea-5c34-4a35-9084-148c363eddaf")
-	if err1 != nil {
-		log.Fatalf("❌ Invalid tutor UUID: %v", err1)
-	}
-	if err2 != nil {
-		log.Fatalf("❌ Invalid tutor UUID: %v", err2)
-	}
-	if err3 != nil {
-		log.Fatalf("❌ Invalid tutor UUID: %v", err3)
-	}
-
-	
-
-	
 	users := []models.User{
 		{
 			ID:          userID1,
@@ -90,6 +82,81 @@ func SeedUsers() error {
 			FirstName:   "Hannah",
 			LastName: 	"Kachimside",
 			Email:       "hanniebeke47@gmail.com",
+        	Password:  	 hashPassword("mypassword"), 
+			LoginID:  "QWERTY",
+			Picture:     "https://lh3.googleusercontent.com/a/ACg8ocIucwnbi0gu-NdunUN5er6sqCwOouqNOuQ2dpU-1qR_yH0Kpw=s96-c",
+			Role:        "student",
+			Position:     "student",
+			DOB:       parseDOB("2000-10-08"),
+			Provider:   "local",
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		},
+		{
+			ID:          userID4,
+			FirstName:   "Mercy",
+			LastName: 	"Abeke",
+			Email:       "mercyabeke@gmail.com",
+        	Password:  	 hashPassword("mypassword"), 
+			LoginID:  "QWERTY",
+			Picture:     "https://lh3.googleusercontent.com/a/ACg8ocIucwnbi0gu-NdunUN5er6sqCwOouqNOuQ2dpU-1qR_yH0Kpw=s96-c",
+			Role:        "student",
+			Position:     "student",
+			DOB:       parseDOB("2000-10-08"),
+			Provider:   "local",
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		},
+		{
+			ID:          userID5,
+			FirstName:   "Yemi",
+			LastName: 	"Ogumbiyi",
+			Email:       "yemi@gmail.com",
+        	Password:  	 hashPassword("mypassword"), 
+			LoginID:  "QWERTY",
+			Picture:     "https://lh3.googleusercontent.com/a/ACg8ocIucwnbi0gu-NdunUN5er6sqCwOouqNOuQ2dpU-1qR_yH0Kpw=s96-c",
+			Role:        "student",
+			Position:     "student",
+			DOB:       parseDOB("2000-10-08"),
+			Provider:   "local",
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		},
+		{
+			ID:          userID6,
+			FirstName:   "Joseph",
+			LastName: 	"Abeke",
+			Email:       "Joseph@gmail.com",
+        	Password:  	 hashPassword("mypassword"), 
+			LoginID:  "QWERTY",
+			Picture:     "https://lh3.googleusercontent.com/a/ACg8ocIucwnbi0gu-NdunUN5er6sqCwOouqNOuQ2dpU-1qR_yH0Kpw=s96-c",
+			Role:        "student",
+			Position:     "student",
+			DOB:       parseDOB("2000-10-08"),
+			Provider:   "local",
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		},
+		{
+			ID:          userID7,
+			FirstName:   "Testimony",
+			LastName: 	"Florence",
+			Email:       "testimony@gmail.com",
+        	Password:  	 hashPassword("mypassword"), 
+			LoginID:  "QWERTY",
+			Picture:     "https://lh3.googleusercontent.com/a/ACg8ocIucwnbi0gu-NdunUN5er6sqCwOouqNOuQ2dpU-1qR_yH0Kpw=s96-c",
+			Role:        "student",
+			Position:     "student",
+			DOB:       parseDOB("2000-10-08"),
+			Provider:   "local",
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		},
+		{
+			ID:          userID8,
+			FirstName:   "Blessig",
+			LastName: 	"Uche",
+			Email:       "blessing@gmail.com",
         	Password:  	 hashPassword("mypassword"), 
 			LoginID:  "QWERTY",
 			Picture:     "https://lh3.googleusercontent.com/a/ACg8ocIucwnbi0gu-NdunUN5er6sqCwOouqNOuQ2dpU-1qR_yH0Kpw=s96-c",

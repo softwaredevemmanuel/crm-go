@@ -472,6 +472,15 @@ func (s *StudentEnrollmentService) GetAllStudentEnrollments(params *dto.StudentE
 		}
 	}
 
+	// Add GradeID filter - This joins with arms table to filter by grade
+	if params.GradeID != "" {
+		gradeID, err := uuid.Parse(params.GradeID)
+		if err == nil {
+			query = query.Joins("JOIN arms ON student_enrollments.arm_id = arms.id").
+				Where("arms.grade_id = ?", gradeID)
+		}
+	}
+
 	if params.Status != "" {
 		query = query.Where("student_enrollments.status = ?", params.Status)
 	}
@@ -497,7 +506,7 @@ func (s *StudentEnrollmentService) GetAllStudentEnrollments(params *dto.StudentE
 	offset := (params.Page - 1) * params.Limit
 	query = query.Offset(offset).Limit(params.Limit)
 
-	// Execute with preloads - Preload Arm and its Grade
+	// Execute with preloads
 	var enrollments []models.StudentEnrollment
 	if err := query.
 		Preload("Student").
@@ -525,6 +534,104 @@ func (s *StudentEnrollmentService) GetAllStudentEnrollments(params *dto.StudentE
 		TotalPages:  totalPages,
 	}, nil
 }
+
+// GetEnrollmentsByGrade retrieves all student enrollments for a specific grade
+func (s *StudentEnrollmentService) GetEnrollmentsByGrade(gradeID string, params *dto.StudentEnrollmentQueryParams) (*dto.StudentEnrollmentListResponse, error) {
+	// Parse grade ID
+	gID, err := uuid.Parse(gradeID)
+	if err != nil {
+		return nil, errors.New("invalid grade ID")
+	}
+
+	// Set defaults
+	if params.Page < 1 {
+		params.Page = 1
+	}
+	if params.Limit < 1 || params.Limit > 100 {
+		params.Limit = 20
+	}
+	if params.SortBy == "" {
+		params.SortBy = "created_at"
+	}
+	if params.SortOrder == "" {
+		params.SortOrder = "desc"
+	}
+
+	// Build query - Join with arms to filter by grade
+	query := s.db.Model(&models.StudentEnrollment{}).
+		Joins("JOIN arms ON student_enrollments.arm_id = arms.id").
+		Where("arms.grade_id = ?", gID).
+		Where("student_enrollments.deleted_at IS NULL")
+
+	// Apply additional filters
+	if params.StudentID != "" {
+		studentID, err := uuid.Parse(params.StudentID)
+		if err == nil {
+			query = query.Where("student_enrollments.student_id = ?", studentID)
+		}
+	}
+
+	if params.ArmID != "" {
+		armID, err := uuid.Parse(params.ArmID)
+		if err == nil {
+			query = query.Where("student_enrollments.arm_id = ?", armID)
+		}
+	}
+
+	if params.Status != "" {
+		query = query.Where("student_enrollments.status = ?", params.Status)
+	}
+
+	if params.IsVerified != nil {
+		query = query.Where("student_enrollments.is_verified = ?", *params.IsVerified)
+	}
+
+	// Get total count
+	var total int64
+	if err := query.Count(&total).Error; err != nil {
+		return nil, fmt.Errorf("failed to count enrollments: %w", err)
+	}
+
+	// Apply sorting
+	sortDirection := "DESC"
+	if strings.ToLower(params.SortOrder) == "asc" {
+		sortDirection = "ASC"
+	}
+	query = query.Order("student_enrollments." + params.SortBy + " " + sortDirection)
+
+	// Apply pagination
+	offset := (params.Page - 1) * params.Limit
+	query = query.Offset(offset).Limit(params.Limit)
+
+	// Execute with preloads
+	var enrollments []models.StudentEnrollment
+	if err := query.
+		Preload("Student").
+		Preload("Arm").
+		Preload("Arm.Grade").
+		Preload("Arm.ClassTeacher").
+		Preload("Arm.ClassTeacher.Teacher").
+		Find(&enrollments).Error; err != nil {
+		return nil, fmt.Errorf("failed to fetch enrollments: %w", err)
+	}
+
+	// Convert to response
+	responses := make([]dto.StudentEnrollmentResponse, len(enrollments))
+	for i, enrollment := range enrollments {
+		responses[i] = *s.toEnrollmentResponseWithGrade(&enrollment)
+	}
+
+	totalPages := int((total + int64(params.Limit) - 1) / int64(params.Limit))
+
+	return &dto.StudentEnrollmentListResponse{
+		Enrollments: responses,
+		Total:       total,
+		Page:        params.Page,
+		Limit:       params.Limit,
+		TotalPages:  totalPages,
+	}, nil
+}
+
 
 // GetEnrollmentsByStudent retrieves all verified enrollments for a specific student with grade info
 func (s *StudentEnrollmentService) GetEnrollmentsByStudent(studentID string) ([]dto.StudentEnrollmentResponse, error) {

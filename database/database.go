@@ -69,6 +69,7 @@ func MigrateDatabase() {
 	db.AutoMigrate(&models.Module{})
 	db.AutoMigrate(&models.Topic{})
 	db.AutoMigrate(&models.Lesson{})
+	db.AutoMigrate(&models.DailyReport{})
 	
 
 

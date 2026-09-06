@@ -19,7 +19,7 @@ import (
 // @Success 200 {object} LoginIdResponse
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 401 {object} models.ErrorResponse
-// @Router /auth/login/id [post]
+// @Router /api/auth/login/id [post]
 func LoginId(c *gin.Context) {
 	// Get email from header
 	email := c.GetHeader("email")

@@ -20,7 +20,7 @@ import (
 // @Success 200 {object} models.AlreadyLoggedOutResponse "Session already invalidated"
 // @Failure 400 {object} models.ErrorResponse "No token provided"
 // @Failure 500 {object} models.ErrorResponse "Failed to logout"
-// @Router /auth/logout [post]
+// @Router /api/auth/logout [post]
 func Logout(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 	if len(token) > 7 && token[:7] == "Bearer " {

@@ -30,7 +30,8 @@ func StudentEnrollmentRoutes(router *gin.RouterGroup, db *gorm.DB) {
 		
 		// Get all enrollments with pagination and filters
 		enrollmentGroup.GET("/fetch-student-enrollments", enrollmentHandler.GetAllStudentEnrollments)
-		
+		enrollmentGroup.GET("/student-enrollments/grade/:grade_id", enrollmentHandler.GetEnrollmentsByGrade)
+
 		// Get enrollment by ID
 		enrollmentGroup.GET("/student-enrollments/:id", enrollmentHandler.GetStudentEnrollmentByID)
 		

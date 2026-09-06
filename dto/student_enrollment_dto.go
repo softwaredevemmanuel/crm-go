@@ -58,6 +58,7 @@ type StudentEnrollmentListResponse struct {
 type StudentEnrollmentQueryParams struct {
 	StudentID string `form:"student_id"`
 	ArmID     string `form:"arm_id"`
+	GradeID     string     `form:"grade_id"` // Add this
 	Status    string `form:"status"`
 	IsVerified *bool  `form:"is_verified"`
 	Page      int    `form:"page" default:"1"`

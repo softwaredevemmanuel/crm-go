@@ -418,7 +418,6 @@ definitions:
             assessment:
               type: string
             content:
-              description: JSON string
               type: string
             description:
               type: string
@@ -780,6 +779,42 @@ definitions:
     - code
     - level
     - name
+    type: object
+  dto.CreateDailyReportRequest:
+    properties:
+      challenges:
+        type: string
+      lesson_id:
+        type: string
+      module_id:
+        type: string
+      remarks:
+        type: string
+      report:
+        type: string
+      report_date:
+        type: string
+      scheme_of_work_id:
+        type: string
+      status:
+        enum:
+        - not_taught
+        - in_progress
+        - completed
+        type: string
+      students_absent:
+        type: integer
+      students_present:
+        type: integer
+      topic_id:
+        type: string
+    required:
+    - lesson_id
+    - module_id
+    - report_date
+    - scheme_of_work_id
+    - status
+    - topic_id
     type: object
   dto.CreateDepartmentRequest:
     properties:
@@ -1234,7 +1269,6 @@ definitions:
       assessment:
         type: string
       content:
-        description: JSON string
         type: string
       created_at:
         type: string
@@ -1848,6 +1882,25 @@ definitions:
         - inactive
         - archived
         type: string
+    type: object
+  dto.UpdateDailyReportRequest:
+    properties:
+      challenges:
+        type: string
+      remarks:
+        type: string
+      report:
+        type: string
+      status:
+        enum:
+        - not_taught
+        - in_progress
+        - completed
+        type: string
+      students_absent:
+        type: integer
+      students_present:
+        type: integer
     type: object
   dto.UpdateDepartmentRequest:
     properties:
@@ -2521,6 +2574,9 @@ definitions:
       id:
         example: 550e8400-e29b-41d4-a716-446655440000
         type: string
+      is_verified:
+        example: true
+        type: boolean
       last_name:
         example: Doe
         type: string
@@ -4051,6 +4107,98 @@ paths:
       summary: Delete an arm
       tags:
       - Arms
+  /api/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and return JWT token with session information
+      parameters:
+      - description: Login credentials
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successful
+          schema:
+            $ref: '#/definitions/models.LoginResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: User login
+      tags:
+      - Authentication
+  /api/auth/login/id:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates user using email from header and password from body
+      parameters:
+      - description: User Email
+        in: header
+        name: email
+        required: true
+        type: string
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.LoginIdInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.LoginIdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Login with ID
+      tags:
+      - Authentication
+  /api/auth/logout:
+    post:
+      description: Invalidates the user's session and clears authentication cookies
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Session already invalidated
+          schema:
+            $ref: '#/definitions/models.AlreadyLoggedOutResponse'
+        "400":
+          description: No token provided
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Failed to logout
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: User logout
+      tags:
+      - Authentication
   /api/auth/resend-verification:
     post:
       consumes:
@@ -4196,6 +4344,40 @@ paths:
             additionalProperties: true
             type: object
       summary: Send email verification
+      tags:
+      - Authentication
+  /api/auth/signup:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account with first name, last name, email, password,
+        and role
+      parameters:
+      - description: User signup credentials
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.SignUpInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User created successfully. Verification email sent.
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid input or email already exists
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Failed to create user or send email
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register a new user
       tags:
       - Authentication
   /api/auth/verify-email:
@@ -5083,6 +5265,329 @@ paths:
       summary: Update an existing course
       tags:
       - Courses
+  /api/daily-reports:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of daily reports with filters
+      parameters:
+      - description: Teacher ID
+        in: query
+        name: teacher_id
+        type: string
+      - description: Scheme of Work ID
+        in: query
+        name: scheme_of_work_id
+        type: string
+      - description: Module ID
+        in: query
+        name: module_id
+        type: string
+      - description: Topic ID
+        in: query
+        name: topic_id
+        type: string
+      - description: Lesson ID
+        in: query
+        name: lesson_id
+        type: string
+      - description: Status (not_taught, in_progress, completed)
+        in: query
+        name: status
+        type: string
+      - description: Date from (YYYY-MM-DD)
+        in: query
+        name: date_from
+        type: string
+      - description: Date to (YYYY-MM-DD)
+        in: query
+        name: date_to
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get reports
+      tags:
+      - Daily Reports
+    post:
+      consumes:
+      - application/json
+      description: Create a new daily teaching report
+      parameters:
+      - description: Report data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateDailyReportRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create daily report
+      tags:
+      - Daily Reports
+  /api/daily-reports/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete a daily report
+      parameters:
+      - description: Report ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete report
+      tags:
+      - Daily Reports
+    get:
+      consumes:
+      - application/json
+      description: Get a specific daily report by ID
+      parameters:
+      - description: Report ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get report by ID
+      tags:
+      - Daily Reports
+    put:
+      consumes:
+      - application/json
+      description: Update an existing daily report
+      parameters:
+      - description: Report ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateDailyReportRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update report
+      tags:
+      - Daily Reports
+  /api/daily-reports/lesson/{lesson_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all reports for a specific lesson
+      parameters:
+      - description: Lesson ID
+        in: path
+        name: lesson_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get reports by lesson
+      tags:
+      - Daily Reports
+  /api/daily-reports/stats:
+    get:
+      consumes:
+      - application/json
+      description: Get statistics for a teacher's daily reports
+      parameters:
+      - description: Teacher ID (defaults to authenticated user)
+        in: query
+        name: teacher_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get report statistics
+      tags:
+      - Daily Reports
   /api/deleted-records/{id}/restore:
     post:
       description: Restores a deleted course material from archive
@@ -5365,6 +5870,11 @@ paths:
       - description: Filter by arm ID
         in: query
         name: arm_id
+        type: string
+      - description: Grade ID
+        in: path
+        name: grade_id
+        required: true
         type: string
       - description: Filter by status
         in: query
@@ -8190,6 +8700,58 @@ paths:
       summary: Bulk create student enrollments
       tags:
       - Student Enrollments
+  /api/student-enrollments/grade/{grade_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all student enrollments for a specific grade
+      parameters:
+      - description: Grade ID
+        in: path
+        name: grade_id
+        required: true
+        type: string
+      - description: Status filter
+        in: query
+        name: status
+        type: string
+      - description: Verification status
+        in: query
+        name: is_verified
+        type: boolean
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get enrollments by grade
+      tags:
+      - Student Enrollments
   /api/student-enrollments/stats:
     get:
       consumes:
@@ -10094,132 +10656,6 @@ paths:
           schema:
             type: string
       summary: Initiate Google OAuth2 login
-      tags:
-      - Authentication
-  /auth/login:
-    post:
-      consumes:
-      - application/json
-      description: Authenticate user and return JWT token with session information
-      parameters:
-      - description: Login credentials
-        in: body
-        name: login
-        required: true
-        schema:
-          $ref: '#/definitions/models.LoginInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Login successful
-          schema:
-            $ref: '#/definitions/models.LoginResponse'
-        "400":
-          description: Invalid input
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "401":
-          description: Invalid credentials
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: User login
-      tags:
-      - Authentication
-  /auth/login/id:
-    post:
-      consumes:
-      - application/json
-      description: Authenticates user using email from header and password from body
-      parameters:
-      - description: User Email
-        in: header
-        name: email
-        required: true
-        type: string
-      - description: Login credentials
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/controllers.LoginIdInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.LoginIdResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Login with ID
-      tags:
-      - Authentication
-  /auth/logout:
-    post:
-      description: Invalidates the user's session and clears authentication cookies
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Session already invalidated
-          schema:
-            $ref: '#/definitions/models.AlreadyLoggedOutResponse'
-        "400":
-          description: No token provided
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "500":
-          description: Failed to logout
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: User logout
-      tags:
-      - Authentication
-  /auth/signup:
-    post:
-      consumes:
-      - application/json
-      description: Create a new user account with first name, last name, email, password,
-        and role
-      parameters:
-      - description: User signup credentials
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/controllers.SignUpInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Register a new user
       tags:
       - Authentication
   /categories:

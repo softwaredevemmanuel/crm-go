@@ -24,7 +24,7 @@ import (
 // @Success 201 {object} map[string]interface{} "User created successfully. Verification email sent."
 // @Failure 400 {object} map[string]interface{} "Invalid input or email already exists"
 // @Failure 500 {object} map[string]interface{} "Failed to create user or send email"
-// @Router /auth/signup [post]
+// @Router /api/auth/signup [post]
 func SignUp(c *gin.Context) {
 	var input SignUpInput
 	if err := c.ShouldBindJSON(&input); err != nil {

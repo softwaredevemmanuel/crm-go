@@ -771,6 +771,11 @@ func (s *LessonService) toLessonResponse(lesson *models.Lesson) *dto.LessonRespo
 		response.Module = &dto.ModuleResponse{
 			ID:    lesson.Module.ID.String(),
 			Title: lesson.Module.Title,
+			SchemeOfWorkID: lesson.Module.SchemeOfWorkID.String(),
+			Description: lesson.Module.Description,
+			ModuleOrder: lesson.Module.ModuleOrder,
+			CreatedAt: lesson.Module.CreatedAt,
+			UpdatedAt: lesson.Module.UpdatedAt,
 		}
 	}
 

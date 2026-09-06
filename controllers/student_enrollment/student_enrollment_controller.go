@@ -157,6 +157,7 @@ func (h *StudentEnrollmentHandler) BulkCreateStudentEnrollments(c *gin.Context) 
 // @Produce json
 // @Param student_id query string false "Filter by student ID"
 // @Param arm_id query string false "Filter by arm ID"
+// @Param grade_id path string true "Grade ID"
 // @Param status query string false "Filter by status"
 // @Param is_verified query bool false "Filter by verification status"
 // @Param page query int false "Page number" default(1)
@@ -186,6 +187,60 @@ func (h *StudentEnrollmentHandler) GetAllStudentEnrollments(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
+		"message": "Enrollments retrieved successfully",
+		"data":    response,
+	})
+}
+
+// GetEnrollmentsByGrade handles fetching enrollments for a specific grade
+// @Summary Get enrollments by grade
+// @Description Get all student enrollments for a specific grade
+// @Tags Student Enrollments
+// @Accept json
+// @Produce json
+// @Param grade_id path string true "Grade ID"
+// @Param status query string false "Status filter"
+// @Param is_verified query bool false "Verification status"
+// @Param page query int false "Page number" default(1)
+// @Param limit query int false "Items per page" default(20)
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Security BearerAuth
+// @Router /api/student-enrollments/grade/{grade_id} [get]
+func (c *StudentEnrollmentHandler) GetEnrollmentsByGrade(ctx *gin.Context) {
+	gradeID := ctx.Param("grade_id")
+	if gradeID == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Grade ID is required",
+		})
+		return
+	}
+
+	var params dto.StudentEnrollmentQueryParams
+	if err := ctx.ShouldBindQuery(&params); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Invalid query parameters",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	response, err := c.enrollmentService.GetEnrollmentsByGrade(gradeID, &params)
+	if err != nil {
+		if strings.Contains(err.Error(), "invalid grade ID") {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
 		"message": "Enrollments retrieved successfully",
 		"data":    response,
 	})

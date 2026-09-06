@@ -24,7 +24,7 @@ type AcademicSession struct {
 	// Relationships
 	Terms    []Term    `gorm:"foreignKey:AcademicSessionID" json:"terms,omitempty"`
 	Creator  User            `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
-
+	DailyReports []DailyReport `gorm:"foreignKey:AcademicSessionID" json:"daily_reports,omitempty"`
 }
 
 // TableName specifies the table name
