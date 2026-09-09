@@ -36,7 +36,7 @@ func SeedSchemesOfWork() {
 			Term:        "second",
 			Title:       "Biology Scheme of Work - SS1 Second Term",
 			Description: "Second term Biology scheme of work for Senior Secondary School 1.",
-			Status:      "draft",
+			Status:      "published",
 			CreatedBy:   adminID,
 		},
 		{
@@ -46,7 +46,7 @@ func SeedSchemesOfWork() {
 			Term:        "third",
 			Title:       "Biology Scheme of Work - SS1 Third Term",
 			Description: "Third term Biology scheme of work for Senior Secondary School 1.",
-			Status:      "draft",
+			Status:      "published",
 			CreatedBy:   adminID,
 		},
 
@@ -67,7 +67,7 @@ func SeedSchemesOfWork() {
 			Term:        "second",
 			Title:       "Biology Scheme of Work - SS2 Second Term",
 			Description: "Second term Biology scheme of work for Senior Secondary School 2.",
-			Status:      "draft",
+			Status:      "published",
 			CreatedBy:   adminID,
 		},
 		{
@@ -77,7 +77,7 @@ func SeedSchemesOfWork() {
 			Term:        "third",
 			Title:       "Biology Scheme of Work - SS2 Third Term",
 			Description: "Third term Biology scheme of work for Senior Secondary School 2.",
-			Status:      "draft",
+			Status:      "published",
 			CreatedBy:   adminID,
 		},
 	}

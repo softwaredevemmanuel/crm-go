@@ -161,7 +161,7 @@ func (c *DailyReportController) GetReportByID(ctx *gin.Context) {
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Security BearerAuth
-// @Router /api/daily-reports [get]
+// @Router /api/fetch-daily-reports [get]
 func (c *DailyReportController) GetReports(ctx *gin.Context) {
 	var params dto.DailyReportQueryParams
 	if err := ctx.ShouldBindQuery(&params); err != nil {
@@ -172,13 +172,7 @@ func (c *DailyReportController) GetReports(ctx *gin.Context) {
 		return
 	}
 
-	// If no teacher_id is provided, use the authenticated user
-	if params.TeacherID == "" {
-		teacherIDStr, exists := ctx.Get("user_id")
-		if exists {
-			params.TeacherID = teacherIDStr.(string)
-		}
-	}
+
 
 	response, err := c.reportService.GetReports(&params)
 	if err != nil {

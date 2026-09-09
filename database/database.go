@@ -70,8 +70,7 @@ func MigrateDatabase() {
 	db.AutoMigrate(&models.Topic{})
 	db.AutoMigrate(&models.Lesson{})
 	db.AutoMigrate(&models.DailyReport{})
-	
-
+	db.AutoMigrate(&models.ObjectiveQuestionAnswer{})
 
 	log.Println("✅ Database migrated successfully")
 

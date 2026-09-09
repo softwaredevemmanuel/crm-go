@@ -21,7 +21,7 @@ func DailyReportRoutes(router *gin.RouterGroup, db *gorm.DB) {
 		reportGroup.POST("/daily-reports", reportController.CreateReport)
 
 		// READ
-		reportGroup.GET("/daily-reports", reportController.GetReports)
+		reportGroup.GET("/fetch-daily-reports", reportController.GetReports)
 		reportGroup.GET("/daily-reports/stats", reportController.GetReportStats)
 		reportGroup.GET("/daily-reports/lesson/:lesson_id", reportController.GetReportsByLesson)
 		reportGroup.GET("/daily-reports/:id", reportController.GetReportByID)

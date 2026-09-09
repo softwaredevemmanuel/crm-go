@@ -1,142 +1,59 @@
+// models/objective_question.go
 package models
 
 import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type ObjectiveQuestion struct {
-	ID              uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
-	QuestionText    string    `gorm:"type:text;not null" json:"question_text"`
-	QuestionType    string    `gorm:"type:varchar(50);default:'multiple_choice';check:question_type IN ('multiple_choice', 'true_false', 'multiple_response', 'matching', 'ordering')" json:"question_type"`
-	DifficultyLevel string    `gorm:"type:varchar(20);default:'medium';check:difficulty_level IN ('easy', 'medium', 'hard', 'expert')" json:"difficulty_level"`
-	Points          int       `gorm:"default:1;check:points >= 0" json:"points"`
+	ID                uuid.UUID      `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
+	QuestionText      string         `gorm:"type:text;not null" json:"question_text"`
+	QuestionType      string         `gorm:"type:varchar(50);default:'multiple_choice';check:question_type IN ('multiple_choice', 'true_false', 'multiple_response', 'matching', 'ordering')" json:"question_type"`
+	DifficultyLevel   string         `gorm:"type:varchar(20);default:'medium';check:difficulty_level IN ('easy', 'medium', 'hard', 'expert')" json:"difficulty_level"`
+	Points            int            `gorm:"default:1;check:points >= 0" json:"points"`
+	ImageURL          string         `gorm:"type:varchar(500)" json:"image_url,omitempty"`
+	VideoURL          string         `gorm:"type:varchar(500)" json:"video_url,omitempty"`
+	SubjectID         uuid.UUID      `gorm:"type:uuid;not null;index" json:"subject_id"`
+	SchemeOfWorkID    uuid.UUID      `gorm:"type:uuid;not null;index" json:"scheme_of_work_id"`
+	ModuleID          uuid.UUID      `gorm:"type:uuid;index" json:"module_id"`
+	TopicID           uuid.UUID      `gorm:"type:uuid;index" json:"topic_id"`
+	LessonID          uuid.UUID      `gorm:"type:uuid;index" json:"lesson_id"`
+	AnswerExplanation string         `gorm:"type:text" json:"answer_explanation,omitempty"`
+	SolutionSteps     string         `gorm:"type:text" json:"solution_steps,omitempty"`
+	Hint              string         `gorm:"type:text" json:"hint,omitempty"`
+	Status            string         `gorm:"type:varchar(20);default:'active';check:status IN ('active','inactive','draft','archived')" json:"status"`
+	CreatedAt         time.Time      `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt         time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+	DeletedAt         gorm.DeletedAt `gorm:"index" json:"-"`
 
-	// Media Support
-	ImageURL string `gorm:"type:varchar(500)" json:"image_url,omitempty"`
-	VideoURL string `gorm:"type:varchar(500)" json:"video_url,omitempty"`
-
-	// Content Relationships
-	CourseID uuid.UUID  `gorm:"type:uuid;not null" json:"course_id"`
-	ModuleID uuid.UUID `gorm:"type:uuid" json:"module_id"`
-	LessonID uuid.UUID `gorm:"type:uuid" json:"lesson_id"`
-
-	// Answer Configuration
-	AnswerExplanation string `gorm:"type:text" json:"answer_explanation,omitempty"`
-	SolutionSteps     string `gorm:"type:text" json:"solution_steps,omitempty"`
-	Hint              string `gorm:"type:text" json:"hint,omitempty"`
-
-	// Metadata
-	TutorID    uuid.UUID `gorm:"type:uuid;not null" json:"tutor_id"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
-	IsApproved bool      `json:"is_approved"`
 	// Relationships
-	Course Course `gorm:"foreignKey:CourseID" json:"course,omitempty"`
-	Options []QuestionOption `gorm:"foreignKey:QuestionID"`
-
+	Subject      Subject          `gorm:"foreignKey:SubjectID" json:"subject,omitempty"`
+	SchemeOfWork SchemeOfWork     `gorm:"foreignKey:SchemeOfWorkID" json:"scheme_of_work,omitempty"`
+	Module       Module           `gorm:"foreignKey:ModuleID" json:"module,omitempty"`
+	Topic        Topic            `gorm:"foreignKey:TopicID" json:"topic,omitempty"`
+	Lesson       Lesson           `gorm:"foreignKey:LessonID" json:"lesson,omitempty"`
+	Options      []QuestionOption `gorm:"foreignKey:QuestionID" json:"options,omitempty"`
 }
 
-// ObjectiveQuestionInput - for creating objective questions
-type ObjectiveQuestionInput struct {
-	// Required fields
-	QuestionText string    `json:"question_text" binding:"required,min=10,max=1000"`
-	CourseID     uuid.UUID `json:"course_id" binding:"required"`
-	TutorID      uuid.UUID `json:"tutor_id" binding:"required"`
-
-	// Optional fields with defaults
-	QuestionType    string `json:"question_type" binding:"omitempty,oneof=multiple_choice true_false multiple_response matching ordering"`
-	DifficultyLevel string `json:"difficulty_level" binding:"omitempty,oneof=easy medium hard expert"`
-	Points          int    `json:"points" binding:"omitempty,min=0,max=100"`
-
-	// Media support
-	ImageURL string `json:"image_url" binding:"omitempty,url,max=500"`
-	VideoURL string `json:"video_url" binding:"omitempty,url,max=500"`
-
-	// Content relationships
-	ModuleID uuid.UUID `json:"module_id"`
-	LessonID uuid.UUID `json:"lesson_id"`
-
-	// Answer configuration
-	AnswerExplanation string `json:"answer_explanation" binding:"max=2000"`
-	SolutionSteps     string `json:"solution_steps" binding:"max=2000"`
-	Hint              string `json:"hint" binding:"max=500"`
-
-	// Options for multiple choice questions
-	Options []QuestionOptionInput `json:"options"`
-
-	// Approval
-	IsApproved bool `json:"is_approved"`
+func (ObjectiveQuestion) TableName() string {
+	return "objective_questions"
 }
 
-// QuestionOptionInput - for question options
-type QuestionOptionInput struct {
-	OptionText  string `json:"option_text" binding:"required,min=1,max=500"`
-	IsCorrect   bool   `json:"is_correct"`
-	Explanation string `json:"explanation" binding:"max=500"`
-	SortOrder   int    `json:"sort_order" binding:"min=0"`
-}
-
-// ObjectiveQuestionResponse - for API responses
-type ObjectiveQuestionResponse struct {
-	ID              uuid.UUID `json:"id"`
-	QuestionText    string    `json:"question_text"`
-	QuestionType    string    `json:"question_type"`
-	DifficultyLevel string    `json:"difficulty_level"`
-	Points          int       `json:"points"`
-
-	ImageURL string `json:"image_url,omitempty"`
-	VideoURL string `json:"video_url,omitempty"`
-
-	CourseID   uuid.UUID  `json:"course_id"`
-	CourseName string     `json:"course_name,omitempty"`
-	ModuleID   *uuid.UUID `json:"module_id,omitempty"`
-	ModuleName string     `json:"module_name,omitempty"`
-	LessonID   *uuid.UUID `json:"lesson_id,omitempty"`
-	LessonName string     `json:"lesson_name,omitempty"`
-
-	AnswerExplanation string `json:"answer_explanation,omitempty"`
-	SolutionSteps     string `json:"solution_steps,omitempty"`
-	Hint              string `json:"hint,omitempty"`
-
-	TutorID     uuid.UUID `json:"tutor_id"`
-	CreatorName string    `json:"creator_name,omitempty"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
-	IsApproved  bool      `json:"is_approved"`
-
-	// Options (for multiple choice questions)
-	Options []QuestionOptionResponse `json:"options,omitempty"`
-
-	// Statistics (optional)
-	TotalAttempts   int     `json:"total_attempts,omitempty"`
-	CorrectAttempts int     `json:"correct_attempts,omitempty"`
-	SuccessRate     float64 `json:"success_rate,omitempty"`
-}
-
-// QuestionOptionResponse - option response
-type QuestionOptionResponse struct {
-	ID          uuid.UUID `json:"id"`
-	QuestionID  uuid.UUID `json:"question_id"`
-	OptionText  string    `json:"option_text"`
-	IsCorrect   bool      `json:"is_correct"`
-	Explanation string    `json:"explanation,omitempty"`
-	SortOrder   int       `json:"sort_order"`
-}
-
-// QuestionOption model for database
 type QuestionOption struct {
-	ID          uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	QuestionID  uuid.UUID `gorm:"type:uuid;not null;index"`
-	OptionText  string    `gorm:"type:varchar(500);not null"`
-	IsCorrect   bool      `gorm:"default:false"`
-	Explanation string    `gorm:"type:text"`
-	SortOrder   int       `gorm:"default:0;check:sort_order >= 0"`
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID         uuid.UUID      `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
+	QuestionID uuid.UUID      `gorm:"type:uuid;not null;index" json:"question_id"`
+	OptionText string         `gorm:"type:text;not null" json:"option_text"`
+	IsCorrect  bool           `gorm:"default:false" json:"is_correct"`
+	Order      int            `gorm:"default:0" json:"order"`
+	CreatedAt  time.Time      `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt  time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+	DeletedAt  gorm.DeletedAt `gorm:"index" json:"-"`
 
-	Question ObjectiveQuestion `gorm:"foreignKey:QuestionID"`
+	// Relationship
+	Question ObjectiveQuestion `gorm:"foreignKey:QuestionID" json:"question,omitempty"`
 }
 
 func (QuestionOption) TableName() string {

@@ -782,6 +782,8 @@ definitions:
     type: object
   dto.CreateDailyReportRequest:
     properties:
+      academic_session_id:
+        type: string
       challenges:
         type: string
       lesson_id:
@@ -804,11 +806,14 @@ definitions:
         type: string
       students_absent:
         type: integer
+      students_covered:
+        type: string
       students_present:
         type: integer
       topic_id:
         type: string
     required:
+    - academic_session_id
     - lesson_id
     - module_id
     - report_date
@@ -998,6 +1003,79 @@ definitions:
     - title
     - type
     - user_id
+    type: object
+  dto.CreateObjectiveQuestionRequest:
+    properties:
+      answer_explanation:
+        type: string
+      difficulty_level:
+        enum:
+        - easy
+        - medium
+        - hard
+        - expert
+        type: string
+      hint:
+        type: string
+      image_url:
+        type: string
+      lesson_id:
+        type: string
+      module_id:
+        type: string
+      options:
+        items:
+          $ref: '#/definitions/dto.CreateOptionRequest'
+        minItems: 2
+        type: array
+      points:
+        minimum: 1
+        type: integer
+      question_text:
+        type: string
+      question_type:
+        enum:
+        - multiple_choice
+        - true_false
+        - multiple_response
+        - matching
+        - ordering
+        type: string
+      scheme_of_work_id:
+        type: string
+      solution_steps:
+        type: string
+      status:
+        enum:
+        - active
+        - inactive
+        - draft
+        - archived
+        type: string
+      subject_id:
+        type: string
+      topic_id:
+        type: string
+      video_url:
+        type: string
+    required:
+    - difficulty_level
+    - options
+    - question_text
+    - question_type
+    - scheme_of_work_id
+    - subject_id
+    type: object
+  dto.CreateOptionRequest:
+    properties:
+      is_correct:
+        type: boolean
+      option_text:
+        type: string
+      order:
+        type: integer
+    required:
+    - option_text
     type: object
   dto.CreateSchemeOfWorkRequest:
     properties:
@@ -1649,6 +1727,24 @@ definitions:
       updated_at:
         type: string
     type: object
+  dto.SubmitAnswerRequest:
+    properties:
+      question_id:
+        type: string
+      selected_option_id:
+        description: For single selection
+        type: string
+      selected_option_ids:
+        description: For multiple selection
+        items:
+          type: string
+        type: array
+      time_spent:
+        description: Time spent in seconds
+        type: integer
+    required:
+    - question_id
+    type: object
   dto.TeacherSubjectAssignmentListResponse:
     properties:
       assignments:
@@ -1899,6 +1995,8 @@ definitions:
         type: string
       students_absent:
         type: integer
+      students_covered:
+        type: string
       students_present:
         type: integer
     type: object
@@ -2012,6 +2110,63 @@ definitions:
         - high
         - urgent
         type: string
+    type: object
+  dto.UpdateObjectiveQuestionRequest:
+    properties:
+      answer_explanation:
+        type: string
+      difficulty_level:
+        enum:
+        - easy
+        - medium
+        - hard
+        - expert
+        type: string
+      hint:
+        type: string
+      image_url:
+        type: string
+      options:
+        items:
+          $ref: '#/definitions/dto.UpdateOptionRequest'
+        type: array
+      points:
+        minimum: 1
+        type: integer
+      question_text:
+        type: string
+      question_type:
+        enum:
+        - multiple_choice
+        - true_false
+        - multiple_response
+        - matching
+        - ordering
+        type: string
+      solution_steps:
+        type: string
+      status:
+        enum:
+        - active
+        - inactive
+        - draft
+        - archived
+        type: string
+      video_url:
+        type: string
+    type: object
+  dto.UpdateOptionRequest:
+    properties:
+      id:
+        type: string
+      is_correct:
+        type: boolean
+      option_text:
+        type: string
+      order:
+        type: integer
+    required:
+    - option_text
     type: object
   dto.UpdateSchemeOfWorkRequest:
     properties:
@@ -5266,76 +5421,6 @@ paths:
       tags:
       - Courses
   /api/daily-reports:
-    get:
-      consumes:
-      - application/json
-      description: Get a list of daily reports with filters
-      parameters:
-      - description: Teacher ID
-        in: query
-        name: teacher_id
-        type: string
-      - description: Scheme of Work ID
-        in: query
-        name: scheme_of_work_id
-        type: string
-      - description: Module ID
-        in: query
-        name: module_id
-        type: string
-      - description: Topic ID
-        in: query
-        name: topic_id
-        type: string
-      - description: Lesson ID
-        in: query
-        name: lesson_id
-        type: string
-      - description: Status (not_taught, in_progress, completed)
-        in: query
-        name: status
-        type: string
-      - description: Date from (YYYY-MM-DD)
-        in: query
-        name: date_from
-        type: string
-      - description: Date to (YYYY-MM-DD)
-        in: query
-        name: date_to
-        type: string
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        type: integer
-      - default: 20
-        description: Items per page
-        in: query
-        name: limit
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get reports
-      tags:
-      - Daily Reports
     post:
       consumes:
       - application/json
@@ -5857,6 +5942,77 @@ paths:
       summary: Export all data to Excel
       tags:
       - Export
+  /api/fetch-daily-reports:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of daily reports with filters
+      parameters:
+      - description: Teacher ID
+        in: query
+        name: teacher_id
+        type: string
+      - description: Scheme of Work ID
+        in: query
+        name: scheme_of_work_id
+        type: string
+      - description: Module ID
+        in: query
+        name: module_id
+        type: string
+      - description: Topic ID
+        in: query
+        name: topic_id
+        type: string
+      - description: Lesson ID
+        in: query
+        name: lesson_id
+        type: string
+      - description: Status (not_taught, in_progress, completed)
+        in: query
+        name: status
+        type: string
+      - description: Date from (YYYY-MM-DD)
+        in: query
+        name: date_from
+        type: string
+      - description: Date to (YYYY-MM-DD)
+        in: query
+        name: date_to
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get reports
+      tags:
+      - Daily Reports
   /api/fetch-student-enrollments:
     get:
       consumes:
@@ -7765,6 +7921,343 @@ paths:
       summary: Get notification statistics
       tags:
       - Notifications
+  /api/objective-questions:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of objective questions with filters
+      parameters:
+      - description: Subject ID
+        in: query
+        name: subject_id
+        type: string
+      - description: Scheme of Work ID
+        in: query
+        name: scheme_of_work_id
+        type: string
+      - description: Module ID
+        in: query
+        name: module_id
+        type: string
+      - description: Topic ID
+        in: query
+        name: topic_id
+        type: string
+      - description: Lesson ID
+        in: query
+        name: lesson_id
+        type: string
+      - description: Question Type
+        in: query
+        name: question_type
+        type: string
+      - description: Difficulty Level
+        in: query
+        name: difficulty_level
+        type: string
+      - description: Status
+        in: query
+        name: status
+        type: string
+      - description: Search
+        in: query
+        name: search
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get questions
+      tags:
+      - Objective Questions
+    post:
+      consumes:
+      - application/json
+      description: Create a new objective question with options
+      parameters:
+      - description: Question data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateObjectiveQuestionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create objective question
+      tags:
+      - Objective Questions
+  /api/objective-questions/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete an objective question
+      parameters:
+      - description: Question ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete question
+      tags:
+      - Objective Questions
+    get:
+      consumes:
+      - application/json
+      description: Get a specific objective question by ID
+      parameters:
+      - description: Question ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get question by ID
+      tags:
+      - Objective Questions
+    put:
+      consumes:
+      - application/json
+      description: Update an existing objective question
+      parameters:
+      - description: Question ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateObjectiveQuestionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update question
+      tags:
+      - Objective Questions
+  /api/objective-questions/lesson/{lesson_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all objective questions for a specific lesson
+      parameters:
+      - description: Lesson ID
+        in: path
+        name: lesson_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get questions by lesson
+      tags:
+      - Objective Questions
+  /api/objective-questions/module/{module_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all objective questions for a specific module
+      parameters:
+      - description: Module ID
+        in: path
+        name: module_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get questions by module
+      tags:
+      - Objective Questions
+  /api/objective-questions/topic/{topic_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all objective questions for a specific topic
+      parameters:
+      - description: Topic ID
+        in: path
+        name: topic_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get questions by topic
+      tags:
+      - Objective Questions
   /api/products:
     post:
       consumes:
@@ -8401,6 +8894,179 @@ paths:
       summary: Get schemes by subject
       tags:
       - Scheme of Work
+  /api/student-answers:
+    get:
+      consumes:
+      - application/json
+      description: Get all answers submitted by a student
+      parameters:
+      - description: Question ID
+        in: query
+        name: question_id
+        type: string
+      - description: Filter by correctness
+        in: query
+        name: is_correct
+        type: boolean
+      - description: Status
+        in: query
+        name: status
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get student answers
+      tags:
+      - Objective Question Answers
+  /api/student-answers/question/{question_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all attempts for a specific question by a student
+      parameters:
+      - description: Question ID
+        in: path
+        name: question_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get question attempts
+      tags:
+      - Objective Question Answers
+  /api/student-answers/stats:
+    get:
+      consumes:
+      - application/json
+      description: Get statistics for a student's answers
+      parameters:
+      - description: Lesson ID
+        in: query
+        name: lesson_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get student statistics
+      tags:
+      - Objective Question Answers
+  /api/student-answers/submit:
+    post:
+      consumes:
+      - application/json
+      description: Submit a student's answer to an objective question
+      parameters:
+      - description: Answer data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SubmitAnswerRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Submit answer
+      tags:
+      - Objective Question Answers
   /api/student-enrollments:
     post:
       consumes:

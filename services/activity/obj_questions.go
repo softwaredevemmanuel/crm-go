@@ -22,8 +22,6 @@ func (a *ObjectiveActivity) Created(
 
 	metadata := map[string]interface{}{
 		"objective_id": objective.ID,
-		"tutor_id":   objective.TutorID,
-		"course_id":    objective.CourseID,
 	}
 
 	return a.logger.LogWithTx(
