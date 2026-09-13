@@ -42,6 +42,7 @@ import (
 func main() {
 	// Migrate to database
 	database.MigrateDatabase()
+	config.InitCloudinary()
 
 	// Initialize DB connection
 	config.ConnectDB()
@@ -137,6 +138,12 @@ func main() {
 	routes.DailyReportRoutes(&r.RouterGroup, config.DB)
 	routes.ObjectiveQuestionRoutes(&r.RouterGroup, config.DB)
 	routes.ObjectiveQuestionAnswersRoutes(&r.RouterGroup, config.DB)
+	routes.InventorySectionRoutes(&r.RouterGroup, config.DB)
+	routes.InventoryItemRoutes(&r.RouterGroup, config.DB)
+	routes.InventoryRequestRoutes(&r.RouterGroup, config.DB)
+	routes.InventoryTransactionRoutes(&r.RouterGroup, config.DB)
+	routes.InventoryAuditRoutes(&r.RouterGroup, config.DB)
+	routes.UploadRoutes(&r.RouterGroup, config.DB)
 
 	// Example curl command to clear DB (replace with your server address):
 	// curl -X DELETE "http://localhost:8080/admin/clear-db" \

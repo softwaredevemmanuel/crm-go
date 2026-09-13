@@ -71,6 +71,12 @@ func MigrateDatabase() {
 	db.AutoMigrate(&models.Lesson{})
 	db.AutoMigrate(&models.DailyReport{})
 	db.AutoMigrate(&models.ObjectiveQuestionAnswer{})
+	db.AutoMigrate(&models.InventorySection{})
+	db.AutoMigrate(&models.InventoryItem{})
+	db.AutoMigrate(&models.InventoryItemImage{})
+	db.AutoMigrate(&models.InventoryRequest{})
+	db.AutoMigrate(&models.InventoryTransaction{})
+	db.AutoMigrate(&models.InventoryAuditItem{})
 
 	log.Println("✅ Database migrated successfully")
 

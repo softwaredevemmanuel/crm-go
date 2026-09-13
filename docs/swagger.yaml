@@ -267,6 +267,21 @@ definitions:
       user_id:
         type: string
     type: object
+  dto.ApproveInventoryAuditRequest:
+    properties:
+      notes:
+        type: string
+    type: object
+  dto.ApproveInventoryRequestRequest:
+    properties:
+      notes:
+        type: string
+      quantity_approved:
+        minimum: 1
+        type: integer
+    required:
+    - quantity_approved
+    type: object
   dto.ArmClassTeacherListResponse:
     properties:
       assignments:
@@ -348,6 +363,38 @@ definitions:
         type: string
       updated_at:
         type: string
+    type: object
+  dto.AuditItemInput:
+    properties:
+      action_taken:
+        type: string
+      condition:
+        enum:
+        - new
+        - good
+        - fair
+        - poor
+        - damaged
+        - obsolete
+        - expired
+        type: string
+      is_damaged:
+        type: boolean
+      is_excess:
+        type: boolean
+      is_missing:
+        type: boolean
+      item_id:
+        type: string
+      location:
+        type: string
+      notes:
+        type: string
+      physical_quantity:
+        minimum: 0
+        type: integer
+    required:
+    - item_id
     type: object
   dto.BulkAssignClassTeachersRequest:
     properties:
@@ -657,6 +704,25 @@ definitions:
       updated_at:
         type: string
     type: object
+  dto.CompleteTransactionRequest:
+    properties:
+      actual_return_date:
+        type: string
+      attachment_url:
+        type: string
+      condition_after:
+        enum:
+        - new
+        - good
+        - fair
+        - poor
+        - damaged
+        - obsolete
+        - expired
+        type: string
+      notes:
+        type: string
+    type: object
   dto.CreateAcademicSessionRequest:
     properties:
       academic_year:
@@ -909,6 +975,290 @@ definitions:
     - phone
     - relationship
     - student_id
+    type: object
+  dto.CreateInventoryAuditRequest:
+    properties:
+      audit_date:
+        type: string
+      inventory_section_id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/dto.AuditItemInput'
+        type: array
+      notes:
+        type: string
+    required:
+    - audit_date
+    - inventory_section_id
+    type: object
+  dto.CreateInventoryItemRequest:
+    properties:
+      allowed_roles:
+        type: string
+      barcode:
+        type: string
+      brand:
+        description: Identification
+        type: string
+      cas_number:
+        type: string
+      chemical_formula:
+        type: string
+      concentration:
+        type: string
+      condition:
+        description: Item Properties
+        enum:
+        - new
+        - good
+        - fair
+        - poor
+        - damaged
+        - obsolete
+        - expired
+        type: string
+      description:
+        type: string
+      disposal_instructions:
+        type: string
+      hazard_class:
+        enum:
+        - none
+        - flammable
+        - toxic
+        - corrosive
+        - explosive
+        - radioactive
+        - biohazard
+        - oxidizer
+        type: string
+      images:
+        description: Media
+        items:
+          $ref: '#/definitions/dto.ImageInput'
+        type: array
+      inventory_section_id:
+        type: string
+      is_chemical:
+        description: Chemical-specific fields
+        type: boolean
+      item_code:
+        maxLength: 100
+        minLength: 2
+        type: string
+      item_name:
+        maxLength: 255
+        minLength: 2
+        type: string
+      location:
+        type: string
+      model:
+        type: string
+      quantity_available:
+        minimum: 0
+        type: integer
+      quantity_damaged:
+        minimum: 0
+        type: integer
+      quantity_in_use:
+        minimum: 0
+        type: integer
+      quantity_total:
+        description: Stock
+        minimum: 0
+        type: integer
+      requires_supervision:
+        description: Safety & Compliance
+        type: boolean
+      restricted_access:
+        type: boolean
+      safety_data_sheet_url:
+        type: string
+      safety_instructions:
+        type: string
+      serial_number:
+        type: string
+      status:
+        enum:
+        - active
+        - inactive
+        - archived
+        - disposed
+        - out_of_stock
+        type: string
+      storage_conditions:
+        type: string
+      volume:
+        type: string
+    required:
+    - inventory_section_id
+    - item_code
+    - item_name
+    type: object
+  dto.CreateInventoryRequestRequest:
+    properties:
+      inventory_item_id:
+        type: string
+      inventory_section_id:
+        type: string
+      needed_by_date:
+        description: 'Format: YYYY-MM-DD'
+        type: string
+      notes:
+        type: string
+      purpose:
+        minLength: 3
+        type: string
+      quantity_requested:
+        minimum: 1
+        type: integer
+    required:
+    - inventory_item_id
+    - inventory_section_id
+    - purpose
+    - quantity_requested
+    type: object
+  dto.CreateInventorySectionRequest:
+    properties:
+      code:
+        maxLength: 50
+        minLength: 2
+        type: string
+      description:
+        type: string
+      head_of_dept_id:
+        type: string
+      location:
+        maxLength: 255
+        type: string
+      name:
+        maxLength: 255
+        minLength: 2
+        type: string
+      notes:
+        type: string
+      status:
+        enum:
+        - active
+        - inactive
+        - closed
+        - renovation
+        type: string
+    required:
+    - code
+    - name
+    type: object
+  dto.CreateInventoryTransactionRequest:
+    properties:
+      approved_by_id:
+        type: string
+      attachment_url:
+        type: string
+      class_id:
+        type: string
+      condition_after:
+        enum:
+        - new
+        - good
+        - fair
+        - poor
+        - damaged
+        - obsolete
+        - expired
+        type: string
+      condition_before:
+        enum:
+        - new
+        - good
+        - fair
+        - poor
+        - damaged
+        - obsolete
+        - expired
+        type: string
+      expected_return_date:
+        type: string
+      experiment_name:
+        type: string
+      from_location:
+        type: string
+      from_section_id:
+        type: string
+      inventory_section_id:
+        type: string
+      issued_by_id:
+        type: string
+      issued_to_id:
+        type: string
+      item_id:
+        type: string
+      notes:
+        type: string
+      purpose:
+        type: string
+      quantity:
+        minimum: 1
+        type: integer
+      received_by_id:
+        type: string
+      reference_number:
+        type: string
+      reference_type:
+        enum:
+        - purchase_order
+        - invoice
+        - requisition
+        - return
+        - transfer
+        - experiment
+        - practical
+        type: string
+      status:
+        enum:
+        - pending
+        - approved
+        - rejected
+        - completed
+        - cancelled
+        type: string
+      student_count:
+        type: integer
+      supervisor_id:
+        type: string
+      to_location:
+        type: string
+      to_section_id:
+        type: string
+      transaction_date:
+        type: string
+      transaction_type:
+        enum:
+        - purchase
+        - donation
+        - issue
+        - return
+        - transfer
+        - borrow
+        - usage
+        - experiment
+        - damage
+        - loss
+        - repair
+        - repair_return
+        - disposal
+        - adjustment
+        - audit
+        - expiry
+        - calibration
+        type: string
+      unit_cost:
+        type: number
+    required:
+    - inventory_section_id
+    - item_id
+    - quantity
+    - transaction_type
     type: object
   dto.CreateLessonRequest:
     properties:
@@ -1220,6 +1570,16 @@ definitions:
       updated_at:
         type: string
     type: object
+  dto.FulfillInventoryRequestRequest:
+    properties:
+      notes:
+        type: string
+      quantity_issued:
+        minimum: 1
+        type: integer
+    required:
+    - quantity_issued
+    type: object
   dto.GradeResponse:
     properties:
       code:
@@ -1324,6 +1684,19 @@ definitions:
         $ref: '#/definitions/dto.UserResponse'
       user_id:
         type: string
+    type: object
+  dto.ImageInput:
+    properties:
+      caption:
+        type: string
+      display_order:
+        type: integer
+      image_url:
+        type: string
+      is_primary:
+        type: boolean
+    required:
+    - image_url
     type: object
   dto.LessonListResponse:
     properties:
@@ -1507,6 +1880,22 @@ definitions:
         type: integer
       unread:
         type: integer
+    type: object
+  dto.RejectInventoryAuditRequest:
+    properties:
+      rejection_reason:
+        minLength: 3
+        type: string
+    required:
+    - rejection_reason
+    type: object
+  dto.RejectInventoryRequestRequest:
+    properties:
+      rejection_reason:
+        minLength: 3
+        type: string
+    required:
+    - rejection_reason
     type: object
   dto.ReorderLessonsRequest:
     properties:
@@ -1960,6 +2349,34 @@ definitions:
         - archived
         type: string
     type: object
+  dto.UpdateAuditItemRequest:
+    properties:
+      action_taken:
+        type: string
+      condition:
+        enum:
+        - new
+        - good
+        - fair
+        - poor
+        - damaged
+        - obsolete
+        - expired
+        type: string
+      is_damaged:
+        type: boolean
+      is_excess:
+        type: boolean
+      is_missing:
+        type: boolean
+      location:
+        type: string
+      notes:
+        type: string
+      physical_quantity:
+        minimum: 0
+        type: integer
+    type: object
   dto.UpdateClassGradeRequest:
     properties:
       code:
@@ -2057,6 +2474,202 @@ definitions:
         type: string
       student_id:
         type: string
+    type: object
+  dto.UpdateInventoryAuditRequest:
+    properties:
+      audit_date:
+        type: string
+      notes:
+        type: string
+    type: object
+  dto.UpdateInventoryItemRequest:
+    properties:
+      allowed_roles:
+        type: string
+      barcode:
+        type: string
+      brand:
+        description: Identification
+        type: string
+      cas_number:
+        type: string
+      chemical_formula:
+        type: string
+      concentration:
+        type: string
+      condition:
+        description: Item Properties
+        enum:
+        - new
+        - good
+        - fair
+        - poor
+        - damaged
+        - obsolete
+        - expired
+        type: string
+      description:
+        type: string
+      disposal_instructions:
+        type: string
+      hazard_class:
+        enum:
+        - none
+        - flammable
+        - toxic
+        - corrosive
+        - explosive
+        - radioactive
+        - biohazard
+        - oxidizer
+        type: string
+      images:
+        description: Media
+        items:
+          $ref: '#/definitions/dto.ImageInput'
+        type: array
+      inventory_section_id:
+        type: string
+      is_chemical:
+        description: Chemical-specific fields
+        type: boolean
+      item_code:
+        maxLength: 100
+        minLength: 2
+        type: string
+      item_name:
+        maxLength: 255
+        minLength: 2
+        type: string
+      location:
+        type: string
+      model:
+        type: string
+      quantity_available:
+        type: integer
+      quantity_damaged:
+        type: integer
+      quantity_in_use:
+        type: integer
+      quantity_total:
+        description: Stock
+        type: integer
+      requires_supervision:
+        description: Safety & Compliance
+        type: boolean
+      restricted_access:
+        type: boolean
+      safety_data_sheet_url:
+        type: string
+      safety_instructions:
+        type: string
+      serial_number:
+        type: string
+      status:
+        enum:
+        - active
+        - inactive
+        - archived
+        - disposed
+        - out_of_stock
+        type: string
+      storage_conditions:
+        type: string
+      volume:
+        type: string
+    type: object
+  dto.UpdateInventoryRequestRequest:
+    properties:
+      needed_by_date:
+        type: string
+      notes:
+        type: string
+      purpose:
+        type: string
+      quantity_requested:
+        type: integer
+    type: object
+  dto.UpdateInventorySectionRequest:
+    properties:
+      code:
+        maxLength: 50
+        minLength: 2
+        type: string
+      description:
+        type: string
+      head_of_dept_id:
+        type: string
+      location:
+        maxLength: 255
+        type: string
+      name:
+        maxLength: 255
+        minLength: 2
+        type: string
+      notes:
+        type: string
+      status:
+        enum:
+        - active
+        - inactive
+        - closed
+        - renovation
+        type: string
+    type: object
+  dto.UpdateInventoryTransactionRequest:
+    properties:
+      attachment_url:
+        type: string
+      condition_after:
+        enum:
+        - new
+        - good
+        - fair
+        - poor
+        - damaged
+        - obsolete
+        - expired
+        type: string
+      expected_return_date:
+        type: string
+      experiment_name:
+        type: string
+      from_location:
+        type: string
+      notes:
+        type: string
+      purpose:
+        type: string
+      quantity:
+        type: integer
+      reference_number:
+        type: string
+      reference_type:
+        enum:
+        - purchase_order
+        - invoice
+        - requisition
+        - return
+        - transfer
+        - experiment
+        - practical
+        type: string
+      status:
+        enum:
+        - pending
+        - approved
+        - rejected
+        - completed
+        - cancelled
+        type: string
+      student_count:
+        type: integer
+      to_location:
+        type: string
+      transaction_date:
+        type: string
+      unit_cost:
+        type: number
     type: object
   dto.UpdateLessonRequest:
     properties:
@@ -6804,6 +7417,2433 @@ paths:
       summary: Get guardians by student
       tags:
       - Guardians
+  /api/inventory-audits:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of inventory audits with filters
+      parameters:
+      - description: Filter by Section ID
+        in: query
+        name: inventory_section_id
+        type: string
+      - description: Filter by conductor ID
+        in: query
+        name: conducted_by_id
+        type: string
+      - description: Filter by status
+        enum:
+        - in_progress
+        - completed
+        - approved
+        - rejected
+        - cancelled
+        in: query
+        name: status
+        type: string
+      - description: Search by code or notes
+        in: query
+        name: search
+        type: string
+      - description: Filter by date from (YYYY-MM-DD)
+        in: query
+        name: date_from
+        type: string
+      - description: Filter by date to (YYYY-MM-DD)
+        in: query
+        name: date_to
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - default: created_at
+        description: Sort field
+        in: query
+        name: sort_by
+        type: string
+      - default: desc
+        description: Sort direction
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Audits retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid query parameters
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all inventory audits
+      tags:
+      - Inventory Audits
+    post:
+      consumes:
+      - application/json
+      description: Create a new inventory audit with optional items
+      parameters:
+      - description: Audit data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateInventoryAuditRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Audit created successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Section or item not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create inventory audit
+      tags:
+      - Inventory Audits
+  /api/inventory-audits/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete an inventory audit
+      parameters:
+      - description: Audit ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Audit deleted successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Audit ID is required
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Audit not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete inventory audit
+      tags:
+      - Inventory Audits
+    get:
+      consumes:
+      - application/json
+      description: Get a specific audit by its ID with all items
+      parameters:
+      - description: Audit ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Audit retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Audit ID is required
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Audit not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get inventory audit by ID
+      tags:
+      - Inventory Audits
+    put:
+      consumes:
+      - application/json
+      description: Update an in-progress audit
+      parameters:
+      - description: Audit ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateInventoryAuditRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Audit updated successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or not in-progress
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Not authorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Audit not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update inventory audit
+      tags:
+      - Inventory Audits
+  /api/inventory-audits/{id}/approve:
+    post:
+      consumes:
+      - application/json
+      description: Approve a completed audit and apply stock adjustments
+      parameters:
+      - description: Audit ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Approval data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ApproveInventoryAuditRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Audit approved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Cannot approve audit
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Audit not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Approve inventory audit
+      tags:
+      - Inventory Audits
+  /api/inventory-audits/{id}/cancel:
+    post:
+      consumes:
+      - application/json
+      description: Cancel an in-progress audit
+      parameters:
+      - description: Audit ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Audit cancelled successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Cannot cancel audit
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Not authorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Audit not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Cancel inventory audit
+      tags:
+      - Inventory Audits
+  /api/inventory-audits/{id}/complete:
+    post:
+      consumes:
+      - application/json
+      description: Mark an in-progress audit as completed
+      parameters:
+      - description: Audit ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Audit completed successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Cannot complete audit
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Not authorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Audit not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Complete inventory audit
+      tags:
+      - Inventory Audits
+  /api/inventory-audits/{id}/items:
+    post:
+      consumes:
+      - application/json
+      description: Add an item to an in-progress audit
+      parameters:
+      - description: Audit ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Item data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AuditItemInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item added successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or duplicate
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Audit or item not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Add item to audit
+      tags:
+      - Inventory Audits
+  /api/inventory-audits/{id}/items/{item_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove an item from an in-progress audit
+      parameters:
+      - description: Audit ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Audit Item ID
+        in: path
+        name: item_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item removed successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Audit or item not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Remove audit item
+      tags:
+      - Inventory Audits
+    put:
+      consumes:
+      - application/json
+      description: Update a specific item within an in-progress audit
+      parameters:
+      - description: Audit ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Audit Item ID
+        in: path
+        name: item_id
+        required: true
+        type: string
+      - description: Update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateAuditItemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item updated successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Audit or item not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update audit item
+      tags:
+      - Inventory Audits
+  /api/inventory-audits/{id}/reject:
+    post:
+      consumes:
+      - application/json
+      description: Reject a completed audit with reason
+      parameters:
+      - description: Audit ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Rejection data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RejectInventoryAuditRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Audit rejected successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Cannot reject audit
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Audit not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Reject inventory audit
+      tags:
+      - Inventory Audits
+  /api/inventory-audits/stats:
+    get:
+      consumes:
+      - application/json
+      description: Get statistics for inventory audits
+      parameters:
+      - description: Filter by section ID
+        in: query
+        name: section_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Statistics retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid section ID
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get inventory audit statistics
+      tags:
+      - Inventory Audits
+  /api/inventory-items:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of inventory items with optional filters
+      parameters:
+      - description: Filter by Inventory Section ID
+        in: query
+        name: inventory_section_id
+        type: string
+      - description: Search by name, code, description, brand, or model
+        in: query
+        name: search
+        type: string
+      - description: Filter by condition
+        enum:
+        - new
+        - good
+        - fair
+        - poor
+        - damaged
+        - obsolete
+        - expired
+        in: query
+        name: condition
+        type: string
+      - description: Filter by status
+        enum:
+        - active
+        - inactive
+        - archived
+        - disposed
+        - out_of_stock
+        in: query
+        name: status
+        type: string
+      - description: Filter chemical items only
+        in: query
+        name: is_chemical
+        type: boolean
+      - description: Filter by hazard class
+        enum:
+        - none
+        - flammable
+        - toxic
+        - corrosive
+        - explosive
+        - radioactive
+        - biohazard
+        - oxidizer
+        in: query
+        name: hazard_class
+        type: string
+      - description: Filter by location
+        in: query
+        name: location
+        type: string
+      - description: Filter items with low stock
+        in: query
+        name: low_stock
+        type: boolean
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - default: created_at
+        description: Sort field
+        in: query
+        name: sort_by
+        type: string
+      - default: desc
+        description: Sort direction
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Items retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid query parameters
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all inventory items
+      tags:
+      - Inventory Items
+    post:
+      consumes:
+      - application/json
+      description: Create a new inventory item with images
+      parameters:
+      - description: Item data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateInventoryItemRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Item created successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Inventory section not found
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Item code already exists
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create inventory item
+      tags:
+      - Inventory Items
+  /api/inventory-items/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete an inventory item
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item deleted successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Item ID is required
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Item not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete inventory item
+      tags:
+      - Inventory Items
+    get:
+      consumes:
+      - application/json
+      description: Get a specific inventory item by its ID with all details
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Item ID is required
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Item not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get inventory item by ID
+      tags:
+      - Inventory Items
+    put:
+      consumes:
+      - application/json
+      description: Update an existing inventory item
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateInventoryItemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item updated successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Item not found
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Item code already exists
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update inventory item
+      tags:
+      - Inventory Items
+  /api/inventory-items/section/{section_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all inventory items in a specific section
+      parameters:
+      - description: Inventory Section ID
+        in: path
+        name: section_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Items retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Section ID is required
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get inventory items by section
+      tags:
+      - Inventory Items
+  /api/inventory-items/stats:
+    get:
+      consumes:
+      - application/json
+      description: Get statistics for inventory items, optionally filtered by section
+      parameters:
+      - description: Filter by Section ID
+        in: query
+        name: section_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Statistics retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid section ID
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get inventory item statistics
+      tags:
+      - Inventory Items
+  /api/inventory-requests:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of inventory requests with optional filters
+      parameters:
+      - description: Filter by requester ID
+        in: query
+        name: requested_by_id
+        type: string
+      - description: Filter by section ID
+        in: query
+        name: inventory_section_id
+        type: string
+      - description: Filter by item ID
+        in: query
+        name: inventory_item_id
+        type: string
+      - description: Filter by status
+        enum:
+        - pending
+        - approved
+        - rejected
+        - fulfilled
+        - cancelled
+        in: query
+        name: status
+        type: string
+      - description: Search by request code, purpose, or notes
+        in: query
+        name: search
+        type: string
+      - description: Filter by date from (YYYY-MM-DD)
+        in: query
+        name: date_from
+        type: string
+      - description: Filter by date to (YYYY-MM-DD)
+        in: query
+        name: date_to
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - default: created_at
+        description: Sort field
+        in: query
+        name: sort_by
+        type: string
+      - default: desc
+        description: Sort direction
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Requests retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid query parameters
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all inventory requests
+      tags:
+      - Inventory Requests
+    post:
+      consumes:
+      - application/json
+      description: Create a new request for an inventory item
+      parameters:
+      - description: Request data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateInventoryRequestRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Request created successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or insufficient stock
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Section or item not found
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Duplicate pending request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create inventory request
+      tags:
+      - Inventory Requests
+  /api/inventory-requests/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete an inventory request
+      parameters:
+      - description: Request ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Request deleted successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Request ID is required
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Request not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete inventory request
+      tags:
+      - Inventory Requests
+    get:
+      consumes:
+      - application/json
+      description: Get a specific inventory request by its ID
+      parameters:
+      - description: Request ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Request retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Request ID is required
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Request not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get inventory request by ID
+      tags:
+      - Inventory Requests
+    put:
+      consumes:
+      - application/json
+      description: Update a pending inventory request (only by requester)
+      parameters:
+      - description: Request ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateInventoryRequestRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Request updated successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or not pending
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: You can only update your own requests
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Request not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update inventory request
+      tags:
+      - Inventory Requests
+  /api/inventory-requests/{id}/approve:
+    post:
+      consumes:
+      - application/json
+      description: Approve a pending inventory request (admin only)
+      parameters:
+      - description: Request ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Approval data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ApproveInventoryRequestRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Request approved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or insufficient stock
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Request not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Approve inventory request
+      tags:
+      - Inventory Requests
+  /api/inventory-requests/{id}/cancel:
+    post:
+      consumes:
+      - application/json
+      description: Cancel a pending or approved request (by requester)
+      parameters:
+      - description: Request ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Request cancelled successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Cannot cancel this request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: You can only cancel your own requests
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Request not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Cancel inventory request
+      tags:
+      - Inventory Requests
+  /api/inventory-requests/{id}/fulfill:
+    post:
+      consumes:
+      - application/json
+      description: Fulfill an approved request and reduce stock
+      parameters:
+      - description: Request ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fulfillment data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.FulfillInventoryRequestRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Request fulfilled successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or insufficient stock
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Request not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Fulfill inventory request
+      tags:
+      - Inventory Requests
+  /api/inventory-requests/{id}/reject:
+    post:
+      consumes:
+      - application/json
+      description: Reject a pending inventory request (admin only)
+      parameters:
+      - description: Request ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Rejection data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RejectInventoryRequestRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Request rejected successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or not pending
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Request not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Reject inventory request
+      tags:
+      - Inventory Requests
+  /api/inventory-requests/my-requests:
+    get:
+      consumes:
+      - application/json
+      description: Get all inventory requests created by the current user
+      parameters:
+      - description: Filter by status
+        enum:
+        - pending
+        - approved
+        - rejected
+        - fulfilled
+        - cancelled
+        in: query
+        name: status
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Requests retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get my inventory requests
+      tags:
+      - Inventory Requests
+  /api/inventory-requests/stats:
+    get:
+      consumes:
+      - application/json
+      description: Get statistics for inventory requests
+      parameters:
+      - description: Filter by section ID
+        in: query
+        name: section_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Statistics retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid section ID
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get inventory request statistics
+      tags:
+      - Inventory Requests
+  /api/inventory-sections:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of inventory sections with optional filters
+      parameters:
+      - description: Search by name, code, or description
+        in: query
+        name: search
+        type: string
+      - description: Filter by status
+        enum:
+        - active
+        - inactive
+        - closed
+        - renovation
+        in: query
+        name: status
+        type: string
+      - description: Filter by location
+        in: query
+        name: location
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - default: created_at
+        description: Sort field
+        in: query
+        name: sort_by
+        type: string
+      - default: desc
+        description: Sort direction
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sections retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid query parameters
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all inventory sections
+      tags:
+      - Inventory Sections
+    post:
+      consumes:
+      - application/json
+      description: Create a new inventory section (e.g., Laboratory, ICT Room)
+      parameters:
+      - description: Section data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateInventorySectionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Section created successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Head of department user not found
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Section with this code already exists
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create inventory section
+      tags:
+      - Inventory Sections
+  /api/inventory-sections/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete an inventory section. Cannot delete if it has items.
+      parameters:
+      - description: Section ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Section deleted successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Section ID is required or section has items
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Section not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete inventory section
+      tags:
+      - Inventory Sections
+    get:
+      consumes:
+      - application/json
+      description: Get a specific inventory section by its ID with all details
+      parameters:
+      - description: Section ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Section retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Section ID is required
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Section not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get inventory section by ID
+      tags:
+      - Inventory Sections
+    put:
+      consumes:
+      - application/json
+      description: Update an existing inventory section's details
+      parameters:
+      - description: Section ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateInventorySectionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Section updated successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Section not found
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Section code already exists
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update inventory section
+      tags:
+      - Inventory Sections
+  /api/inventory-transactions:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of inventory transactions with filters
+      parameters:
+      - description: Filter by Item ID
+        in: query
+        name: item_id
+        type: string
+      - description: Filter by Section ID
+        in: query
+        name: inventory_section_id
+        type: string
+      - description: Filter by transaction type
+        in: query
+        name: transaction_type
+        type: string
+      - description: Filter by status
+        enum:
+        - pending
+        - approved
+        - rejected
+        - completed
+        - cancelled
+        in: query
+        name: status
+        type: string
+      - description: Filter by recipient
+        in: query
+        name: issued_to_id
+        type: string
+      - description: Filter by issuer
+        in: query
+        name: issued_by_id
+        type: string
+      - description: Filter by approver
+        in: query
+        name: approved_by_id
+        type: string
+      - description: Filter by class
+        in: query
+        name: class_id
+        type: string
+      - description: Search by code, reference, purpose, or notes
+        in: query
+        name: search
+        type: string
+      - description: Filter by date from (YYYY-MM-DD)
+        in: query
+        name: date_from
+        type: string
+      - description: Filter by date to (YYYY-MM-DD)
+        in: query
+        name: date_to
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - default: transaction_date
+        description: Sort field
+        in: query
+        name: sort_by
+        type: string
+      - default: desc
+        description: Sort direction
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transactions retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid query parameters
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all inventory transactions
+      tags:
+      - Inventory Transactions
+    post:
+      consumes:
+      - application/json
+      description: Create a new inventory transaction (stock movement)
+      parameters:
+      - description: Transaction data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateInventoryTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Transaction created successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or insufficient stock
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Item or section not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create inventory transaction
+      tags:
+      - Inventory Transactions
+  /api/inventory-transactions/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete an inventory transaction
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction deleted successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Transaction ID is required
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Transaction not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete inventory transaction
+      tags:
+      - Inventory Transactions
+    get:
+      consumes:
+      - application/json
+      description: Get a specific inventory transaction by its ID
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Transaction ID is required
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Transaction not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get inventory transaction by ID
+      tags:
+      - Inventory Transactions
+    put:
+      consumes:
+      - application/json
+      description: Update a pending transaction (only by creator)
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateInventoryTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction updated successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or not pending
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: You can only update your own transactions
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Transaction not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update inventory transaction
+      tags:
+      - Inventory Transactions
+  /api/inventory-transactions/{id}/approve:
+    post:
+      consumes:
+      - application/json
+      description: Approve a pending inventory transaction (admin only)
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction approved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or not pending
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Transaction not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Approve inventory transaction
+      tags:
+      - Inventory Transactions
+  /api/inventory-transactions/{id}/cancel:
+    post:
+      consumes:
+      - application/json
+      description: Cancel a pending transaction (by creator)
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction cancelled successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Cannot cancel this transaction
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: You can only cancel your own transactions
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Transaction not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Cancel inventory transaction
+      tags:
+      - Inventory Transactions
+  /api/inventory-transactions/{id}/complete:
+    post:
+      consumes:
+      - application/json
+      description: Complete an approved transaction (e.g., mark item as returned)
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Completion data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CompleteTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction completed successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or status
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Transaction not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Complete inventory transaction
+      tags:
+      - Inventory Transactions
+  /api/inventory-transactions/{id}/reject:
+    post:
+      consumes:
+      - application/json
+      description: Reject a pending inventory transaction (admin only)
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction rejected successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or not pending
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Transaction not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Reject inventory transaction
+      tags:
+      - Inventory Transactions
+  /api/inventory-transactions/item/{item_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all transactions for a specific inventory item
+      parameters:
+      - description: Item ID
+        in: path
+        name: item_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transactions retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Item ID is required
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get transactions by item
+      tags:
+      - Inventory Transactions
+  /api/inventory-transactions/stats:
+    get:
+      consumes:
+      - application/json
+      description: Get statistics for inventory transactions
+      parameters:
+      - description: Filter by section ID
+        in: query
+        name: section_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Statistics retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid section ID
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get inventory transaction statistics
+      tags:
+      - Inventory Transactions
   /api/lessons:
     get:
       consumes:
