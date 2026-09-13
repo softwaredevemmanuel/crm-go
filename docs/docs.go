@@ -5036,6 +5036,130 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/fetch/student-answers": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all answers with optional filters. Teachers can view all students' answers, students can view their own.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Objective Question Answers"
+                ],
+                "summary": "Get student answers",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filter by Student ID",
+                        "name": "student_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by Lesson ID",
+                        "name": "lesson_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by Grade ID",
+                        "name": "grade_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by Question ID",
+                        "name": "question_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter by correctness",
+                        "name": "is_correct",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "active",
+                            "inactive"
+                        ],
+                        "type": "string",
+                        "description": "Filter by status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "created_at",
+                        "description": "Sort field",
+                        "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "default": "desc",
+                        "description": "Sort direction",
+                        "name": "sort_order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Answers retrieved successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid query parameters",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/grade-subjects": {
             "get": {
                 "security": [
@@ -6368,6 +6492,56 @@ const docTemplate = `{
                         "name": "scheme_of_work_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "enum": [
+                            "draft",
+                            "published",
+                            "archived",
+                            "in_review"
+                        ],
+                        "type": "string",
+                        "description": "Filter by status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search in title or description",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "lesson_order",
+                        "description": "Sort field",
+                        "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "default": "asc",
+                        "description": "Sort direction",
+                        "name": "sort_order",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -9290,14 +9464,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/student-answers": {
+        "/api/student-answers/grade/{grade_id}/results": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get all answers submitted by a student",
+                "description": "Get aggregated test results for all students in a specific grade. Only accessible by teachers and admins.",
                 "consumes": [
                     "application/json"
                 ],
@@ -9307,51 +9481,26 @@ const docTemplate = `{
                 "tags": [
                     "Objective Question Answers"
                 ],
-                "summary": "Get student answers",
+                "summary": "Get grade test results",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Question ID",
-                        "name": "question_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "Filter by correctness",
-                        "name": "is_correct",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Status",
-                        "name": "status",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 20,
-                        "description": "Items per page",
-                        "name": "limit",
-                        "in": "query"
+                        "description": "Grade ID",
+                        "name": "grade_id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Grade results retrieved successfully",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Grade ID is required",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -9364,8 +9513,15 @@ const docTemplate = `{
                             "additionalProperties": true
                         }
                     },
+                    "403": {
+                        "description": "Forbidden - Not authorized to view all test results",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -9374,14 +9530,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/student-answers/question/{question_id}": {
+        "/api/student-answers/lesson/{lesson_id}/results": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get all attempts for a specific question by a student",
+                "description": "Get aggregated test results for all students in a specific lesson. Only accessible by teachers and admins.",
                 "consumes": [
                     "application/json"
                 ],
@@ -9391,26 +9547,26 @@ const docTemplate = `{
                 "tags": [
                     "Objective Question Answers"
                 ],
-                "summary": "Get question attempts",
+                "summary": "Get lesson test results",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Question ID",
-                        "name": "question_id",
+                        "description": "Lesson ID",
+                        "name": "lesson_id",
                         "in": "path",
                         "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Lesson results retrieved successfully",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Lesson ID is required",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -9423,8 +9579,15 @@ const docTemplate = `{
                             "additionalProperties": true
                         }
                     },
+                    "403": {
+                        "description": "Forbidden - Not authorized to view all test results",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -9440,7 +9603,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get statistics for a student's answers",
+                "description": "Get statistics for a student's answers, optionally filtered by lesson and grade",
                 "consumes": [
                     "application/json"
                 ],
@@ -9454,21 +9617,27 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Lesson ID",
+                        "description": "Filter by Lesson ID",
                         "name": "lesson_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by Grade ID",
+                        "name": "grade_id",
                         "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Statistics retrieved successfully",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid parameters",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -9482,7 +9651,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -9498,7 +9667,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Submit a student's answer to an objective question",
+                "description": "Submit a student's answer to an objective question. If no option is selected, the answer is marked as wrong.",
                 "consumes": [
                     "application/json"
                 ],
@@ -9522,28 +9691,35 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Answer submitted successfully with result",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid request or question not active",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "Question or grade not found",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal server error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -15961,9 +16137,14 @@ const docTemplate = `{
         "dto.SubmitAnswerRequest": {
             "type": "object",
             "required": [
+                "grade_id",
                 "question_id"
             ],
             "properties": {
+                "grade_id": {
+                    "description": "Added",
+                    "type": "string"
+                },
                 "question_id": {
                     "type": "string"
                 },

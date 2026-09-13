@@ -20,9 +20,16 @@ func ObjectiveQuestionAnswersRoutes(router *gin.RouterGroup, db *gorm.DB) {
 		// Submit answer
 		answerGroup.POST("/student-answers/submit", answerController.SubmitAnswer)
 
-		// Get answers
-		answerGroup.GET("/student-answers", answerController.GetStudentAnswers)
+		// Get answers (with filters)
+		answerGroup.GET("/fetch/student-answers", answerController.GetStudentAnswers)
+		
+		// Get statistics
 		answerGroup.GET("/student-answers/stats", answerController.GetStudentStats)
-		answerGroup.GET("/student-answers/question/:question_id", answerController.GetQuestionAttempts)
+		
+		// Get lesson test results (for teachers/admins)
+		answerGroup.GET("/student-answers/lesson/:lesson_id/results", answerController.GetLessonTestResults)
+		
+		// Get grade test results (for teachers/admins)
+		answerGroup.GET("/student-answers/grade/:grade_id/results", answerController.GetGradeTestResults)
 	}
 }

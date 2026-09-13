@@ -94,6 +94,15 @@ type LessonQueryParams struct {
 	SortBy         string `form:"sort_by" default:"lesson_order"`
 	SortOrder      string `form:"sort_order" default:"asc"`
 }
+// LessonQueryParams for filtering lessons by schem eof work
+type LessonStatusQueryParams struct {
+	Status         string `form:"status"`
+	Search         string `form:"search"`
+	Page           int    `form:"page" default:"1"`
+	Limit          int    `form:"limit" default:"20"`
+	SortBy         string `form:"sort_by" default:"lesson_order"`
+	SortOrder      string `form:"sort_order" default:"asc"`
+}
 
 // BulkCreateLessonsRequest represents the request to bulk create lessons
 type BulkCreateLessonsRequest struct {

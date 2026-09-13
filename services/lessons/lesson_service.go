@@ -359,24 +359,65 @@ func (s *LessonService) GetLessonByID(id string) (*dto.LessonResponse, error) {
 	return s.toLessonResponse(&lesson), nil
 }
 
-// GetLessonsBySchemeOfWork retrieves all lessons for a scheme of work
-func (s *LessonService) GetLessonsBySchemeOfWork(schemeOfWorkID string) ([]dto.LessonResponse, error) {
+// GetLessonsBySchemeOfWork retrieves all lessons for a scheme of work and can filter by status
+func (s *LessonService) GetLessonsBySchemeOfWork(schemeOfWorkID string, params *dto.LessonStatusQueryParams) ([]dto.LessonResponse, error) {
+	// Set defaults
+	if params.Page < 1 {
+		params.Page = 1
+	}
+	if params.Limit < 1 || params.Limit > 100 {
+		params.Limit = 20
+	}
+	if params.SortBy == "" {
+		params.SortBy = "lesson_order"
+	}
+	if params.SortOrder == "" {
+		params.SortOrder = "asc"
+	}
+
 	sID, err := uuid.Parse(schemeOfWorkID)
 	if err != nil {
 		return nil, errors.New("invalid scheme of work ID")
 	}
 
+	// Build query
+	query := s.db.Model(&models.Lesson{}).
+		Where("lessons.scheme_of_work_id = ? AND lessons.deleted_at IS NULL", sID)
+
+	// Apply status filter
+	if params.Status != "" {
+		query = query.Where("lessons.status = ?", params.Status)
+	}
+
+	// Apply search filter (optional)
+	if params.Search != "" {
+		search := "%" + params.Search + "%"
+		query = query.Where("lessons.title ILIKE ? OR lessons.description ILIKE ?", search, search)
+	}
+
+	// Apply sorting
+	sortDirection := "ASC"
+	if strings.ToLower(params.SortOrder) == "desc" {
+		sortDirection = "DESC"
+	}
+	query = query.Order(fmt.Sprintf("lessons.%s %s", params.SortBy, sortDirection))
+
+	// Apply pagination
+	offset := (params.Page - 1) * params.Limit
+	query = query.Offset(offset).Limit(params.Limit)
+
+	// Execute query with preloads
 	var lessons []models.Lesson
-	if err := s.db.Where("scheme_of_work_id = ? AND deleted_at IS NULL", sID).
+	if err := query.
 		Preload("SchemeOfWork").
 		Preload("Module").
 		Preload("Topic").
 		Preload("Creator").
-		Order("lesson_order ASC").
 		Find(&lessons).Error; err != nil {
 		return nil, fmt.Errorf("failed to fetch lessons: %w", err)
 	}
 
+	// Convert to response
 	responses := make([]dto.LessonResponse, len(lessons))
 	for i, lesson := range lessons {
 		responses[i] = *s.toLessonResponse(&lesson)

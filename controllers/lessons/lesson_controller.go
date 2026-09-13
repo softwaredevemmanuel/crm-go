@@ -235,12 +235,27 @@ func (h *LessonHandler) GetLessonByID(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param scheme_of_work_id path string true "Scheme of Work ID"
+// @Param status query string false "Filter by status" Enums(draft, published, archived, in_review)
+// @Param search query string false "Search in title or description"
+// @Param page query int false "Page number" default(1)
+// @Param limit query int false "Items per page" default(20)
+// @Param sort_by query string false "Sort field" default(lesson_order)
+// @Param sort_order query string false "Sort direction" default(asc) Enums(asc, desc)
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Security BearerAuth
 // @Router /api/lessons/scheme/{scheme_of_work_id} [get]
 func (h *LessonHandler) GetLessonsBySchemeOfWork(c *gin.Context) {
+	var params dto.LessonStatusQueryParams
+		if err := c.ShouldBindQuery(&params); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Invalid query parameters",
+			"details": err.Error(),
+		})
+		return
+	}
+
 	schemeID := c.Param("scheme_of_work_id")
 	if schemeID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -249,7 +264,7 @@ func (h *LessonHandler) GetLessonsBySchemeOfWork(c *gin.Context) {
 		return
 	}
 
-	lessons, err := h.lessonService.GetLessonsBySchemeOfWork(schemeID)
+	lessons, err := h.lessonService.GetLessonsBySchemeOfWork(schemeID, &params)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),

@@ -19,16 +19,16 @@ type Lesson struct {
 	Title       string `gorm:"type:varchar(255);not null" json:"title"`
 	Description string `gorm:"type:text" json:"description"`
 
-	LessonDate *time.Time     `gorm:"type:date" json:"lesson_date,omitempty"`
-	Week       int            `gorm:"default:1" json:"week"`
-	Duration   int            `gorm:"default:40" json:"duration"`
-    Content     string 			`json:"content" gorm:"type:text"` // Make sure it's TEXT type
+	LessonDate *time.Time `gorm:"type:date" json:"lesson_date,omitempty"`
+	Week       int        `gorm:"default:1" json:"week"`
+	Duration   int        `gorm:"default:40" json:"duration"`
+	Content    string     `json:"content" gorm:"type:text"` // Make sure it's TEXT type
 
 	Objectives string `gorm:"type:text" json:"objectives"`
 	Activities string `gorm:"type:text" json:"activities"`
 	Resources  string `gorm:"type:text" json:"resources"`
 	Assessment string `gorm:"type:text" json:"assessment"`
-	Status     string `gorm:"type:varchar(20);default:'planned'" json:"status"`
+	Status     string `gorm:"type:varchar(20);default:'draft';check:status IN ('published','in_review','draft','archived')" json:"status"`
 
 	CreatedBy uuid.UUID      `gorm:"type:uuid;not null" json:"created_by"`
 	CreatedAt time.Time      `json:"created_at"`

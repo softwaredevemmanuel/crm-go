@@ -30,6 +30,21 @@ func (s *StudentAnswerService) SubmitAnswer(studentID uuid.UUID, req *dto.Submit
 		return nil, errors.New("invalid question ID")
 	}
 
+	// Parse grade ID
+	gradeID, err := uuid.Parse(req.GradeID)
+	if err != nil {
+		return nil, errors.New("invalid grade ID")
+	}
+
+	// Verify grade exists
+	var grade models.ClassGrade
+	if err := s.db.Where("id = ? AND deleted_at IS NULL", gradeID).First(&grade).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("grade not found")
+		}
+		return nil, fmt.Errorf("failed to verify grade: %w", err)
+	}
+
 	// Fetch the question with options
 	var question models.ObjectiveQuestion
 	if err := s.db.Where("id = ? AND deleted_at IS NULL", questionID).
@@ -46,16 +61,15 @@ func (s *StudentAnswerService) SubmitAnswer(studentID uuid.UUID, req *dto.Submit
 		return nil, errors.New("question is not active")
 	}
 
-	// Check if student has already answered this question
+	// Check if student has already answered this question in this grade
 	var existingAnswers []models.ObjectiveQuestionAnswer
-	if err := s.db.Where("student_id = ? AND question_id = ? AND deleted_at IS NULL", studentID, questionID).
-		Order("attempt_number DESC").
+	if err := s.db.Where("student_id = ? AND question_id = ? AND grade_id = ? AND deleted_at IS NULL", studentID, questionID, gradeID).
+		Order("created_at DESC").
 		Find(&existingAnswers).Error; err != nil {
 		return nil, fmt.Errorf("failed to check existing answers: %w", err)
 	}
 
 	previousAttempts := len(existingAnswers)
-	attemptNumber := previousAttempts + 1
 
 	// Validate answer based on question type
 	var isCorrect bool
@@ -65,9 +79,7 @@ func (s *StudentAnswerService) SubmitAnswer(studentID uuid.UUID, req *dto.Submit
 
 	switch question.QuestionType {
 	case "multiple_choice":
-		// Single selection - validate exactly one option
 		if req.SelectedOptionID == "" {
-			// No option selected - mark as wrong
 			isCorrect = false
 			score = 0
 			selectedOptionID = uuid.Nil
@@ -79,7 +91,6 @@ func (s *StudentAnswerService) SubmitAnswer(studentID uuid.UUID, req *dto.Submit
 		}
 		selectedOptionID = optionID
 
-		// Find the selected option
 		var selectedOption models.QuestionOption
 		for _, opt := range question.Options {
 			if opt.ID == optionID {
@@ -88,7 +99,6 @@ func (s *StudentAnswerService) SubmitAnswer(studentID uuid.UUID, req *dto.Submit
 			}
 		}
 		if selectedOption.ID == uuid.Nil {
-			// Option not found - mark as wrong
 			isCorrect = false
 			score = 0
 			break
@@ -101,9 +111,7 @@ func (s *StudentAnswerService) SubmitAnswer(studentID uuid.UUID, req *dto.Submit
 		}
 
 	case "true_false":
-		// Single selection - validate exactly one option
 		if req.SelectedOptionID == "" {
-			// No option selected - mark as wrong
 			isCorrect = false
 			score = 0
 			selectedOptionID = uuid.Nil
@@ -123,7 +131,6 @@ func (s *StudentAnswerService) SubmitAnswer(studentID uuid.UUID, req *dto.Submit
 			}
 		}
 		if selectedOption.ID == uuid.Nil {
-			// Option not found - mark as wrong
 			isCorrect = false
 			score = 0
 			break
@@ -136,16 +143,13 @@ func (s *StudentAnswerService) SubmitAnswer(studentID uuid.UUID, req *dto.Submit
 		}
 
 	case "multiple_response":
-		// Multiple selection - validate at least one option
 		if len(req.SelectedOptionIDs) == 0 {
-			// No options selected - mark as wrong
 			isCorrect = false
 			score = 0
 			selectedOptionIDsStr = ""
 			break
 		}
 
-		// Parse all selected option IDs
 		var selectedOptionIDs []uuid.UUID
 		for _, idStr := range req.SelectedOptionIDs {
 			id, err := uuid.Parse(idStr)
@@ -155,7 +159,6 @@ func (s *StudentAnswerService) SubmitAnswer(studentID uuid.UUID, req *dto.Submit
 			selectedOptionIDs = append(selectedOptionIDs, id)
 		}
 
-		// Check if all selected options are valid and count correct selections
 		correctCount := 0
 		totalCorrect := 0
 		allCorrect := true
@@ -163,7 +166,6 @@ func (s *StudentAnswerService) SubmitAnswer(studentID uuid.UUID, req *dto.Submit
 		for _, opt := range question.Options {
 			if opt.IsCorrect {
 				totalCorrect++
-				// Check if this correct option was selected
 				found := false
 				for _, selID := range selectedOptionIDs {
 					if selID == opt.ID {
@@ -177,7 +179,6 @@ func (s *StudentAnswerService) SubmitAnswer(studentID uuid.UUID, req *dto.Submit
 					allCorrect = false
 				}
 			} else {
-				// Check if any incorrect option was selected
 				for _, selID := range selectedOptionIDs {
 					if selID == opt.ID {
 						allCorrect = false
@@ -187,11 +188,9 @@ func (s *StudentAnswerService) SubmitAnswer(studentID uuid.UUID, req *dto.Submit
 			}
 		}
 
-		// All correct options must be selected and no incorrect options
 		isCorrect = allCorrect && correctCount == totalCorrect && len(selectedOptionIDs) == totalCorrect
 		score = question.Points
 		if !isCorrect {
-			// Partial scoring: give points based on correct selections
 			if correctCount > 0 {
 				score = (correctCount * question.Points) / totalCorrect
 			} else {
@@ -199,7 +198,6 @@ func (s *StudentAnswerService) SubmitAnswer(studentID uuid.UUID, req *dto.Submit
 			}
 		}
 
-		// Store selected option IDs as comma-separated string
 		var idStrs []string
 		for _, id := range selectedOptionIDs {
 			idStrs = append(idStrs, id.String())
@@ -207,32 +205,24 @@ func (s *StudentAnswerService) SubmitAnswer(studentID uuid.UUID, req *dto.Submit
 		selectedOptionIDsStr = strings.Join(idStrs, ",")
 
 	case "matching":
-		// For matching questions, store as comma-separated pairs
 		if len(req.SelectedOptionIDs) == 0 {
-			// No options selected - mark as wrong
 			isCorrect = false
 			score = 0
 			selectedOptionIDsStr = ""
 			break
 		}
 		selectedOptionIDsStr = strings.Join(req.SelectedOptionIDs, ",")
-		// For matching, we need to check each pair
-		// This is a simplified version - implement proper matching logic
 		isCorrect = false
 		score = 0
 
 	case "ordering":
-		// For ordering questions, store as comma-separated ordered list
 		if len(req.SelectedOptionIDs) == 0 {
-			// No options selected - mark as wrong
 			isCorrect = false
 			score = 0
 			selectedOptionIDsStr = ""
 			break
 		}
 		selectedOptionIDsStr = strings.Join(req.SelectedOptionIDs, ",")
-		// For ordering, we need to check if the order is correct
-		// This is a simplified version - implement proper ordering logic
 		isCorrect = false
 		score = 0
 
@@ -243,14 +233,13 @@ func (s *StudentAnswerService) SubmitAnswer(studentID uuid.UUID, req *dto.Submit
 	// Create the answer record
 	answer := &models.ObjectiveQuestionAnswer{
 		ID:                uuid.New(),
+		GradeID:           gradeID,
 		StudentID:         studentID,
 		QuestionID:        questionID,
 		SelectedOptionIDs: selectedOptionIDsStr,
 		SelectedOptionID:  selectedOptionID,
 		IsCorrect:         isCorrect,
 		Score:             score,
-		TimeSpent:         req.TimeSpent,
-		AttemptNumber:     attemptNumber,
 		Status:            "active",
 		CreatedAt:         time.Now(),
 		UpdatedAt:         time.Now(),
@@ -273,7 +262,6 @@ func (s *StudentAnswerService) SubmitAnswer(studentID uuid.UUID, req *dto.Submit
 	}
 	explanation = question.AnswerExplanation
 
-	// If no option was selected, set correct answer message
 	if req.SelectedOptionID == "" && len(req.SelectedOptionIDs) == 0 {
 		correctAnswer = "You did not select any option"
 		explanation = "Please select an option to answer this question"
@@ -284,7 +272,7 @@ func (s *StudentAnswerService) SubmitAnswer(studentID uuid.UUID, req *dto.Submit
 		Score:            score,
 		CorrectAnswer:    correctAnswer,
 		Explanation:      explanation,
-		TotalAttempts:    attemptNumber,
+		TotalAttempts:    previousAttempts + 1,
 		PreviousAttempts: previousAttempts,
 		TimeSpent:        req.TimeSpent,
 	}
@@ -292,33 +280,57 @@ func (s *StudentAnswerService) SubmitAnswer(studentID uuid.UUID, req *dto.Submit
 	return response, nil
 }
 
-// GetStudentAnswers retrieves all answers for a student
+// GetStudentAnswers retrieves all answers with optional filters
 func (s *StudentAnswerService) GetStudentAnswers(
-	studentID uuid.UUID,
 	params *dto.StudentAnswerQueryParams,
 ) ([]dto.StudentAnswerResponse, error) {
 
 	var answers []models.ObjectiveQuestionAnswer
 
-	query := s.db.
-		Where("student_id = ? AND deleted_at IS NULL", studentID)
+	// Start building query
+	query := s.db.Model(&models.ObjectiveQuestionAnswer{}).Where("objective_question_answers.deleted_at IS NULL")
+
+	// If lesson_id is provided, join with questions to filter by lesson
+	if params.LessonID != "" {
+		lessonID, err := uuid.Parse(params.LessonID)
+		if err == nil {
+			query = query.Joins("JOIN objective_questions ON objective_question_answers.question_id = objective_questions.id").
+				Where("objective_questions.lesson_id = ?", lessonID)
+		}
+	}
+
+	// If grade_id is provided, filter by grade
+	if params.GradeID != "" {
+		gradeID, err := uuid.Parse(params.GradeID)
+		if err == nil {
+			query = query.Where("objective_question_answers.grade_id = ?", gradeID)
+		}
+	}
+
+	// If student_id is provided, filter by student
+	if params.StudentID != "" {
+		sID, err := uuid.Parse(params.StudentID)
+		if err == nil {
+			query = query.Where("objective_question_answers.student_id = ?", sID)
+		}
+	}
 
 	// Filter by question
 	if params.QuestionID != "" {
 		questionID, err := uuid.Parse(params.QuestionID)
 		if err == nil {
-			query = query.Where("question_id = ?", questionID)
+			query = query.Where("objective_question_answers.question_id = ?", questionID)
 		}
 	}
 
 	// Filter by correctness
 	if params.IsCorrect != nil {
-		query = query.Where("is_correct = ?", *params.IsCorrect)
+		query = query.Where("objective_question_answers.is_correct = ?", *params.IsCorrect)
 	}
 
 	// Filter by status
 	if params.Status != "" {
-		query = query.Where("status = ?", params.Status)
+		query = query.Where("objective_question_answers.status = ?", params.Status)
 	}
 
 	// Apply sorting
@@ -332,7 +344,7 @@ func (s *StudentAnswerService) GetStudentAnswers(
 		sortDirection = "ASC"
 	}
 
-	query = query.Order(fmt.Sprintf("%s %s", sortBy, sortDirection))
+	query = query.Order(fmt.Sprintf("objective_question_answers.%s %s", sortBy, sortDirection))
 
 	// Apply pagination
 	if params.Limit > 0 {
@@ -351,6 +363,8 @@ func (s *StudentAnswerService) GetStudentAnswers(
 	// Execute query
 	if err := query.
 		Preload("Question").
+		Preload("Student").
+		Preload("Grade").
 		Find(&answers).Error; err != nil {
 		return nil, fmt.Errorf("failed to fetch answers: %w", err)
 	}
@@ -365,50 +379,347 @@ func (s *StudentAnswerService) GetStudentAnswers(
 	return responses, nil
 }
 
+// GetLessonTestResults retrieves aggregated results for all students in a lesson
+func (s *StudentAnswerService) GetLessonTestResults(lessonID string) (*dto.LessonTestResultsResponse, error) {
+	lID, err := uuid.Parse(lessonID)
+	if err != nil {
+		return nil, errors.New("invalid lesson ID")
+	}
+
+	// Get all questions for this lesson
+	var questions []models.ObjectiveQuestion
+	if err := s.db.Where("lesson_id = ? AND deleted_at IS NULL", lID).
+		Find(&questions).Error; err != nil {
+		return nil, fmt.Errorf("failed to fetch questions: %w", err)
+	}
+
+	if len(questions) == 0 {
+		return &dto.LessonTestResultsResponse{
+			Results: []dto.LessonTestResult{},
+			Total:   0,
+			Stats: &dto.LessonTestStats{
+				TotalStudents: 0,
+			},
+		}, nil
+	}
+
+	// Get all question IDs
+	questionIDs := make([]uuid.UUID, len(questions))
+	maxScore := 0
+	for i, q := range questions {
+		questionIDs[i] = q.ID
+		maxScore += q.Points
+	}
+
+	// Get all answers for these questions
+	var answers []models.ObjectiveQuestionAnswer
+	if err := s.db.Where("question_id IN ? AND deleted_at IS NULL", questionIDs).
+		Preload("Student").
+		Preload("Question").
+		Preload("Grade").
+		Find(&answers).Error; err != nil {
+		return nil, fmt.Errorf("failed to fetch answers: %w", err)
+	}
+
+	// Group answers by student
+	studentAnswers := make(map[uuid.UUID][]models.ObjectiveQuestionAnswer)
+	for _, answer := range answers {
+		studentAnswers[answer.StudentID] = append(studentAnswers[answer.StudentID], answer)
+	}
+
+	// Build results for each student
+	var results []dto.LessonTestResult
+	var totalScoreSum int
+	var passedCount int
+	var highestScore float64
+	var lowestScore float64 = 100
+
+	for studentID, studentAnswerList := range studentAnswers {
+		var correctCount int
+		var totalScore int
+
+		for _, ans := range studentAnswerList {
+			if ans.IsCorrect {
+				correctCount++
+			}
+			totalScore += ans.Score
+		}
+
+		scorePercentage := 0.0
+		if maxScore > 0 {
+			scorePercentage = (float64(totalScore) / float64(maxScore)) * 100
+		}
+
+		// Get student info
+		var student models.User
+		if len(studentAnswerList) > 0 && studentAnswerList[0].Student.ID != uuid.Nil {
+			student = studentAnswerList[0].Student
+		} else {
+			if err := s.db.Where("id = ? AND deleted_at IS NULL", studentID).First(&student).Error; err != nil {
+				continue
+			}
+		}
+
+		// Get grade info
+		var gradeName, gradeID string
+		if len(studentAnswerList) > 0 && studentAnswerList[0].Grade.ID != uuid.Nil {
+			gradeName = studentAnswerList[0].Grade.Name
+			gradeID = studentAnswerList[0].GradeID.String()
+		}
+
+		result := dto.LessonTestResult{
+			StudentID:        studentID.String(),
+			StudentFirstName: student.FirstName,
+			StudentLastName:  student.LastName,
+			StudentEmail:     student.Email,
+			GradeID:          gradeID,
+			GradeName:        gradeName,
+			TotalQuestions:   len(questions),
+			CorrectAnswers:   correctCount,
+			IncorrectAnswers: len(questions) - correctCount,
+			TotalScore:       totalScore,
+			MaxScore:         maxScore,
+			ScorePercentage:  scorePercentage,
+			Status:           "completed",
+			CreatedAt:        time.Now().Format(time.RFC3339),
+			UpdatedAt:        time.Now().Format(time.RFC3339),
+		}
+
+		results = append(results, result)
+		totalScoreSum += totalScore
+
+		if scorePercentage >= 50 {
+			passedCount++
+		}
+
+		if scorePercentage > highestScore {
+			highestScore = scorePercentage
+		}
+		if scorePercentage < lowestScore {
+			lowestScore = scorePercentage
+		}
+	}
+
+	totalStudents := len(results)
+	averageScore := 0.0
+	if totalStudents > 0 {
+		averageScore = float64(totalScoreSum) / float64(totalStudents)
+	}
+
+	stats := &dto.LessonTestStats{
+		TotalStudents: totalStudents,
+		AverageScore:  averageScore,
+		HighestScore:  highestScore,
+		LowestScore:   lowestScore,
+		PassedCount:   passedCount,
+		FailedCount:   totalStudents - passedCount,
+	}
+
+	return &dto.LessonTestResultsResponse{
+		Results: results,
+		Total:   int64(totalStudents),
+		Stats:   stats,
+	}, nil
+}
+
+// GetGradeTestResults retrieves aggregated results for all students in a grade
+func (s *StudentAnswerService) GetGradeTestResults(gradeID string) (*dto.GradeTestResultsResponse, error) {
+	gID, err := uuid.Parse(gradeID)
+	if err != nil {
+		return nil, errors.New("invalid grade ID")
+	}
+
+	// Get all answers for this grade
+	var answers []models.ObjectiveQuestionAnswer
+	if err := s.db.Where("grade_id = ? AND deleted_at IS NULL", gID).
+		Preload("Student").
+		Preload("Question").
+		Preload("Grade").
+		Find(&answers).Error; err != nil {
+		return nil, fmt.Errorf("failed to fetch answers: %w", err)
+	}
+
+	if len(answers) == 0 {
+		return &dto.GradeTestResultsResponse{
+			Results: []dto.GradeTestResult{},
+			Total:   0,
+			Stats:   &dto.GradeTestStats{TotalStudents: 0},
+		}, nil
+	}
+
+	// Group answers by student
+	studentAnswers := make(map[uuid.UUID][]models.ObjectiveQuestionAnswer)
+	for _, answer := range answers {
+		studentAnswers[answer.StudentID] = append(studentAnswers[answer.StudentID], answer)
+	}
+
+	// Calculate max possible score per question
+	questionMaxScores := make(map[uuid.UUID]int)
+	for _, ans := range answers {
+		if ans.Question.ID != uuid.Nil {
+			questionMaxScores[ans.QuestionID] = ans.Question.Points
+		}
+	}
+
+	var results []dto.GradeTestResult
+	var passedCount int
+	var highestScore float64
+	var lowestScore float64 = 100
+	var totalScoreSum int
+
+	for studentID, studentAnswerList := range studentAnswers {
+		var correctCount int
+		var totalScore int
+
+		for _, ans := range studentAnswerList {
+			if ans.IsCorrect {
+				correctCount++
+			}
+			totalScore += ans.Score
+		}
+
+		// Get student info
+		var student models.User
+		if len(studentAnswerList) > 0 && studentAnswerList[0].Student.ID != uuid.Nil {
+			student = studentAnswerList[0].Student
+		} else {
+			continue
+		}
+
+		// Get grade info
+		var gradeName, gradeIDStr string
+		if len(studentAnswerList) > 0 && studentAnswerList[0].Grade.ID != uuid.Nil {
+			gradeName = studentAnswerList[0].Grade.Name
+			gradeIDStr = studentAnswerList[0].GradeID.String()
+		}
+
+		scorePercentage := 0.0
+		totalQuestions := len(studentAnswerList)
+		if totalQuestions > 0 {
+			scorePercentage = (float64(correctCount) / float64(totalQuestions)) * 100
+		}
+
+		result := dto.GradeTestResult{
+			StudentID:        studentID.String(),
+			StudentFirstName: student.FirstName,
+			StudentLastName:  student.LastName,
+			StudentEmail:     student.Email,
+			GradeID:          gradeIDStr,
+			GradeName:        gradeName,
+			TotalQuestions:   totalQuestions,
+			CorrectAnswers:   correctCount,
+			IncorrectAnswers: totalQuestions - correctCount,
+			TotalScore:       totalScore,
+			MaxScore:         totalScore, // This should be calculated based on questions
+			ScorePercentage:  scorePercentage,
+			Status:           "completed",
+			CreatedAt:        time.Now().Format(time.RFC3339),
+			UpdatedAt:        time.Now().Format(time.RFC3339),
+		}
+
+		results = append(results, result)
+		totalScoreSum += totalScore
+
+		if scorePercentage >= 50 {
+			passedCount++
+		}
+
+		if scorePercentage > highestScore {
+			highestScore = scorePercentage
+		}
+		if scorePercentage < lowestScore {
+			lowestScore = scorePercentage
+		}
+	}
+
+	totalStudents := len(results)
+	averageScore := 0.0
+	if totalStudents > 0 {
+		averageScore = float64(totalScoreSum) / float64(totalStudents)
+	}
+
+	stats := &dto.GradeTestStats{
+		TotalStudents: totalStudents,
+		AverageScore:  averageScore,
+		HighestScore:  highestScore,
+		LowestScore:   lowestScore,
+		PassedCount:   passedCount,
+		FailedCount:   totalStudents - passedCount,
+	}
+
+	return &dto.GradeTestResultsResponse{
+		Results: results,
+		Total:   int64(totalStudents),
+		Stats:   stats,
+	}, nil
+}
+
 // GetStudentStats retrieves statistics for a student
-func (s *StudentAnswerService) GetStudentStats(studentID uuid.UUID, lessonID string) (*dto.StudentAnswerStats, error) {
-	// Parse lesson ID if provided
-	var lessonIDPtr *uuid.UUID
+func (s *StudentAnswerService) GetStudentStats( lessonID string, gradeID string) (*dto.StudentAnswerStats, error) {
+	// Build base query for answers
+	baseQuery := s.db.Model(&models.ObjectiveQuestionAnswer{})
+	var totalQuestions int64
+	var correctAnswers int64
+	var totalScore int
+
+	// Filter by grade if provided
+	if gradeID != "" {
+		gID, err := uuid.Parse(gradeID)
+		if err != nil {
+			return nil, errors.New("invalid grade ID")
+		}
+		baseQuery = baseQuery.Where("grade_id = ?", gID)
+	}
+
 	if lessonID != "" {
-		id, err := uuid.Parse(lessonID)
+		lID, err := uuid.Parse(lessonID)
 		if err != nil {
 			return nil, errors.New("invalid lesson ID")
 		}
-		lessonIDPtr = &id
-	}
 
-	// Build query for answers
-	query := s.db.Model(&models.ObjectiveQuestionAnswer{}).
-		Where("student_id = ? AND deleted_at IS NULL", studentID)
+		// Use subquery to get question IDs for the lesson
+		var questionIDs []uuid.UUID
+		if err := s.db.Model(&models.ObjectiveQuestion{}).
+			Where("lesson_id = ? AND deleted_at IS NULL", lID).
+			Pluck("id", &questionIDs).Error; err != nil {
+			return nil, fmt.Errorf("failed to get question IDs: %w", err)
+		}
 
-	// If lesson ID is provided, join with questions to filter by lesson
-	if lessonIDPtr != nil {
-		query = query.Joins("JOIN objective_questions ON objective_question_answers.question_id = objective_questions.id").
-			Where("objective_questions.lesson_id = ?", lessonIDPtr)
-	}
+		if len(questionIDs) == 0 {
+			return &dto.StudentAnswerStats{
+				TotalQuestions:   0,
+				CorrectAnswers:   0,
+				IncorrectAnswers: 0,
+				ScorePercentage:  0,
+				TotalScore:       0,
+			}, nil
+		}
 
-	// Get total questions attempted
-	var totalQuestions int64
-	if err := query.Count(&totalQuestions).Error; err != nil {
-		return nil, fmt.Errorf("failed to count questions: %w", err)
-	}
+		query := baseQuery.Where("question_id IN ?", questionIDs)
 
-	// Get correct answers count
-	var correctAnswers int64
-	if err := query.Where("is_correct = ?", true).Count(&correctAnswers).Error; err != nil {
-		return nil, fmt.Errorf("failed to count correct answers: %w", err)
-	}
+		if err := query.Count(&totalQuestions).Error; err != nil {
+			return nil, fmt.Errorf("failed to count questions: %w", err)
+		}
 
-	// Get total score
-	var totalScore int
-	if err := query.Select("COALESCE(SUM(score), 0)").Scan(&totalScore).Error; err != nil {
-		return nil, fmt.Errorf("failed to get total score: %w", err)
-	}
+		if err := query.Where("is_correct = ?", true).Count(&correctAnswers).Error; err != nil {
+			return nil, fmt.Errorf("failed to count correct answers: %w", err)
+		}
 
-	// Get average time
-	var avgTime float64
-	if err := query.Select("COALESCE(AVG(time_spent), 0)").Scan(&avgTime).Error; err != nil {
-		return nil, fmt.Errorf("failed to get average time: %w", err)
+		if err := query.Select("COALESCE(SUM(score), 0)").Scan(&totalScore).Error; err != nil {
+			return nil, fmt.Errorf("failed to get total score: %w", err)
+		}
+	} else {
+		if err := baseQuery.Count(&totalQuestions).Error; err != nil {
+			return nil, fmt.Errorf("failed to count questions: %w", err)
+		}
+
+		if err := baseQuery.Where("is_correct = ?", true).Count(&correctAnswers).Error; err != nil {
+			return nil, fmt.Errorf("failed to count correct answers: %w", err)
+		}
+
+		if err := baseQuery.Select("COALESCE(SUM(score), 0)").Scan(&totalScore).Error; err != nil {
+			return nil, fmt.Errorf("failed to get total score: %w", err)
+		}
 	}
 
 	scorePercentage := 0.0
@@ -421,130 +732,63 @@ func (s *StudentAnswerService) GetStudentStats(studentID uuid.UUID, lessonID str
 		CorrectAnswers:   int(correctAnswers),
 		IncorrectAnswers: int(totalQuestions) - int(correctAnswers),
 		ScorePercentage:  scorePercentage,
-		AverageTime:      avgTime,
 		TotalScore:       totalScore,
 	}
 
 	return stats, nil
 }
 
-// GetQuestionAttempts retrieves all attempts for a specific question by a student
-func (s *StudentAnswerService) GetQuestionAttempts(studentID uuid.UUID, questionID string) ([]dto.StudentAnswerResponse, error) {
-	qID, err := uuid.Parse(questionID)
-	if err != nil {
-		return nil, errors.New("invalid question ID")
-	}
-
-	var answers []models.ObjectiveQuestionAnswer
-	if err := s.db.Where("student_id = ? AND question_id = ? AND deleted_at IS NULL", studentID, qID).
-		Order("attempt_number DESC").
-		Preload("Question").
-		Find(&answers).Error; err != nil {
-		return nil, fmt.Errorf("failed to fetch attempts: %w", err)
-	}
-
-	responses := make([]dto.StudentAnswerResponse, len(answers))
-	for i, answer := range answers {
-		responses[i] = s.toAnswerResponse(&answer)
-	}
-
-	return responses, nil
-}
-
-// GetUnansweredQuestions retrieves all unanswered questions for a student in a lesson
-func (s *StudentAnswerService) GetUnansweredQuestions(studentID uuid.UUID, lessonID string) ([]models.ObjectiveQuestion, error) {
-	// Parse lesson ID
-	lID, err := uuid.Parse(lessonID)
-	if err != nil {
-		return nil, errors.New("invalid lesson ID")
-	}
-
-	// Get all questions for the lesson
-	var allQuestions []models.ObjectiveQuestion
-	if err := s.db.Where("lesson_id = ? AND status = ? AND deleted_at IS NULL", lID, "active").
-		Find(&allQuestions).Error; err != nil {
-		return nil, fmt.Errorf("failed to fetch questions: %w", err)
-	}
-
-	// Get all answered question IDs for this student
-	var answeredQuestionIDs []uuid.UUID
-	if err := s.db.Model(&models.ObjectiveQuestionAnswer{}).
-		Where("student_id = ? AND deleted_at IS NULL", studentID).
-		Pluck("question_id", &answeredQuestionIDs).Error; err != nil {
-		return nil, fmt.Errorf("failed to fetch answered questions: %w", err)
-	}
-
-	// Create a map for quick lookup
-	answeredMap := make(map[uuid.UUID]bool)
-	for _, id := range answeredQuestionIDs {
-		answeredMap[id] = true
-	}
-
-	// Filter unanswered questions
-	var unansweredQuestions []models.ObjectiveQuestion
-	for _, q := range allQuestions {
-		if !answeredMap[q.ID] {
-			unansweredQuestions = append(unansweredQuestions, q)
-		}
-	}
-
-	return unansweredQuestions, nil
-}
-
-// SubmitAllAnswers submits all answers for a student in a lesson
-func (s *StudentAnswerService) SubmitAllAnswers(studentID uuid.UUID, lessonID string, answers map[string]string) ([]dto.SubmitAnswerResponse, error) {
-	var results []dto.SubmitAnswerResponse
-
-	// Get all questions for the lesson
-	var questions []models.ObjectiveQuestion
-	if err := s.db.Where("lesson_id = ? AND status = ? AND deleted_at IS NULL", lessonID, "active").
-		Preload("Options").
-		Find(&questions).Error; err != nil {
-		return nil, fmt.Errorf("failed to fetch questions: %w", err)
-	}
-
-	for _, question := range questions {
-		// Check if answer exists for this question
-		selectedOptionID, exists := answers[question.ID.String()]
-		
-		var req dto.SubmitAnswerRequest
-		req.QuestionID = question.ID.String()
-		req.TimeSpent = 0 // This could be calculated per question
-		
-		if exists && selectedOptionID != "" {
-			// Student selected an option
-			req.SelectedOptionID = selectedOptionID
-		} else {
-			// Student did not select an option - mark as wrong
-			req.SelectedOptionID = ""
-		}
-
-		// Submit the answer
-		response, err := s.SubmitAnswer(studentID, &req)
-		if err != nil {
-			// Log error but continue with other questions
-			continue
-		}
-		results = append(results, *response)
-	}
-
-	return results, nil
-}
-
 // toAnswerResponse converts model to response DTO
 func (s *StudentAnswerService) toAnswerResponse(answer *models.ObjectiveQuestionAnswer) dto.StudentAnswerResponse {
-	return dto.StudentAnswerResponse{
+	response := dto.StudentAnswerResponse{
 		ID:                answer.ID.String(),
+		GradeID:           answer.GradeID.String(),
 		StudentID:         answer.StudentID.String(),
 		QuestionID:        answer.QuestionID.String(),
 		SelectedOptionIDs: answer.SelectedOptionIDs,
 		SelectedOptionID:  answer.SelectedOptionID.String(),
 		IsCorrect:         answer.IsCorrect,
 		Score:             answer.Score,
-		TimeSpent:         answer.TimeSpent,
-		AttemptNumber:     answer.AttemptNumber,
 		Status:            answer.Status,
 		CreatedAt:         answer.CreatedAt,
 		UpdatedAt:         answer.UpdatedAt,
 	}
+
+	// Add student details if preloaded
+	if answer.Student.ID != uuid.Nil {
+		response.Student = &dto.UserResponse{
+			ID:        answer.Student.ID.String(),
+			FirstName: answer.Student.FirstName,
+			LastName:  answer.Student.LastName,
+			Email:     answer.Student.Email,
+			Phone:     answer.Student.Phone,
+			Role:      answer.Student.Role,
+			Position:  answer.Student.Position,
+		}
+	}
+
+	// Add question details if preloaded
+	if answer.Question.ID != uuid.Nil {
+		response.Question = &dto.ObjectiveQuestionResponse{
+			ID:           answer.Question.ID.String(),
+			QuestionText: answer.Question.QuestionText,
+			QuestionType: answer.Question.QuestionType,
+			Points:       answer.Question.Points,
+			Status:       answer.Question.Status,
+		}
+	}
+
+	// Add grade details if preloaded
+	if answer.Grade.ID != uuid.Nil {
+		response.Grade = &dto.ClassGradeResponse{
+			ID:          answer.Grade.ID.String(),
+			Name:        answer.Grade.Name,
+			Code:        answer.Grade.Code,
+			Level:       answer.Grade.Level,
+			Description: answer.Grade.Description,
+			Status:      answer.Grade.Status,
+		}
+	}
+
+	return response
 }

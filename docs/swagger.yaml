@@ -1729,6 +1729,9 @@ definitions:
     type: object
   dto.SubmitAnswerRequest:
     properties:
+      grade_id:
+        description: Added
+        type: string
       question_id:
         type: string
       selected_option_id:
@@ -1743,6 +1746,7 @@ definitions:
         description: Time spent in seconds
         type: integer
     required:
+    - grade_id
     - question_id
     type: object
   dto.TeacherSubjectAssignmentListResponse:
@@ -6077,6 +6081,91 @@ paths:
       summary: Get all student enrollments
       tags:
       - Student Enrollments
+  /api/fetch/student-answers:
+    get:
+      consumes:
+      - application/json
+      description: Get all answers with optional filters. Teachers can view all students'
+        answers, students can view their own.
+      parameters:
+      - description: Filter by Student ID
+        in: query
+        name: student_id
+        type: string
+      - description: Filter by Lesson ID
+        in: query
+        name: lesson_id
+        type: string
+      - description: Filter by Grade ID
+        in: query
+        name: grade_id
+        type: string
+      - description: Filter by Question ID
+        in: query
+        name: question_id
+        type: string
+      - description: Filter by correctness
+        in: query
+        name: is_correct
+        type: boolean
+      - description: Filter by status
+        enum:
+        - active
+        - inactive
+        in: query
+        name: status
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - default: created_at
+        description: Sort field
+        in: query
+        name: sort_by
+        type: string
+      - default: desc
+        description: Sort direction
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Answers retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid query parameters
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get student answers
+      tags:
+      - Objective Question Answers
   /api/grade-subjects:
     get:
       consumes:
@@ -7086,6 +7175,42 @@ paths:
         in: path
         name: scheme_of_work_id
         required: true
+        type: string
+      - description: Filter by status
+        enum:
+        - draft
+        - published
+        - archived
+        - in_review
+        in: query
+        name: status
+        type: string
+      - description: Search in title or description
+        in: query
+        name: search
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - default: lesson_order
+        description: Sort field
+        in: query
+        name: sort_by
+        type: string
+      - default: asc
+        description: Sort direction
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort_order
         type: string
       produces:
       - application/json
@@ -8894,83 +9019,28 @@ paths:
       summary: Get schemes by subject
       tags:
       - Scheme of Work
-  /api/student-answers:
+  /api/student-answers/grade/{grade_id}/results:
     get:
       consumes:
       - application/json
-      description: Get all answers submitted by a student
+      description: Get aggregated test results for all students in a specific grade.
+        Only accessible by teachers and admins.
       parameters:
-      - description: Question ID
-        in: query
-        name: question_id
-        type: string
-      - description: Filter by correctness
-        in: query
-        name: is_correct
-        type: boolean
-      - description: Status
-        in: query
-        name: status
-        type: string
-      - default: 1
-        description: Page number
-        in: query
-        name: page
-        type: integer
-      - default: 20
-        description: Items per page
-        in: query
-        name: limit
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get student answers
-      tags:
-      - Objective Question Answers
-  /api/student-answers/question/{question_id}:
-    get:
-      consumes:
-      - application/json
-      description: Get all attempts for a specific question by a student
-      parameters:
-      - description: Question ID
+      - description: Grade ID
         in: path
-        name: question_id
+        name: grade_id
         required: true
         type: string
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Grade results retrieved successfully
           schema:
             additionalProperties: true
             type: object
         "400":
-          description: Bad Request
+          description: Grade ID is required
           schema:
             additionalProperties: true
             type: object
@@ -8979,36 +9049,91 @@ paths:
           schema:
             additionalProperties: true
             type: object
+        "403":
+          description: Forbidden - Not authorized to view all test results
+          schema:
+            additionalProperties: true
+            type: object
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             additionalProperties: true
             type: object
       security:
       - BearerAuth: []
-      summary: Get question attempts
+      summary: Get grade test results
+      tags:
+      - Objective Question Answers
+  /api/student-answers/lesson/{lesson_id}/results:
+    get:
+      consumes:
+      - application/json
+      description: Get aggregated test results for all students in a specific lesson.
+        Only accessible by teachers and admins.
+      parameters:
+      - description: Lesson ID
+        in: path
+        name: lesson_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Lesson results retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Lesson ID is required
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden - Not authorized to view all test results
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get lesson test results
       tags:
       - Objective Question Answers
   /api/student-answers/stats:
     get:
       consumes:
       - application/json
-      description: Get statistics for a student's answers
+      description: Get statistics for a student's answers, optionally filtered by
+        lesson and grade
       parameters:
-      - description: Lesson ID
+      - description: Filter by Lesson ID
         in: query
         name: lesson_id
+        type: string
+      - description: Filter by Grade ID
+        in: query
+        name: grade_id
         type: string
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Statistics retrieved successfully
           schema:
             additionalProperties: true
             type: object
         "400":
-          description: Bad Request
+          description: Invalid parameters
           schema:
             additionalProperties: true
             type: object
@@ -9018,7 +9143,7 @@ paths:
             additionalProperties: true
             type: object
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             additionalProperties: true
             type: object
@@ -9031,7 +9156,8 @@ paths:
     post:
       consumes:
       - application/json
-      description: Submit a student's answer to an objective question
+      description: Submit a student's answer to an objective question. If no option
+        is selected, the answer is marked as wrong.
       parameters:
       - description: Answer data
         in: body
@@ -9043,22 +9169,27 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Answer submitted successfully with result
           schema:
             additionalProperties: true
             type: object
         "400":
-          description: Bad Request
+          description: Invalid request or question not active
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized - Invalid or missing token
           schema:
             additionalProperties: true
             type: object
         "404":
-          description: Not Found
+          description: Question or grade not found
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             additionalProperties: true
             type: object
