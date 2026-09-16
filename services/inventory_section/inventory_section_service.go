@@ -103,7 +103,7 @@ func (s *InventorySectionService) GetInventorySectionByID(id string) (*dto.Inven
 	// Get item count
 	var itemCount int64
 	s.db.Model(&models.InventoryItem{}).
-		Where("inventory_id = ? AND deleted_at IS NULL", sectionID).
+		Where("inventory_section_id = ? AND deleted_at IS NULL", sectionID).
 		Count(&itemCount)
 
 	response := s.toSectionResponse(&section)
@@ -196,7 +196,7 @@ func (s *InventorySectionService) GetInventorySections(params *dto.InventorySect
 		// Get item count for each section
 		var itemCount int64
 		s.db.Model(&models.InventoryItem{}).
-			Where("inventory_id = ? AND deleted_at IS NULL", section.ID).
+			Where("inventory_section_id = ? AND deleted_at IS NULL", section.ID).
 			Count(&itemCount)
 		response.ItemCount = itemCount
 

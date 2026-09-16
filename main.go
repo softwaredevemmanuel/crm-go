@@ -48,6 +48,9 @@ func main() {
 	config.ConnectDB()
 	db := config.DB
 
+	flutterwaveSecretKey := os.Getenv("FLUTTERWAVE_SECRET_KEY")
+
+
 	// ✅ Initialize and start the academic session scheduler
 
 	sched := scheduler.NewAcademicSessionScheduler(db)
@@ -144,6 +147,7 @@ func main() {
 	routes.InventoryTransactionRoutes(&r.RouterGroup, config.DB)
 	routes.InventoryAuditRoutes(&r.RouterGroup, config.DB)
 	routes.UploadRoutes(&r.RouterGroup, config.DB)
+	routes.WalletRoutes(&r.RouterGroup, config.DB, flutterwaveSecretKey)
 
 	// Example curl command to clear DB (replace with your server address):
 	// curl -X DELETE "http://localhost:8080/admin/clear-db" \
