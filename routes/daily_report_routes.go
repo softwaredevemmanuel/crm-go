@@ -1,35 +1,35 @@
-// routes/daily_report_routes.go
+// routes/Lesson_report_routes.go
 package routes
 
 import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
-	"crm-go/controllers/daily_report"
+	"crm-go/controllers/lesson_report"
 	"crm-go/middleware"
-	"crm-go/services/daily_report"
+	"crm-go/services/lesson_report"
 )
 
-func DailyReportRoutes(router *gin.RouterGroup, db *gorm.DB) {
-	reportService := services.NewDailyReportService(db)
-	reportController := controllers.NewDailyReportController(reportService)
+func LessonReportRoutes(router *gin.RouterGroup, db *gorm.DB) {
+	reportService := services.NewLessonReportService(db)
+	reportController := controllers.NewLessonReportController(reportService)
 
 	reportGroup := router.Group("/api")
 	reportGroup.Use(middleware.AuthMiddleware())
 	{
 		// CREATE
-		reportGroup.POST("/daily-reports", reportController.CreateReport)
+		reportGroup.POST("/lesson-reports", reportController.CreateReport)
 
 		// READ
-		reportGroup.GET("/fetch-daily-reports", reportController.GetReports)
-		reportGroup.GET("/daily-reports/stats", reportController.GetReportStats)
-		reportGroup.GET("/daily-reports/lesson/:lesson_id", reportController.GetReportsByLesson)
-		reportGroup.GET("/daily-reports/:id", reportController.GetReportByID)
+		reportGroup.GET("/fetch-lesson-reports", reportController.GetReports)
+		reportGroup.GET("/lesson-reports/stats", reportController.GetReportStats)
+		reportGroup.GET("/lesson-reports/lesson/:lesson_id", reportController.GetReportsByLesson)
+		reportGroup.GET("/lesson-reports/:id", reportController.GetReportByID)
 
 		// UPDATE
-		reportGroup.PUT("/daily-reports/:id", reportController.UpdateReport)
+		reportGroup.PUT("/lesson-reports/:id", reportController.UpdateReport)
 
 		// DELETE
-		reportGroup.DELETE("/daily-reports/:id", reportController.DeleteReport)
+		reportGroup.DELETE("/lesson-reports/:id", reportController.DeleteReport)
 	}
 }

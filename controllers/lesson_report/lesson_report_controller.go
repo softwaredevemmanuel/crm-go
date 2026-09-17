@@ -1,4 +1,4 @@
-// controllers/daily_report_controller.go
+// controllers/lesson_report_controller.go
 package controllers
 
 import (
@@ -9,26 +9,26 @@ import (
 	"github.com/google/uuid"
 
 	"crm-go/dto"
-	"crm-go/services/daily_report"
+	"crm-go/services/lesson_report"
 )
 
-type DailyReportController struct {
-	reportService *services.DailyReportService
+type LessonReportController struct {
+	reportService *services.LessonReportService
 }
 
-func NewDailyReportController(reportService *services.DailyReportService) *DailyReportController {
-	return &DailyReportController{
+func NewLessonReportController(reportService *services.LessonReportService) *LessonReportController {
+	return &LessonReportController{
 		reportService: reportService,
 	}
 }
 
-// CreateReport creates a new daily report
-// @Summary Create daily report
-// @Description Create a new daily teaching report
-// @Tags Daily Reports
+// CreateReport creates a new lesson report
+// @Summary Create lesson report
+// @Description Create a new lesson teaching report
+// @Tags lesson Reports
 // @Accept json
 // @Produce json
-// @Param request body dto.CreateDailyReportRequest true "Report data"
+// @Param request body dto.CreateLessonReportRequest true "Report data"
 // @Success 201 {object} map[string]interface{}
 // @Failure 400 {object} map[string]interface{}
 // @Failure 401 {object} map[string]interface{}
@@ -36,9 +36,9 @@ func NewDailyReportController(reportService *services.DailyReportService) *Daily
 // @Failure 409 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Security BearerAuth
-// @Router /api/daily-reports [post]
-// controllers/daily_report_controller.go - Updated CreateReport
-func (c *DailyReportController) CreateReport(ctx *gin.Context) {
+// @Router /api/lesson-reports [post]
+// controllers/lesson_report_controller.go - Updated CreateReport
+func (c *LessonReportController) CreateReport(ctx *gin.Context) {
 	// Get teacher ID from context (set by auth middleware)
 	teacherIDStr, exists := ctx.Get("user_id")
 	if !exists {
@@ -56,7 +56,7 @@ func (c *DailyReportController) CreateReport(ctx *gin.Context) {
 		return
 	}
 
-	var req dto.CreateDailyReportRequest
+	var req dto.CreateLessonReportRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error":   "Invalid request",
@@ -94,15 +94,15 @@ func (c *DailyReportController) CreateReport(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, gin.H{
-		"message": "Daily report created successfully",
+		"message": "lesson report created successfully",
 		"data":    report,
 	})
 }
 
 // GetReportByID retrieves a report by ID
 // @Summary Get report by ID
-// @Description Get a specific daily report by ID
-// @Tags Daily Reports
+// @Description Get a specific lesson report by ID
+// @Tags lesson Reports
 // @Accept json
 // @Produce json
 // @Param id path string true "Report ID"
@@ -111,8 +111,8 @@ func (c *DailyReportController) CreateReport(ctx *gin.Context) {
 // @Failure 404 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Security BearerAuth
-// @Router /api/daily-reports/{id} [get]
-func (c *DailyReportController) GetReportByID(ctx *gin.Context) {
+// @Router /api/lesson-reports/{id} [get]
+func (c *LessonReportController) GetReportByID(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -143,8 +143,8 @@ func (c *DailyReportController) GetReportByID(ctx *gin.Context) {
 
 // GetReports retrieves reports with filters
 // @Summary Get reports
-// @Description Get a list of daily reports with filters
-// @Tags Daily Reports
+// @Description Get a list of lesson reports with filters
+// @Tags lesson Reports
 // @Accept json
 // @Produce json
 // @Param teacher_id query string false "Teacher ID"
@@ -161,9 +161,9 @@ func (c *DailyReportController) GetReportByID(ctx *gin.Context) {
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Security BearerAuth
-// @Router /api/fetch-daily-reports [get]
-func (c *DailyReportController) GetReports(ctx *gin.Context) {
-	var params dto.DailyReportQueryParams
+// @Router /api/fetch-lesson-reports [get]
+func (c *LessonReportController) GetReports(ctx *gin.Context) {
+	var params dto.LessonReportQueryParams
 	if err := ctx.ShouldBindQuery(&params); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error":   "Invalid query parameters",
@@ -190,20 +190,20 @@ func (c *DailyReportController) GetReports(ctx *gin.Context) {
 
 // UpdateReport updates an existing report
 // @Summary Update report
-// @Description Update an existing daily report
-// @Tags Daily Reports
+// @Description Update an existing lesson report
+// @Tags lesson Reports
 // @Accept json
 // @Produce json
 // @Param id path string true "Report ID"
-// @Param request body dto.UpdateDailyReportRequest true "Update data"
+// @Param request body dto.UpdateLessonReportRequest true "Update data"
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]interface{}
 // @Failure 401 {object} map[string]interface{}
 // @Failure 404 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Security BearerAuth
-// @Router /api/daily-reports/{id} [put]
-func (c *DailyReportController) UpdateReport(ctx *gin.Context) {
+// @Router /api/lesson-reports/{id} [put]
+func (c *LessonReportController) UpdateReport(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -212,7 +212,7 @@ func (c *DailyReportController) UpdateReport(ctx *gin.Context) {
 		return
 	}
 
-	var req dto.UpdateDailyReportRequest
+	var req dto.UpdateLessonReportRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error":   "Invalid request",
@@ -243,8 +243,8 @@ func (c *DailyReportController) UpdateReport(ctx *gin.Context) {
 
 // DeleteReport deletes a report
 // @Summary Delete report
-// @Description Soft delete a daily report
-// @Tags Daily Reports
+// @Description Soft delete a lesson report
+// @Tags lesson Reports
 // @Accept json
 // @Produce json
 // @Param id path string true "Report ID"
@@ -254,8 +254,8 @@ func (c *DailyReportController) UpdateReport(ctx *gin.Context) {
 // @Failure 404 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Security BearerAuth
-// @Router /api/daily-reports/{id} [delete]
-func (c *DailyReportController) DeleteReport(ctx *gin.Context) {
+// @Router /api/lesson-reports/{id} [delete]
+func (c *LessonReportController) DeleteReport(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -284,8 +284,8 @@ func (c *DailyReportController) DeleteReport(ctx *gin.Context) {
 
 // GetReportStats retrieves statistics for a teacher
 // @Summary Get report statistics
-// @Description Get statistics for a teacher's daily reports
-// @Tags Daily Reports
+// @Description Get statistics for a teacher's lesson reports
+// @Tags lesson Reports
 // @Accept json
 // @Produce json
 // @Param teacher_id query string false "Teacher ID (defaults to authenticated user)"
@@ -294,8 +294,8 @@ func (c *DailyReportController) DeleteReport(ctx *gin.Context) {
 // @Failure 404 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Security BearerAuth
-// @Router /api/daily-reports/stats [get]
-func (c *DailyReportController) GetReportStats(ctx *gin.Context) {
+// @Router /api/lesson-reports/stats [get]
+func (c *LessonReportController) GetReportStats(ctx *gin.Context) {
 	teacherID := ctx.Query("teacher_id")
 	if teacherID == "" {
 		// Use authenticated user
@@ -332,7 +332,7 @@ func (c *DailyReportController) GetReportStats(ctx *gin.Context) {
 // GetReportsByLesson retrieves reports for a specific lesson
 // @Summary Get reports by lesson
 // @Description Get all reports for a specific lesson
-// @Tags Daily Reports
+// @Tags lesson Reports
 // @Accept json
 // @Produce json
 // @Param lesson_id path string true "Lesson ID"
@@ -340,8 +340,8 @@ func (c *DailyReportController) GetReportStats(ctx *gin.Context) {
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Security BearerAuth
-// @Router /api/daily-reports/lesson/{lesson_id} [get]
-func (c *DailyReportController) GetReportsByLesson(ctx *gin.Context) {
+// @Router /api/lesson-reports/lesson/{lesson_id} [get]
+func (c *LessonReportController) GetReportsByLesson(ctx *gin.Context) {
 	lessonID := ctx.Param("lesson_id")
 	if lessonID == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{

@@ -138,7 +138,7 @@ func main() {
 	routes.ModuleRoutes(&r.RouterGroup, config.DB)
 	routes.TopicRoutes(&r.RouterGroup, config.DB)
 	routes.LessonRoutes(&r.RouterGroup, config.DB)
-	routes.DailyReportRoutes(&r.RouterGroup, config.DB)
+	routes.LessonReportRoutes(&r.RouterGroup, config.DB)
 	routes.ObjectiveQuestionRoutes(&r.RouterGroup, config.DB)
 	routes.ObjectiveQuestionAnswersRoutes(&r.RouterGroup, config.DB)
 	routes.InventorySectionRoutes(&r.RouterGroup, config.DB)

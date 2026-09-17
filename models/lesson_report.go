@@ -1,4 +1,4 @@
-// models/daily_report.go
+// models/Lesson_report.go
 package models
 
 import (
@@ -8,8 +8,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// DailyReport represents a teacher's daily teaching progress report
-type DailyReport struct {
+// LessonReport represents a teacher's Lesson teaching progress report
+type LessonReport struct {
 	ID                uuid.UUID      `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
 	TeacherID         uuid.UUID      `gorm:"type:uuid;not null;index" json:"teacher_id"`
 	SchemeOfWorkID    uuid.UUID      `gorm:"type:uuid;not null;index" json:"scheme_of_work_id"`
@@ -38,6 +38,6 @@ type DailyReport struct {
 	AcademicSession AcademicSession `gorm:"foreignKey:AcademicSessionID" json:"academic_session,omitempty"`
 }
 
-func (DailyReport) TableName() string {
-	return "daily_reports"
+func (LessonReport) TableName() string {
+	return "lesson_reports"
 }

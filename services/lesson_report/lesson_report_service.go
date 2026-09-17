@@ -1,4 +1,4 @@
-// services/daily_report_service.go
+// services/Lesson_report_service.go
 package services
 
 import (
@@ -14,17 +14,17 @@ import (
 	"crm-go/models"
 )
 
-type DailyReportService struct {
+type LessonReportService struct {
 	db *gorm.DB
 }
 
-func NewDailyReportService(db *gorm.DB) *DailyReportService {
-	return &DailyReportService{db: db}
+func NewLessonReportService(db *gorm.DB) *LessonReportService {
+	return &LessonReportService{db: db}
 }
 
-// CreateReport creates a new daily report
-// CreateReport creates a new daily report
-func (s *DailyReportService) CreateReport(teacherID uuid.UUID, req *dto.CreateDailyReportRequest) (*dto.DailyReportResponse, error) {
+// CreateReport creates a new lesson report
+// CreateReport creates a new lesson report
+func (s *LessonReportService) CreateReport(teacherID uuid.UUID, req *dto.CreateLessonReportRequest) (*dto.LessonReportResponse, error) {
 	// Parse UUIDs
 	schemeOfWorkID, err := uuid.Parse(req.SchemeOfWorkID)
 	if err != nil {
@@ -122,7 +122,7 @@ func (s *DailyReportService) CreateReport(teacherID uuid.UUID, req *dto.CreateDa
 
 	// Check if a report already exists for this lesson in the same academic session
 	// This checks for any report with the same lesson_id and academic_session_id
-	var existingReport models.DailyReport
+	var existingReport models.LessonReport
 	err = s.db.Where(
 		"lesson_id = ? AND academic_session_id = ? AND deleted_at IS NULL",
 		lessonID, academicSessionID,
@@ -137,7 +137,7 @@ func (s *DailyReportService) CreateReport(teacherID uuid.UUID, req *dto.CreateDa
 	// Additional check: If report_date is provided, check for duplicate on the same date
 	// This is a secondary check for the same day
 	if !req.ReportDate.IsZero() {
-		var dateReport models.DailyReport
+		var dateReport models.LessonReport
 		startOfDay := time.Date(req.ReportDate.Year(), req.ReportDate.Month(), req.ReportDate.Day(), 0, 0, 0, 0, req.ReportDate.Location())
 		endOfDay := startOfDay.Add(24 * time.Hour)
 		
@@ -154,7 +154,7 @@ func (s *DailyReportService) CreateReport(teacherID uuid.UUID, req *dto.CreateDa
 	}
 
 	// Create the report
-	report := &models.DailyReport{
+	report := &models.LessonReport{
 		ID:                uuid.New(),
 		TeacherID:         teacherID,
 		SchemeOfWorkID:    schemeOfWorkID,
@@ -193,13 +193,13 @@ func (s *DailyReportService) CreateReport(teacherID uuid.UUID, req *dto.CreateDa
 }
 
 // GetReportByID retrieves a report by ID
-func (s *DailyReportService) GetReportByID(id string) (*dto.DailyReportResponse, error) {
+func (s *LessonReportService) GetReportByID(id string) (*dto.LessonReportResponse, error) {
 	reportID, err := uuid.Parse(id)
 	if err != nil {
 		return nil, errors.New("invalid report ID")
 	}
 
-	var report models.DailyReport
+	var report models.LessonReport
 	if err := s.db.Where("id = ? AND deleted_at IS NULL", reportID).
 		Preload("Teacher").
 		Preload("SchemeOfWork").
@@ -217,7 +217,7 @@ func (s *DailyReportService) GetReportByID(id string) (*dto.DailyReportResponse,
 }
 
 // GetReports retrieves reports with filters
-func (s *DailyReportService) GetReports(params *dto.DailyReportQueryParams) (*dto.DailyReportListResponse, error) {
+func (s *LessonReportService) GetReports(params *dto.LessonReportQueryParams) (*dto.LessonReportListResponse, error) {
 	// Set defaults
 	if params.Page < 1 {
 		params.Page = 1
@@ -233,7 +233,7 @@ func (s *DailyReportService) GetReports(params *dto.DailyReportQueryParams) (*dt
 	}
 
 	// Build query
-	query := s.db.Model(&models.DailyReport{}).Where("deleted_at IS NULL")
+	query := s.db.Model(&models.LessonReport{}).Where("deleted_at IS NULL")
 
 	// Apply filters
 	if params.TeacherID != "" {
@@ -307,7 +307,7 @@ func (s *DailyReportService) GetReports(params *dto.DailyReportQueryParams) (*dt
 	query = query.Offset(offset).Limit(params.Limit)
 
 	// Execute with preloads
-	var reports []models.DailyReport
+	var reports []models.LessonReport
 	if err := query.Preload("Teacher").
 		Preload("SchemeOfWork").
 		Preload("Module").
@@ -318,14 +318,14 @@ func (s *DailyReportService) GetReports(params *dto.DailyReportQueryParams) (*dt
 	}
 
 	// Convert to response
-	responses := make([]dto.DailyReportResponse, len(reports))
+	responses := make([]dto.LessonReportResponse, len(reports))
 	for i, report := range reports {
 		responses[i] = *s.toReportResponse(&report)
 	}
 
 	totalPages := int((total + int64(params.Limit) - 1) / int64(params.Limit))
 
-	return &dto.DailyReportListResponse{
+	return &dto.LessonReportListResponse{
 		Reports:    responses,
 		Total:      total,
 		Page:       params.Page,
@@ -335,13 +335,13 @@ func (s *DailyReportService) GetReports(params *dto.DailyReportQueryParams) (*dt
 }
 
 // UpdateReport updates an existing report
-func (s *DailyReportService) UpdateReport(id string, req *dto.UpdateDailyReportRequest) (*dto.DailyReportResponse, error) {
+func (s *LessonReportService) UpdateReport(id string, req *dto.UpdateLessonReportRequest) (*dto.LessonReportResponse, error) {
 	reportID, err := uuid.Parse(id)
 	if err != nil {
 		return nil, errors.New("invalid report ID")
 	}
 
-	var report models.DailyReport
+	var report models.LessonReport
 	if err := s.db.Where("id = ? AND deleted_at IS NULL", reportID).First(&report).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("report not found")
@@ -392,13 +392,13 @@ func (s *DailyReportService) UpdateReport(id string, req *dto.UpdateDailyReportR
 }
 
 // DeleteReport soft deletes a report
-func (s *DailyReportService) DeleteReport(id string) error {
+func (s *LessonReportService) DeleteReport(id string) error {
 	reportID, err := uuid.Parse(id)
 	if err != nil {
 		return errors.New("invalid report ID")
 	}
 
-	var report models.DailyReport
+	var report models.LessonReport
 	if err := s.db.Where("id = ? AND deleted_at IS NULL", reportID).First(&report).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return errors.New("report not found")
@@ -414,7 +414,7 @@ func (s *DailyReportService) DeleteReport(id string) error {
 }
 
 // GetReportStats retrieves statistics for a teacher
-func (s *DailyReportService) GetReportStats(teacherID string) (*dto.DailyReportStats, error) {
+func (s *LessonReportService) GetReportStats(teacherID string) (*dto.LessonReportStats, error) {
 	tID, err := uuid.Parse(teacherID)
 	if err != nil {
 		return nil, errors.New("invalid teacher ID")
@@ -429,10 +429,10 @@ func (s *DailyReportService) GetReportStats(teacherID string) (*dto.DailyReportS
 		return nil, fmt.Errorf("failed to verify teacher: %w", err)
 	}
 
-	var stats dto.DailyReportStats
+	var stats dto.LessonReportStats
 
 	// Get total reports
-	if err := s.db.Model(&models.DailyReport{}).
+	if err := s.db.Model(&models.LessonReport{}).
 		Where("teacher_id = ? AND deleted_at IS NULL", tID).
 		Count(&stats.TotalReports).Error; err != nil {
 		return nil, fmt.Errorf("failed to count total reports: %w", err)
@@ -443,7 +443,7 @@ func (s *DailyReportService) GetReportStats(teacherID string) (*dto.DailyReportS
 		Status string
 		Count  int64
 	}
-	if err := s.db.Model(&models.DailyReport{}).
+	if err := s.db.Model(&models.LessonReport{}).
 		Select("status, count(*) as count").
 		Where("teacher_id = ? AND deleted_at IS NULL", tID).
 		Group("status").
@@ -468,7 +468,7 @@ func (s *DailyReportService) GetReportStats(teacherID string) (*dto.DailyReportS
 		TotalAbsent  int
 		Count        int
 	}
-	if err := s.db.Model(&models.DailyReport{}).
+	if err := s.db.Model(&models.LessonReport{}).
 		Select("COALESCE(SUM(students_present), 0) as total_present, COALESCE(SUM(students_absent), 0) as total_absent, COUNT(*) as count").
 		Where("teacher_id = ? AND deleted_at IS NULL", tID).
 		Scan(&result).Error; err != nil {
@@ -484,13 +484,13 @@ func (s *DailyReportService) GetReportStats(teacherID string) (*dto.DailyReportS
 }
 
 // GetReportsByLesson retrieves reports for a specific lesson
-func (s *DailyReportService) GetReportsByLesson(lessonID string, teacherID string) ([]dto.DailyReportResponse, error) {
+func (s *LessonReportService) GetReportsByLesson(lessonID string, teacherID string) ([]dto.LessonReportResponse, error) {
 	lID, err := uuid.Parse(lessonID)
 	if err != nil {
 		return nil, errors.New("invalid lesson ID")
 	}
 
-	var reports []models.DailyReport
+	var reports []models.LessonReport
 	query := s.db.Where("lesson_id = ? AND deleted_at IS NULL", lID)
 
 	if teacherID != "" {
@@ -510,7 +510,7 @@ func (s *DailyReportService) GetReportsByLesson(lessonID string, teacherID strin
 		return nil, fmt.Errorf("failed to fetch reports: %w", err)
 	}
 
-	responses := make([]dto.DailyReportResponse, len(reports))
+	responses := make([]dto.LessonReportResponse, len(reports))
 	for i, report := range reports {
 		responses[i] = *s.toReportResponse(&report)
 	}
@@ -519,8 +519,8 @@ func (s *DailyReportService) GetReportsByLesson(lessonID string, teacherID strin
 }
 
 // toReportResponse converts model to response DTO
-func (s *DailyReportService) toReportResponse(report *models.DailyReport) *dto.DailyReportResponse {
-	response := &dto.DailyReportResponse{
+func (s *LessonReportService) toReportResponse(report *models.LessonReport) *dto.LessonReportResponse {
+	response := &dto.LessonReportResponse{
 		ID:                report.ID.String(),
 		TeacherID:         report.TeacherID.String(),
 		SchemeOfWorkID:    report.SchemeOfWorkID.String(),
