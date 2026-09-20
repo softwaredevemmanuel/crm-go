@@ -72,6 +72,7 @@ func main() {
 		"http://localhost:1420":               true,
 		"http://localhost:3000":               true,
 		"https://hr-app-ecru-nine.vercel.app": true,
+		"https://seahorse-app-hp47q.ondigitalocean.app": true,
 	}
 	r.Use(cors.New(cors.Config{
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
