@@ -41,7 +41,6 @@ func (Wallet) TableName() string {
 	return "wallets"
 }
 
-
 type WalletTransactionType string
 
 const (
@@ -92,7 +91,6 @@ func (WalletTransaction) TableName() string {
 	return "wallet_transactions"
 }
 
-
 type Beneficiary struct {
 	ID uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
 
@@ -100,7 +98,7 @@ type Beneficiary struct {
 
 	AccountNumber string `gorm:"type:varchar(20);not null" json:"account_number"`
 
-	BankCode string `gorm:"type:varchar(20);not null" json:"bank_code"`
+	AccountBank string `gorm:"type:varchar(20);not null" json:"account_bank"`
 
 	BankName string `gorm:"type:varchar(255)" json:"bank_name"`
 
@@ -122,11 +120,10 @@ func (Beneficiary) TableName() string {
 	return "wallet_beneficiaries"
 }
 
-
 type DisbursementStatus string
 
 const (
-	DisbursementPending   DisbursementStatus = "pending"
+	DisbursementPending    DisbursementStatus = "pending"
 	DisbursementProcessing DisbursementStatus = "processing"
 	DisbursementSuccessful DisbursementStatus = "successful"
 	DisbursementFailed     DisbursementStatus = "failed"
@@ -164,21 +161,20 @@ type WalletDisbursement struct {
 	UpdatedAt time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 
-	Wallet       Wallet      `gorm:"foreignKey:WalletID" json:"wallet,omitempty"`
-	Beneficiary  Beneficiary `gorm:"foreignKey:BeneficiaryID" json:"beneficiary,omitempty"`
+	Wallet      Wallet      `gorm:"foreignKey:WalletID" json:"wallet,omitempty"`
+	Beneficiary Beneficiary `gorm:"foreignKey:BeneficiaryID" json:"beneficiary,omitempty"`
 }
 
 func (WalletDisbursement) TableName() string {
 	return "wallet_disbursements"
 }
 
-
 type WalletFundingStatus string
 
 const (
-	FundingPending   WalletFundingStatus = "pending"
+	FundingPending    WalletFundingStatus = "pending"
 	FundingSuccessful WalletFundingStatus = "successful"
-	FundingFailed    WalletFundingStatus = "failed"
+	FundingFailed     WalletFundingStatus = "failed"
 )
 
 type WalletFunding struct {

@@ -23,7 +23,7 @@ func NewWalletService(db *gorm.DB, secretKey string) *WalletService {
 	// Use sandbox in dev/test environments
 	env := strings.ToLower(os.Getenv("FLUTTERWAVE_ENV"))
 	if env == "sandbox" || env == "test" || env == "dev" {
-		baseURL = "https://developersandbox-api.flutterwave.com"
+		baseURL = "https://api.flutterwave.com/v3"
 	}
 
 	return &WalletService{

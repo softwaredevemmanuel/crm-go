@@ -35,23 +35,23 @@ type TransferResponse struct {
 	Status  string `json:"status"`
 	Message string `json:"message"`
 	Data    struct {
-		ID                int64   `json:"id"`
-		AccountNumber     string  `json:"account_number"`
-		BankCode          string  `json:"bank_code"`
-		FullName          string  `json:"full_name"`
-		CreatedAt         string  `json:"created_at"`
-		Currency          string  `json:"currency"`
-		DebitCurrency     string  `json:"debit_currency"`
-		Amount            int64   `json:"amount"`
-		Fee               float64 `json:"fee"`
-		Status            string  `json:"status"`
-		Reference         string  `json:"reference"`
-		Meta              any     `json:"meta"`
-		Narration         string  `json:"narration"`
-		CompleteMessage   string  `json:"complete_message"`
-		RequiresApproval  int     `json:"requires_approval"`
-		IsApproved        int     `json:"is_approved"`
-		BankName          string  `json:"bank_name"`
+		ID               int64   `json:"id"`
+		AccountNumber    string  `json:"account_number"`
+		AccountBank      string  `json:"account_bank"`
+		FullName         string  `json:"full_name"`
+		CreatedAt        string  `json:"created_at"`
+		Currency         string  `json:"currency"`
+		DebitCurrency    string  `json:"debit_currency"`
+		Amount           int64   `json:"amount"`
+		Fee              float64 `json:"fee"`
+		Status           string  `json:"status"`
+		Reference        string  `json:"reference"`
+		Meta             any     `json:"meta"`
+		Narration        string  `json:"narration"`
+		CompleteMessage  string  `json:"complete_message"`
+		RequiresApproval int     `json:"requires_approval"`
+		IsApproved       int     `json:"is_approved"`
+		BankName         string  `json:"bank_name"`
 	} `json:"data"`
 }
 
@@ -60,11 +60,11 @@ type GetTransferResponse struct {
 	Status  string `json:"status"`
 	Message string `json:"message"`
 	Data    struct {
-		ID              int64   `json:"id"`
-		Amount          int64   `json:"amount"`
-		Currency        string  `json:"currency"`
-		Status          string  `json:"status"`
-		Reference       string  `json:"reference"`
-		CompleteMessage string  `json:"complete_message"`
+		ID              int64  `json:"id"`
+		Amount          int64  `json:"amount"`
+		Currency        string `json:"currency"`
+		Status          string `json:"status"`
+		Reference       string `json:"reference"`
+		CompleteMessage string `json:"complete_message"`
 	} `json:"data"`
 }

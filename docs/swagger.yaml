@@ -76,6 +76,21 @@ definitions:
       video_url:
         type: string
     type: object
+  controllers.CreateBeneficiaryRequest:
+    properties:
+      account_bank:
+        example: "044"
+        type: string
+      account_number:
+        example: "0690000031"
+        type: string
+      bank_name:
+        example: Access Bank
+        type: string
+    required:
+    - account_bank
+    - account_number
+    type: object
   controllers.CreateCourseInput:
     properties:
       description:
@@ -101,6 +116,43 @@ definitions:
     - title
     - tutor_id
     type: object
+  controllers.CreateWalletRequest:
+    properties:
+      currency:
+        example: NGN
+        type: string
+      name:
+        example: Main Operations Wallet
+        maxLength: 255
+        minLength: 2
+        type: string
+    required:
+    - name
+    type: object
+  controllers.DisburseRequest:
+    properties:
+      amount:
+        example: 5000
+        type: integer
+      beneficiary_id:
+        example: 550e8400-e29b-41d4-a716-446655440003
+        type: string
+      reason:
+        example: Vendor payment
+        type: string
+    required:
+    - amount
+    - beneficiary_id
+    type: object
+  controllers.ErrorResponse:
+    properties:
+      error:
+        example: wallet not found
+        type: string
+      success:
+        example: false
+        type: boolean
+    type: object
   controllers.ListCoursesByProduct:
     properties:
       course_id:
@@ -124,6 +176,15 @@ definitions:
       message:
         example: Login successful
         type: string
+    type: object
+  controllers.MessageResponse:
+    properties:
+      message:
+        example: Wallet deleted successfully
+        type: string
+      success:
+        example: true
+        type: boolean
     type: object
   controllers.SignUpInput:
     properties:
@@ -153,6 +214,27 @@ definitions:
     - password
     - phone
     - role
+    type: object
+  controllers.UpdateWalletRequest:
+    properties:
+      name:
+        example: Renamed Wallet
+        type: string
+      status:
+        example: active
+        type: string
+    type: object
+  controllers.VerifyAccountRequest:
+    properties:
+      account_bank:
+        example: "044"
+        type: string
+      account_number:
+        example: "0690000031"
+        type: string
+    required:
+    - account_bank
+    - account_number
     type: object
   crm-go_controllers_category.ListCategoryCourses:
     properties:
@@ -846,47 +928,6 @@ definitions:
     - level
     - name
     type: object
-  dto.CreateDailyReportRequest:
-    properties:
-      academic_session_id:
-        type: string
-      challenges:
-        type: string
-      lesson_id:
-        type: string
-      module_id:
-        type: string
-      remarks:
-        type: string
-      report:
-        type: string
-      report_date:
-        type: string
-      scheme_of_work_id:
-        type: string
-      status:
-        enum:
-        - not_taught
-        - in_progress
-        - completed
-        type: string
-      students_absent:
-        type: integer
-      students_covered:
-        type: string
-      students_present:
-        type: integer
-      topic_id:
-        type: string
-    required:
-    - academic_session_id
-    - lesson_id
-    - module_id
-    - report_date
-    - scheme_of_work_id
-    - status
-    - topic_id
-    type: object
   dto.CreateDepartmentRequest:
     properties:
       code:
@@ -1259,6 +1300,47 @@ definitions:
     - item_id
     - quantity
     - transaction_type
+    type: object
+  dto.CreateLessonReportRequest:
+    properties:
+      academic_session_id:
+        type: string
+      challenges:
+        type: string
+      lesson_id:
+        type: string
+      module_id:
+        type: string
+      remarks:
+        type: string
+      report:
+        type: string
+      report_date:
+        type: string
+      scheme_of_work_id:
+        type: string
+      status:
+        enum:
+        - not_taught
+        - in_progress
+        - completed
+        type: string
+      students_absent:
+        type: integer
+      students_covered:
+        type: string
+      students_present:
+        type: integer
+      topic_id:
+        type: string
+    required:
+    - academic_session_id
+    - lesson_id
+    - module_id
+    - report_date
+    - scheme_of_work_id
+    - status
+    - topic_id
     type: object
   dto.CreateLessonRequest:
     properties:
@@ -2400,27 +2482,6 @@ definitions:
         - archived
         type: string
     type: object
-  dto.UpdateDailyReportRequest:
-    properties:
-      challenges:
-        type: string
-      remarks:
-        type: string
-      report:
-        type: string
-      status:
-        enum:
-        - not_taught
-        - in_progress
-        - completed
-        type: string
-      students_absent:
-        type: integer
-      students_covered:
-        type: string
-      students_present:
-        type: integer
-    type: object
   dto.UpdateDepartmentRequest:
     properties:
       code:
@@ -2670,6 +2731,27 @@ definitions:
         type: string
       unit_cost:
         type: number
+    type: object
+  dto.UpdateLessonReportRequest:
+    properties:
+      challenges:
+        type: string
+      remarks:
+        type: string
+      report:
+        type: string
+      status:
+        enum:
+        - not_taught
+        - in_progress
+        - completed
+        type: string
+      students_absent:
+        type: integer
+      students_covered:
+        type: string
+      students_present:
+        type: integer
     type: object
   dto.UpdateLessonRequest:
     properties:
@@ -6037,259 +6119,6 @@ paths:
       summary: Update an existing course
       tags:
       - Courses
-  /api/daily-reports:
-    post:
-      consumes:
-      - application/json
-      description: Create a new daily teaching report
-      parameters:
-      - description: Report data
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.CreateDailyReportRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "409":
-          description: Conflict
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Create daily report
-      tags:
-      - Daily Reports
-  /api/daily-reports/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Soft delete a daily report
-      parameters:
-      - description: Report ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Delete report
-      tags:
-      - Daily Reports
-    get:
-      consumes:
-      - application/json
-      description: Get a specific daily report by ID
-      parameters:
-      - description: Report ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get report by ID
-      tags:
-      - Daily Reports
-    put:
-      consumes:
-      - application/json
-      description: Update an existing daily report
-      parameters:
-      - description: Report ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Update data
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.UpdateDailyReportRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Update report
-      tags:
-      - Daily Reports
-  /api/daily-reports/lesson/{lesson_id}:
-    get:
-      consumes:
-      - application/json
-      description: Get all reports for a specific lesson
-      parameters:
-      - description: Lesson ID
-        in: path
-        name: lesson_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get reports by lesson
-      tags:
-      - Daily Reports
-  /api/daily-reports/stats:
-    get:
-      consumes:
-      - application/json
-      description: Get statistics for a teacher's daily reports
-      parameters:
-      - description: Teacher ID (defaults to authenticated user)
-        in: query
-        name: teacher_id
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get report statistics
-      tags:
-      - Daily Reports
   /api/deleted-records/{id}/restore:
     post:
       description: Restores a deleted course material from archive
@@ -6537,6 +6366,112 @@ paths:
       summary: Get department with its subjects
       tags:
       - Departments
+  /api/disbursements:
+    get:
+      consumes:
+      - application/json
+      description: Returns paginated disbursements across all wallets. Filterable
+        by wallet and status.
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Filter by wallet ID
+        format: uuid
+        in: query
+        name: wallet_id
+        type: string
+      - description: Disbursement status
+        enum:
+        - pending
+        - processing
+        - successful
+        - failed
+        - reversed
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Disbursement list
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List all disbursements
+      tags:
+      - Disbursements
+  /api/disbursements/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Returns a single disbursement with related wallet and beneficiary
+        details.
+      parameters:
+      - description: Disbursement ID (UUID)
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Disbursement details
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get disbursement by ID
+      tags:
+      - Disbursements
+  /api/disbursements/stats:
+    get:
+      consumes:
+      - application/json
+      description: Returns totals by status plus total amount and fees for successful
+        disbursements.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Disbursement stats
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Disbursement aggregate stats
+      tags:
+      - Disbursements
   /api/export/excel:
     get:
       description: Fetches all data from the database and exports it as an Excel (.xlsx)
@@ -6559,11 +6494,11 @@ paths:
       summary: Export all data to Excel
       tags:
       - Export
-  /api/fetch-daily-reports:
+  /api/fetch-lesson-reports:
     get:
       consumes:
       - application/json
-      description: Get a list of daily reports with filters
+      description: Get a list of lesson reports with filters
       parameters:
       - description: Teacher ID
         in: query
@@ -6629,7 +6564,7 @@ paths:
       - BearerAuth: []
       summary: Get reports
       tags:
-      - Daily Reports
+      - lesson Reports
   /api/fetch-student-enrollments:
     get:
       consumes:
@@ -9844,6 +9779,259 @@ paths:
       summary: Get inventory transaction statistics
       tags:
       - Inventory Transactions
+  /api/lesson-reports:
+    post:
+      consumes:
+      - application/json
+      description: Create a new lesson teaching report
+      parameters:
+      - description: Report data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateLessonReportRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create lesson report
+      tags:
+      - lesson Reports
+  /api/lesson-reports/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete a lesson report
+      parameters:
+      - description: Report ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete report
+      tags:
+      - lesson Reports
+    get:
+      consumes:
+      - application/json
+      description: Get a specific lesson report by ID
+      parameters:
+      - description: Report ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get report by ID
+      tags:
+      - lesson Reports
+    put:
+      consumes:
+      - application/json
+      description: Update an existing lesson report
+      parameters:
+      - description: Report ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateLessonReportRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update report
+      tags:
+      - lesson Reports
+  /api/lesson-reports/lesson/{lesson_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all reports for a specific lesson
+      parameters:
+      - description: Lesson ID
+        in: path
+        name: lesson_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get reports by lesson
+      tags:
+      - lesson Reports
+  /api/lesson-reports/stats:
+    get:
+      consumes:
+      - application/json
+      description: Get statistics for a teacher's lesson reports
+      parameters:
+      - description: Teacher ID (defaults to authenticated user)
+        in: query
+        name: teacher_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get report statistics
+      tags:
+      - lesson Reports
   /api/lessons:
     get:
       consumes:
@@ -14159,6 +14347,61 @@ paths:
       summary: Reorder topics
       tags:
       - Topics
+  /api/transactions:
+    get:
+      consumes:
+      - application/json
+      description: Returns paginated transactions across all wallets. Filterable by
+        wallet, type, and status.
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Filter by wallet ID
+        format: uuid
+        in: query
+        name: wallet_id
+        type: string
+      - description: Transaction type
+        enum:
+        - credit
+        - debit
+        in: query
+        name: type
+        type: string
+      - description: Transaction status
+        enum:
+        - pending
+        - completed
+        - failed
+        - reversed
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction list
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List all transactions
+      tags:
+      - Transactions
   /api/users:
     get:
       consumes:
@@ -14440,6 +14683,497 @@ paths:
       summary: Get users by role
       tags:
       - Users
+  /api/wallets:
+    get:
+      consumes:
+      - application/json
+      description: Returns a paginated list of wallets. Supports filtering by status
+        and searching by name.
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Wallet status
+        enum:
+        - active
+        - inactive
+        - frozen
+        in: query
+        name: status
+        type: string
+      - description: Search by name
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of wallets
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List all wallets
+      tags:
+      - Wallets
+    post:
+      consumes:
+      - application/json
+      description: Creates a new wallet with a name and currency. Balance starts at
+        0.
+      parameters:
+      - description: Wallet creation payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.CreateWalletRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Wallet created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new wallet
+      tags:
+      - Wallets
+  /api/wallets/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft-deletes a wallet. Only allowed if wallet balance is zero.
+      parameters:
+      - description: Wallet ID (UUID)
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a wallet
+      tags:
+      - Wallets
+    get:
+      consumes:
+      - application/json
+      description: Returns a single wallet with its details and current balance.
+      parameters:
+      - description: Wallet ID (UUID)
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Wallet details
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get wallet by ID
+      tags:
+      - Wallets
+    put:
+      consumes:
+      - application/json
+      description: Updates the wallet's name and/or status.
+      parameters:
+      - description: Wallet ID (UUID)
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Wallet update payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.UpdateWalletRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated wallet
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a wallet
+      tags:
+      - Wallets
+  /api/wallets/{id}/disburse:
+    post:
+      consumes:
+      - application/json
+      description: Sends money from a wallet to a verified beneficiary's bank account
+        via Flutterwave.
+      parameters:
+      - description: Wallet ID (UUID)
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Disbursement payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.DisburseRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Disbursement created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Disburse funds to a beneficiary
+      tags:
+      - Disbursements
+  /api/wallets/{id}/transactions:
+    get:
+      consumes:
+      - application/json
+      description: Returns paginated transactions belonging to a specific wallet.
+      parameters:
+      - description: Wallet ID (UUID)
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Transaction type
+        enum:
+        - credit
+        - debit
+        in: query
+        name: type
+        type: string
+      - description: Transaction status
+        enum:
+        - pending
+        - completed
+        - failed
+        - reversed
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction list
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List transactions for a wallet
+      tags:
+      - Transactions
+  /api/wallets/beneficiaries:
+    get:
+      consumes:
+      - application/json
+      description: Returns paginated beneficiaries. Supports search by name, account
+        number, or bank.
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Search term
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Beneficiary list
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List all beneficiaries
+      tags:
+      - Beneficiaries
+    post:
+      consumes:
+      - application/json
+      description: Verifies the bank account via Flutterwave and stores it as a beneficiary.
+      parameters:
+      - description: Beneficiary payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.CreateBeneficiaryRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Beneficiary created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a beneficiary
+      tags:
+      - Beneficiaries
+  /api/wallets/beneficiaries/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a beneficiary. Fails if there are pending disbursements.
+      parameters:
+      - description: Beneficiary ID (UUID)
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a beneficiary
+      tags:
+      - Beneficiaries
+    get:
+      consumes:
+      - application/json
+      description: Returns a single beneficiary.
+      parameters:
+      - description: Beneficiary ID (UUID)
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Beneficiary details
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get beneficiary by ID
+      tags:
+      - Beneficiaries
+  /api/wallets/stats:
+    get:
+      consumes:
+      - application/json
+      description: Returns total wallets, active wallets, and total balance across
+        all wallets.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Wallet stats
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Wallet aggregate stats
+      tags:
+      - Wallets
+  /api/wallets/verify-account:
+    post:
+      consumes:
+      - application/json
+      description: Resolves a bank account via Flutterwave and returns the account
+        name.
+      parameters:
+      - description: Account verification payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.VerifyAccountRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Account details
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Verify a bank account
+      tags:
+      - Beneficiaries
+  /api/webhooks/flutterwave:
+    post:
+      consumes:
+      - application/json
+      description: Receives transfer status updates from Flutterwave. Verified via
+        verif-hash header. Not authenticated by JWT.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      summary: Flutterwave webhook receiver
+      tags:
+      - Webhooks
   /auth/google/callback:
     get:
       description: Processes Google OAuth2 callback, creates/updates user, and returns

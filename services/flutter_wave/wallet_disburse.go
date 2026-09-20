@@ -97,7 +97,7 @@ func (s *WalletService) Disburse(ctx context.Context, walletID uuid.UUID, benefi
 // initiateFlutterwaveTransfer makes the API call to Flutterwave
 func (s *WalletService) initiateFlutterwaveTransfer(ctx context.Context, beneficiary *models.Beneficiary, amount int64, reference string) (*TransferResponse, error) {
 	payload := TransferRequest{
-		AccountBank:   beneficiary.BankCode,
+		AccountBank:   beneficiary.AccountBank,
 		AccountNumber: beneficiary.AccountNumber,
 		Amount:        amount,
 		Narration:     fmt.Sprintf("Payout to %s", beneficiary.AccountName),
