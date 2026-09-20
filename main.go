@@ -30,7 +30,7 @@ import (
 // @license.name MIT
 // @license.url https://opensource.org/licenses/MIT
 
-// @host https://seahorse-app-hp47q.ondigitalocean.app/
+// @host https://seahorse-app-hp47q.ondigitalocean.app
 // @BasePath /
 // @schemes http
 
