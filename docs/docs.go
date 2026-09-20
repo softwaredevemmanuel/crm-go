@@ -23236,9 +23236,9 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "https://seahorse-app-hp47q.ondigitalocean.app",
+	Host:             "seahorse-app-hp47q.ondigitalocean.app",
 	BasePath:         "/",
-	Schemes:          []string{"http"},
+	Schemes:          []string{"https"},
 	Title:            "GO CRM API",
 	Description:      "This is a comprehensive CRM system for course management with authentication and role-based access control.",
 	InfoInstanceName: "swagger",

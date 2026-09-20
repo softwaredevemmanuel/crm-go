@@ -3458,7 +3458,7 @@ definitions:
       user_id:
         type: string
     type: object
-host: https://seahorse-app-hp47q.ondigitalocean.app
+host: seahorse-app-hp47q.ondigitalocean.app
 info:
   contact:
     email: support@gocrm.com
@@ -15529,7 +15529,7 @@ paths:
       tags:
       - Products
 schemes:
-- http
+- https
 securityDefinitions:
   BearerAuth:
     description: Type "Bearer" followed by a space and JWT token.
