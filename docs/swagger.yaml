@@ -3458,7 +3458,7 @@ definitions:
       user_id:
         type: string
     type: object
-host: localhost:8080
+host: https://seahorse-app-hp47q.ondigitalocean.app/
 info:
   contact:
     email: support@gocrm.com

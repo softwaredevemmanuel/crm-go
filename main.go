@@ -236,7 +236,7 @@ func main() {
 }
 
 func SetupSwagger(r *gin.Engine) {
-	url := "http://localhost:8080/swagger/doc.json" // your swagger.json
+	url := "https://seahorse-app-hp47q.ondigitalocean.app/swagger/doc.json" // your swagger.json
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler,
 		ginSwagger.URL(url),
 		ginSwagger.DefaultModelsExpandDepth(-1),
