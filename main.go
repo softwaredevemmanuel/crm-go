@@ -39,6 +39,7 @@ import (
 // @name Authorization
 // @description Type "Bearer" followed by a space and JWT token.
 
+
 func main() {
 	// Migrate to database
 	database.MigrateDatabase()
