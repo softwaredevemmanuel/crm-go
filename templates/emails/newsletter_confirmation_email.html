@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="x-apple-disable-message-reformatting" />
+  <title>Confirm Your Email — Ehizua Hub</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+  <style>
+    /* Reset */
+    html, body { margin: 0 !important; padding: 0 !important; height: 100% !important; width: 100% !important; }
+    * { -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt !important; mso-table-rspace: 0pt !important; border-collapse: collapse !important; }
+    img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; display: block; }
+    a { text-decoration: none; }
+
+    /* Responsive */
+    @media screen and (max-width: 600px) {
+      .container { width: 100% !important; padding: 0 16px !important; }
+      .px { padding-left: 24px !important; padding-right: 24px !important; }
+      .h1 { font-size: 24px !important; line-height: 32px !important; }
+      .btn { width: 100% !important; display: block !important; }
+      .btn a { display: block !important; width: 100% !important; box-sizing: border-box !important; }
+      .hide-sm { display: none !important; }
+      .stack { display: block !important; width: 100% !important; }
+    }
+  </style>
+</head>
+<body style="margin:0; padding:0; background-color:#f8fafc; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color:#134574;">
+
+  <!-- Preheader (hidden preview text) -->
+  <div style="display:none; font-size:1px; color:#f8fafc; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden;">
+    Confirm your email address to complete your subscription to Ehizua Hub.
+  </div>
+
+  <!-- Wrapper -->
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f8fafc;">
+    <tr>
+      <td align="center" style="padding: 40px 16px;">
+
+        <!-- Container -->
+        <table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px; background-color:#ffffff; border-radius:16px; overflow:hidden; box-shadow: 0 4px 24px rgba(19,69,116,0.08);">
+
+          <!-- ==================== HEADER ==================== -->
+          <tr>
+            <td align="center" style="background: linear-gradient(135deg, #134574 0%, #1a5a9e 100%); padding: 32px 24px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="center">
+                    <div style="display:inline-block; padding: 12px 20px; background: rgba(255,255,255,0.12); border-radius: 12px;">
+                      <span style="font-size: 20px; font-weight: 700; color: #ffffff; letter-spacing: 0.5px;">
+                        News Letter Confirmation
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+     
+              </table>
+            </td>
+          </tr>
+
+          <!-- ==================== BODY ==================== -->
+          <tr>
+            <td class="px" style="padding: 40px 40px 24px 40px;">
+
+              <!-- Greeting -->
+              <h1 class="h1" style="margin: 0 0 8px 0; font-size: 28px; line-height: 36px; font-weight: 700; color:#134574;">
+                Hi {{.Name}},
+              </h1>
+
+              <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 26px; color:#4a5568;">
+                Welcome to <strong style="color:#134574;">Ehizua Hub</strong>! You're one click away from joining a community of innovators, learners, and changemakers.
+              </p>
+
+              <p style="margin: 0 0 28px 0; font-size: 16px; line-height: 26px; color:#4a5568;">
+                Please confirm your email address to complete your subscription:
+              </p>
+
+              <!-- CTA Button -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" class="btn" style="margin: 0 auto 28px auto;">
+                <tr>
+                  <td align="center" style="border-radius: 12px; background: linear-gradient(135deg, #F13178 0%, #c8346a 100%); box-shadow: 0 6px 16px rgba(241,49,120,0.3);">
+                    <a href="{{.ConfirmationURL}}" target="_blank"
+                       style="display: inline-block; padding: 16px 40px; font-size: 16px; font-weight: 600; color: #ffffff; border-radius: 12px; letter-spacing: 0.3px;">
+                      Confirm My Email →
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin: 0 0 8px 0; font-size: 13px; line-height: 20px; color:#8898aa; text-align: center;">
+                This link will expire in 24 hours.
+              </p>
+
+              <p style="margin: 0 0 28px 0; font-size: 13px; line-height: 20px; color:#8898aa; text-align: center;">
+                Button not working? Copy and paste this URL into your browser:
+              </p>
+
+              <!-- Fallback URL -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 28px;">
+                <tr>
+                  <td style="background:#f8fafc; border: 1px dashed #cbd5e0; border-radius: 10px; padding: 14px 16px;">
+                    <p style="margin: 0; font-size: 12px; line-height: 18px; color:#134574; font-family: 'Courier New', monospace; word-break: break-all;">
+                      {{.ConfirmationURL}}
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Divider -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="border-top: 1px solid #edf2f7; padding-top: 24px;"></td>
+                </tr>
+              </table>
+
+              <!-- Why am I getting this? -->
+              <p style="margin: 0 0 12px 0; font-size: 14px; line-height: 22px; color:#4a5568; font-weight: 600;">
+                What you'll get:
+              </p>
+
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 20px;">
+                <tr>
+                  <td style="padding: 6px 0; font-size: 14px; line-height: 22px; color:#4a5568;">
+                    <span style="color:#F13178; font-weight: 700;">✓</span>&nbsp;&nbsp;New course launches and updates
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 6px 0; font-size: 14px; line-height: 22px; color:#4a5568;">
+                    <span style="color:#F13178; font-weight: 700;">✓</span>&nbsp;&nbsp;Free learning resources and study tips
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 6px 0; font-size: 14px; line-height: 22px; color:#4a5568;">
+                    <span style="color:#F13178; font-weight: 700;">✓</span>&nbsp;&nbsp;Early access to workshops and events
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 6px 0; font-size: 14px; line-height: 22px; color:#4a5568;">
+                    <span style="color:#F13178; font-weight: 700;">✓</span>&nbsp;&nbsp;Community stories and success spotlights
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin: 0; font-size: 13px; line-height: 22px; color:#8898aa;">
+                If you didn't sign up for Ehizua Hub, you can safely ignore this email — no account will be created.
+              </p>
+
+            </td>
+          </tr>
+
+          <!-- ==================== FOOTER ==================== -->
+          <tr>
+            <td class="px" style="background:#f8fafc; padding: 32px 40px; border-top: 1px solid #edf2f7;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="center" style="padding-bottom: 16px;">
+                    <p style="margin: 0; font-size: 14px; font-weight: 700; color:#134574;">
+                      Ehizua<span style="color:#F13178;">Hub</span>
+                    </p>
+                    <p style="margin: 6px 0 0 0; font-size: 12px; line-height: 20px; color:#8898aa;">
+                      Igniting Tech Brilliance in Young Innovators
+                    </p>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" style="padding: 12px 0;">
+                    <a href="https://facebook.com/ehizuahub" style="display:inline-block; margin: 0 6px; width: 32px; height: 32px; line-height: 32px; background: #134574; border-radius: 50%; color:#ffffff; font-size: 13px; text-align: center;">f</a>
+                    <a href="https://twitter.com/ehizuahub" style="display:inline-block; margin: 0 6px; width: 32px; height: 32px; line-height: 32px; background: #134574; border-radius: 50%; color:#ffffff; font-size: 13px; text-align: center;">𝕏</a>
+                    <a href="https://instagram.com/ehizuahub" style="display:inline-block; margin: 0 6px; width: 32px; height: 32px; line-height: 32px; background: #134574; border-radius: 50%; color:#ffffff; font-size: 13px; text-align: center;">◉</a>
+                    <a href="https://linkedin.com/company/ehizuahub" style="display:inline-block; margin: 0 6px; width: 32px; height: 32px; line-height: 32px; background: #134574; border-radius: 50%; color:#ffffff; font-size: 13px; text-align: center;">in</a>
+                    <a href="https://youtube.com/@ehizuahub" style="display:inline-block; margin: 0 6px; width: 32px; height: 32px; line-height: 32px; background: #134574; border-radius: 50%; color:#ffffff; font-size: 13px; text-align: center;">▶</a>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" style="padding-top: 8px;">
+                    <p style="margin: 0; font-size: 12px; line-height: 20px; color:#8898aa;">
+                      6, Hon Fatai Eletu Street, Container Bus Stop,<br />
+                      Awoyaya, Lekki, Lagos, Nigeria
+                    </p>
+                    <p style="margin: 8px 0 0 0; font-size: 12px; line-height: 20px; color:#8898aa;">
+                      <a href="mailto:info@ehizuahub.com" style="color:#F13178; text-decoration: none;">info@ehizuahub.com</a>
+                      &nbsp;·&nbsp;
+                      <a href="tel:+2348073693973" style="color:#F13178; text-decoration: none;">+234 8073 693 973</a>
+                    </p>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td align="center" style="padding-top: 20px; border-top: 1px solid #edf2f7; margin-top: 20px;">
+                    <p style="margin: 16px 0 0 0; font-size: 11px; line-height: 18px; color:#a0aec0;">
+                      &copy; {{.Year}} Ehizua Hub. All rights reserved.<br />
+                      You received this email because someone used this address to subscribe.<br />
+                      If that wasn't you, no action is needed — you can safely delete this message.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+        </table>
+        <!-- /Container -->
+
+      </td>
+    </tr>
+  </table>
+  <!-- /Wrapper -->
+
+</body>
+</html>

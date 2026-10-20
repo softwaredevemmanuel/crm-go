@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="x-apple-disable-message-reformatting" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="supported-color-schemes" content="light dark" />
+  <title>{{.Subject}}</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+  <style>
+    /* Reset */
+    html, body { margin: 0 !important; padding: 0 !important; height: 100% !important; width: 100% !important; }
+    * { -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt !important; mso-table-rspace: 0pt !important; border-collapse: collapse !important; }
+    img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; display: block; max-width: 100%; height: auto; }
+    a { text-decoration: none; }
+    a[x-apple-data-detectors] { color: inherit !important; text-decoration: none !important; font-size: inherit !important; font-family: inherit !important; font-weight: inherit !important; line-height: inherit !important; }
+
+    /* Prevent Gmail auto-linking phone numbers on desktop */
+    u + #body a { color: inherit; text-decoration: none; font-size: inherit; font-family: inherit; font-weight: inherit; line-height: inherit; }
+
+    /* Responsive */
+    @media screen and (max-width: 600px) {
+      .container { width: 100% !important; padding: 0 16px !important; }
+      .px { padding-left: 24px !important; padding-right: 24px !important; }
+      .h1 { font-size: 22px !important; line-height: 30px !important; }
+      .h2 { font-size: 18px !important; line-height: 26px !important; }
+      .btn { width: 100% !important; display: block !important; }
+      .btn a { display: block !important; width: 100% !important; box-sizing: border-box !important; }
+      .hide-sm { display: none !important; }
+      .stack { display: block !important; width: 100% !important; }
+      .stack-pad { padding: 0 0 16px 0 !important; }
+      .mobile-center { text-align: center !important; }
+      .mobile-py { padding-top: 24px !important; padding-bottom: 24px !important; }
+    }
+
+    /* Dark mode overrides */
+    @media (prefers-color-scheme: dark) {
+      .dm-bg { background-color: #0f1b2d !important; }
+      .dm-card { background-color: #16253f !important; }
+      .dm-text { color: #e2e8f0 !important; }
+      .dm-muted { color: #94a3b8 !important; }
+      .dm-divider { border-color: #1e3a5f !important; }
+      .dm-h1 { color: #ffffff !important; }
+    }
+  </style>
+</head>
+<body id="body" style="margin:0; padding:0; background-color:#f5f7fb; font-family: -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color:#0d2b52;">
+
+  <!-- Hidden preview text -->
+  <div style="display:none; font-size:1px; color:#f5f7fb; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden;">
+    {{.Preview}}
+    &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847;
+  </div>
+
+  <!-- Outer wrapper -->
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="dm-bg" style="background-color:#f5f7fb;">
+    <tr>
+      <td align="center" style="padding: 32px 16px;">
+
+        <!-- Container -->
+        <table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px; background-color:#ffffff; border-radius:20px; overflow:hidden; box-shadow: 0 10px 40px rgba(13,43,82,0.08);">
+
+          <!-- ==================== TOP BAR ==================== -->
+          <tr>
+            <td style="height: 6px; background: linear-gradient(90deg, #F13178 0%, #c8346a 50%, #134574 100%); line-height: 6px; font-size: 6px;">&nbsp;</td>
+          </tr>
+
+          <!-- ==================== HEADER ==================== -->
+          <tr>
+            <td class="px" style="padding: 28px 40px 20px 40px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <!-- Logo -->
+                  <td align="left" valign="middle">
+                    <a href="{{.SiteURL}}" style="display: inline-block; text-decoration: none;">
+                      <span style="font-size: 20px; font-weight: 800; color:#134574; letter-spacing: -0.3px;">
+                        Ehizua<span style="color:#F13178;">Hub</span>
+                      </span>
+                    </a>
+                  </td>
+                  <!-- View in browser -->
+                  <td align="right" valign="middle" class="hide-sm">
+                    <a href="{{.BrowserURL}}" style="font-size: 12px; color:#8898aa; text-decoration: underline;">View in browser</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- ==================== SUBJECT / TITLE ==================== -->
+          {{if .Title}}
+          <tr>
+            <td class="px" style="padding: 12px 40px 8px 40px;">
+              <p class="dm-muted" style="margin: 0; font-size: 12px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #F13178;">
+                Newsletter
+              </p>
+              <h1 class="h1 dm-h1" style="margin: 8px 0 0 0; font-size: 28px; line-height: 36px; font-weight: 800; color:#0d2b52; letter-spacing: -0.5px;">
+                {{.Title}}
+              </h1>
+            </td>
+          </tr>
+          {{end}}
+
+          <!-- ==================== HERO IMAGE (optional) ==================== -->
+          {{if .HeroImageURL}}
+          <tr>
+            <td class="px" style="padding: 20px 40px 0 40px;">
+              <a href="{{.HeroImageLink}}" style="display: block;">
+                <img src="{{.HeroImageURL}}" alt="{{.Title}}" width="520" style="width: 100%; border-radius: 14px; display: block;" />
+              </a>
+            </td>
+          </tr>
+          {{end}}
+
+          <!-- ==================== BODY CONTENT ==================== -->
+          <tr>
+            <td class="px" style="padding: 24px 40px 8px 40px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td class="dm-text" style="font-size: 16px; line-height: 26px; color:#4a5568;">
+                    {{.Content}}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- ==================== PRIMARY CTA (optional) ==================== -->
+          {{if .CTAURL}}
+          <tr>
+            <td class="px" align="center" style="padding: 24px 40px 8px 40px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" class="btn" style="margin: 0 auto;">
+                <tr>
+                  <td align="center" style="border-radius: 12px; background: linear-gradient(135deg, #F13178 0%, #c8346a 100%); box-shadow: 0 6px 16px rgba(241,49,120,0.3);">
+                    <a href="{{.CTAURL}}" target="_blank" style="display: inline-block; padding: 14px 36px; font-size: 15px; font-weight: 700; color: #ffffff; border-radius: 12px; letter-spacing: 0.3px;">
+                      {{if .CTALabel}}{{.CTALabel}}{{else}}Learn More →{{end}}
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          {{end}}
+
+          <!-- ==================== DIVIDER ==================== -->
+          <tr>
+            <td class="px" style="padding: 24px 40px 0 40px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td class="dm-divider" style="border-top: 1px solid #edf2f7; line-height: 1px; font-size: 1px;">&nbsp;</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- ==================== SECONDARY / SIGN-OFF ==================== -->
+          <tr>
+            <td class="px" style="padding: 24px 40px 32px 40px;">
+              <p class="dm-text" style="margin: 0 0 6px 0; font-size: 15px; line-height: 24px; color:#4a5568;">
+                Thanks for being part of our community,
+              </p>
+              <p class="dm-h1" style="margin: 0; font-size: 15px; line-height: 24px; font-weight: 700; color:#0d2b52;">
+                The Ehizua Hub Team
+              </p>
+            </td>
+          </tr>
+
+          <!-- ==================== FOOTER ==================== -->
+          <tr>
+            <td class="px dm-card" style="background: #f8fafc; padding: 32px 40px; border-top: 1px solid #edf2f7;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <!-- Brand -->
+                <tr>
+                  <td align="center" style="padding-bottom: 16px;">
+                    <p class="dm-h1" style="margin: 0; font-size: 15px; font-weight: 800; color:#134574;">
+                      Ehizua<span style="color:#F13178;">Hub</span>
+                    </p>
+                    <p class="dm-muted" style="margin: 6px 0 0 0; font-size: 12px; line-height: 18px; color:#8898aa;">
+                      Igniting Tech Brilliance in Young Innovators
+                    </p>
+                  </td>
+                </tr>
+
+                <!-- Social -->
+                <tr>
+                  <td align="center" style="padding: 12px 0 16px 0;">
+                    <a href="https://facebook.com/ehizuahub" style="display:inline-block; margin: 0 5px; width: 32px; height: 32px; line-height: 32px; background: #134574; border-radius: 50%; color:#ffffff; font-size: 13px; text-align: center; text-decoration: none;">f</a>
+                    <a href="https://twitter.com/ehizuahub" style="display:inline-block; margin: 0 5px; width: 32px; height: 32px; line-height: 32px; background: #134574; border-radius: 50%; color:#ffffff; font-size: 13px; text-align: center; text-decoration: none;">𝕏</a>
+                    <a href="https://instagram.com/ehizuahub" style="display:inline-block; margin: 0 5px; width: 32px; height: 32px; line-height: 32px; background: #134574; border-radius: 50%; color:#ffffff; font-size: 13px; text-align: center; text-decoration: none;">◉</a>
+                    <a href="https://linkedin.com/company/ehizuahub" style="display:inline-block; margin: 0 5px; width: 32px; height: 32px; line-height: 32px; background: #134574; border-radius: 50%; color:#ffffff; font-size: 13px; text-align: center; text-decoration: none;">in</a>
+                    <a href="https://youtube.com/@ehizuahub" style="display:inline-block; margin: 0 5px; width: 32px; height: 32px; line-height: 32px; background: #134574; border-radius: 50%; color:#ffffff; font-size: 13px; text-align: center; text-decoration: none;">▶</a>
+                  </td>
+                </tr>
+
+                <!-- Address -->
+                <tr>
+                  <td align="center">
+                    <p class="dm-muted" style="margin: 0; font-size: 12px; line-height: 20px; color:#8898aa;">
+                      6, Hon Fatai Eletu Street, Container Bus Stop,<br />
+                      Awoyaya, Lekki, Lagos, Nigeria
+                    </p>
+                    <p class="dm-muted" style="margin: 8px 0 0 0; font-size: 12px; line-height: 20px; color:#8898aa;">
+                      <a href="mailto:info@ehizuahub.com" style="color:#F13178; text-decoration: none;">info@ehizuahub.com</a>
+                      &nbsp;·&nbsp;
+                      <a href="tel:+2348073693973" style="color:#F13178; text-decoration: none;">+234 8073 693 973</a>
+                    </p>
+                  </td>
+                </tr>
+
+                <!-- Divider -->
+                <tr>
+                  <td style="padding: 20px 0 12px 0;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td class="dm-divider" style="border-top: 1px solid #edf2f7; line-height: 1px; font-size: 1px;">&nbsp;</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Unsubscribe -->
+                <tr>
+                  <td align="center">
+                    <p class="dm-muted" style="margin: 0 0 8px 0; font-size: 11px; line-height: 18px; color:#a0aec0;">
+                      You're receiving this email because you subscribed to Ehizua Hub updates.
+                    </p>
+                    <p style="margin: 0; font-size: 11px; line-height: 18px;">
+                      <a href="{{.UnsubscribeURL}}" style="color:#F13178; text-decoration: underline;">Unsubscribe</a>
+                      &nbsp;·&nbsp;
+                      <a href="{{.PreferencesURL}}" style="color:#8898aa; text-decoration: underline;">Manage preferences</a>
+                    </p>
+                    <p class="dm-muted" style="margin: 12px 0 0 0; font-size: 11px; line-height: 18px; color:#cbd5e0;">
+                      &copy; {{.Year}} Ehizua Hub. All rights reserved.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+        </table>
+        <!-- /Container -->
+
+        <!-- Post-footer note (outside card, for spam filters) -->
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" class="container" style="width:600px; max-width:600px; margin-top: 16px;">
+          <tr>
+            <td align="center" style="padding: 8px 16px;">
+              <p style="margin: 0; font-size: 11px; line-height: 16px; color:#a0aec0;">
+                Having trouble viewing this email? <a href="{{.BrowserURL}}" style="color:#8898aa; text-decoration: underline;">View it in your browser</a>.
+              </p>
+            </td>
+          </tr>
+        </table>
+
+      </td>
+    </tr>
+  </table>
+  <!-- /Outer wrapper -->
+
+</body>
+</html>

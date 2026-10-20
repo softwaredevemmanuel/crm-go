@@ -2,9 +2,11 @@ package utils
 
 import (
 	"time"
-
+"crm-go/config"
 	"github.com/golang-jwt/jwt/v5"
 )
+var cfg = config.LoadEnv()
+
 
 var jwtSecret = []byte(cfg.JWTSecret) // 🔥 change this to env variable in prod
 

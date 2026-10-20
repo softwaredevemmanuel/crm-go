@@ -1,5 +1,5 @@
 // services/email_service.go
-package services
+package utils
 
 import (
 	"bytes"
@@ -10,8 +10,10 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
+	"time"
 	"gopkg.in/gomail.v2"
+	"net/url"
+
 )
 
 type EmailService struct {
@@ -315,3 +317,56 @@ func (s *EmailService) SendEmailWithTemplate(to, subject, templateName string, d
 
 	return SendEmail(emailData)
 }
+
+// SendConfirmationEmail sends the confirmation link to a new subscriber.
+func (s *EmailService) SendConfirmationEmail(to, name, token string) error {
+	// Base URL where the frontend handles the confirmation.
+	// Set APP_FRONTEND_URL in your env — e.g. https://ehizuahub.com
+	frontendURL := os.Getenv("FRONTEND_URL")
+	if frontendURL == "" {
+		frontendURL = "http://localhost:3000"
+	}
+
+	// Build absolute URL and encode the token
+	confirmationURL := fmt.Sprintf(
+		"%s/confirm-newsletter-email?token=%s",
+		frontendURL,
+		url.QueryEscape(token),
+	)
+
+	emailData := EmailData{
+		To:       to,
+		Subject:  "Confirm Your Email Address — Ehizua Hub",
+		Template: "newsletter_confirmation_email.html",
+		TemplateData: map[string]interface{}{
+			"Name":            name,
+			"ConfirmationURL": confirmationURL,
+			"Token":           token,
+			"Email":           to,
+			"Year":            time.Now().Year(),
+		},
+	}
+
+	return SendEmail(emailData)
+}
+
+
+// SendCampaignEmail sends a newsletter campaign email to a subscriber.
+func (s *EmailService) SendCampaignEmail(to, name, subject, title, content, preview, unsubscribeURL string) error {
+	emailData := EmailData{
+		To:       to,
+		Subject:  subject,
+		Template: "newsletter_campaign_email.html",
+		TemplateData: map[string]interface{}{
+			"Name":           name,
+			"Title":          title,
+			"Content":        content,
+			"Preview":        preview,
+			"UnsubscribeURL": unsubscribeURL,
+			"Year":           time.Now().Year(),
+		},
+	}
+
+	return SendEmail(emailData)
+}
+

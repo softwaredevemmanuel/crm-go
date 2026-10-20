@@ -9,13 +9,13 @@ import (
 func CourseMaterialRoutes(r *gin.Engine) {
 	{
 		courseMaterials := r.Group("/course-materials")
-		courseMaterials.GET("/", courseMaterialController.GetCourseMaterials)
+		courseMaterials.GET("/fetch", courseMaterialController.GetCourseMaterials)
 		courseMaterials.GET("/:id", courseMaterialController.GetCourseMaterialByID)
 
 		// Protected routes
 		protected := r.Group("/api")
 		protected.Use(middleware.AuthMiddleware())
-		protected.POST("/course-materials", middleware.RoleMiddleware("admin"), courseMaterialController.CreateCourseMaterial)
+		protected.POST("course-materials", middleware.RoleMiddleware("admin"), courseMaterialController.CreateCourseMaterial)
 		protected.PUT("/course-materials/:id", middleware.RoleMiddleware("admin"), courseMaterialController.UpdateCourseMaterial)
 		protected.DELETE("/course-materials/:id", middleware.RoleMiddleware("admin"), courseMaterialController.DeleteCourseMaterial)
 		protected.POST("/deleted-records/:id/restore", middleware.RoleMiddleware("admin"), courseMaterialController.RestoreCourseMaterial)

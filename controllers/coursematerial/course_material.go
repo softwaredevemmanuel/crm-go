@@ -99,7 +99,7 @@ func CreateCourseMaterial(c *gin.Context) {
 // @Param        type        query   string  false  "Material Type"
 // @Success      200 {array}  models.SuccessResponse
 // @Failure      400 {object} models.ErrorResponse
-// @Router       /course-materials [get]
+// @Router       /course-materials/fetch [get]
 func GetCourseMaterials(c *gin.Context) {
 	var materials []models.CourseMaterial
 	var responses []models.CourseMaterialResponse

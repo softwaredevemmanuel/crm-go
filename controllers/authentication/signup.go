@@ -4,7 +4,7 @@ package controllers
 import (
 	"crm-go/config"
 	"crm-go/models"
-	"crm-go/services"
+	"crm-go/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -132,7 +132,7 @@ func SignUp(c *gin.Context) {
 	verificationURL := fmt.Sprintf("%s/verify-email?token=%s", frontendURL, token)
 
 	// Send verification email
-	emailService := services.NewEmailService()
+	emailService := utils.NewEmailService()
 	err = emailService.SendVerificationEmail(
 		user.Email,
 		user.FirstName,

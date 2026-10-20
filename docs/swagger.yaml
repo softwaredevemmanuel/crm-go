@@ -55,23 +55,61 @@ definitions:
     type: object
   controllers.CourseResponse:
     properties:
+      code:
+        type: string
+      cover_image_url:
+        type: string
+      created_at:
+        type: string
+      currency:
+        type: string
       description:
         type: string
+      duration_minutes:
+        type: integer
+      enrollment_count:
+        type: integer
       id:
         type: string
       image:
         type: string
+      intro_video_url:
+        type: string
+      is_free:
+        type: boolean
+      is_restricted:
+        type: boolean
       learning_outcomes:
         items:
           type: string
         type: array
+      level:
+        type: string
+      price_cents:
+        type: integer
+      published_at:
+        type: string
+      rating:
+        type: number
+      rating_count:
+        type: integer
       requirements:
         items:
           type: string
         type: array
+      requires_enrollment:
+        type: boolean
+      slug:
+        type: string
+      status:
+        type: string
+      thumbnail_url:
+        type: string
       title:
         type: string
-      tutor_id:
+      total_lessons:
+        type: integer
+      updated_at:
         type: string
       video_url:
         type: string
@@ -93,28 +131,66 @@ definitions:
     type: object
   controllers.CreateCourseInput:
     properties:
-      description:
+      code:
+        maxLength: 50
+        minLength: 2
         type: string
+      cover_image_url:
+        type: string
+      currency:
+        type: string
+      description:
+        maxLength: 5000
+        type: string
+      duration_minutes:
+        minimum: 0
+        type: integer
       image:
         type: string
+      intro_video_url:
+        type: string
+      is_free:
+        type: boolean
+      is_restricted:
+        type: boolean
       learning_outcomes:
         items:
           type: string
         type: array
+      level:
+        enum:
+        - beginner
+        - intermediate
+        - advanced
+        type: string
+      price_cents:
+        minimum: 0
+        type: integer
       requirements:
         items:
           type: string
         type: array
-      title:
+      requires_enrollment:
+        type: boolean
+      slug:
+        maxLength: 255
         type: string
-      tutor_id:
+      status:
+        enum:
+        - draft
+        - published
+        - archived
+        type: string
+      thumbnail_url:
+        type: string
+      title:
+        maxLength: 255
+        minLength: 3
         type: string
       video_url:
         type: string
     required:
-    - description
     - title
-    - tutor_id
     type: object
   controllers.CreateWalletRequest:
     properties:
@@ -214,6 +290,67 @@ definitions:
     - password
     - phone
     - role
+    type: object
+  controllers.UpdateCourseInput:
+    properties:
+      code:
+        maxLength: 50
+        minLength: 2
+        type: string
+      cover_image_url:
+        type: string
+      currency:
+        type: string
+      description:
+        maxLength: 5000
+        type: string
+      duration_minutes:
+        minimum: 0
+        type: integer
+      image:
+        type: string
+      intro_video_url:
+        type: string
+      is_free:
+        type: boolean
+      is_restricted:
+        type: boolean
+      learning_outcomes:
+        items:
+          type: string
+        type: array
+      level:
+        enum:
+        - beginner
+        - intermediate
+        - advanced
+        type: string
+      price_cents:
+        minimum: 0
+        type: integer
+      requirements:
+        items:
+          type: string
+        type: array
+      requires_enrollment:
+        type: boolean
+      slug:
+        maxLength: 255
+        type: string
+      status:
+        enum:
+        - draft
+        - published
+        - archived
+        type: string
+      thumbnail_url:
+        type: string
+      title:
+        maxLength: 255
+        minLength: 3
+        type: string
+      video_url:
+        type: string
     type: object
   controllers.UpdateWalletRequest:
     properties:
@@ -347,6 +484,43 @@ definitions:
         - $ref: '#/definitions/dto.UserResponse'
         description: Nested user details
       user_id:
+        type: string
+    type: object
+  dto.AdminCreateSubscriberRequest:
+    properties:
+      email:
+        maxLength: 255
+        type: string
+      name:
+        maxLength: 255
+        type: string
+      status:
+        enum:
+        - subscribed
+        - pending
+        - unsubscribed
+        type: string
+      tags:
+        maxLength: 500
+        type: string
+    required:
+    - email
+    type: object
+  dto.AdminUpdateSubscriberRequest:
+    properties:
+      name:
+        maxLength: 255
+        type: string
+      status:
+        enum:
+        - pending
+        - subscribed
+        - unsubscribed
+        - bounced
+        - complained
+        type: string
+      tags:
+        maxLength: 500
         type: string
     type: object
   dto.ApproveInventoryAuditRequest:
@@ -750,6 +924,47 @@ definitions:
     - module_id
     - topics
     type: object
+  dto.CampaignResponse:
+    properties:
+      audience:
+        type: string
+      audience_tag:
+        type: string
+      clicked_count:
+        type: integer
+      content:
+        type: string
+      created_at:
+        type: string
+      created_by:
+        type: string
+      delivered_count:
+        type: integer
+      failed_count:
+        type: integer
+      failure_reason:
+        type: string
+      id:
+        type: string
+      opened_count:
+        type: integer
+      preview:
+        type: string
+      recipient_count:
+        type: integer
+      scheduled_at:
+        type: string
+      sent_at:
+        type: string
+      status:
+        type: string
+      subject:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
   dto.ClassGradeListResponse:
     properties:
       class_grades:
@@ -900,6 +1115,47 @@ definitions:
     required:
     - grade_id
     - name
+    type: object
+  dto.CreateCampaignRequest:
+    properties:
+      audience:
+        enum:
+        - all
+        - active
+        - tagged
+        - manual
+        example: active
+        type: string
+      audience_tag:
+        example: courses
+        maxLength: 255
+        type: string
+      content:
+        example: <h1>Hello {{.Name}}</h1><p>...</p>
+        type: string
+      manual_ids:
+        items:
+          type: string
+        type: array
+      preview:
+        example: Here's what's new this week...
+        maxLength: 500
+        type: string
+      scheduled_at:
+        example: "2025-02-01T09:00:00Z"
+        type: string
+      subject:
+        example: 'New Course Launch: Intro to Go'
+        maxLength: 255
+        minLength: 3
+        type: string
+      title:
+        example: Course Announcement
+        maxLength: 255
+        type: string
+    required:
+    - content
+    - subject
     type: object
   dto.CreateClassGradeRequest:
     properties:
@@ -1301,6 +1557,95 @@ definitions:
     - quantity
     - transaction_type
     type: object
+  dto.CreateInvoiceItemRequest:
+    properties:
+      description:
+        maxLength: 5000
+        type: string
+      discount_cents:
+        minimum: 0
+        type: integer
+      discount_percent:
+        maximum: 100
+        minimum: 0
+        type: number
+      display_order:
+        type: integer
+      item_type:
+        enum:
+        - tuition
+        - course
+        - material
+        - exam
+        - registration
+        - hostel
+        - transport
+        - library
+        - uniform
+        - fine
+        - discount
+        - custom
+        type: string
+      notes:
+        maxLength: 2000
+        type: string
+      quantity:
+        minimum: 1
+        type: integer
+      sku:
+        maxLength: 100
+        type: string
+      term_id:
+        type: string
+      title:
+        maxLength: 255
+        minLength: 1
+        type: string
+      unit_price_cents:
+        type: integer
+    required:
+    - item_type
+    - quantity
+    - term_id
+    - title
+    type: object
+  dto.CreateInvoiceRequest:
+    properties:
+      currency:
+        type: string
+      discount_cents:
+        minimum: 0
+        type: integer
+      discount_code:
+        maxLength: 50
+        type: string
+      discount_reason:
+        maxLength: 255
+        type: string
+      due_at:
+        description: RFC3339
+        type: string
+      item_ids:
+        items:
+          type: string
+        minItems: 1
+        type: array
+      notes:
+        type: string
+      student_id:
+        type: string
+      tax_label:
+        maxLength: 50
+        type: string
+      tax_rate_percent:
+        maximum: 100
+        minimum: 0
+        type: number
+      terms:
+        type: string
+    required:
+    - item_ids
+    type: object
   dto.CreateLessonReportRequest:
     properties:
       academic_session_id:
@@ -1652,6 +1997,19 @@ definitions:
       updated_at:
         type: string
     type: object
+  dto.ErrorResponse:
+    properties:
+      error:
+        example: validation failed
+        type: string
+      fields:
+        additionalProperties:
+          type: string
+        type: object
+      message:
+        example: one or more fields are invalid
+        type: string
+    type: object
   dto.FulfillInventoryRequestRequest:
     properties:
       notes:
@@ -1780,6 +2138,114 @@ definitions:
     required:
     - image_url
     type: object
+  dto.InvoiceItemResponse:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      discount_cents:
+        type: integer
+      discount_percent:
+        type: number
+      display_order:
+        type: integer
+      id:
+        type: string
+      item_type:
+        type: string
+      line_total_cents:
+        description: derived, never stored
+        type: integer
+      notes:
+        type: string
+      quantity:
+        type: integer
+      sku:
+        type: string
+      term:
+        allOf:
+        - $ref: '#/definitions/dto.TermMiniResponse'
+        description: populated when preloaded
+      term_id:
+        type: string
+      title:
+        type: string
+      unit_price_cents:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  dto.InvoiceResponse:
+    properties:
+      amount_due_cents:
+        type: integer
+      amount_paid_cents:
+        type: integer
+      cancelled_at:
+        type: string
+      created_at:
+        type: string
+      created_by:
+        type: string
+      currency:
+        type: string
+      discount_cents:
+        type: integer
+      discount_code:
+        type: string
+      discount_reason:
+        type: string
+      due_at:
+        type: string
+      id:
+        type: string
+      invoice_number:
+        type: string
+      issued_at:
+        type: string
+      notes:
+        type: string
+      paid_at:
+        type: string
+      pdf_url:
+        type: string
+      refunded_at:
+        type: string
+      sent_at:
+        type: string
+      status:
+        type: string
+      student_id:
+        type: string
+      subtotal_cents:
+        type: integer
+      tax_cents:
+        type: integer
+      tax_label:
+        type: string
+      tax_rate_percent:
+        type: number
+      terms:
+        type: string
+      total_cents:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  dto.InvoiceSummaryResponse:
+    properties:
+      overdue_count:
+        type: integer
+      total_billed_cents:
+        type: integer
+      total_due_cents:
+        type: integer
+      total_invoices:
+        type: integer
+      total_paid_cents:
+        type: integer
+    type: object
   dto.LessonListResponse:
     properties:
       lessons:
@@ -1886,6 +2352,21 @@ definitions:
       updated_at:
         type: string
     type: object
+  dto.NewsletterStats:
+    properties:
+      bounced:
+        type: integer
+      last_30_days:
+        type: integer
+      pending:
+        type: integer
+      subscribed:
+        type: integer
+      total:
+        type: integer
+      unsubscribed:
+        type: integer
+    type: object
   dto.NotificationListResponse:
     properties:
       limit:
@@ -1961,6 +2442,66 @@ definitions:
       total:
         type: integer
       unread:
+        type: integer
+    type: object
+  dto.PaginatedCampaignsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.CampaignResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.PaginatedInvoiceItemsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.InvoiceItemResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.PaginatedInvoicesResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.InvoiceResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.PaginatedSubscribersResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.SubscriberResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
         type: integer
     type: object
   dto.RejectInventoryAuditRequest:
@@ -2094,6 +2635,15 @@ definitions:
       updated_at:
         type: string
     type: object
+  dto.SendCampaignResponse:
+    properties:
+      message:
+        example: Campaign is being sent to 1,240 subscribers.
+        type: string
+      recipient_count:
+        example: 1240
+        type: integer
+    type: object
   dto.SendPasswordResetRequest:
     properties:
       email:
@@ -2107,6 +2657,33 @@ definitions:
         type: string
     required:
     - email
+    type: object
+  dto.SimpleMessage:
+    properties:
+      message:
+        example: Please check your email to confirm your subscription.
+        type: string
+    type: object
+  dto.SingleCampaignResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.CampaignResponse'
+    type: object
+  dto.SingleInvoiceItemResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.InvoiceItemResponse'
+    type: object
+  dto.SingleInvoiceResponse:
+    properties:
+      data:
+        description: Use interface to allow model with preloaded items/payments if
+          needed
+    type: object
+  dto.SingleSubscriberResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.SubscriberResponse'
     type: object
   dto.StudentEnrollmentListResponse:
     properties:
@@ -2220,6 +2797,56 @@ definitions:
     - grade_id
     - question_id
     type: object
+  dto.SubscribeRequest:
+    properties:
+      email:
+        example: jane@example.com
+        maxLength: 255
+        type: string
+      name:
+        example: Jane Doe
+        maxLength: 255
+        type: string
+      source:
+        enum:
+        - homepage_footer
+        - blog
+        - course_page
+        - other
+        example: homepage_footer
+        type: string
+      tags:
+        example: courses,news
+        maxLength: 500
+        type: string
+    required:
+    - email
+    type: object
+  dto.SubscriberResponse:
+    properties:
+      confirmed_at:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      source:
+        type: string
+      status:
+        type: string
+      tags:
+        type: string
+      unsubscribe_reason:
+        type: string
+      unsubscribed_at:
+        type: string
+      updated_at:
+        type: string
+    type: object
   dto.TeacherSubjectAssignmentListResponse:
     properties:
       assignments:
@@ -2277,6 +2904,17 @@ definitions:
         type: integer
       total_pages:
         type: integer
+    type: object
+  dto.TermMiniResponse:
+    properties:
+      end_date:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      start_date:
+        type: string
     type: object
   dto.TermResponse:
     properties:
@@ -2458,6 +3096,37 @@ definitions:
       physical_quantity:
         minimum: 0
         type: integer
+    type: object
+  dto.UpdateCampaignRequest:
+    properties:
+      audience:
+        enum:
+        - all
+        - active
+        - tagged
+        - manual
+        type: string
+      audience_tag:
+        maxLength: 255
+        type: string
+      content:
+        type: string
+      manual_ids:
+        items:
+          type: string
+        type: array
+      preview:
+        maxLength: 500
+        type: string
+      scheduled_at:
+        type: string
+      subject:
+        maxLength: 255
+        minLength: 3
+        type: string
+      title:
+        maxLength: 255
+        type: string
     type: object
   dto.UpdateClassGradeRequest:
     properties:
@@ -2731,6 +3400,92 @@ definitions:
         type: string
       unit_cost:
         type: number
+    type: object
+  dto.UpdateInvoiceItemRequest:
+    properties:
+      description:
+        maxLength: 5000
+        type: string
+      discount_cents:
+        minimum: 0
+        type: integer
+      discount_percent:
+        maximum: 100
+        minimum: 0
+        type: number
+      display_order:
+        type: integer
+      item_type:
+        enum:
+        - tuition
+        - course
+        - material
+        - exam
+        - registration
+        - hostel
+        - transport
+        - library
+        - uniform
+        - fine
+        - discount
+        - custom
+        type: string
+      notes:
+        maxLength: 2000
+        type: string
+      quantity:
+        minimum: 1
+        type: integer
+      sku:
+        maxLength: 100
+        type: string
+      title:
+        maxLength: 255
+        minLength: 1
+        type: string
+      unit_price_cents:
+        type: integer
+    type: object
+  dto.UpdateInvoiceRequest:
+    properties:
+      currency:
+        type: string
+      discount_cents:
+        minimum: 0
+        type: integer
+      discount_code:
+        maxLength: 50
+        type: string
+      discount_reason:
+        maxLength: 255
+        type: string
+      due_at:
+        type: string
+      notes:
+        type: string
+      pdf_url:
+        type: string
+      status:
+        enum:
+        - draft
+        - pending
+        - partial
+        - paid
+        - overdue
+        - cancelled
+        - refunded
+        type: string
+      student_id:
+        type: string
+      tax_label:
+        maxLength: 50
+        type: string
+      tax_rate_percent:
+        maximum: 100
+        minimum: 0
+        type: number
+      terms:
+        type: string
     type: object
   dto.UpdateLessonReportRequest:
     properties:
@@ -3178,6 +3933,12 @@ definitions:
     properties:
       id:
         type: string
+      level:
+        type: string
+      slug:
+        type: string
+      thumbnail_url:
+        type: string
       title:
         type: string
     type: object
@@ -3458,7 +4219,7 @@ definitions:
       user_id:
         type: string
     type: object
-host: seahorse-app-hp47q.ondigitalocean.app
+host: localhost:8080
 info:
   contact:
     email: support@gocrm.com
@@ -5994,7 +6755,8 @@ paths:
     post:
       consumes:
       - application/json
-      description: Admin creates a new course. Prevents duplicate titles.
+      description: Admin creates a new course. Prevents duplicate title, code, or
+        slug.
       parameters:
       - description: Course details
         in: body
@@ -6016,7 +6778,7 @@ paths:
               type: string
             type: object
         "409":
-          description: Course with the same title already exists
+          description: Course with the same title, code, or slug already exists
           schema:
             additionalProperties:
               type: string
@@ -6034,9 +6796,11 @@ paths:
       - Courses
   /api/courses/{id}:
     delete:
-      description: Admin deletes a course by ID
+      description: Admin soft-deletes a course by ID. The record is preserved with
+        a deleted_at timestamp.
       parameters:
       - description: Course ID
+        format: uuid
         in: path
         name: id
         required: true
@@ -6076,19 +6840,21 @@ paths:
     put:
       consumes:
       - application/json
-      description: Admin updates course details by ID
+      description: Admin updates course details by ID. Only fields present in the
+        payload are updated.
       parameters:
       - description: Course ID
+        format: uuid
         in: path
         name: id
         required: true
         type: string
-      - description: Updated course details
+      - description: Updated course fields
         in: body
         name: course
         required: true
         schema:
-          $ref: '#/definitions/controllers.CreateCourseInput'
+          $ref: '#/definitions/controllers.UpdateCourseInput'
       produces:
       - application/json
       responses:
@@ -6108,6 +6874,12 @@ paths:
             additionalProperties:
               type: string
             type: object
+        "409":
+          description: Code or slug already in use
+          schema:
+            additionalProperties:
+              type: string
+            type: object
         "500":
           description: Failed to update course
           schema:
@@ -6116,7 +6888,7 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Update an existing course
+      summary: Update an existing course (partial)
       tags:
       - Courses
   /api/deleted-records/{id}/restore:
@@ -6629,6 +7401,70 @@ paths:
       summary: Get all student enrollments
       tags:
       - Student Enrollments
+  /api/fetch/newsletter/campaigns:
+    get:
+      description: Admin lists campaigns with optional search and status filter.
+      parameters:
+      - description: Page number (default 1)
+        in: query
+        minimum: 1
+        name: page
+        type: integer
+      - description: Items per page (default 20, max 100)
+        in: query
+        name: limit
+        type: integer
+      - description: Search by subject or title
+        in: query
+        name: search
+        type: string
+      - description: Filter by status
+        enum:
+        - draft
+        - scheduled
+        - sending
+        - sent
+        - failed
+        - cancelled
+        in: query
+        name: status
+        type: string
+      - description: Sort field
+        enum:
+        - created_at
+        - updated_at
+        - sent_at
+        - subject
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort direction
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PaginatedCampaignsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List newsletter campaigns
+      tags:
+      - Newsletter Campaigns
   /api/fetch/student-answers:
     get:
       consumes:
@@ -9779,6 +10615,476 @@ paths:
       summary: Get inventory transaction statistics
       tags:
       - Inventory Transactions
+  /api/invoice-items:
+    get:
+      parameters:
+      - description: Page number (default 1)
+        in: query
+        minimum: 1
+        name: page
+        type: integer
+      - description: Items per page (default 50, max 200)
+        in: query
+        name: limit
+        type: integer
+      - description: Search in title, description, SKU
+        in: query
+        name: search
+        type: string
+      - description: Filter by item type
+        enum:
+        - tuition
+        - course
+        - material
+        - exam
+        - registration
+        - hostel
+        - transport
+        - library
+        - uniform
+        - fine
+        - discount
+        - custom
+        in: query
+        name: item_type
+        type: string
+      - description: Filter by term UUID
+        in: query
+        name: term_id
+        type: string
+      - description: Sort field
+        enum:
+        - display_order
+        - created_at
+        - updated_at
+        - title
+        - unit_price_cents
+        - item_type
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort direction
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PaginatedInvoiceItemsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List invoice items (paginated)
+      tags:
+      - Invoice Items
+    post:
+      consumes:
+      - application/json
+      description: Adds a single charge (tuition, hostel, exam, discount, etc.) under
+        a Term.
+      parameters:
+      - description: Item payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateInvoiceItemRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.SingleInvoiceItemResponse'
+        "400":
+          description: Validation failed
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Term not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create an invoice item
+      tags:
+      - Invoice Items
+  /api/invoice-items/{id}:
+    delete:
+      description: Soft-deletes the line item.
+      parameters:
+      - description: Invoice Item UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete an invoice item
+      tags:
+      - Invoice Items
+    get:
+      parameters:
+      - description: Invoice Item UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SingleInvoiceItemResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get an invoice item by ID
+      tags:
+      - Invoice Items
+    patch:
+      consumes:
+      - application/json
+      description: TermID is immutable. To move an item to a different term, delete
+        + recreate.
+      parameters:
+      - description: Invoice Item UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateInvoiceItemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SingleInvoiceItemResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update an invoice item (partial)
+      tags:
+      - Invoice Items
+  /api/invoices:
+    get:
+      description: Admin lists invoices with search, filters, and pagination.
+      parameters:
+      - description: Page number (default 1)
+        in: query
+        minimum: 1
+        name: page
+        type: integer
+      - description: Items per page (default 20, max 100)
+        in: query
+        name: limit
+        type: integer
+      - description: Search by invoice number
+        in: query
+        name: search
+        type: string
+      - description: Filter by status
+        enum:
+        - draft
+        - pending
+        - partial
+        - paid
+        - overdue
+        - cancelled
+        - refunded
+        in: query
+        name: status
+        type: string
+      - description: Filter by student UUID
+        in: query
+        name: student_id
+        type: string
+      - description: Created after (RFC3339)
+        in: query
+        name: from
+        type: string
+      - description: Created before (RFC3339)
+        in: query
+        name: to
+        type: string
+      - description: Sort field
+        enum:
+        - created_at
+        - updated_at
+        - invoice_number
+        - total_cents
+        - status
+        - issued_at
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort direction
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PaginatedInvoicesResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List invoices (paginated)
+      tags:
+      - Invoices
+    post:
+      consumes:
+      - application/json
+      description: Admin creates a new draft invoice.
+      parameters:
+      - description: Invoice payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateInvoiceRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.SingleInvoiceResponse'
+        "400":
+          description: Validation failed
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create an invoice
+      tags:
+      - Invoices
+  /api/invoices/{id}:
+    delete:
+      description: Only draft or cancelled invoices can be deleted.
+      parameters:
+      - description: Invoice UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "409":
+          description: Invoice not deletable
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete an invoice (soft)
+      tags:
+      - Invoices
+    get:
+      description: Returns the invoice with line items and payment history.
+      parameters:
+      - description: Invoice UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SingleInvoiceResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get an invoice by ID
+      tags:
+      - Invoices
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Invoice UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateInvoiceRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SingleInvoiceResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "409":
+          description: Invoice not editable
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update an invoice (partial)
+      tags:
+      - Invoices
+  /api/invoices/{id}/recalculate:
+    post:
+      description: Recomputes subtotal/tax/total/due from items and payments. Useful
+        after bulk changes.
+      parameters:
+      - description: Invoice UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SingleInvoiceResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Recalculate invoice totals
+      tags:
+      - Invoices
+  /api/invoices/summary:
+    get:
+      description: Returns totals for the admin dashboard.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.InvoiceSummaryResponse'
+      security:
+      - BearerAuth: []
+      summary: Invoice dashboard summary
+      tags:
+      - Invoices
   /api/lesson-reports:
     post:
       consumes:
@@ -10857,6 +12163,528 @@ paths:
       summary: Get modules by scheme of work
       tags:
       - Modules
+  /api/newsletter/campaigns:
+    post:
+      consumes:
+      - application/json
+      description: Admin creates a draft or scheduled newsletter campaign targeting
+        a subscriber audience.
+      parameters:
+      - description: Campaign details
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateCampaignRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.SingleCampaignResponse'
+        "400":
+          description: Validation failed
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a newsletter campaign
+      tags:
+      - Newsletter Campaigns
+  /api/newsletter/campaigns/{id}:
+    delete:
+      parameters:
+      - description: Campaign UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a campaign
+      tags:
+      - Newsletter Campaigns
+    get:
+      parameters:
+      - description: Campaign UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SingleCampaignResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get a campaign by ID
+      tags:
+      - Newsletter Campaigns
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Campaign UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateCampaignRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SingleCampaignResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a campaign (partial)
+      tags:
+      - Newsletter Campaigns
+  /api/newsletter/campaigns/{id}/cancel:
+    post:
+      parameters:
+      - description: Campaign UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SingleCampaignResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Cancel a scheduled campaign
+      tags:
+      - Newsletter Campaigns
+  /api/newsletter/campaigns/{id}/send:
+    post:
+      description: Queues the campaign for immediate delivery to its audience.
+      parameters:
+      - description: Campaign UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/dto.SendCampaignResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "409":
+          description: Already sent or no recipients
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Send a campaign
+      tags:
+      - Newsletter Campaigns
+  /api/newsletter/campaigns/preview:
+    get:
+      description: Returns how many subscribers match the given audience rules, without
+        sending anything.
+      parameters:
+      - description: Audience
+        enum:
+        - all
+        - active
+        - tagged
+        - manual
+        in: query
+        name: audience
+        required: true
+        type: string
+      - description: Tag (when audience=tagged)
+        in: query
+        name: tag
+        type: string
+      - collectionFormat: csv
+        description: Manual subscriber UUIDs (when audience=manual)
+        in: query
+        items:
+          type: string
+        name: manual_ids
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              format: int64
+              type: integer
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Preview audience size
+      tags:
+      - Newsletter Campaigns
+  /api/newsletter/confirm:
+    get:
+      description: Confirms a pending subscriber using the token from the confirmation
+        email.
+      parameters:
+      - description: Confirmation token
+        in: query
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SimpleMessage'
+        "400":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Confirm subscription (link from email)
+      tags:
+      - Newsletter
+  /api/newsletter/stats:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.NewsletterStats'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get newsletter stats
+      tags:
+      - Newsletter Admin
+  /api/newsletter/subscribe:
+    post:
+      consumes:
+      - application/json
+      description: Public endpoint. Adds the email as a pending subscriber and sends
+        a confirmation email.
+      parameters:
+      - description: Subscription details
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SubscribeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.SimpleMessage'
+        "400":
+          description: Invalid payload
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Subscribe to newsletter
+      tags:
+      - Newsletter
+  /api/newsletter/subscribers:
+    get:
+      description: Admin lists all subscribers with optional search, status, and source
+        filters.
+      parameters:
+      - description: Page number (default 1)
+        in: query
+        minimum: 1
+        name: page
+        type: integer
+      - description: Items per page (default 20, max 100)
+        in: query
+        name: limit
+        type: integer
+      - description: Search by email or name
+        in: query
+        name: search
+        type: string
+      - description: Filter by status
+        enum:
+        - pending
+        - subscribed
+        - unsubscribed
+        - bounced
+        - complained
+        in: query
+        name: status
+        type: string
+      - description: Filter by source
+        in: query
+        name: source
+        type: string
+      - description: Sort field
+        enum:
+        - created_at
+        - updated_at
+        - email
+        - status
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort direction
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PaginatedSubscribersResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List subscribers (paginated)
+      tags:
+      - Newsletter Admin
+    post:
+      consumes:
+      - application/json
+      description: Adds a subscriber directly, bypassing double opt-in.
+      parameters:
+      - description: Subscriber details
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AdminCreateSubscriberRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.SingleSubscriberResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "409":
+          description: Email already exists
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Admin creates a subscriber
+      tags:
+      - Newsletter Admin
+  /api/newsletter/subscribers/{id}:
+    delete:
+      parameters:
+      - description: Subscriber UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a subscriber
+      tags:
+      - Newsletter Admin
+    get:
+      parameters:
+      - description: Subscriber UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SingleSubscriberResponse'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get a subscriber by ID
+      tags:
+      - Newsletter Admin
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Subscriber UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AdminUpdateSubscriberRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SingleSubscriberResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a subscriber (partial)
+      tags:
+      - Newsletter Admin
+  /api/newsletter/unsubscribe:
+    get:
+      description: Unsubscribes a subscriber using their unsubscribe token.
+      parameters:
+      - description: Unsubscribe token
+        in: query
+        name: token
+        required: true
+        type: string
+      - description: Optional reason
+        in: query
+        name: reason
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SimpleMessage'
+        "400":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Unsubscribe from newsletter
+      tags:
+      - Newsletter
   /api/notifications:
     get:
       consumes:
@@ -13638,6 +15466,37 @@ paths:
       summary: Get assignments by teacher and grade
       tags:
       - Teacher Subject Assignments
+  /api/term/{term_id}/invoice-items:
+    get:
+      parameters:
+      - description: Term UUID
+        format: uuid
+        in: path
+        name: term_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.InvoiceItemResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List items belonging to a specific term
+      tags:
+      - Invoice Items
   /api/terms:
     get:
       consumes:
@@ -15283,7 +17142,34 @@ paths:
       summary: Category Details with Related Courses
       tags:
       - Categories
-  /course-materials:
+  /course-materials/{id}:
+    get:
+      description: Get course material with module and topic details
+      parameters:
+      - description: Course Material ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CourseMaterialViewResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.NotFoundResponse'
+      summary: Get course material details
+      tags:
+      - Course Materials
+  /course-materials/fetch:
     get:
       description: Get all course materials, optionally filtered by course, module,
         or topic
@@ -15324,14 +17210,38 @@ paths:
       summary: Get course materials
       tags:
       - Course Materials
-  /course-materials/{id}:
+  /courses:
     get:
-      description: Get course material with module and topic details
+      description: Retrieve all courses available in the system. Supports pagination,
+        search, and filters.
       parameters:
-      - description: Course Material ID
-        in: path
-        name: id
-        required: true
+      - description: Page number (default 1)
+        in: query
+        name: page
+        type: integer
+      - description: Items per page (default 20, max 100)
+        in: query
+        name: limit
+        type: integer
+      - description: Search in title, code, description
+        in: query
+        name: search
+        type: string
+      - description: Filter by status
+        enum:
+        - draft
+        - published
+        - archived
+        in: query
+        name: status
+        type: string
+      - description: Filter by level
+        enum:
+        - beginner
+        - intermediate
+        - advanced
+        in: query
+        name: level
         type: string
       produces:
       - application/json
@@ -15339,30 +17249,8 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.CourseMaterialViewResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.NotFoundResponse'
-      summary: Get course material details
-      tags:
-      - Course Materials
-  /courses:
-    get:
-      description: Retrieve all courses available in the system
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/controllers.CourseResponse'
-            type: array
+            additionalProperties: true
+            type: object
         "500":
           description: Failed to fetch courses
           schema:
@@ -15377,6 +17265,7 @@ paths:
       description: Retrieve details of a specific course using its ID
       parameters:
       - description: Course ID
+        format: uuid
         in: path
         name: id
         required: true
@@ -15409,6 +17298,7 @@ paths:
         table
       parameters:
       - description: Course ID
+        format: uuid
         in: path
         name: id
         required: true
@@ -15439,7 +17329,32 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: Get Products related to a course ID
+      summary: Get products related to a course
+      tags:
+      - Courses
+  /courses/slug/{slug}:
+    get:
+      description: Retrieve a course by its URL-friendly slug.
+      parameters:
+      - description: Course slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.CourseResponse'
+        "404":
+          description: Course not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a course by slug
       tags:
       - Courses
   /products:
@@ -15529,7 +17444,7 @@ paths:
       tags:
       - Products
 schemes:
-- https
+- http
 securityDefinitions:
   BearerAuth:
     description: Type "Bearer" followed by a space and JWT token.

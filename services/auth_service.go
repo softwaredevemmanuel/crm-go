@@ -6,22 +6,27 @@ import (
 	"encoding/hex"
 	"errors"
 	"time"
-
 	"crm-go/dto"
 	"crm-go/models"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"os"
+	
 )
+
+type EmailSender interface {
+	SendVerificationEmail(email, firstName, lastName, token, frontendURL string) error
+	SendPasswordResetEmail(email, firstName, lastName, token, frontendURL string) error
+}
 
 type AuthService struct {
 	db           *gorm.DB
-	emailService *EmailService
+	emailService EmailSender
 	frontendURL  string
 }
 
-func NewAuthService(db *gorm.DB, emailService *EmailService) *AuthService {
+func NewAuthService(db *gorm.DB, emailService EmailSender) *AuthService {
 	frontendURL := os.Getenv("FRONTEND_URL")
 	if frontendURL == "" {
 		frontendURL = "http://localhost:3000"

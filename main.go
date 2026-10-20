@@ -6,6 +6,7 @@ import (
 	"crm-go/database/seeds"
 	"crm-go/middleware"
 	"crm-go/routes"
+	"crm-go/utils"
 	"flag"
 	"github.com/gin-contrib/cors"
 	"log"
@@ -30,9 +31,9 @@ import (
 // @license.name MIT
 // @license.url https://opensource.org/licenses/MIT
 
-// @host seahorse-app-hp47q.ondigitalocean.app
+// @host localhost:8080
 // @BasePath /
-// @schemes https
+// @schemes http
 
 // @securityDefinitions.apikey BearerAuth
 // @in header
@@ -150,6 +151,11 @@ func main() {
 	routes.InventoryAuditRoutes(&r.RouterGroup, config.DB)
 	routes.UploadRoutes(&r.RouterGroup, config.DB)
 	routes.WalletRoutes(&r.RouterGroup, config.DB, flutterwaveSecretKey)
+	routes.NewsletterRoutes(&r.RouterGroup, config.DB, utils.EmailService{}, middleware.AuthMiddleware())
+	routes.NewsletterCampaignRoutes(&r.RouterGroup, config.DB, utils.EmailService{}, middleware.AuthMiddleware())
+	routes.InvoiceItemRoutes(&r.RouterGroup, config.DB)
+	routes.InvoiceRoutes(&r.RouterGroup, config.DB)
+
 
 	// Example curl command to clear DB (replace with your server address):
 	// curl -X DELETE "http://localhost:8080/admin/clear-db" \
@@ -238,10 +244,14 @@ func main() {
 }
 
 func SetupSwagger(r *gin.Engine) {
-	url := "https://seahorse-app-hp47q.ondigitalocean.app/swagger/doc.json" // your swagger.json
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler,
-		ginSwagger.URL(url),
+	// Serve generated Swagger specification
+	r.StaticFile("/swagger-spec.json", "./docs/swagger.json")
+
+	// Swagger UI
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(
+		swaggerFiles.Handler,
+		ginSwagger.URL("/swagger-spec.json"),
 		ginSwagger.DefaultModelsExpandDepth(-1),
-		ginSwagger.PersistAuthorization(true), // 👈 keeps token after refresh
+		ginSwagger.PersistAuthorization(true),
 	))
 }

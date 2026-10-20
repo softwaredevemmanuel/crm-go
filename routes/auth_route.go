@@ -7,10 +7,11 @@ import (
 
 	"crm-go/controllers/authentication"
 	"crm-go/services"
+	"crm-go/utils"
 )
 
 func AuthRoutes(router *gin.RouterGroup, db *gorm.DB) {
-	emailService := services.NewEmailService()
+	emailService := utils.NewEmailService()
 	authService := services.NewAuthService(db, emailService)
 	authController := controllers.NewAuthController(authService)
 
