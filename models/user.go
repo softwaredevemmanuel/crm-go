@@ -9,7 +9,6 @@ import (
 )
 
 
-
 type User struct {
 	ID         uuid.UUID      `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
 	FirstName  string         `gorm:"type:varchar(100);not null" json:"first_name"`

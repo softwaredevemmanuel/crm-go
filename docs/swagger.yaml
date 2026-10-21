@@ -1632,6 +1632,16 @@ definitions:
         type: array
       notes:
         type: string
+      status:
+        enum:
+        - draft
+        - pending
+        - partial
+        - paid
+        - overdue
+        - cancelled
+        - refunded
+        type: string
       student_id:
         type: string
       tax_label:
@@ -1853,6 +1863,46 @@ definitions:
         type: integer
     required:
     - option_text
+    type: object
+  dto.CreatePaymentRequest:
+    properties:
+      amount_cents:
+        type: integer
+      instalment_no:
+        minimum: 0
+        type: integer
+      instalment_total:
+        minimum: 0
+        type: integer
+      is_instalment:
+        type: boolean
+      method:
+        enum:
+        - card
+        - bank_transfer
+        - cash
+        - wallet
+        - paystack
+        - flutterwave
+        - stripe
+        - cheque
+        type: string
+      notes:
+        maxLength: 5000
+        type: string
+      paid_at:
+        description: optional RFC3339 — defaults to now if status=succeeded
+        type: string
+      status:
+        description: defaults to succeeded
+        enum:
+        - pending
+        - succeeded
+        - failed
+        type: string
+    required:
+    - amount_cents
+    - method
     type: object
   dto.CreateSchemeOfWorkRequest:
     properties:
@@ -2140,8 +2190,6 @@ definitions:
     type: object
   dto.InvoiceItemResponse:
     properties:
-      created_at:
-        type: string
       description:
         type: string
       discount_cents:
@@ -2154,9 +2202,6 @@ definitions:
         type: string
       item_type:
         type: string
-      line_total_cents:
-        description: derived, never stored
-        type: integer
       notes:
         type: string
       quantity:
@@ -2166,15 +2211,13 @@ definitions:
       term:
         allOf:
         - $ref: '#/definitions/dto.TermMiniResponse'
-        description: populated when preloaded
+        description: <-- Add this!
       term_id:
         type: string
       title:
         type: string
       unit_price_cents:
         type: integer
-      updated_at:
-        type: string
     type: object
   dto.InvoiceResponse:
     properties:
@@ -2216,6 +2259,8 @@ definitions:
         type: string
       status:
         type: string
+      student:
+        $ref: '#/definitions/dto.StudentMiniResponse'
       student_id:
         type: string
       subtotal_cents:
@@ -2489,6 +2534,21 @@ definitions:
       total_pages:
         type: integer
     type: object
+  dto.PaginatedPaymentsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.PaymentResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
   dto.PaginatedSubscribersResponse:
     properties:
       data:
@@ -2503,6 +2563,35 @@ definitions:
         type: integer
       total_pages:
         type: integer
+    type: object
+  dto.PaymentResponse:
+    properties:
+      amount_cents:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: string
+      instalment_no:
+        type: integer
+      instalment_total:
+        type: integer
+      invoice_id:
+        type: string
+      is_instalment:
+        type: boolean
+      method:
+        type: string
+      notes:
+        type: string
+      paid_at:
+        type: string
+      recorded_by:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
     type: object
   dto.RejectInventoryAuditRequest:
     properties:
@@ -2680,6 +2769,11 @@ definitions:
         description: Use interface to allow model with preloaded items/payments if
           needed
     type: object
+  dto.SinglePaymentResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.PaymentResponse'
+    type: object
   dto.SingleSubscriberResponse:
     properties:
       data:
@@ -2729,6 +2823,17 @@ definitions:
       student_id:
         type: string
       updated_at:
+        type: string
+    type: object
+  dto.StudentMiniResponse:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      last_name:
         type: string
     type: object
   dto.SubjectListResponse:
@@ -2907,6 +3012,8 @@ definitions:
     type: object
   dto.TermMiniResponse:
     properties:
+      description:
+        type: string
       end_date:
         type: string
       id:
@@ -3461,6 +3568,11 @@ definitions:
         type: string
       due_at:
         type: string
+      item_ids:
+        items:
+          type: string
+        minItems: 1
+        type: array
       notes:
         type: string
       pdf_url:
@@ -3486,6 +3598,8 @@ definitions:
         type: number
       terms:
         type: string
+    required:
+    - item_ids
     type: object
   dto.UpdateLessonReportRequest:
     properties:
@@ -3621,6 +3735,31 @@ definitions:
         type: integer
     required:
     - option_text
+    type: object
+  dto.UpdatePaymentRequest:
+    properties:
+      method:
+        enum:
+        - card
+        - bank_transfer
+        - cash
+        - wallet
+        - paystack
+        - flutterwave
+        - stripe
+        - cheque
+        type: string
+      notes:
+        maxLength: 5000
+        type: string
+      status:
+        enum:
+        - pending
+        - succeeded
+        - failed
+        - refunded
+        - partial_refund
+        type: string
     type: object
   dto.UpdateSchemeOfWorkRequest:
     properties:
@@ -11039,6 +11178,66 @@ paths:
       summary: Update an invoice (partial)
       tags:
       - Invoices
+  /api/invoices/{id}/payments:
+    get:
+      parameters:
+      - description: Invoice UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List payments for a specific invoice
+      tags:
+      - Payments
+    post:
+      consumes:
+      - application/json
+      description: Supports partial and instalment payments. Automatically recomputes
+        the invoice totals and status.
+      parameters:
+      - description: Invoice UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Payment payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreatePaymentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.SinglePaymentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Invoice not found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Record a payment against an invoice
+      tags:
+      - Payments
   /api/invoices/{id}/recalculate:
     post:
       description: Recomputes subtotal/tax/total/due from items and payments. Useful
@@ -13439,6 +13638,109 @@ paths:
       summary: Get questions by topic
       tags:
       - Objective Questions
+  /api/payments:
+    get:
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - description: Filter by method
+        in: query
+        name: method
+        type: string
+      - description: Filter by invoice UUID
+        in: query
+        name: invoice_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PaginatedPaymentsResponse'
+      security:
+      - BearerAuth: []
+      summary: List payments (paginated)
+      tags:
+      - Payments
+  /api/payments/{id}:
+    delete:
+      description: Hard deletes the payment and recomputes the parent invoice.
+      parameters:
+      - description: Payment UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      security:
+      - BearerAuth: []
+      summary: Delete a payment
+      tags:
+      - Payments
+    get:
+      parameters:
+      - description: Payment UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SinglePaymentResponse'
+      security:
+      - BearerAuth: []
+      summary: Get a payment by ID
+      tags:
+      - Payments
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Payment UUID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdatePaymentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SinglePaymentResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a payment (status/notes)
+      tags:
+      - Payments
   /api/products:
     post:
       consumes:

@@ -54,7 +54,7 @@ func (ctrl *InvoiceItemController) CreateInvoiceItem(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, dto.SingleInvoiceItemResponse{
-		Data: dto.FromInvoiceItemModel(item, true),
+		Data: dto.FromInvoiceItemModel(item),
 	})
 }
 
@@ -90,7 +90,7 @@ func (ctrl *InvoiceItemController) ListInvoiceItems(c *gin.Context) {
 
 	resp := make([]dto.InvoiceItemResponse, 0, len(items))
 	for i := range items {
-		resp = append(resp, dto.FromInvoiceItemModel(&items[i], true))
+		resp = append(resp, dto.FromInvoiceItemModel(&items[i]))
 	}
 	totalPages := int((total + int64(q.Limit) - 1) / int64(q.Limit))
 
@@ -132,7 +132,7 @@ func (ctrl *InvoiceItemController) GetInvoiceItem(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dto.SingleInvoiceItemResponse{
-		Data: dto.FromInvoiceItemModel(item, true),
+		Data: dto.FromInvoiceItemModel(item),
 	})
 }
 
@@ -162,7 +162,7 @@ func (ctrl *InvoiceItemController) ListInvoiceItemsByTerm(c *gin.Context) {
 
 	resp := make([]dto.InvoiceItemResponse, 0, len(items))
 	for i := range items {
-		resp = append(resp, dto.FromInvoiceItemModel(&items[i], true))
+		resp = append(resp, dto.FromInvoiceItemModel(&items[i]))
 	}
 	c.JSON(http.StatusOK, gin.H{"data": resp})
 }
@@ -209,7 +209,7 @@ func (ctrl *InvoiceItemController) UpdateInvoiceItem(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dto.SingleInvoiceItemResponse{
-		Data: dto.FromInvoiceItemModel(item, true),
+		Data: dto.FromInvoiceItemModel(item),
 	})
 }
 

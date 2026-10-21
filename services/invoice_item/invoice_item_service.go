@@ -26,23 +26,49 @@ func NewInvoiceItemService(db *gorm.DB) *InvoiceItemService {
 }
 
 // ---------- Create ----------
-func (s *InvoiceItemService) Create(req dto.CreateInvoiceItemRequest) (*models.InvoiceItem, error) {
-	// Validate parent term exists
+func (s *InvoiceItemService) Create(req dto.CreateInvoiceItemRequest,) (*models.InvoiceItem, error) {
+	// Validate parent term exists.
 	var count int64
 	if err := s.DB.Model(&models.Term{}).
 		Where("id = ?", req.TermID).
 		Count(&count).Error; err != nil {
 		return nil, err
 	}
+
 	if count == 0 {
 		return nil, ErrTermNotFound
 	}
 
+	title := strings.TrimSpace(req.Title)
+	itemType := models.InvoiceItemType(req.ItemType)
+
+	// Check for duplicate item type, term, and title.
+	var existing models.InvoiceItem
+	err := s.DB.
+		Where(
+			"item_type = ? AND term_id = ? AND LOWER(TRIM(title)) = LOWER(?) AND LOWER(TRIM(description)) = LOWER(?)",
+			itemType,
+			req.TermID,
+			title,
+			strings.TrimSpace(req.Description),
+		).
+		First(&existing).Error
+
+	if err == nil {
+		return nil, errors.New(
+			"an invoice item with this type and title already exists for this term",
+		)
+	}
+
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+
 	item := &models.InvoiceItem{
 		TermID:          req.TermID,
-		ItemType:        models.InvoiceItemType(req.ItemType),
-		Title:           strings.TrimSpace(req.Title),
-		Description:     req.Description,
+		ItemType:        itemType,
+		Title:           title,
+		Description:     strings.TrimSpace(req.Description),
 		SKU:             strings.TrimSpace(req.SKU),
 		UnitPriceCents:  req.UnitPriceCents,
 		Quantity:        req.Quantity,
@@ -58,7 +84,7 @@ func (s *InvoiceItemService) Create(req dto.CreateInvoiceItemRequest) (*models.I
 		return nil, err
 	}
 
-	// Reload with Term preloaded for response
+	// Reload with Term preloaded for response.
 	return s.GetByID(item.ID)
 }
 
@@ -129,8 +155,13 @@ func (s *InvoiceItemService) List(q dto.ListInvoiceItemsQuery) ([]models.Invoice
 	query = query.Order(fmt.Sprintf("%s %s", sortBy, sortOrder))
 
 	offset := (q.Page - 1) * q.Limit
+	
+	// Execute the query with Preload
 	if err := query.
-		Preload("Term").
+		Preload("Term", func(db *gorm.DB) *gorm.DB {
+			// Optional: Only select the ID and Name columns from the Terms table
+			return db.Select("id", "name", "description") 
+		}).
 		Offset(offset).Limit(q.Limit).
 		Find(&items).Error; err != nil {
 		return nil, 0, err

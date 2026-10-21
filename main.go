@@ -77,7 +77,7 @@ func main() {
 		"https://seahorse-app-hp47q.ondigitalocean.app": true,
 	}
 	r.Use(cors.New(cors.Config{
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Accept", "email", "user_id"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
@@ -155,6 +155,7 @@ func main() {
 	routes.NewsletterCampaignRoutes(&r.RouterGroup, config.DB, utils.EmailService{}, middleware.AuthMiddleware())
 	routes.InvoiceItemRoutes(&r.RouterGroup, config.DB)
 	routes.InvoiceRoutes(&r.RouterGroup, config.DB)
+	routes.PaymentRoutes(&r.RouterGroup, config.DB)
 
 
 	// Example curl command to clear DB (replace with your server address):

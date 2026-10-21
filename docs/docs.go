@@ -10273,6 +10273,98 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/invoices/{id}/payments": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "List payments for a specific invoice",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Invoice UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Supports partial and instalment payments. Automatically recomputes the invoice totals and status.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Record a payment against an invoice",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Invoice UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Payment payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreatePaymentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SinglePaymentResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Invoice not found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/invoices/{id}/recalculate": {
             "post": {
                 "security": [
@@ -13876,6 +13968,170 @@ const docTemplate = `{
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/payments": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "List payments (paginated)",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by method",
+                        "name": "method",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by invoice UUID",
+                        "name": "invoice_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.PaginatedPaymentsResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/payments/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Get a payment by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Payment UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SinglePaymentResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Hard deletes the payment and recomputes the parent invoice.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Delete a payment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Payment UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Update a payment (status/notes)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Payment UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Fields to update",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdatePaymentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SinglePaymentResponse"
                         }
                     }
                 }
@@ -22245,6 +22501,18 @@ const docTemplate = `{
                 "notes": {
                     "type": "string"
                 },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "draft",
+                        "pending",
+                        "partial",
+                        "paid",
+                        "overdue",
+                        "cancelled",
+                        "refunded"
+                    ]
+                },
                 "student_id": {
                     "type": "string"
                 },
@@ -22551,6 +22819,59 @@ const docTemplate = `{
                 },
                 "order": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.CreatePaymentRequest": {
+            "type": "object",
+            "required": [
+                "amount_cents",
+                "method"
+            ],
+            "properties": {
+                "amount_cents": {
+                    "type": "integer"
+                },
+                "instalment_no": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "instalment_total": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "is_instalment": {
+                    "type": "boolean"
+                },
+                "method": {
+                    "type": "string",
+                    "enum": [
+                        "card",
+                        "bank_transfer",
+                        "cash",
+                        "wallet",
+                        "paystack",
+                        "flutterwave",
+                        "stripe",
+                        "cheque"
+                    ]
+                },
+                "notes": {
+                    "type": "string",
+                    "maxLength": 5000
+                },
+                "paid_at": {
+                    "description": "optional RFC3339 — defaults to now if status=succeeded",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "defaults to succeeded",
+                    "type": "string",
+                    "enum": [
+                        "pending",
+                        "succeeded",
+                        "failed"
+                    ]
                 }
             }
         },
@@ -22983,9 +23304,6 @@ const docTemplate = `{
         "dto.InvoiceItemResponse": {
             "type": "object",
             "properties": {
-                "created_at": {
-                    "type": "string"
-                },
                 "description": {
                     "type": "string"
                 },
@@ -23004,10 +23322,6 @@ const docTemplate = `{
                 "item_type": {
                     "type": "string"
                 },
-                "line_total_cents": {
-                    "description": "derived, never stored",
-                    "type": "integer"
-                },
                 "notes": {
                     "type": "string"
                 },
@@ -23018,7 +23332,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "term": {
-                    "description": "populated when preloaded",
+                    "description": "\u003c-- Add this!",
                     "allOf": [
                         {
                             "$ref": "#/definitions/dto.TermMiniResponse"
@@ -23033,9 +23347,6 @@ const docTemplate = `{
                 },
                 "unit_price_cents": {
                     "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
                 }
             }
         },
@@ -23098,6 +23409,9 @@ const docTemplate = `{
                 },
                 "status": {
                     "type": "string"
+                },
+                "student": {
+                    "$ref": "#/definitions/dto.StudentMiniResponse"
                 },
                 "student_id": {
                     "type": "string"
@@ -23518,6 +23832,29 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.PaginatedPaymentsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.PaymentResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.PaginatedSubscribersResponse": {
             "type": "object",
             "properties": {
@@ -23538,6 +23875,50 @@ const docTemplate = `{
                 },
                 "total_pages": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.PaymentResponse": {
+            "type": "object",
+            "properties": {
+                "amount_cents": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "instalment_no": {
+                    "type": "integer"
+                },
+                "instalment_total": {
+                    "type": "integer"
+                },
+                "invoice_id": {
+                    "type": "string"
+                },
+                "is_instalment": {
+                    "type": "boolean"
+                },
+                "method": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "paid_at": {
+                    "type": "string"
+                },
+                "recorded_by": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
         },
@@ -23808,6 +24189,14 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.SinglePaymentResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dto.PaymentResponse"
+                }
+            }
+        },
         "dto.SingleSubscriberResponse": {
             "type": "object",
             "properties": {
@@ -23884,6 +24273,23 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.StudentMiniResponse": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "last_name": {
                     "type": "string"
                 }
             }
@@ -24154,6 +24560,9 @@ const docTemplate = `{
         "dto.TermMiniResponse": {
             "type": "object",
             "properties": {
+                "description": {
+                    "type": "string"
+                },
                 "end_date": {
                     "type": "string"
                 },
@@ -24920,6 +25329,9 @@ const docTemplate = `{
         },
         "dto.UpdateInvoiceRequest": {
             "type": "object",
+            "required": [
+                "item_ids"
+            ],
             "properties": {
                 "currency": {
                     "type": "string"
@@ -24938,6 +25350,13 @@ const docTemplate = `{
                 },
                 "due_at": {
                     "type": "string"
+                },
+                "item_ids": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "notes": {
                     "type": "string"
@@ -25168,6 +25587,38 @@ const docTemplate = `{
                 },
                 "order": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.UpdatePaymentRequest": {
+            "type": "object",
+            "properties": {
+                "method": {
+                    "type": "string",
+                    "enum": [
+                        "card",
+                        "bank_transfer",
+                        "cash",
+                        "wallet",
+                        "paystack",
+                        "flutterwave",
+                        "stripe",
+                        "cheque"
+                    ]
+                },
+                "notes": {
+                    "type": "string",
+                    "maxLength": 5000
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "pending",
+                        "succeeded",
+                        "failed",
+                        "refunded",
+                        "partial_refund"
+                    ]
                 }
             }
         },

@@ -1,8 +1,6 @@
 package dto
 
 import (
-	"time"
-
 	"github.com/google/uuid"
 
 	"crm-go/models"
@@ -42,40 +40,29 @@ type UpdateInvoiceItemRequest struct {
 type TermMiniResponse struct {
 	ID        uuid.UUID `json:"id"`
 	Name      string    `json:"name,omitempty"`
+	Description string    `json:"description,omitempty"`
 	StartDate *string   `json:"start_date,omitempty"`
 	EndDate   *string   `json:"end_date,omitempty"`
 }
 
-// InvoiceItemResponse — API shape returned to the client.
 type InvoiceItemResponse struct {
-	ID              uuid.UUID         `json:"id"`
-	TermID          uuid.UUID         `json:"term_id"`
-	Term            *TermMiniResponse `json:"term,omitempty"` // populated when preloaded
-
-	ItemType        string `json:"item_type"`
-	Title           string `json:"title"`
-	Description     string `json:"description,omitempty"`
-	SKU             string `json:"sku,omitempty"`
-	UnitPriceCents  int64  `json:"unit_price_cents"`
-	Quantity        int    `json:"quantity"`
-	DiscountCents   int64  `json:"discount_cents"`
-	DiscountPercent float64 `json:"discount_percent"`
-	LineTotalCents  int64  `json:"line_total_cents"` // derived, never stored
-	DisplayOrder    int    `json:"display_order"`
-	Notes           string `json:"notes,omitempty"`
-
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID              uuid.UUID        `json:"id"`
+	TermID          uuid.UUID        `json:"term_id"`
+	Term            *TermMiniResponse `json:"term,omitempty"` // <-- Add this!
+	
+	ItemType        string           `json:"item_type"`
+	Title           string           `json:"title"`
+	Description     string           `json:"description,omitempty"`
+	SKU             string           `json:"sku,omitempty"`
+	UnitPriceCents  int64            `json:"unit_price_cents"`
+	Quantity        int              `json:"quantity"`
+	DiscountCents   int64            `json:"discount_cents"`
+	DiscountPercent float64          `json:"discount_percent"`
+	DisplayOrder    int              `json:"display_order"`
+	Notes           string           `json:"notes,omitempty"`
 }
 
-// FromInvoiceItemModel maps the model to the response.
-// Set includeTerm=true to embed the preloaded Term.
-func FromInvoiceItemModel(it *models.InvoiceItem, includeTerm bool) InvoiceItemResponse {
-	lineTotal := it.UnitPriceCents*int64(it.Quantity) - it.DiscountCents
-	if lineTotal < 0 {
-		lineTotal = 0
-	}
-
+func FromInvoiceItemModel(it *models.InvoiceItem) InvoiceItemResponse {
 	resp := InvoiceItemResponse{
 		ID:              it.ID,
 		TermID:          it.TermID,
@@ -87,21 +74,22 @@ func FromInvoiceItemModel(it *models.InvoiceItem, includeTerm bool) InvoiceItemR
 		Quantity:        it.Quantity,
 		DiscountCents:   it.DiscountCents,
 		DiscountPercent: it.DiscountPercent,
-		LineTotalCents:  lineTotal,
 		DisplayOrder:    it.DisplayOrder,
 		Notes:           it.Notes,
-		CreatedAt:       it.CreatedAt,
-		UpdatedAt:       it.UpdatedAt,
 	}
 
-	if includeTerm && it.TermID != uuid.Nil {
-		// InvoiceItem does not carry a loaded Term on the model itself.
-		// The caller can populate resp.Term separately if needed.
-		_ = includeTerm
+	// If the Term was preloaded, map it to the DTO
+	if it.Term.ID != uuid.Nil {
+		resp.Term = &TermMiniResponse{
+			ID:   it.Term.ID,
+			Name: it.Term.Name,
+			Description: it.Term.Description,
+		}
 	}
 
 	return resp
 }
+
 
 // ListInvoiceItemsQuery — filters + pagination.
 type ListInvoiceItemsQuery struct {

@@ -27,8 +27,6 @@ const (
 type InvoiceItem struct {
 	ID        uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
 	TermID    uuid.UUID `gorm:"type:uuid;not null;index" json:"term_id"`
-	InvoiceID *uuid.UUID `gorm:"type:uuid;index" json:"invoice_id,omitempty"`
-
 	// Classification
 	ItemType    InvoiceItemType `gorm:"type:varchar(30);not null;default:'custom';index" json:"item_type"`
 
@@ -60,6 +58,8 @@ type InvoiceItem struct {
 
 	// Relationships
 	Term Term `gorm:"foreignKey:TermID;references:ID" json:"term,omitempty"`
+	Invoices []Invoice `gorm:"many2many:invoice_line_items;" json:"-"`
+
 }
 
 func (InvoiceItem) TableName() string {

@@ -53,58 +53,51 @@ func (s *InvoiceService) nextInvoiceNumber() (string, error) {
 func (s *InvoiceService) Create(req dto.CreateInvoiceRequest, createdBy *uuid.UUID) (*models.Invoice, error) {
 	var inv *models.Invoice
 
-	// Start Transaction
 	err := s.DB.Transaction(func(tx *gorm.DB) error {
-		// 1. Generate Invoice Number
 		num, err := s.nextInvoiceNumber()
 		if err != nil {
 			return err
 		}
 
-		// 2. Find the requested items
-		var items []models.InvoiceItem
-		if err := tx.Where("id IN ?", req.ItemIDs).Find(&items).Error; err != nil {
+		// 1. Find the requested catalog items
+		var catalogItems []models.InvoiceItem
+		if err := tx.Where("id IN ?", req.ItemIDs).Find(&catalogItems).Error; err != nil {
 			return err
 		}
 
-		// Safety check: Ensure all requested items were actually found
-		if len(items) != len(req.ItemIDs) {
+		if len(catalogItems) != len(req.ItemIDs) {
 			return errors.New("one or more invoice items not found")
 		}
 
-		// Safety check: Ensure they are not already tied to another invoice
-		for _, item := range items {
-			if item.InvoiceID != nil {
-				return fmt.Errorf("item %s is already attached to an invoice", item.ID)
-			}
+		// 2. Create the Invoice Header
+		inv = &models.Invoice{
+			InvoiceNumber:  num,
+			Status:         models.InvoiceStatus(req.Status),
+			StudentID:      req.StudentID,
+			Currency:       req.Currency,
+			DiscountCents:  req.DiscountCents,
+			TaxRatePercent: req.TaxRatePercent,
+			TaxLabel:       req.TaxLabel,
+			Notes:          req.Notes,
+			IssuedAt:       time.Now(),
+			CreatedBy:      createdBy,
+			Items:          catalogItems, // <--- Attach the products here!
+		}
+		
+		if req.DueAt != nil && *req.DueAt != "" {
+			t, _ := time.Parse(time.RFC3339, *req.DueAt)
+			inv.DueAt = &t
 		}
 
-		// 3. Create the Invoice
-		inv = &models.Invoice{
-			InvoiceNumber: num,
-			Status:        models.InvoiceDraft,
-			StudentID:     req.StudentID,
-			Currency:      req.Currency,
-			DiscountCents: req.DiscountCents,
-			IssuedAt:      time.Now(),
-			CreatedBy:     createdBy,
-		}
+		// 3. Save the Invoice. 
+		// Because we added `Items`, GORM will automatically:
+		// - Create the Invoice
+		// - Insert rows into `invoice_line_items` linking this invoice to the catalog items
 		if err := tx.Create(inv).Error; err != nil {
 			return err
 		}
 
-		// 4. Attach the items to this new Invoice
-		for i := range items {
-			items[i].InvoiceID = &inv.ID
-		}
-
-		// Save the updated items (GORM updates them based on their IDs)
-		if err := tx.Save(&items).Error; err != nil {
-			return err
-		}
-
-		// 5. Recalculate totals and save
-		inv.Items = items
+		// 4. Recalculate totals
 		inv.RecomputeTotals()
 
 		if err := tx.Save(inv).Error; err != nil {
@@ -121,18 +114,15 @@ func (s *InvoiceService) Create(req dto.CreateInvoiceRequest, createdBy *uuid.UU
 	return inv, nil
 }
 
+
 // ---------- Get ----------
 func (s *InvoiceService) GetByID(id uuid.UUID) (*models.Invoice, error) {
 	var inv models.Invoice
 	err := s.DB.
-		Preload("Items", func(db *gorm.DB) *gorm.DB {
-			return db.Order("display_order ASC, created_at ASC")
-		}).
-		Preload("Payments", func(db *gorm.DB) *gorm.DB {
-			return db.Order("created_at DESC")
-		}).
+		Preload("Student"). // <-- ADD THIS
+		Preload("Items").
+		Preload("Payments").
 		First(&inv, "id = ?", id).Error
-
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, ErrInvoiceNotFound
 	}
@@ -189,9 +179,18 @@ func (s *InvoiceService) List(q dto.ListInvoicesQuery) ([]models.Invoice, int64,
 	query = query.Order(fmt.Sprintf("%s %s", sortBy, order))
 
 	offset := (q.Page - 1) * q.Limit
-	if err := query.Offset(offset).Limit(q.Limit).Find(&invoices).Error; err != nil {
+	
+	// --- HERE IS THE FIX ---
+	// Preload the Student relationship, and optionally only select the columns we need
+	if err := query.
+		Preload("Student", func(db *gorm.DB) *gorm.DB {
+			return db.Select("id", "first_name", "last_name", "email") // Only fetch what we need (optional but good for performance)
+		}).
+		Offset(offset).Limit(q.Limit).
+		Find(&invoices).Error; err != nil {
 		return nil, 0, err
 	}
+	
 	return invoices, total, nil
 }
 
@@ -204,77 +203,115 @@ func (s *InvoiceService) Update(id uuid.UUID, req dto.UpdateInvoiceRequest) (*mo
 
 	// Prevent editing critical fields on paid/cancelled/refunded invoices
 	if inv.Status == models.InvoicePaid || inv.Status == models.InvoiceCancelled || inv.Status == models.InvoiceRefunded {
-		// Allow only certain fields? For now, we block all edits.
 		return nil, ErrInvoiceNotEditable
 	}
 
-	if req.StudentID != nil {
-		inv.StudentID = req.StudentID
-	}
-	if req.Currency != nil {
-		inv.Currency = strings.ToUpper(*req.Currency)
-	}
-	if req.DiscountCents != nil {
-		inv.DiscountCents = *req.DiscountCents
-	}
-	if req.DiscountCode != nil {
-		inv.DiscountCode = *req.DiscountCode
-	}
-	if req.DiscountReason != nil {
-		inv.DiscountReason = *req.DiscountReason
-	}
-	if req.TaxRatePercent != nil {
-		inv.TaxRatePercent = *req.TaxRatePercent
-	}
-	if req.TaxLabel != nil {
-		inv.TaxLabel = *req.TaxLabel
-	}
-	if req.Notes != nil {
-		inv.Notes = *req.Notes
-	}
-	if req.Terms != nil {
-		inv.Terms = *req.Terms
-	}
-	if req.PdfURL != nil {
-		inv.PdfURL = *req.PdfURL
-	}
-	if req.DueAt != nil {
-		if *req.DueAt == "" {
-			inv.DueAt = nil
-		} else {
-			t, err := time.Parse(time.RFC3339, *req.DueAt)
-			if err != nil {
-				return nil, fmt.Errorf("invalid due_at: %w", err)
+	// Start Transaction
+	err = s.DB.Transaction(func(tx *gorm.DB) error {
+		
+		// 1. Update scalar fields
+		if req.StudentID != nil {
+			inv.StudentID = req.StudentID
+		}
+		if req.Currency != nil {
+			inv.Currency = strings.ToUpper(*req.Currency)
+		}
+		if req.DiscountCents != nil {
+			inv.DiscountCents = *req.DiscountCents
+		}
+		if req.DiscountCode != nil {
+			inv.DiscountCode = *req.DiscountCode
+		}
+		if req.DiscountReason != nil {
+			inv.DiscountReason = *req.DiscountReason
+		}
+		if req.TaxRatePercent != nil {
+			inv.TaxRatePercent = *req.TaxRatePercent
+		}
+		if req.TaxLabel != nil {
+			inv.TaxLabel = *req.TaxLabel
+		}
+		if req.Notes != nil {
+			inv.Notes = *req.Notes
+		}
+		if req.Terms != nil {
+			inv.Terms = *req.Terms
+		}
+		if req.PdfURL != nil {
+			inv.PdfURL = *req.PdfURL
+		}
+		if req.DueAt != nil {
+			if *req.DueAt == "" {
+				inv.DueAt = nil
+			} else {
+				t, err := time.Parse(time.RFC3339, *req.DueAt)
+				if err != nil {
+					return fmt.Errorf("invalid due_at: %w", err)
+				}
+				inv.DueAt = &t
 			}
-			inv.DueAt = &t
 		}
-	}
-	if req.Status != nil {
-		newStatus := models.InvoiceStatus(*req.Status)
-		// Auto-manage paidAt if status is set to paid
-		if newStatus == models.InvoicePaid && inv.PaidAt == nil {
-			now := time.Now()
-			inv.PaidAt = &now
+		if req.Status != nil {
+			newStatus := models.InvoiceStatus(*req.Status)
+			// Auto-manage timestamps
+			if newStatus == models.InvoicePaid && inv.PaidAt == nil {
+				now := time.Now()
+				inv.PaidAt = &now
+			}
+			if newStatus == models.InvoiceCancelled && inv.CancelledAt == nil {
+				now := time.Now()
+				inv.CancelledAt = &now
+			}
+			if newStatus == models.InvoiceRefunded && inv.RefundedAt == nil {
+				now := time.Now()
+				inv.RefundedAt = &now
+			}
+			inv.Status = newStatus
 		}
-		if newStatus == models.InvoiceCancelled && inv.CancelledAt == nil {
-			now := time.Now()
-			inv.CancelledAt = &now
-		}
-		if newStatus == models.InvoiceRefunded && inv.RefundedAt == nil {
-			now := time.Now()
-			inv.RefundedAt = &now
-		}
-		inv.Status = newStatus
-	}
 
-	// Recompute totals in case items/payments changed, and check overdue
-	inv.RecomputeTotals()
-	inv.RecomputeStatusIfOverdue()
+		// 2. Handle Items Update (Many-to-Many)
+		// If ItemIDs are provided, we swap the current line items
+		if len(req.ItemIDs) > 0 {
+			// Fetch the new catalog items to attach
+			var newItems []models.InvoiceItem
+			if err := tx.Where("id IN ?", req.ItemIDs).Find(&newItems).Error; err != nil {
+				return err
+			}
+			
+			// Safety check
+			if len(newItems) != len(req.ItemIDs) {
+				return errors.New("one or more invoice items not found")
+			}
 
-	if err := s.DB.Save(inv).Error; err != nil {
+			// Replace the associations. 
+			// GORM will automatically remove old links in the pivot table 
+			// and insert the new ones.
+			if err := tx.Model(inv).Association("Items").Replace(newItems); err != nil {
+				return err
+			}
+			
+			// Set the local struct so RecomputeTotals has the right data
+			inv.Items = newItems
+		}
+
+		// 3. Recompute totals based on the (possibly new) items
+		inv.RecomputeTotals()
+		inv.RecomputeStatusIfOverdue()
+
+		// 4. Save the invoice header (totals, status, etc.)
+		if err := tx.Save(inv).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
 		return nil, err
 	}
-	return inv, nil
+
+	// Reload to ensure all relationships are fresh before returning to the controller
+	return s.GetByID(id)
 }
 
 // ---------- Delete ----------

@@ -11,23 +11,31 @@ import (
 // ============================================================
 // Invoice DTOs
 // ============================================================
+type StudentMiniResponse struct {
+	ID        uuid.UUID `json:"id"`
+	FirstName string    `json:"first_name"`
+	LastName  string    `json:"last_name"`
+	Email     string    `json:"email"`
+}
 
 type CreateInvoiceRequest struct {
-	StudentID      *uuid.UUID `json:"student_id"`
-	ItemIDs []uuid.UUID `json:"item_ids" binding:"required,min=1,dive"`
-	Currency       string     `json:"currency" binding:"omitempty,len=3"`
-	DiscountCents  int64      `json:"discount_cents" binding:"gte=0"`
-	DiscountCode   string     `json:"discount_code" binding:"omitempty,max=50"`
-	DiscountReason string     `json:"discount_reason" binding:"omitempty,max=255"`
-	TaxRatePercent float64    `json:"tax_rate_percent" binding:"gte=0,lte=100"`
-	TaxLabel       string     `json:"tax_label" binding:"omitempty,max=50"`
-	Notes          string     `json:"notes"`
-	Terms          string     `json:"terms"`
-	DueAt          *string    `json:"due_at"` // RFC3339
+	StudentID      *uuid.UUID  `json:"student_id"`
+	ItemIDs        []uuid.UUID `json:"item_ids" binding:"required,min=1,dive"`
+	Status         string      `json:"status" binding:"omitempty,oneof=draft pending partial paid overdue cancelled refunded"`
+	Currency       string      `json:"currency" binding:"omitempty,len=3"`
+	DiscountCents  int64       `json:"discount_cents" binding:"gte=0"`
+	DiscountCode   string      `json:"discount_code" binding:"omitempty,max=50"`
+	DiscountReason string      `json:"discount_reason" binding:"omitempty,max=255"`
+	TaxRatePercent float64     `json:"tax_rate_percent" binding:"gte=0,lte=100"`
+	TaxLabel       string      `json:"tax_label" binding:"omitempty,max=50"`
+	Notes          string      `json:"notes"`
+	Terms          string      `json:"terms"`
+	DueAt          *string     `json:"due_at"` // RFC3339
 }
 
 type UpdateInvoiceRequest struct {
 	StudentID      *uuid.UUID `json:"student_id"`
+	ItemIDs        []uuid.UUID `json:"item_ids" binding:"required,min=1,dive"`
 	Currency       *string    `json:"currency" binding:"omitempty,len=3"`
 	DiscountCents  *int64     `json:"discount_cents" binding:"omitempty,gte=0"`
 	DiscountCode   *string    `json:"discount_code" binding:"omitempty,max=50"`
@@ -42,22 +50,20 @@ type UpdateInvoiceRequest struct {
 }
 
 type InvoiceResponse struct {
-	ID            uuid.UUID  `json:"id"`
-	InvoiceNumber string     `json:"invoice_number"`
-	Status        string     `json:"status"`
-	StudentID     *uuid.UUID `json:"student_id,omitempty"`
-
-	Currency string `json:"currency"`
-
-	SubtotalCents   int64 `json:"subtotal_cents"`
-	DiscountCents   int64 `json:"discount_cents"`
-	TaxCents        int64 `json:"tax_cents"`
-	TotalCents      int64 `json:"total_cents"`
-	AmountPaidCents int64 `json:"amount_paid_cents"`
-	AmountDueCents  int64 `json:"amount_due_cents"`
-
-	TaxRatePercent float64 `json:"tax_rate_percent"`
-	TaxLabel       string  `json:"tax_label,omitempty"`
+	ID              uuid.UUID            `json:"id"`
+	InvoiceNumber   string               `json:"invoice_number"`
+	Status          string               `json:"status"`
+	StudentID       *uuid.UUID           `json:"student_id,omitempty"`
+	Student         *StudentMiniResponse `json:"student,omitempty"`
+	Currency        string               `json:"currency"`
+	SubtotalCents   int64                `json:"subtotal_cents"`
+	DiscountCents   int64                `json:"discount_cents"`
+	TaxCents        int64                `json:"tax_cents"`
+	TotalCents      int64                `json:"total_cents"`
+	AmountPaidCents int64                `json:"amount_paid_cents"`
+	AmountDueCents  int64                `json:"amount_due_cents"`
+	TaxRatePercent  float64              `json:"tax_rate_percent"`
+	TaxLabel        string               `json:"tax_label,omitempty"`
 
 	DiscountCode   string `json:"discount_code,omitempty"`
 	DiscountReason string `json:"discount_reason,omitempty"`
@@ -80,12 +86,12 @@ type InvoiceResponse struct {
 
 	// Embedded relations (populated on single-fetch)
 	// Items/Payments are omitted from the DTO here to avoid circular imports if InvoiceItem DTO is elsewhere.
-	// Include their IDs if you prefer, or use dedicated endpoints. 
+	// Include their IDs if you prefer, or use dedicated endpoints.
 	// For a full invoice, we'll return the model directly in the controller if needed.
 }
 
 func FromInvoiceModel(inv *models.Invoice) InvoiceResponse {
-	return InvoiceResponse{
+	resp := InvoiceResponse{
 		ID:              inv.ID,
 		InvoiceNumber:   inv.InvoiceNumber,
 		Status:          string(inv.Status),
@@ -114,19 +120,30 @@ func FromInvoiceModel(inv *models.Invoice) InvoiceResponse {
 		CreatedAt:       inv.CreatedAt,
 		UpdatedAt:       inv.UpdatedAt,
 	}
+
+	if inv.Student != nil {
+		resp.Student = &StudentMiniResponse{
+			ID:        inv.Student.ID,
+			FirstName: inv.Student.FirstName,
+			LastName:  inv.Student.LastName,
+			Email:     inv.Student.Email,
+		}
+	}
+
+	return resp
 }
 
 // ListInvoicesQuery — filters + pagination.
 type ListInvoicesQuery struct {
-	Page          int    `form:"page,default=1" binding:"min=1"`
-	Limit         int    `form:"limit,default=20" binding:"min=1,max=100"`
-	Search        string `form:"search"`
-	Status        string `form:"status"`
-	StudentID     string `form:"student_id"`
-	From          string `form:"from"` // RFC3339
-	To            string `form:"to"`   // RFC3339
-	SortBy        string `form:"sort_by,default=created_at"`
-	SortOrder     string `form:"sort_order,default=desc"`
+	Page      int    `form:"page,default=1" binding:"min=1"`
+	Limit     int    `form:"limit,default=20" binding:"min=1,max=100"`
+	Search    string `form:"search"`
+	Status    string `form:"status"`
+	StudentID string `form:"student_id"`
+	From      string `form:"from"` // RFC3339
+	To        string `form:"to"`   // RFC3339
+	SortBy    string `form:"sort_by,default=created_at"`
+	SortOrder string `form:"sort_order,default=desc"`
 }
 
 type SingleInvoiceResponse struct {
@@ -148,4 +165,3 @@ type InvoiceSummaryResponse struct {
 	TotalDueCents    int64 `json:"total_due_cents"`
 	OverdueCount     int64 `json:"overdue_count"`
 }
-

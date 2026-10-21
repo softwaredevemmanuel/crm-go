@@ -62,9 +62,9 @@ type Invoice struct {
 	CreatedBy *uuid.UUID `gorm:"type:uuid" json:"created_by,omitempty"`
 
 	// Relationships
-	Items []InvoiceItem `gorm:"foreignKey:InvoiceID;references:ID" json:"items,omitempty"`
+	Items []InvoiceItem `gorm:"many2many:invoice_line_items;" json:"items,omitempty"`
 	Payments []Payment     `gorm:"foreignKey:InvoiceID;constraint:OnDelete:CASCADE;" json:"payments,omitempty"`
-
+   	Student *User `gorm:"foreignKey:StudentID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"student,omitempty"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
