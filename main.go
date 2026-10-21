@@ -156,6 +156,7 @@ func main() {
 	routes.InvoiceItemRoutes(&r.RouterGroup, config.DB)
 	routes.InvoiceRoutes(&r.RouterGroup, config.DB)
 	routes.PaymentRoutes(&r.RouterGroup, config.DB)
+	routes.UpskillProgramRoutes(&r.RouterGroup, config.DB)
 
 
 	// Example curl command to clear DB (replace with your server address):

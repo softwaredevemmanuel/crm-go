@@ -1020,6 +1020,21 @@ definitions:
       notes:
         type: string
     type: object
+  dto.CourseMiniResponse:
+    properties:
+      code:
+        type: string
+      id:
+        type: string
+      level:
+        type: string
+      slug:
+        type: string
+      thumbnail_url:
+        type: string
+      title:
+        type: string
+    type: object
   dto.CreateAcademicSessionRequest:
     properties:
       academic_year:
@@ -2026,6 +2041,27 @@ definitions:
     - module_id
     - title
     type: object
+  dto.CreateUpskillProgramRequest:
+    properties:
+      courses:
+        items:
+          $ref: '#/definitions/dto.ProgramCourseInput'
+        type: array
+      description:
+        maxLength: 5000
+        type: string
+      is_active:
+        type: boolean
+      name:
+        maxLength: 150
+        minLength: 2
+        type: string
+      slug:
+        maxLength: 150
+        type: string
+    required:
+    - name
+    type: object
   dto.DepartmentResponse:
     properties:
       code:
@@ -2564,6 +2600,21 @@ definitions:
       total_pages:
         type: integer
     type: object
+  dto.PaginatedUpskillProgramsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.UpskillProgramResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
   dto.PaymentResponse:
     properties:
       amount_cents:
@@ -2592,6 +2643,31 @@ definitions:
         type: string
       updated_at:
         type: string
+    type: object
+  dto.ProgramCourseInput:
+    properties:
+      course_id:
+        type: string
+      course_order:
+        minimum: 1
+        type: integer
+      is_required:
+        type: boolean
+    required:
+    - course_id
+    type: object
+  dto.ProgramCourseResponse:
+    properties:
+      course:
+        $ref: '#/definitions/dto.CourseMiniResponse'
+      course_id:
+        type: string
+      course_order:
+        type: integer
+      id:
+        type: string
+      is_required:
+        type: boolean
     type: object
   dto.RejectInventoryAuditRequest:
     properties:
@@ -2778,6 +2854,11 @@ definitions:
     properties:
       data:
         $ref: '#/definitions/dto.SubscriberResponse'
+    type: object
+  dto.SingleUpskillProgramResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.UpskillProgramResponse'
     type: object
   dto.StudentEnrollmentListResponse:
     properties:
@@ -3848,6 +3929,25 @@ definitions:
       topic_order:
         type: integer
     type: object
+  dto.UpdateUpskillProgramRequest:
+    properties:
+      courses:
+        items:
+          $ref: '#/definitions/dto.ProgramCourseInput'
+        type: array
+      description:
+        maxLength: 5000
+        type: string
+      is_active:
+        type: boolean
+      name:
+        maxLength: 150
+        minLength: 2
+        type: string
+      slug:
+        maxLength: 150
+        type: string
+    type: object
   dto.UpdateUserRequest:
     properties:
       first_name:
@@ -3889,6 +3989,27 @@ definitions:
         enum:
         - active
         - inactive
+        type: string
+    type: object
+  dto.UpskillProgramResponse:
+    properties:
+      courses:
+        items:
+          $ref: '#/definitions/dto.ProgramCourseResponse'
+        type: array
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      slug:
+        type: string
+      updated_at:
         type: string
     type: object
   dto.UserListResponse:
@@ -16563,6 +16684,292 @@ paths:
       summary: List all transactions
       tags:
       - Transactions
+  /api/upskill-programs:
+    get:
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Search by name or description
+        in: query
+        name: search
+        type: string
+      - description: Filter by active status
+        enum:
+        - "true"
+        - "false"
+        in: query
+        name: is_active
+        type: string
+      - description: Sort field
+        enum:
+        - created_at
+        - updated_at
+        - name
+        - is_active
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort direction
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PaginatedUpskillProgramsResponse'
+      security:
+      - BearerAuth: []
+      summary: List upskill programs (paginated)
+      tags:
+      - Upskill Programs
+    post:
+      consumes:
+      - application/json
+      description: Creates an upskill program with an optional initial set of courses.
+      parameters:
+      - description: Program payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateUpskillProgramRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.SingleUpskillProgramResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "409":
+          description: Name already exists
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new upskill program
+      tags:
+      - Upskill Programs
+  /api/upskill-programs/{id}:
+    delete:
+      parameters:
+      - description: Program UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete an upskill program
+      tags:
+      - Upskill Programs
+    get:
+      parameters:
+      - description: Program UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SingleUpskillProgramResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get an upskill program by ID
+      tags:
+      - Upskill Programs
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Program UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateUpskillProgramRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SingleUpskillProgramResponse'
+      security:
+      - BearerAuth: []
+      summary: Update an upskill program (partial)
+      tags:
+      - Upskill Programs
+  /api/upskill-programs/{id}/active:
+    patch:
+      parameters:
+      - description: Program UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Active state
+        in: query
+        name: active
+        required: true
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SingleUpskillProgramResponse'
+      security:
+      - BearerAuth: []
+      summary: Toggle active status
+      tags:
+      - Upskill Programs
+  /api/upskill-programs/{id}/courses:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Program UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Course to add
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProgramCourseInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SingleUpskillProgramResponse'
+      security:
+      - BearerAuth: []
+      summary: Add a course to a program
+      tags:
+      - Upskill Programs
+  /api/upskill-programs/{id}/courses/{course_id}:
+    delete:
+      parameters:
+      - description: Program UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Course UUID
+        in: path
+        name: course_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SingleUpskillProgramResponse'
+      security:
+      - BearerAuth: []
+      summary: Remove a course from a program
+      tags:
+      - Upskill Programs
+  /api/upskill-programs/{id}/courses/reorder:
+    post:
+      consumes:
+      - application/json
+      description: Provide a JSON body with the ordered list of course IDs.
+      parameters:
+      - description: Program UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Ordered course IDs
+        in: body
+        name: payload
+        required: true
+        schema:
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SingleUpskillProgramResponse'
+      security:
+      - BearerAuth: []
+      summary: Reorder the courses within a program
+      tags:
+      - Upskill Programs
+  /api/upskill-programs/slug/{slug}:
+    get:
+      parameters:
+      - description: Program slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SingleUpskillProgramResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Get an upskill program by slug
+      tags:
+      - Upskill Programs
   /api/users:
     get:
       consumes:
